@@ -1,0 +1,6 @@
+
+  .tooltipBg{
+     --bs-tooltip-bg:transparent !important;
+     background-color:transparent !important;
+     z-index: 1080;
+}

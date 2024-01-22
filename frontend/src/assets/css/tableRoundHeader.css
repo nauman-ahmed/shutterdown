@@ -1,0 +1,20 @@
+.tableViewClient td:first-child {
+     border-left-style: solid;
+     border-bottom-left-radius: 10px;
+     border-top-left-radius: 10px;
+}
+
+.tableViewClient td:last-child {
+     border-right-style: solid;
+     border-bottom-right-radius: 10px;
+     border-top-right-radius: 10px;
+}
+
+.dateInput {
+     background-color: transparent;
+     color: #8077ff;
+     padding: 7px;
+     border: none;
+     outline: none;
+     width: 80%;
+}

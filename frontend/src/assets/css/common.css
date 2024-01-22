@@ -1,0 +1,1251 @@
+:root {
+    --primaryColor: #666DFF;
+    --primaryHover: #969bf8;
+    --blackColor: #000000;
+    --greyColor: #ABABAB;
+    --placeholderColor: #131313;
+    --sideBar: #EDEEF7;
+    --sideBarColor: #AEAEAE;
+}
+
+
+@font-face {
+    font-family: "Roboto Regular";
+    src: url("../fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Medium";
+    src: url("../fonts/Roboto-Medium.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Light";
+    src: url("../fonts/Roboto-Light.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Bold";
+    src: url("../fonts/Roboto-Bold.ttf");
+}
+
+
+.row {
+    --bs-gutter-x: 0 !important
+}
+
+.loginContainer {
+    margin-left: 50px;
+    height: 100vh;
+}
+
+.padding_left {
+    margin-left: 80px
+}
+
+.padding_left_signup {
+    margin-left: 10px
+}
+
+.heading {
+    color: var(--blackColor);
+    font-family: 'Roboto Medium';
+    font-size: 25px;
+}
+
+.subheading {
+    color: var(--greyColor);
+    font-family: 'Roboto Regular';
+    font-size: 12px;
+}
+
+.input_lbl {
+    color: var(--blackColor);
+    font-family: 'Roboto Regular';
+    font-size: 12px;
+}
+
+input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: var(--placeholderColor);
+    opacity: 1;
+    /* Firefox */
+}
+
+.input_div {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    width: 35vw;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.input_field {
+    width: 33vw;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+Label {
+    font-family: 'Roboto Medium';
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.input_banner_img {
+    background-image: url('../../../public/images/banner.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right bottom;
+    height: 99vh;
+    margin-top: 6px;
+    margin-right: 10px;
+    /* background-attachment: fixed; */
+}
+
+.signup_banner_img {
+    background-image: url('../../../public/images/signup_banner.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    height: 100vh;
+    background-size: contain;
+}
+
+.reset_banner_img {
+    background-image: url('../../../public/images/reset_banner.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    height: 100vh;
+    background-size: contain;
+}
+
+.full_view_login {
+    width: 35vw;
+}
+
+.transparent_btn {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Roboto Medium';
+    font-size: 10px;
+    margin-top: -7px;
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--primaryColor) !important;
+    --bs-btn-hover-bg: var(--primaryHover) !important;
+}
+
+.btn {
+    --bs-btn-font-family: 'Roboto Regular' !important;
+    --bs-btn-border-width: 1.5px;
+
+}
+
+.btn-outline-secondary {
+    --bs-btn-border-color: var(--greyColor) !important;
+    --bs-btn-color: var(--blackColor) !important
+}
+
+.submit_btn {
+    --bs-btn-bg: var(--primaryColor);
+    width: 35vw;
+    border-radius: 10px;
+    height: 45px;
+    font-family: 'Roboto Regular';
+    color: white
+}
+
+.Update_btn {
+    font-size: 16px;
+    padding: 6px 12px 6px 12px;
+    font-family: 'Roboto Regular';
+    color: white;
+    background-color: #666FDD;
+    border: none;
+}
+
+.add_album {
+    --bs-btn-bg: var(--primaryColor);
+    /* width: 35px; */
+    border-radius: 10px;
+    height: 35px;
+    font-family: 'Roboto Regular';
+    color: white
+}
+
+.album {
+    width: 100px;
+}
+
+.shootDetailsBtn {
+    --bs-btn-bg: transparent !important;
+    color: #040A80 !important;
+    width: 13vw !important;
+}
+
+.summary {
+    border-radius: 14px 0px 14px 0px !important;
+    --bs-btn-font-size: 1.2rem !important;
+    --bs-btn-font-weight: 600 !important;
+    --bs-btn-border-width: 0px !important;
+}
+
+.cancelBtn {
+    --bs-btn-bg: #EFF0F5 !important;
+    color: #C1C1C1 !important;
+    border: white;
+    --bs-btn-border-width: 0px !important;
+}
+
+.submit {
+    width: 10vw;
+}
+
+
+
+.bottom_width {
+    width: 35vw;
+    text-align: center;
+}
+
+
+/********************* Register  ***********************/
+
+.input_div_signup {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    width: 100%;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.input_field_signup {
+    width: 90%;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.space_between {
+    margin-left: 20px;
+}
+
+.PhoneInput {
+    padding-top: 12px !important;
+}
+
+.PhoneInputInput {
+    border: none;
+    text-decoration: none;
+    outline: none;
+    font-family: 'Roboto Medium';
+    font-size: 12px;
+}
+
+.grey_color {
+    color: var(--greyColor)
+}
+
+.signup_submit_btn {
+    width: 42.5vw;
+}
+
+.bottom_width_signup {
+    text-align: center;
+    width: 42.5vw;
+
+}
+
+.full_view_container {
+    max-width: 100%;
+}
+
+/********************* Register End ***********************/
+
+
+/******************** Rest Password Start ****************/
+.reset_input_div {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    width: 22vw;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.reset_input_field {
+    width: 20vw;
+    height: 45px;
+    font-family: 'Roboto Medium';
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+/******************* Reset Password End *****************/
+
+.set_header_width {
+    margin-left: 250px;
+
+}
+
+.main_content {
+    padding-left: 18.4vw;
+    margin-top: 90px;
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+
+
+
+.mobile_view_header {
+    display: none !important;
+}
+
+.hide_nav_profile_ {
+    display: none !important
+}
+
+
+/********************* Text styles ***********************/
+
+.Text20Semi {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 20px;
+    line-height: 23px;
+    color: #131313;
+}
+
+.Text12Semi {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: #AEAEAE;
+}
+
+.Text14Semi {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 14px;
+    color: #131313;
+}
+
+.Text14 {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 14px;
+    color: #131313;
+}
+
+.Text12 {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 12px;
+    color: #000000;
+}
+
+.Text16N {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 16px;
+    color: #131313;
+}
+
+.Text16N1 {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 16px;
+    color: #131313;
+}
+
+.Text10N {
+    font-size: 10px;
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    color: #131313;
+}
+
+.Text10S {
+    font-size: 10px;
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    color: #131313;
+}
+
+.Text18S {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 18px;
+    line-height: 21px;
+    color: #000000;
+}
+
+.Text8S {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 8px;
+    line-height: 9px;
+    color: #FFFFFF;
+}
+
+.Text6S {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 6px;
+    line-height: 7px;
+    color: #AEAEAE;
+}
+
+
+.Text50Semi {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 50px;
+    line-height: 59px;
+    color: #000000;
+}
+
+.Text24Semi {
+    font-family: 'Roboto Medium';
+    font-style: normal;
+    font-size: 24px;
+    color: #000000;
+}
+
+.Text35R {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 35px;
+    color: #000000;
+}
+
+/********************* DropDown styles ***********************/
+
+.DropDownBox {
+    background: #666DFF;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+    border-radius: 10px !important;
+    border-width: 0px !important;
+}
+
+.DropDownBox2 {
+    background: #666DFF;
+    color: white !important;
+    --bs-btn-hover-bg: #666DFF !important;
+    border-radius: 4px !important;
+    border-width: 0px !important;
+    --bs-btn-padding-y: 0rem !important;
+    --bs-btn-padding-x: 0.4rem !important;
+    --bs-btn-font-size: 0.8rem !important;
+    --bs-btn-line-height: 21.5px !important;
+    --bs-btn-font-weight: 600 !important;
+}
+
+.colorDropDown {
+    background: transparent !important;
+    color: #AEAEAE !important;
+}
+
+.tableDropdwn {
+    background: transparent !important;
+    box-shadow: none !important;
+    --bs-btn-color: #666DFF !important;
+    --bs-btn-font-size: 0.8rem !important;
+}
+
+.dropBox {
+    background: #EFF0F5;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    --bs-btn-bg: #EFF0F5 !important
+}
+
+.dropOpenBox {
+    --bs-btn-bg: #EFF0F5 !important;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    --bs-dropdown-border-width: 0px !important
+}
+
+.dropOpenBox2 {
+    --bs-btn-bg: #EFF0F5 !important;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    --bs-dropdown-border-width: 0px !important;
+    --bs-dropdown-min-width: 8rem !important
+}
+
+.DropDownBoxRowHeader {
+    --bs-btn-padding-y: 0rem !important
+}
+
+/********************* Input styles ***********************/
+.input {
+    width: 100%;
+    height: 24%;
+    border: none;
+    padding: 7px 13px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    resize: none;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.15);
+}
+
+.input2 {
+    width: 100%;
+    border: none;
+    border-bottom: 0.7px solid rgba(193, 193, 193, 0.4);
+    ;
+    background-color: #FFFFFF;
+    resize: none;
+}
+
+.forminput {
+    background: #EFF0F5 !important;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    border: 0px solid #ced4da !important;
+    color: #666DFF !important;
+    padding: 0.8rem .75rem !important;
+    font-size: 16px !important;
+    font-family: 'Roboto Medium' !important;
+}
+
+.forminput:focus {
+    background: #EFF0F5 !important;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    border: 0px solid #ced4da !important;
+}
+
+.phoneinput {
+    border-radius: 0px 6px 6px 0px !important;
+}
+
+.phoneBox {
+    background: #D9D9D9;
+    border-radius: 6px 0px 0px 6px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+}
+
+/********************* Width styles ***********************/
+.W_3 {
+    width: 33%;
+}
+
+.W_70 {
+    width: 70%;
+}
+
+.W90 {
+    width: 95%;
+}
+
+.W80 {
+    width: 80%;
+}
+
+.h140 {
+    height: 140px;
+}
+
+.h100 {
+    height: 100px;
+}
+
+/********************* margin styles ***********************/
+.p10 {
+    padding: 10px;
+}
+
+.pr6 {
+    padding-right: 20px !important;
+}
+
+.pr5 {
+    padding-right: 20px !important;
+}
+
+.p4 {
+    padding: 4px;
+}
+
+.p12 {
+    padding: 12px;
+}
+
+.padding_leftSmall {
+    padding-left: 14px;
+}
+
+.plt12 {
+    padding: 0px 0px 12px 12px;
+}
+
+.pR25 {
+    padding-right: 25px;
+    background: red;
+}
+
+.pR0 {
+    padding-right: 0px;
+}
+
+.pR3 {
+    padding-right: 3px;
+}
+
+.marginrightsmall {
+    margin-right: 8px;
+}
+
+.mtsmall {
+    margin-top: 8px;
+    font-size: 14px;
+    font-family: 'Roboto Regular';
+}
+
+.marginrightlarge {
+    margin-right: 28px;
+}
+
+.MR40 {
+    margin-right: 40px;
+}
+
+.mR_Elarge {
+    margin-right: 120px;
+}
+
+.mt7 {
+    margin-top: 7px;
+}
+
+.mt12 {
+    margin-top: 12px;
+}
+
+.mt15 {
+    margin-top: 15px;
+}
+
+.mt18 {
+    margin-top: 15px;
+}
+
+.mt25 {
+    margin-top: 25px;
+}
+
+.mb25 {
+    margin-bottom: 25px;
+}
+
+.mt40 {
+    margin-top: 40px;
+}
+
+.ml20 {
+    margin-left: 25px;
+}
+
+.mb15 {
+    margin-bottom: 15px;
+}
+
+.mb8 {
+    margin-bottom: 8px;
+}
+
+.pl20 {
+    padding-left: 20px;
+}
+
+/********************* Color styles ***********************/
+.gray {
+    color: #AEAEAE;
+}
+
+.gray2 {
+    color: #9D9A9A;
+}
+
+.graybg2 {
+    background-color: #9D9A9A;
+}
+
+.graybg3 {
+    background-color: #FF9797;
+}
+
+.gray3 {
+    background: #EFF0F5;
+}
+
+.black {
+    color: #131313;
+}
+
+.white {
+    color: #FFFFFF;
+}
+
+.primary1 {
+    color: #869DFE;
+}
+
+.primary2 {
+    color: #666DFF !important;
+}
+
+.green {
+    color: #007500;
+}
+
+.green2 {
+    color: #00FF00;
+}
+
+.bgG {
+    background: #AAAAAA;
+}
+
+.bgG1 {
+    background: #C1C1C1;
+}
+
+.yel {
+    color: #FFFF00;
+}
+
+/********************* Button styles ***********************/
+
+.btnSummary {
+    background: #666DFF;
+    border-radius: 0px 0px 14px 0px;
+}
+
+/********************* Calender Sidebar ***********************/
+
+.CalenderComponent {
+    height: 100vh;
+    background: var(--sideBar);
+    width: 24vw;
+    border-radius: 30px 0px 0px 0px;
+    padding: 24px;
+}
+
+.rowBox {
+    display: flex;
+    flex-direction: row;
+    width: 56vw !important;
+    /* padding-right: 40px; */
+}
+
+.rowalign {
+    display: flex;
+    flex-direction: row;
+}
+
+.rowalign2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.R_A_Justify {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.R_A_Justify1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.R_A_Evenly {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.centerAlign {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rightAlign {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.alignTop {
+    vertical-align: top;
+}
+
+.alignCenter {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.ProfileBox {
+    background: #EDEEF7;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 6px 0px 0px 6px;
+    height: 186px;
+    padding: 48px;
+}
+
+.ProfileRightBox {
+    background: #FFFFFF;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 0px 6px 6px 0px;
+    height: 186px;
+    width: 100%;
+    padding-top: 15px;
+}
+
+.bottomBox {
+    background: #F6F6F6;
+    height: 34px;
+    margin-top: 10px;
+    /* overflow: hidden; */
+}
+
+.iconImage {
+    width: 14px;
+    height: 14px;
+}
+
+.itemsbox {
+    color: #AEAEAE;
+    font-family: 'Roboto Medium';
+}
+
+
+.line {
+    border: 0.7px solid rgba(157, 154, 154, 0.2);
+}
+
+.linestyle {
+    margin: 17px 0px 15px 14px;
+}
+
+.focus_arrow {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.react-calendar__navigation button {
+    width: 35px !important;
+    min-width: 35px !important;
+    color: var(--primaryColor) !important;
+}
+
+.react-calendar__month-view__weekdays {
+    font-size: 0.6em !important;
+}
+
+.react-calendar__tile {
+    font-size: 13px !important;
+}
+
+.mobile_hide_calendar {
+    display: block !important;
+}
+
+.react-calendar__tile--rangeStart {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    background: var(--primaryColor) !important;
+    color: white !important
+}
+
+.react-calendar__tile--rangeEnd {
+    color: white !important;
+    background: var(--primaryColor) !important;
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+
+}
+
+/****************** Profile Card **********************/
+.title_profile {
+    font-family: 'Roboto Regular';
+    font-size: 13px;
+    margin-bottom: 0px;
+}
+
+.active_profile_tab {
+    background: #E9EEEE;
+    border-radius: 3px;
+    width: auto;
+    height: auto;
+    padding: 0px 10px;
+    /* margin-left: 20px; */
+}
+
+.activeClient {
+    background: #666DFF;
+    color: white;
+}
+
+.non_active_profile_tab {
+    /* margin-left: 20px; */
+    padding: 0px 10px
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .hide_img {
+        display: none;
+    }
+
+    .pr6 {
+        padding-right: 0px !important;
+    }
+
+    .pr5 {
+        padding-right: 20px !important;
+    }
+
+    .input_div {
+        width: 90%;
+    }
+
+    .padding_left {
+        margin-left: 5%;
+    }
+
+    .submit_btn {
+        width: 90%;
+    }
+
+    .full_view_login {
+        width: 90%;
+    }
+
+    .bottom_width {
+        width: 90%;
+    }
+
+    .space_between {
+        margin-left: 0px;
+    }
+
+    .signup_mobile_container {
+        max-width: 95% !important;
+        margin-left: 2.5% !important
+    }
+
+    .signup_submit_btn {
+        width: 95%;
+        margin-left: 2.5%;
+    }
+
+    .bottom_width_signup {
+        text-align: center;
+        width: 95%;
+    }
+
+    .mobile_hide {
+        display: none !important;
+    }
+
+    .set_header_width {
+        margin-left: 0px;
+    }
+
+    .main_content {
+        margin-left: 0vw !important;
+        padding-left: 3vw !important;
+        margin-top: 20px
+    }
+
+    .main_content2 {
+        padding-left: 0vw !important;
+    }
+
+    .rowBox {
+        width: 94vw !important;
+    }
+
+    .mobile_view_header {
+        display: block !important;
+        margin-top: -50px !important;
+    }
+
+    .hide_nav_profile_ {
+        display: none !important
+    }
+
+    .reset_input_div {
+        width: 90%;
+    }
+
+    .reset_input_field {
+        width: 90%;
+    }
+
+    .mobile_hide_calendar {
+        display: none !important;
+    }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 768px) {
+    .hide_img {
+        display: none;
+    }
+
+    .input_div {
+        width: 90%;
+    }
+
+    .padding_left {
+        margin-left: 5%;
+    }
+
+    .submit_btn {
+        width: 90%;
+    }
+
+    .full_view_login {
+        width: 90%;
+    }
+
+    .bottom_width {
+        width: 90%;
+    }
+
+    .space_between {
+        margin-left: 0px;
+    }
+
+    .signup_mobile_container {
+        max-width: 95% !important;
+        margin-left: 2.5% !important
+    }
+
+    .signup_submit_btn {
+        width: 95%;
+        margin-left: 2.5%;
+    }
+
+    .bottom_width_signup {
+        text-align: center;
+        width: 95%;
+    }
+
+    .mobile_hide {
+        display: none !important;
+    }
+
+    .set_header_width {
+        margin-left: 0px;
+    }
+
+    .main_content {
+        margin-left: 0vw !important;
+        padding-left: 3vw !important;
+        margin-top: 20px
+    }
+
+    .main_content2 {
+        padding-left: 0vw !important;
+    }
+
+
+    .rowBox {
+        width: 94vw !important;
+    }
+
+    .mobile_view_header {
+        display: block !important;
+        margin-top: -50px !important;
+    }
+
+    .hide_nav_profile_ {
+        display: none !important
+    }
+
+    .reset_input_div {
+        width: 90%;
+    }
+
+    .reset_input_field {
+        width: 90%;
+    }
+
+    .mobile_hide_calendar {
+        display: none !important;
+    }
+
+    .rowBox {
+        width: 94vw !important;
+    }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+    .rowBox {
+        width: 79vw !important;
+    }
+
+    .mobile_hide_calendar {
+        display: none !important;
+    }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) and (max-width: 1000px) {
+    .mobile_hide_calendar {
+        display: block !important;
+    }
+
+    .rowBox {
+        width: 56vw !important;
+    }
+}
+
+@media only screen and (min-width: 1001px) and (max-width: 1919px) {
+    .mobile_hide_calendar {
+        display: block !important;
+    }
+
+    .rowBox {
+        width: 56vw !important;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+    .mobile_hide_calendar {
+        display: block !important;
+    }
+
+    .rowBox {
+        width: 56vw !important;
+    }
+
+    /* For Projectors or Higher Resolution Screens (Full HD) */
+
+}
+
+.fc .fc-button-primary {
+    background-color: var(--primaryColor) !important;
+    border-color: white !important;
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+    font-family: "Roboto Regular";
+    color: #9D9A9A !important;
+}
+
+/* This is Button Drop Down Styling */
+
+.Drop {
+    margin-top: 28px;
+}
+
+.LabelDrop {
+    font-family: "Roboto Medium";
+    font-size: 16px;
+    margin-bottom: 12px;
+
+
+}
+
+.SelectDrop {
+    border: none;
+    outline: none;
+    background-color: #eff0f5;
+    padding: 9px;
+    font-size: 17px;
+    border-radius: 8px;
+    box-shadow: rgba(185, 184, 184, 0.5) 0px 1px 5px;
+}
+
+.option {
+    padding: 5px;
+    border: none;
+    background-color: #eff0f5;
+}
+
+/* This is Profile Model Styling */
+
+.PrimaryModel {
+    outline: none;
+    border: none;
+    border-radius: 7px;
+    background-color: #eff0f5;
+    padding: 12px;
+    width: 75%;
+}
+
+.PrimaryModelDrop {
+    outline: none;
+    border: none;
+    font-size: 16px;
+    border-radius: 7px;
+    background-color: #eff0f5;
+    padding: 6px 12px 6px 12px;
+    font-family: "Roboto Regular";
+}
+
+.label {
+    font-size: 16px;
+    font-family: "Roboto Medium";
+    padding-bottom: 8px;
+}
+
+
+.ContactModel {
+    outline: none;
+    border: none;
+    border-radius: 7px;
+    background-color: #eff0f5;
+    padding: 12px;
+    width: 75%;
+}
+
+.ExperienceModel {
+    outline: none;
+    border: none;
+    border-radius: 7px;
+    background-color: #eff0f5;
+    padding: 12px;
+    width: 100%;
+}
+
+.shooterNameHidden {
+    display: none !important;
+}

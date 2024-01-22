@@ -1,0 +1,39 @@
+.clientBtn {
+     background: #E9EEEE;
+     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+     border-radius: 10px;
+     padding: 4px 9px;
+}
+
+.calenderBox{
+     border-radius: 4px 0px 0px 4px;
+     border:1px solid #E5E5E5 ;
+}
+.calenderBox1{
+     border-radius: 0px 4px 4px 0px;
+     border:1px solid #E5E5E5 ;
+}
+
+.point{
+     cursor: pointer;
+}
+.checkinInput{
+    border: 1px solid #d4d4d4;
+    border-radius: 5px;
+    padding: 5px;
+}
+.label_input{
+     font-size: 13px;
+    font-family: 'Poppins Medium';
+}
+@media only screen and (max-width: 600px) {
+     .clientBtn {
+          background: #E9EEEE;
+          box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+          border-radius: 16px;
+          padding: 2px 4px;
+     }
+     .Text24Semi{
+          font-size: 16px;
+     }
+}

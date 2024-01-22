@@ -1,0 +1,56 @@
+.topbar {
+     background: #FD4B7B;
+     padding: 10px;
+}
+
+.calenderEventBox {
+     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
+     border-radius: 0px 15px 15px 0px;
+     background-color: var(--fc-event-bg-color, #3788d8);
+}
+
+.popover-custom-content {
+     /* Adjust the height and width as needed */
+     width: max-content;
+     max-height: 150px;
+     overflow-y: auto; /* Add scrollbars if content exceeds the maximum height */
+}
+
+.popover-custom-content .rowalign{
+     display: flex;
+    flex-direction: row;
+}
+
+.popover-custom-content .weds{
+     color: red;
+}
+
+.popover-custom-content .wedHead{
+     color: deepskyblue;
+}
+
+.dayFormat {
+     background: #E9EEEE;
+     box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+     height: 60px;
+     font-family: 'Roboto';
+     font-style: normal;
+     font-weight: 500;
+     font-size: 16px;
+     line-height: 19px;
+     color: #9D9A9A;
+     text-align: center;
+     vertical-align: middle;
+     align-items: center;
+}
+
+.CalenderViewWidth{
+     width: 70% !important;
+}
+
+
+@media only screen and (max-width: 990px) {
+     .CalenderViewWidth{
+          width: 100% !important;
+     }     
+}
