@@ -37,13 +37,15 @@ function Reports(props) {
           responsive
           // striped
           className="tableViewClient"
-          style={{ width: "100%", marginTop: "15px" }}
+          style={{ width: '130%', marginTop: '15px' }}
         >
           <thead>
             <tr className="logsHeader Text16N1">
               <th className="tableBody">Client:</th>
               <th className="tableBody">Task Assigned</th>
               <th className="tableBody">Task Assigned Date</th>
+              <th className="tableBody">Assigned By</th>
+              <th className="tableBody">Assigned To</th>
               <th className="tableBody">Status</th>
               <th className="tableBody">Deadline</th>
               <th className="tableBody">Completion Date</th>
@@ -99,6 +101,24 @@ function Reports(props) {
                     }}
                   >
                     {dayjs(task.assignDate).format('DD/MM/YYYY')}
+                  </td>
+                  <td
+                    className="tableBody Text14Semi primary2"
+                    style={{
+                      paddingTop: "15px",
+                      paddingBottom: "15px",
+                    }}
+                  >
+                    {task.assignBy.firstName} {task.assignBy.lastName}
+                  </td>
+                  <td
+                    className="tableBody Text14Semi primary2"
+                    style={{
+                      paddingTop: "15px",
+                      paddingBottom: "15px",
+                    }}
+                  >
+                    {task.assignTo.firstName} {task.assignTo.lastName}
                   </td>
                   <td
                     className="tableBody Text14Semi primary2"
