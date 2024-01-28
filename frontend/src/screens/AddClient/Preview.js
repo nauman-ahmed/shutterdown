@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SaveClientForm } from "../../API/Client"
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import { updateClintData } from '../../redux/clientBookingForm';
+import Cookies from 'js-cookie';
 
 function Preview() {
   const dispatch = useDispatch();
@@ -19,11 +20,9 @@ function Preview() {
   const [eventIndex, setEventIndex] = useState(0)
   const submitClient = async () => {
     setRequesting(true)
-    const user = JSON.parse(localStorage.getItem('loginUser'));
-    await SaveClientForm({ ...clientData, userID: user?.data?.User._id });
+    await SaveClientForm(clientData);
     setRequesting(false);
     dispatch(updateClintData({ albums: [""] }));
-    window.notify("Client has been Added", "success");
     navigate('/MyProfile/AddClient/Form-I');
   };
   const target = useRef(null);

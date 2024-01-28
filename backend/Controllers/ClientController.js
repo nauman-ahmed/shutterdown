@@ -23,7 +23,7 @@ const AddClientFunction = async (req, res) => {
       return event._id
     }))
     client.events = eventIds;
-    
+    console.log(client);
     await client.save()
     res.status(200).json('Client Added SucccessFully');
   } catch (error) {
@@ -33,8 +33,6 @@ const AddClientFunction = async (req, res) => {
 
 const AddCinematography = async (req, res) => {
   try {
-    console.log('request for cinematography');
-    console.log(req.body);
     const client = await ClientModel.findById(req.body.client._id);
 
     client.cinematography = {...req.body.client.cinematography, editor : req.body.client.cinematography.editor._id};
@@ -47,10 +45,8 @@ const AddCinematography = async (req, res) => {
 
 const AddPhotosDeliverables = async (req, res) => {
   try {
-    console.log('request for photos');
     const client = await ClientModel.findById(req.body.client._id);
     client.photosDeliverables = {...req.body.client.photosDeliverables, editor : req.body.client.photosDeliverables.editor._id};
-    console.log(client);
     await client.save();
     res.status(200).json('Cinematography Added SucccessFully');
   } catch (error) {
@@ -71,8 +67,7 @@ const AddAlbumsDeliverables = async (req, res) => {
 };
 const updateClient = async (req, res) => {
   try {
-    console.log(req.body);
-    const client = await ClientModel.findByIdAndUpdate(req.body.client._id, req.body.client);
+    await ClientModel.findByIdAndUpdate(req.body.client._id, req.body.client);
 
     res.status(200).json('client Updated SucccessFully');
   } catch (error) {
@@ -157,7 +152,6 @@ const getClientById = async (req, res) => {
         model : 'user'
       }
     });
-    console.log(client);
     res.status(200).json(client);
   } catch (error) {
     console.log(error);

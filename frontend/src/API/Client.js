@@ -2,19 +2,21 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from "./index"
 import Cookies from 'js-cookie';
-const currentUser = Cookies.get('cuurentUser') && JSON.parse(Cookies.get('currentUser'));
+const currentUser = JSON.parse(Cookies.get('currentUser'));
 export const SaveClientForm = async (data) => {
   try {
-    const dataToSend = {...data, userID : currentUser._id}
+    const dataToSend = { ...data, userID: currentUser._id }
     const res = await axios.post(BASE_URL +
       '/AddClient',
       {
         Headers: {
           'Content-Type': 'application/json',
         },
-        data : dataToSend
+        data: dataToSend
       }
-    );
+    ).then(() => {
+      window.notify("Client has been Added", "success");
+    });
   } catch (error) {
     console.log(error, "error")
   }
@@ -29,7 +31,7 @@ export const addCinematography = async (client) => {
         },
         client
       }
-    ).then(()=>{window.notify('Cinematography details added successfully!', 'success')});
+    ).then(() => { window.notify('Cinematography details added successfully!', 'success') });
   } catch (error) {
     console.log(error, "error")
   }
@@ -44,7 +46,7 @@ export const updateClient = async (client) => {
         },
         client
       }
-    ).then(()=>{window.notify('Details added successfully!', 'success')});
+    ).then(() => { window.notify('Details added successfully!', 'success') });
   } catch (error) {
     console.log(error, "error")
   }
@@ -60,7 +62,7 @@ export const addPhotosDeliverables = async (client) => {
         },
         client
       }
-    ).then(()=>{window.notify('Photos Deliverables added successfully!', 'success')});
+    ).then(() => { window.notify('Photos Deliverables added successfully!', 'success') });
   } catch (error) {
     console.log(error, "error")
   }
@@ -76,7 +78,7 @@ export const addAlbumsDeliverables = async (client) => {
         },
         client
       }
-    ).then(()=>{window.notify('Albums Deliverable added successfully!', 'success')});
+    ).then(() => { window.notify('Albums Deliverable added successfully!', 'success') });
   } catch (error) {
     console.log(error, "error")
   }

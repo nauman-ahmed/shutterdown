@@ -51,7 +51,6 @@ function ListView() {
       if (currentUser.rollSelect == 'Manager') {
         setAllEvents(res.data);
         setEventsForShow(res.data);
-        console.log(res.data);
       } else if (currentUser.rollSelect == 'Shooter') {
         const eventsToShow = res.data.map(event => {
           if (event.shootDirector.some(director => director._id == currentUser._id)) {
@@ -162,7 +161,7 @@ function ListView() {
   return (
     <>
       <ToastContainer />
-      {eventsForShow ? (
+      {eventsForShow !== null ? (
         <>
           <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
             marginTop: '-70px',
