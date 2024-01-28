@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from "./index"
 import Cookies from 'js-cookie';
-const currentUser = JSON.parse(Cookies.get('currentUser'));
+const currentUser = Cookies.get('cuurentUser') && JSON.parse(Cookies.get('currentUser'));
 export const SaveClientForm = async (data) => {
   try {
     const dataToSend = {...data, userID : currentUser._id}

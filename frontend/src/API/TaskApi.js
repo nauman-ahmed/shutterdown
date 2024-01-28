@@ -1,56 +1,56 @@
 import axios from "axios"
 import BASE_URL from "./index"
+import Cookies from "js-cookie";
 
-export const assignTaskFunction=async(data)=>{
+export const addTask = async (data) => {
     try {
-        const res=await axios.post("http://localhost:5001/MyProfile/Tasks/DailyTasks",{
-            Headers:{
-                "Content-Type":"application/json"
+        await axios.post(BASE_URL + "/MyProfile/Tasks/addTask", {
+            Headers: {
+                "Content-Type": "application/json"
             },
             data
-        })
+        }).then(() => { window.notify('Added successfully!', 'success') });
     } catch (error) {
-        console.log(error,"error")
+        console.log(error, "error")
     }
 }
 
-export const updatedAssignTaskData=async(data,id)=>{
+export const updateTaskData = async (data) => {
     try {
-        const res=await axios.put(`http://localhost:5001/MyProfile/Tasks/DailyTasks/${id}`,{
-            Headers:{
-                "Content-Type":"application/json"
+        await axios.put(BASE_URL + '/MyProfile/Tasks/updateTask', {
+            Headers: {
+                "Content-Type": "application/json"
             },
             data
-        })
+        }).then(() => { window.notify('Updated successfully!', 'success') });
     } catch (error) {
-        
+
     }
 }
 
-export const getTaskDataHandler = async () => {
+export const getAllTasks = async () => {
     try {
-        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/DailyTasks`,{
-            Headers:{
-                "Content-Type":"application/json"
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getAllTasks`, {
+            Headers: {
+                "Content-Type": "application/json"
             },
         })
         return res.data
     } catch (error) {
-        
+
     }
 }
 
-export const saveTaskDataHandler = async (taskData) => {
+export const getEditorTasks = async () => {
     try {
-        const res = await axios.post(BASE_URL + `/MyProfile/Tasks/DailyTasks`,{
-            Headers:{
-                "Content-Type":"application/json"
+        const currentUser = JSON.parse(Cookies.get('currentUser'));
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getEditorTasks/${currentUser._id}`, {
+            Headers: {
+                "Content-Type": "application/json"
             },
-            data:taskData
-
         })
         return res.data
     } catch (error) {
-        
+
     }
 }

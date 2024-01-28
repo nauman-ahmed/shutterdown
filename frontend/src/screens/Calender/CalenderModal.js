@@ -61,11 +61,8 @@ const CalenderModal = (props) => {
               <div className="row">
                 {props.currentDate?.map((data) => {
                   return (
-
-                    
                     <>
                     {data.events.map((event)=>{
-
                       return (
                         <>
                           <div className="col-6 mb-3">

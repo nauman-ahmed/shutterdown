@@ -41,20 +41,58 @@ const ClientSchema = mongoose.Schema({
   suggestion: {
     type: String,
   },
-  preWeddingDetails : {
-    type : Object,
+  preWeddingDetails: {
+    type: Object,
   },
-  checklistDetails : {
-    type : Object
+  checklistDetails: {
+    type: Object
   },
-  cinematography : {
-    type : Object
+  cinematography: {
+    editor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user'
+    },
+    weddingDate: {
+      type: Date
+    },
+    companyDeadline: {
+      type: Date
+    },
+    status: {
+      type: String
+    },
+    clientRevision: {
+      type: Number
+    }
   },
-  photosDeliverables : {
-    type : Object
+  photosDeliverables: {
+    editor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user'
+    },
+    weddingDate: {
+      type: Date
+    },
+    companyDeadline: {
+      type: Date
+    },
+    status: {
+      type: String
+    },
+    clientRevision: {
+      type: Number
+    }
   },
-  albumsDeliverables : {
-    type : Object
+  albumsDeliverables: {
+    editor : {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : 'user'
+    },
+    
+    status : {
+      type : String
+    },
+    
   },
   events: [{
     type: mongoose.Types.ObjectId,

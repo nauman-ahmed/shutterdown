@@ -9,10 +9,12 @@
   font-family: "Roboto Medium";
   src: url("./assets/fonts/Roboto-Medium.ttf");
 }
+
 @font-face {
   font-family: "Roboto Light";
   src: url("./assets/fonts/Roboto-Light.ttf");
 }
+
 @font-face {
   font-family: "Roboto Bold";
   src: url("./assets/fonts/Roboto-Bold.ttf");
@@ -23,7 +25,8 @@
 .calendar-container {
   margin-top: 30px;
 }
-.react-calendar { 
+
+.react-calendar {
   width: 400px;
   max-width: 100%;
   background: #FFFFFF;
@@ -33,62 +36,73 @@
   line-height: 1.125em;
   border: #FFFFFF;
   padding: 10px;
- }
- .react-calendar__navigation button {
+}
+
+.react-calendar__navigation button {
   color: #6f48eb;
   min-width: 44px;
   background: none;
   font-size: 16px;
   margin-top: 8px;
- }
- .react-calendar__navigation button:enabled:hover,
- .react-calendar__navigation button:enabled:focus {
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
   background-color: #f8f8fa;
- }
- .react-calendar__navigation button[disabled] {
+}
+
+.react-calendar__navigation button[disabled] {
   background-color: #f0f0f0;
- }
- abbr[title] {
+}
+
+abbr[title] {
   text-decoration: none;
- }
- /* .react-calendar__month-view__days__day--weekend {
+}
+
+/* .react-calendar__month-view__days__day--weekend {
   color: #d10000;
  } */
- .react-calendar__tile:enabled:hover,
- .react-calendar__tile:enabled:focus {
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
   background: #f8f8fa;
   color: #6f48eb;
   border-radius: 6px;
- } 
- .react-calendar__tile--now {
+}
+
+.react-calendar__tile--now {
   background: #6f48eb33;
   border-radius: 50%;
   font-weight: bold;
   color: white;
 }
+
 .react-calendar--selectRange .react-calendar__tile--hover {
- background-color: #f8f8fa;
+  background-color: #f8f8fa;
 }
+
 .react-calendar__tile--range {
- background: #f8f8fa;
- color: #6f48eb;
- border-radius: 0;
+  background: #f8f8fa;
+  color: #6f48eb;
+  border-radius: 0;
 }
+
 .react-calendar__tile--rangeStart {
- background: #6f48eb;
- color: white;
- border-radius: 6px;
+  background: #6f48eb;
+  color: white;
+  border-radius: 6px;
 }
+
 .react-calendar__tile--rangeEnd {
   border-radius: 6px;
   background: #6f48eb;
- color: white;
+  color: white;
 }
-.textPrimary{
+
+.textPrimary {
   color: #666DFF !important;
 }
 
-.cursor-pointer{
+.cursor-pointer {
   cursor: pointer;
 }
 
@@ -97,83 +111,128 @@
   border-radius: 50%;
   color: white;
 }
+
 .highlight2 {
   background: #add8e6;
   border-radius: 50%;
   color: white;
 }
+
 .highlight3 {
   background: #fff065;
   border-radius: 50%;
   color: white;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 9px solid;
+  border-color: #d5d5da;
+  border-right-color: #5c63ed;
+  animation: spinner-d3wgkg 1s infinite linear;
+}
+
+
+@keyframes spinner-d3wgkg {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.smallSpinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: conic-gradient(#0000 10%,#ffffff);
+  -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 3.8px),#000 0);
+  animation: spinner-zp9dbg 1s infinite linear;
+}
+
+@keyframes spinner-zp9dbg {
+  to {
+     transform: rotate(1turn);
+  }
 }
 .highlight4 {
   background: #87cefa;
   border-radius: 50%;
   color: white;
 }
+
 .highlight5 {
   background: #20b2aa;
   border-radius: 50%;
   color: white;
 }
+
 .highlight6 {
   background: #ffa07a;
   border-radius: 50%;
   color: white;
 }
+
 .highlight7 {
   background: #00fa9a;
   border-radius: 50%;
   color: white;
 }
+
 .highlight8 {
   background: #ffe4e1;
   border-radius: 50%;
   color: white;
 }
+
 .highlight9 {
   background: #da70d6;
   border-radius: 50%;
   color: white;
 }
+
 .highlight10 {
   background: #fff5ee;
   border-radius: 50%;
   color: white;
 }
+
 .highlight11 {
   background: #87ceeb;
   border-radius: 50%;
   color: white;
 }
+
 .highlight12 {
   background: #f5deb3;
   border-radius: 50%;
   color: white;
 }
+
 .highlight13 {
   background: #f0f8ff;
   border-radius: 50%;
   color: white;
 }
+
 .highlight14 {
   background: #ff7f50;
   border-radius: 50%;
   color: white;
 }
 
-.Collapsible{
-z-index: 20;
-border-radius: 10px;
-color: #AEAEAE;
-background: transparent;
+.Collapsible {
+  z-index: 20;
+  border-radius: 10px;
+  color: #AEAEAE;
+  background: transparent;
 }
-.Collapsible_Open{
+
+.Collapsible_Open {
   background: #666DFF;
   color: white;
 }
-.Collapsible__trigger{
+
+.Collapsible__trigger {
   font-size: 12px;
-  font-family:"Roboto Medium";
+  font-family: "Roboto Medium";
 }

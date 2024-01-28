@@ -16,7 +16,8 @@ import { Overlay } from 'react-bootstrap';
 function PreWedShootScreen(props) {
   const [preWedClients, setPreWedClients] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
-  const [clientsForShow, setClientsForShow] = useState([]);
+  const [clientsForShow, setClientsForShow] = useState(null);
+  const [updatingIndex, setUpdatingIndex] = useState(null);
   const [filterFor, setFilterFor] = useState('day')
   const toggle = () => {
     setShow(!show);
@@ -36,9 +37,9 @@ function PreWedShootScreen(props) {
   }
   const target = useRef(null);
   const [show, setShow] = useState(false);
-useEffect(()=>{
-  setClientsForShow(preWedClients)
-}, [preWedClients])
+  useEffect(() => {
+    setClientsForShow(preWedClients)
+  }, [preWedClients])
   const getAllClients = async (req, res) => {
     try {
       const allClients = await getClients();
@@ -91,176 +92,189 @@ useEffect(()=>{
         window.notify('Please Select some status!', 'error');
         return
       }
-      await updateClient(client)
+      setUpdatingIndex(index);
+      await updateClient(client);
+      setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
     }
   };
   return (
     <>
+      {clientsForShow ? (
+        <>
+          <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
+            marginTop: '-70px',
+            marginBottom: '30px'
+          }} ref={target}>
 
-
-      <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
-        marginTop: '-70px',
-        marginBottom: '30px'
-      }} ref={target}>
-
-        <div className='w-100 d-flex flex-row align-items-center'>
-          <div className='w-50'>
-            {filterFor === 'day' ?
-              <div
-                className={`forminput R_A_Justify1`}
-                onClick={toggle}
-                style={{ cursor: 'pointer' }}
-              >
-                {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                <img src={CalenderImg} />
-              </div>
-              :
-              <input type='month' onChange={(e) => {
-                filterByMonth(new Date(e.target.value))
-              }} className='forminput R_A_Justify mt-1' />
-            }
-          </div>
-          <div className='w-50 px-2 '>
-            <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-              if (selected.value !== filterFor) {
-                setClientsForShow(preWedClients)
-                setFilteringDay('');
-              }
-              setFilterFor(selected.value);
-              setShow(false)
-            }} styles={customStyles}
-              options={[
-                { value: 'day', label: 'Day' },
-                { value: 'month', label: 'Month' }]} />
-          </div>
-        </div>
-
-      </div>
-      <div style={{ overflowX: 'hidden', width: '100%' }}>
-        <ToastContainer />
-        <Table
-          hover
-          borderless
-          responsive
-          style={{ width: '100%', marginTop: '15px' }}
-        >
-          <thead>
-            <tr className="logsHeader Text16N1">
-              <th className="tableBody">Couple</th>
-              <th className="tableBody">Wedding Date</th>
-              <th className="tableBody">POC</th>
-              <th className="tableBody">Shoot Date</th>
-              <th className="tableBody">Status</th>
-              {currentUser.rollSelect == 'Manager' && (
-                <th className="tableBody">Save</th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="Text12"
-            style={{
-              textAlign: 'center',
-              borderWidth: '0px 1px 0px 1px',
-            }}  >
-            {clientsForShow?.map((client, index) => {
-              return (
-                <>
-                  <tr
-                    style={{
-                      background: index % 2 === 0 ? '' : '#F6F6F6',
-                    }}
+            <div className='w-100 d-flex flex-row align-items-center'>
+              <div className='w-50'>
+                {filterFor === 'day' ?
+                  <div
+                    className={`forminput R_A_Justify1`}
+                    onClick={toggle}
+                    style={{ cursor: 'pointer' }}
                   >
-                    <td className="tableBody Text14Semi primary2">
-                      {client.brideName}
-                      <br />
-                      <img src={Heart} />
-                      <br />
-                      {client.groomName}
-                    </td>
-                    <td className="tableBody Text14Semi primary2">
-                      {client.events.map((event, i) => {
-                        return (
-                          <>
-                            {dayjs(event.eventDate).format('DD/MM/YYYY')}<br />
-                          </>
-                        )
-                      })}
+                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                    <img src={CalenderImg} />
+                  </div>
+                  :
+                  <input type='month' onChange={(e) => {
+                    filterByMonth(new Date(e.target.value))
+                  }} className='forminput R_A_Justify mt-1' />
+                }
+              </div>
+              <div className='w-50 px-2 '>
+                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
+                  if (selected.value !== filterFor) {
+                    setClientsForShow(preWedClients)
+                    setFilteringDay('');
+                  }
+                  setFilterFor(selected.value);
+                  setShow(false)
+                }} styles={customStyles}
+                  options={[
+                    { value: 'day', label: 'Day' },
+                    { value: 'month', label: 'Month' }]} />
+              </div>
+            </div>
 
-                    </td>
-                    <td className="tableBody Text14Semi primary2">
-                      {client.userID?.firstName}{' '}{client.userID?.lastName}
-                    </td>
-                    <td className="tableBody Text14Semi primary2">
-                      <input
-                        type="date"
-                        name="shootDate"
-                        className="dateInput"
-                        onChange={(e) => {
-                          const updatedClients = [...preWedClients]
-                          updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
-                          updatedClients[index].preWeddingDetails.shootDate = e.target.value;
-                          setPreWedClients(updatedClients)
-                        }}
-                        readOnly={currentUser.rollSelect == 'Shooter'}
-                        value={client.preWeddingDetails?.shootDate ? new Date(client.preWeddingDetails.shootDate).toISOString().split('T')[0] : null}
-                      />
-                    </td>
-                    <td className="tableBody Text14Semi primary2">
-                      {currentUser.rollSelect == 'Manager' ? (
-                        <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
-                          const updatedClients = [...preWedClients];
-                          updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
-                          updatedClients[index].preWeddingDetails.status = selected.value;
-                          setPreWedClients(updatedClients)
-                        }} styles={customStyles} options={[
-                          { value: 'Yet to Start', label: 'Yet to Start' },
-                          { value: 'In Progress', label: 'In Progress' },
-                          { value: 'Completed', label: 'Completed' }]} required />
-                      ) : (
-                        <>
-                          {client.preWeddingDetails?.status || 'Not Filled'}
-                        </>
-                      )}
-                    </td>
-                    {currentUser.rollSelect == 'Manager' && (
-                      <td>
-                        <button
-                          style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
-                          onClick={() => handleSaveData(index)}
-                        >
-                          Save
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                </>
-              )
-            }
-
-            )}
-          </tbody>
-        </Table>
-        <Overlay
-          rootClose={true}
-          onHide={() => setShow(false)}
-          target={target.current}
-          show={show}
-          placement="bottom"
-        >
-          <div>
-            <Calendar
-              value={filteringDay}
-              minDate={new Date(Date.now())}
-              CalenderPress={toggle}
-              onClickDay={(date) => {
-                filterByDay(date);
-              }}
-            />
           </div>
+          <div style={{ overflowX: 'hidden', width: '100%' }}>
+            <ToastContainer />
+            <Table
+              hover
+              borderless
+              responsive
+              style={{ width: '100%', marginTop: '15px' }}
+            >
+              <thead>
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Couple</th>
+                  <th className="tableBody">Wedding Date</th>
+                  <th className="tableBody">POC</th>
+                  <th className="tableBody">Shoot Date</th>
+                  <th className="tableBody">Status</th>
+                  {currentUser.rollSelect == 'Manager' && (
+                    <th className="tableBody">Save</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="Text12"
+                style={{
+                  textAlign: 'center',
+                  borderWidth: '0px 1px 0px 1px',
+                }}  >
+                {clientsForShow?.map((client, index) => {
+                  return (
+                    <>
+                      <tr
+                        style={{
+                          background: index % 2 === 0 ? '' : '#F6F6F6',
+                        }}
+                      >
+                        <td className="tableBody Text14Semi primary2">
+                          {client.brideName}
+                          <br />
+                          <img src={Heart} />
+                          <br />
+                          {client.groomName}
+                        </td>
+                        <td className="tableBody Text14Semi primary2">
+                          {client.events.map((event, i) => {
+                            return (
+                              <>
+                                {dayjs(event.eventDate).format('DD/MM/YYYY')}<br />
+                              </>
+                            )
+                          })}
 
-        </Overlay>
-      </div>
+                        </td>
+                        <td className="tableBody Text14Semi primary2">
+                          {client.userID?.firstName}{' '}{client.userID?.lastName}
+                        </td>
+                        <td className="tableBody Text14Semi primary2">
+                          <input
+                            type="date"
+                            name="shootDate"
+                            className="dateInput"
+                            onChange={(e) => {
+                              const updatedClients = [...preWedClients]
+                              updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                              updatedClients[index].preWeddingDetails.shootDate = e.target.value;
+                              setPreWedClients(updatedClients)
+                            }}
+                            readOnly={currentUser.rollSelect == 'Shooter'}
+                            value={client.preWeddingDetails?.shootDate ? new Date(client.preWeddingDetails.shootDate).toISOString().split('T')[0] : null}
+                          />
+                        </td>
+                        <td className="tableBody Text14Semi primary2">
+                          {currentUser.rollSelect == 'Manager' ? (
+                            <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
+                              const updatedClients = [...preWedClients];
+                              updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                              updatedClients[index].preWeddingDetails.status = selected.value;
+                              setPreWedClients(updatedClients)
+                            }} styles={customStyles} options={[
+                              { value: 'Yet to Start', label: 'Yet to Start' },
+                              { value: 'In Progress', label: 'In Progress' },
+                              { value: 'Completed', label: 'Completed' }]} required />
+                          ) : (
+                            <>
+                              {client.preWeddingDetails?.status || 'Not Filled'}
+                            </>
+                          )}
+                        </td>
+                        {currentUser.rollSelect == 'Manager' && (
+                          <td>
+                            <button
+                              style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
+                              onClick={() => handleSaveData(index)}
+                            >
+                              {updatingIndex == index ? (
+                                <div className='w-100'>
+                                  <div class="smallSpinner mx-auto"></div>
+                                </div>
+                              ) : (
+                                "Save"
+                              )}
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    </>
+                  )
+                }
+
+                )}
+              </tbody>
+            </Table>
+            <Overlay
+              rootClose={true}
+              onHide={() => setShow(false)}
+              target={target.current}
+              show={show}
+              placement="bottom"
+            >
+              <div>
+                <Calendar
+                  value={filteringDay}
+                  minDate={new Date(Date.now())}
+                  CalenderPress={toggle}
+                  onClickDay={(date) => {
+                    filterByDay(date);
+                  }}
+                />
+              </div>
+            </Overlay>
+          </div>
+        </>
+      ) : (
+        <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+          <div class="spinner"></div>
+        </div>
+      )}
     </>
   );
 }

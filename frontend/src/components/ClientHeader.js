@@ -23,70 +23,63 @@ import {
   Col,
 } from 'reactstrap';
 import { useEffect } from 'react';
-import { assignTaskFunction } from '../API/TaskApi';
+import { addTask } from '../API/TaskApi';
+import Cookies from 'js-cookie'
+import { getClients } from '../API/Client';
+import Heart from '../assets/Profile/Heart.svg';
+import Select from 'react-select';
+import { getEditors } from '../API/userApi';
+
+
 function ClientHeader(props) {
   const [list, setList] = useState(true);
   const navigate = useNavigate();
   const target = useRef(null);
+  const [taskData, setTaskData] = useState({});
+  const [allClients, setAllClients] = useState();
+  const [editors, setEditors] = useState();
 
   const [show, setShow] = useState(false);
   const [filterType, setFilterType] = useState(1);
-  const [clientData, setClientData] = useState();
-  const [userData, setUserData] = useState();
-  const [groomName, setGroomName] = useState();
-  const [brideName, setBrideName] = useState();
-  const [assignto, setAssignto] = useState();
-  const [assignBy, setAssignBy] = useState();
-  const [companyDate, setCompanyData] = useState();
-  const [completionDate, setCompletionDate] = useState();
-  const [taskName, setTaskName] = useState();
-  const [idHidden, setIdHidden] = useState(false);
-  const [EditorHidden, setEditorHidden] = useState(false);
-  const [location,setLocation]=useState()
-  const [Arraydata,setArrayData]=useState()
-  const [SubmitApi,setSubmitApi]=useState(false)
+
   // This is Model section function and state Start...
- 
+  const currentUser = JSON.parse(Cookies.get('currentUser'))
 
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
 
-  const getClientData = async () => {
-    try {
-      const localStorageData = JSON.parse(localStorage.getItem('userEmail'));
-      const res = await axios.get(
-        `http://localhost:5002/MyProfile/Tasks/DailyTasks/${localStorageData}`,
-        {
-          Headers: {
-            'Content-Type': 'application/Json',
-          },
-        }
-      );
-      setClientData(res.data.ClientData);
-
-      setUserData(res.data.userData);
-    } catch (error) {}
+  const fetchClientsData = async () => {
+    const clients = await getClients();
+    const res = await getEditors();
+    console.log(res);
+    setEditors(res.editors);
+    setAllClients(clients);
+  }
+  const customStyles = {
+    option: (defaultStyles, state) => ({
+      ...defaultStyles,
+      color: state.isSelected ? "white" : "black",
+      backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
+    }),
+    control: (defaultStyles) => ({
+      ...defaultStyles,
+      backgroundColor: "#EFF0F5",
+      padding: "2px",
+      border: "none",
+    }),
+    singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
+    menu: (defaultStyles) => ({ ...defaultStyles, zIndex: 9999 }), // Set a higher zIndex
+    menuList: (defaultStyles) => ({ ...defaultStyles, zIndex: 9999 }), // Set a higher zIndex
+    menuPortal: (defaultStyles) => ({ ...defaultStyles, zIndex: 9999 }), // Set a higher zIndex
   };
+  const route = window.location.href.split('/MyProfile');
+
   useEffect(() => {
-  
-   const Data = window.location.href.split('/MyProfile');
-   setLocation(Data[1])
-    const loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (loginUser.data.User.rollSelect === 'Shooter') {
-      setIdHidden(true);
+    if (route[1].startsWith('/Tasks/DailyTasks') && currentUser.rollSelect === 'Manager') {
+      fetchClientsData()
     }
-    if (loginUser.data.User.rollSelect === 'Editor') {
-      setEditorHidden(true);
-    } else {
-      getClientData();
-    }
-  }, []);
-  // This is Model section function and state End...
-
-  // This is Dropdown Function and State Start.....
-
-  // This is Dropdown Function and State End.....
+  }, [])
 
   const data = [
     {
@@ -106,78 +99,15 @@ function ClientHeader(props) {
       id: 4,
     },
   ];
-  useEffect(() => {
-    'dsflksflkslfjf';
-  }, ['dsflksflkslfjf']);
-  const handleGroomNameChange = (e) => {
-    setGroomName(e.target.value);
-  };
-  const handleBrideNameChange = (e) => {
-    setBrideName(e.target.value);
-  };
-  const handleAssigntoChange = (e) => {
-    setAssignto(e.target.value);
-  };
-  const handleAssignByChange = (e) => {
-    setAssignBy(e.target.value);
-  };
-  const handleCompanyDataChange = (e) => {
-    setCompanyData(e.target.value);
-  };
-  const completionDateChange = (e) => {
-    setCompletionDate(e.target.value);
-  };
-  const taskNameChange = (e) => {
-    setTaskName(e.target.value);
-  };
-let array=[]
+
   const handleTaskSubmit = async () => {
-    if (brideName === undefined) {
-      alert('please Select Bridename');
-    } else if (groomName === undefined) {
-      alert('please Select Groom Name');
-    } else if (companyDate === undefined) {
-      alert('Please Select CompanyDate');
-    } else if (completionDate === undefined) {
-      alert('Please Select Completion Date');
-    } else if (assignto === undefined) {
-      alert('Please Select Assign to ');
-    } else if (assignBy === undefined) {
-      alert('Please Select Assign By');
-    } else if (taskName === undefined) {
-      alert('Please Select Task Name');
-    } else {
-      setModal(!modal);
-      // alert('Success');
-      const id=JSON.parse(localStorage.getItem("userEmail"))
-      const taskData = {
-        id,
-        brideName,
-        groomName,
-        companyDate,
-        completionDate,
-        assignto,
-        assignBy,
-        taskName,
-      };
-      
-      setArrayData(array)
-
-      await assignTaskFunction(taskData);
-      try {
-        const res=await axios.get('http://localhost:5002/MyProfile/Tasks/DailyTasks',{
-          Headers:{
-            'Content-Type':"application/json"
-          }
-        })
-        props.TaskDataFunction(res.data.taskData)
-        props.setSubmitApi(true)
-      } catch (error) {
-        
-      }
-
-    }
+    setModal(!modal);
+    await addTask({ ...taskData, assignBy: currentUser });
+    setTaskData(null);
+    props.updateData();
   };
+
+
   return (
     <>
       <div className="R_A_Justify mb15">
@@ -189,18 +119,17 @@ let array=[]
               ref={target}
               onClick={() => {
                 setShow(!show);
-              }}
-            >
+              }} >
               <img src={Filter} />
             </div>
           )}
-          {idHidden ? null : EditorHidden ? null : location==="/Tasks/DailyTasks"? (  
+          {(currentUser.rollSelect === 'Manager' && route[1].startsWith('/Tasks/DailyTasks')) ? (
             <>
               <div className="btn btn-primary me-1" onClick={toggle}>
-                Add
+                Add Task
               </div>
             </>
-          ):null}
+          ) : null}
           {/* <CoomonDropDown AddEvent /> */}
           {props.calender && (
             <>
@@ -239,7 +168,7 @@ let array=[]
             <div
               className="nav_popover"
               style={{ width: '200px', paddingTop: '10px' }}
-              >
+            >
               {data.map((i) => {
                 const selected = i.id == filterType ? true : false;
                 return (
@@ -282,130 +211,69 @@ let array=[]
         size="lg"
       >
         <ModalHeader>Add Task</ModalHeader>
-        <ModalBody>
-          <Form>
+        <Form onSubmit={(e) => {
+          e.preventDefault();
+          handleTaskSubmit();
+        }}>
+          <ModalBody>
             <Row className="p-3">
               <Col xl="4" sm="6" lg="4" className="p-2">
-                <div className="label">Groom_Name</div>
-                <select
-                  name="GroomName"
-                  className="JobInputDrop p-2"
-                  onChange={(e) => handleGroomNameChange(e)}
-                >
-                  <option value="">Select</option>
-                  {clientData &&
-                    clientData.map((data) => {
-                      return (
-                        <>
-                          <option>{data.Groom_Name}</option>
-                        </>
-                      );
-                    })}
-
-                  {/* <option value="Part Time">Part Time</option> */}
-                </select>
+                <div className="label">Client</div>
+                <Select value={taskData?.client ? { value: taskData?.client, label: <div className='d-flex justify-content-around'><span>{taskData?.client.brideName}</span>  <img src={Heart} /> <span>{taskData?.client.groomName}</span></div> } : null} onChange={(selected) => {
+                  setTaskData({ ...taskData, client: selected.value })
+                }} styles={customStyles} options={allClients?.map(client => {
+                  return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img src={Heart} /> <span>{client.groomName}</span></div> }
+                })} required />
               </Col>
               <Col xl="4" sm="6" lg="4" className="p-2">
-                <div className="label">Bride_Name</div>
-                <select
-                  name="BrideName"
-                  className="JobInputDrop p-2"
-                  onChange={(e) => handleBrideNameChange(e)}
-                >
-                  <option value="">Select</option>
-                  {clientData &&
-                    clientData.map((data) => {
-                      return (
-                        <>
-                          <option>{data.Bride_Name}</option>
-                        </>
-                      );
-                    })}
+                <div className="label">Assign To</div>
+                <Select value={taskData?.assignTo ? { value: taskData?.assignTo, label: <div>{taskData?.assignTo.firstName} {taskData?.assignTo?.lastName}</div> } : null} onChange={(selected) => {
+                  setTaskData({ ...taskData, assignTo: selected.value })
+                }} styles={customStyles} options={editors?.map(editor => {
+                  return { value: editor, label: <div>{editor.firstName} {editor.lastName}</div> }
+                })} required />
+              </Col>
 
-                  {/* <option value="Part Time">Part Time</option> */}
-                </select>
-              </Col>
-              <Col xl="4" sm="6" lg="4" className="p-2">
-                <div className="label">Assign_To</div>
-                <select
-                  name="BrideName"
-                  className="JobInputDrop p-2"
-                  onChange={(e) => handleAssigntoChange(e)}
-                >
-                  <option value="">Select</option>
-                  {userData &&
-                    userData.map((data) => {
-                      return (
-                        <>
-                          <option value={data.firstName + ',' + data._id}>
-                            {data.firstName}{' '}
-                          </option>
-                        </>
-                      );
-                    })}
-                </select>
-              </Col>
             </Row>
             <Row className="p-3">
               <Col xl="4" sm="6" lg="4" className="p-2">
-                <div className="label">Assign_By</div>
-                <select
-                  name="BrideName"
-                  className="JobInputDrop p-2"
-                  onChange={(e) => handleAssignByChange(e)}
-                >
-                  <option value="">Select</option>
-                  {clientData &&
-                    clientData.map((data) => {
-                      return (
-                        <>
-                          <option>{data.POC}</option>
-                        </>
-                      );
-                    })}
-                </select>
-              </Col>
-              <Col className="p-2" xl="4" sm="6">
-                <div className="label">Deadline_Date</div>
+                <div className="label">Deadline Date</div>
                 <input
                   type="date"
-                  name="deadline_date"
+                  name="deadlineDate"
                   className="JobInput"
-                  onChange={(e) => handleCompanyDataChange(e)}
+                  value={taskData?.deadlineDate || null}
+                  onChange={(e) => {
+                    setTaskData({ ...taskData, deadlineDate: e.target.value });
+                  }}
+                  required
                 />
               </Col>
-              <Col className="p-2" xl="4" sm="6">
-                <div className="label">Completion_Date</div>
-                <input
-                  type="date"
-                  name="completion_date"
-                  className="JobInput"
-                  onChange={(e) => completionDateChange(e)}
-                />
-              </Col>
-            </Row>
-            <Row className="p-3">
-              <Col>
-                <div className="label">Task_Name</div>
+              <Col xl="4" sm="6" lg="4" className="p-2">
+                <div className="label">Task Name</div>
                 <input
                   type="text"
-                  name="Task"
+                  name="taskName"
                   className="JobInput"
                   placeholder="Task Name"
-                  onChange={(e) => taskNameChange(e)}
+                  value={taskData?.taskName}
+                  onChange={(e) => {
+                    setTaskData({ ...taskData, taskName: e.target.value });
+                  }}
+                  required
                 />
               </Col>
             </Row>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button className="Update_btn" onClick={handleTaskSubmit}>
-            Update
-          </Button>
-          <Button color="danger" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter>
+          </ModalBody>
+          <ModalFooter>
+            <Button type='submit' className="Update_btn" >
+              ADD
+            </Button>
+            <Button type='button' color="danger" onClick={toggle}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Form>
       </Modal>
     </>
   );

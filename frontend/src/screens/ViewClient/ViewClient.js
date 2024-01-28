@@ -13,7 +13,7 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 
 function ViewClient() {
   const navigate = useNavigate();
-  const [clients, setClients] = useState([])
+  const [clients, setClients] = useState(null)
   const onPress = (clientId) => {
     navigate('/MyProfile/Client/ParticularClient/ClientInfo/' + clientId);
   };
@@ -69,136 +69,143 @@ function ViewClient() {
 
   return (
     <>
-      <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
-        marginTop: '-70px',
-        marginBottom: '30px'
-      }} ref={target}>
+      {clients ? (
+        <>
+          <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
+            marginTop: '-70px',
+            marginBottom: '30px'
+          }} ref={target}>
 
-        <div className='w-100 d-flex flex-row align-items-center'>
-          <div className='w-50'>
-            {filterFor === 'day' ?
-              <div
-                className={`forminput R_A_Justify1`}
-                onClick={toggle}
-                style={{ cursor: 'pointer' }}
-              >
-                {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                <img src={CalenderImg} />
+            <div className='w-100 d-flex flex-row align-items-center'>
+              <div className='w-50'>
+                {filterFor === 'day' ?
+                  <div
+                    className={`forminput R_A_Justify1`}
+                    onClick={toggle}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                    <img src={CalenderImg} />
+                  </div>
+                  :
+                  <input type='month' onChange={(e) => {
+                    filterByMonth(new Date(e.target.value))
+                  }} className='forminput R_A_Justify mt-1' />
+                }
               </div>
-              :
-              <input type='month' onChange={(e) => {
-                filterByMonth(new Date(e.target.value))
-              }} className='forminput R_A_Justify mt-1' />
-            }
+              <div className='w-50 px-2 '>
+                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
+                  if (selected.value !== filterFor) {
+                    setClients(allClients);
+                    setFilteringDay('');
+                  }
+                  setFilterFor(selected.value);
+                  setShow(false)
+                }} styles={customStyles}
+                  options={[
+                    { value: 'day', label: 'Day' },
+                    { value: 'month', label: 'Month' }]} />
+              </div>
+            </div>
           </div>
-          <div className='w-50 px-2 '>
-            <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-              if(selected.value !== filterFor){
-              setClients(allClients);
-              setFilteringDay('');
-              }
-              setFilterFor(selected.value);
-              setShow(false)
-            }} styles={customStyles}
-              options={[
-                { value: 'day', label: 'Day' },
-                { value: 'month', label: 'Month' }]} />
-          </div>
-        </div>
-
-      </div>
-      <Table
-        bordered
-        hover
-        borderless
-        responsive
-        style={{ marginTop: '15px' }}
-        className="ViewClientWidth tableViewClient"
-      >
-        <thead>
-          <tr className="logsHeader Text16N1">
-            <th className="tableBody">Client</th>
-            <th className="tableBody" style={{ width: '33%' }}>
-              Wedding Dates
-            </th>
-            <th className="tableBody"></th>
-          </tr>
-        </thead>
-        <tbody
-          className="Text12"
-          style={{
-            textAlign: 'center',
-            borderWidth: '0px 1px 0px 1px',
-          }}
-        >
-          {clients?.map((client, i) => (
-            <>
-              <tr
-                style={{
-                  background: '#EFF0F5',
-                  borderRadius: '8px',
-                }}
-                onClick={() => onPress(client._id)}
-              >
-                <td
-                  style={{
-                    paddingTop: '15px',
-                    paddingBottom: '15px',
-                    width: '33%',
-                  }}
-                  className="tableBody Text14Semi primary2 textPrimary"
-                >
-                  {client.brideName}
-                  <br />
-                  <img src={Heart} />
-                  <br />
-                  {client.groomName}
-                </td>
-                <td
-                  className="tableBody Text14Semi primary2 textPrimary"
-                  style={{
-                    paddingTop: '15px',
-                    paddingBottom: '15px',
-                    width: '33%',
-                  }}
-                >
-                  {client.events.map((eventData) => {
-                    return (
-                      <p className='mb-0'>
-                      {dayjs(eventData.eventDate).format('DD-MMM-YYYY')}
-                      </p>
-                    )
-                  })}
-                </td>
-                <td
-                  style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                  className="tableBody"
-                ></td>
+          <Table
+            bordered
+            hover
+            borderless
+            responsive
+            style={{ marginTop: '15px' }}
+            className="ViewClientWidth tableViewClient"
+          >
+            <thead>
+              <tr className="logsHeader Text16N1">
+                <th className="tableBody">Client</th>
+                <th className="tableBody" style={{ width: '33%' }}>
+                  Wedding Dates
+                </th>
+                <th className="tableBody"></th>
               </tr>
-              <div style={{ marginTop: '15px' }} />
-            </>
-          ))}
-        </tbody>
-      </Table>
-      <Overlay
-        rootClose={true}
-        onHide={() => setShow(false)}
-        target={target.current}
-        show={show}
-        placement="bottom"
-      >
-        <div>
-          <Calendar
-            value={filteringDay}
-            minDate={new Date(Date.now())}
-            CalenderPress={toggle}
-            onClickDay={(date) => {
-              filterByDay(date);
-            }}
-          />
-        </div>
+            </thead>
+            <tbody
+              className="Text12"
+              style={{
+                textAlign: 'center',
+                borderWidth: '0px 1px 0px 1px',
+              }}
+            >
+              {clients?.map((client, i) => (
+                <>
+                  <tr
+                    style={{
+                      background: '#EFF0F5',
+                      borderRadius: '8px',
+                    }}
+                    onClick={() => onPress(client._id)}
+                  >
+                    <td
+                      style={{
+                        paddingTop: '15px',
+                        paddingBottom: '15px',
+                        width: '33%',
+                      }}
+                      className="tableBody Text14Semi primary2 textPrimary"
+                    >
+                      {client.brideName}
+                      <br />
+                      <img src={Heart} />
+                      <br />
+                      {client.groomName}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 textPrimary"
+                      style={{
+                        paddingTop: '15px',
+                        paddingBottom: '15px',
+                        width: '33%',
+                      }}
+                    >
+                      {client.events.map((eventData) => {
+                        return (
+                          <p className='mb-0'>
+                            {dayjs(eventData.eventDate).format('DD-MMM-YYYY')}
+                          </p>
+                        )
+                      })}
+                    </td>
+                    <td
+                      style={{ paddingTop: '15px', paddingBottom: '15px' }}
+                      className="tableBody"
+                    ></td>
+                  </tr>
+                  <div style={{ marginTop: '15px' }} />
+                </>
+              ))}
+            </tbody>
 
-      </Overlay>
+          </Table>
+          <Overlay
+            rootClose={true}
+            onHide={() => setShow(false)}
+            target={target.current}
+            show={show}
+            placement="bottom"
+          >
+            <div>
+              <Calendar
+                value={filteringDay}
+                minDate={new Date(Date.now())}
+                CalenderPress={toggle}
+                onClickDay={(date) => {
+                  filterByDay(date);
+                }}
+              />
+            </div>
+          </Overlay>
+        </>
+      ) : (
+        <div style={{height : '400px'}} className='d-flex justify-content-center align-items-center'>
+          <div class="spinner"></div>
+        </div>
+      )}
     </>
   );
 }

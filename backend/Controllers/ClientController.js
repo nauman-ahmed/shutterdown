@@ -37,7 +37,7 @@ const AddCinematography = async (req, res) => {
     console.log(req.body);
     const client = await ClientModel.findById(req.body.client._id);
 
-    client.cinematography = req.body.client.cinematography;
+    client.cinematography = {...req.body.client.cinematography, editor : req.body.client.cinematography.editor._id};
     await client.save();
     res.status(200).json('Cinematography Added SucccessFully');
   } catch (error) {
@@ -47,11 +47,10 @@ const AddCinematography = async (req, res) => {
 
 const AddPhotosDeliverables = async (req, res) => {
   try {
-    console.log('request for cinematography');
-    console.log(req.body);
+    console.log('request for photos');
     const client = await ClientModel.findById(req.body.client._id);
-
-    client.photosDeliverables = req.body.client.photosDeliverables;
+    client.photosDeliverables = {...req.body.client.photosDeliverables, editor : req.body.client.photosDeliverables.editor._id};
+    console.log(client);
     await client.save();
     res.status(200).json('Cinematography Added SucccessFully');
   } catch (error) {
@@ -63,7 +62,7 @@ const AddAlbumsDeliverables = async (req, res) => {
   try {
     const client = await ClientModel.findById(req.body.client._id);
 
-    client.albumsDeliverables = req.body.client.albumsDeliverables;
+    client.albumsDeliverables = {...req.body.client.albumsDeliverables, editor : req.body.client.albumsDeliverables.editor._id};
     await client.save();
     res.status(200).json('Albums Deliverables Added SucccessFully');
   } catch (error) {
@@ -97,6 +96,24 @@ const getAllClients = async (req, res) => {
         { path: 'sameDayVideoMakers', model: 'user' },
         { path: 'shootDirector', model: 'user' },
       ],
+    }).populate({
+      path : 'cinematography',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
+    }).populate({
+      path : 'photosDeliverables',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
+    }).populate({
+      path : 'albumsDeliverables',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
     }).populate('userID');
 
     res.status(200).json(clients);
@@ -121,6 +138,24 @@ const getClientById = async (req, res) => {
         { path: 'sameDayVideoMakers', model: 'user' },
         { path: 'shootDirector', model: 'user' },
       ],
+    }).populate({
+      path : 'cinematography',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
+    }).populate({
+      path : 'photosDeliverables',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
+    }).populate({
+      path : 'albumsDeliverables',
+      populate : {
+        path : 'editor',
+        model : 'user'
+      }
     });
     console.log(client);
     res.status(200).json(client);

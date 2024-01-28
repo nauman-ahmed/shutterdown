@@ -1,10 +1,10 @@
-const express=require("express")
-const router=express.Router();
-const DailyTaskRouter=require('../Controllers/DailyTaskController')
-router.get(`/MyProfile/Tasks/DailyTasks/:id`,DailyTaskRouter.handleDailyTaskGetRequest);
+const express = require("express")
+const router = express.Router();
+const DailyTaskController = require('../Controllers/DailyTaskController');
 
-router.post('/MyProfile/Tasks/DailyTasks',DailyTaskRouter.handleDailyTaskPostRequest)
-router.get('/MyProfile/Tasks/DailyTasks',DailyTaskRouter.getTaskData)
+router.post('/MyProfile/Tasks/addTask', DailyTaskController.addTask)
+router.get('/MyProfile/Tasks/getAllTasks',DailyTaskController.getAllTasks)
+router.get('/MyProfile/Tasks/getEditorTasks/:editorId',DailyTaskController.getEditorTasks)
 
-router.put('/MyProfile/Tasks/DailyTasks/:id',DailyTaskRouter.updateTaskData)
-module.exports=router
+router.put('/MyProfile/Tasks/updateTask',DailyTaskController.updateTaskData)
+module.exports = router

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
@@ -7,84 +7,51 @@ import RowHeaderDropDown from "../../components/RowHeaderDropDown";
 import "../../assets/css/tableRoundHeader.css";
 import ClientHeader from "../../components/ClientHeader";
 import axios from "axios";
-import { updatedAssignTaskData, getTaskDataHandler, saveTaskDataHandler } from "../../API/TaskApi";
+import { getAllTasks, getEditorTasks, updateTaskData } from "../../API/TaskApi";
 
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Cookies from "js-cookie";
 
 
 function DailyTasks(props) {
+  const [tasks, setTasks] = useState(null);
+  const [updatingIndex, setUpdatingIndex] = useState(null);
 
-  const [taskData,setTaskData]=useState()
-  const [shootHide,setShootHide]=useState(false)
-  const [EditorHide,setEditorHide]=useState(false)
-  const [EditorData,setEditorData]=useState()
-  const [manager,setManager]=useState()
-  const [editorList,setEditorList]=useState()
-  const [userId,setUserId]=useState()
-  const [submitApi,setSubmitApi]=useState(false)
-  const [submitData,setSubmitData]=useState()
-  const [editorSelect,setEditorSelect]=useState()
-  const [assignBySelect,setAssignBySelect]=useState()
+  const currentUser = JSON.parse(Cookies.get('currentUser'));
 
-  const getTaskData=async()=>{
+  const getTaskData = async () => {
     try {
-      const id=JSON.parse(localStorage.getItem('userEmail'))
-
-      setUserId(id)
-      const res = await getTaskDataHandler()
-
-      setTaskData(res.taskData)
-      setEditorData(res.user)
+      if (currentUser.rollSelect === 'Manager') {
+        const allTasks = await getAllTasks()
+        setTasks(allTasks)
+      } else if (currentUser.rollSelect === 'Editor') {
+        const editorTasks = await getEditorTasks();
+        setTasks(editorTasks);
+      }
     } catch (error) {
-      
+      console.log(error);
     }
   }
 
-  useEffect(()=>{
-    const loginUser=JSON.parse(localStorage.getItem('loginUser'))
-    if (loginUser.data.User.rollSelect==="Shooter") {
-      setShootHide(true)
-    }
-    else if (loginUser.data.User.rollSelect==="Editor") {
-      setEditorHide(true)
-    }
-    else {
-      getTaskData()
-    }
-  },[userId])
+  useEffect(() => {
+    getTaskData();
+  }, [])
 
-
-
-  const TaskDataFunction=(data)=>{
-    // setSubmitData(data)
+  const updateTask = async (index) => {
+    const taskDataToUpdate = tasks[index];
+    if (!taskDataToUpdate.deadlineDate) {
+      window.notify('Please Provide Deadline Date!', 'error');
+      return
+    }
+    setUpdatingIndex(index);
+    await updateTaskData(taskDataToUpdate);
+    await getTaskData();
+    setUpdatingIndex(null)
   }
 
-  const onSubmitHandler = async (index) => {
 
-    
-    if(taskData[index].taskName == null || taskData[index].taskName == undefined || taskData[index].taskName == ""){
-      toast.error('Please add data to taskName');
-      return
-    }
-    if(taskData[index].assignTo == null || taskData[index].assignTo == undefined){
-      toast.error('Please add data to assignTo');
-      return
-    }
-    if(taskData[index].companyDate == null || taskData[index].companyDate == undefined){
-      toast.error('Please add data to companyDate');
-      return
-    }
-    if(taskData[index].completionDate == null || taskData[index].completionDate == undefined){
-      toast.error('Please add data to completionDate');
-      return
-    }
-
-    await saveTaskDataHandler(taskData[index])
-    toast.success('Submitted Data Successfully');
-
-  }
 
   return (
     <>
@@ -92,155 +59,226 @@ function DailyTasks(props) {
       <ClientHeader
         filter
         title={'Daily Tasks'}
-        TaskDataFunction={TaskDataFunction}
-        sumbitApi={submitApi}
-        setSubmitApi={setSubmitApi}
+        updateData={getTaskData}
       />
-        
-          <Table
-            hover
-            borderless
-            responsive
-            className="tableViewClient"
-            style={{ width: '100%', marginTop: '15px' }}
-          >
-            
-              <>
-                <thead>
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Client:</th>
-                    <th className="tableBody">Task</th>
-                    <th className="tableBody">Assign To</th>
-                    <th className="tableBody">Deadline</th>
-                    <th className="tableBody">Completion Date</th>
-                    <th className="tableBody">Save</th>
-                  </tr>
-                </thead>
-              </>
+      {tasks ? (
+        <Table
+          hover
+          borderless
+          responsive
+          className="tableViewClient"
+          style={{ width: '100%', marginTop: '15px' }}
+        >
 
-            <tbody
-              className="Text12"
-              style={{
-                textAlign: 'center',
-                borderWidth: '0px 1px 0px 1px',
-              }}
-            >
+          <>
+            <thead>
+              {currentUser.rollSelect === 'Manager' && (
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Task</th>
+                  <th className="tableBody">Assign To</th>
+                  <th className="tableBody">Assign By</th>
+                  <th className="tableBody">Deadline</th>
+                  <th className="tableBody">Completion Date</th>
+                  <th className="tableBody">Save</th>
+                </tr>
+              )}
+              {currentUser.rollSelect === 'Editor' && (
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Task</th>
+                  <th className="tableBody">Assign By</th>
+                  <th className="tableBody">Deadline</th>
+                  <th className="tableBody">Completion Date</th>
+                </tr>
+              )}
+            </thead>
+          </>
+
+          <tbody
+            className="Text12"
+            style={{
+              textAlign: 'center',
+              borderWidth: '0px 1px 0px 1px',
+            }}
+          >
+            <>
+              {tasks?.map((task, index) => (
                 <>
-                  {taskData &&
-                    taskData.map((data,index) => (
-                      <>
-                        <div style={{ marginTop: '15px' }} />
-                        <tr
-                          style={{
-                            background: '#EFF0F5',
-                            borderRadius: '8px',
+                  <div style={index === 0 ? { marginTop: '15px' } : {marginTop : '0px'}} />
+                  {currentUser.rollSelect === 'Manager' && (
+                    <tr
+                      style={{
+                        background: '#EFF0F5',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.client.brideName}
+                        <br />
+                        <img src={Heart} alt="" />
+                        <br />
+                        {task.client.groomName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.taskName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.assignTo.firstName} {task.assignTo.lastName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.assignBy.firstName} {task.assignBy.lastName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        <input
+                          type="date"
+                          name="deadlineDate"
+                          className="JobInput"
+                          onChange={(e) => {
+                            let temp = [...tasks]
+                            temp[index]["deadlineDate"] = e.target.value
+                            setTasks(temp)
                           }}
+                          value={task.deadlineDate ? dayjs(new Date(task.deadlineDate)).format('YYYY-MM-DD') : null}
+                        />
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        <input
+                          type="date"
+                          name="completion_date"
+                          className="JobInput"
+                          onChange={(e) => {
+                            let temp = [...tasks]
+                            temp[index]["completionDate"] = e.target.value
+                            setTasks(temp)
+                          }}
+                          value={task.completionDate ? dayjs(task.completionDate).format('YYYY-MM-DD') : null}
+                        />
+                      </td>
+                      <td>
+                        <button className="mt-3"
+                          style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
+                          onClick={() => updatingIndex === null && updateTask(index)}
                         >
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                            {data.ClientId.Bride_Name}
-                            <br />
-                            <img src={Heart} alt="" />
-                            <br />
-                            {data.ClientId.Groom_Name}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                             <input
-                                type="text"
-                                name="Task"
-                                className="JobInput"
-                                placeholder={data.taskName ? data.taskName : "Task Name"} 
-                                onChange={(e) => {
-                                  let temp = [...taskData]
-                                  temp[index]["taskName"] = e.target.value
-                                  setTaskData(temp)
-                                }}
-                                value = {data.taskName}
-                              />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                             <CoomonDropDown
-                               table
-                               assigntoStringManager = {'assigntoStringManager'}
-                               valueType = {'assigntoStringManager'}
-                               EditorData={EditorData}
-                               value={data.assignTo ? data.assignTo.firstName : null}
-                               setEditorSelect={(i) => {
-                                let temp = [...taskData]
-                                temp[index]["assignTo"] = i
-                                setTaskData(temp)
-                               }}
-                              />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                             <input
-                              type="date"
-                              name="deadline_date"
-                              className="JobInput"
-                              onChange={(e) => {
-                                let temp = [...taskData]
-                                temp[index]["companyDate"] = e.target.value
-                                setTaskData(temp)
-                              }}
-                              value={data.companyDate ? data.companyDate : null}
-                            />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                             <input
-                              type="date"
-                              name="completion_date"
-                              className="JobInput"
-                              onChange={(e) => {
-                                let temp = [...taskData]
-                                temp[index]["completionDate"] = e.target.value
-                                setTaskData(temp)
-                              }}
-                              value={data.completionDate ? data.completionDate : null}
-                            />
-                          </td>
-                          <td>
-                        <button 
-                          style={{backgroundColor:'#FFDADA',borderRadius:'5px',border:'none',height:'30px'}} 
-                          onClick={()=>onSubmitHandler(index)}
-                        >
-                          Save
+                          {updatingIndex === index ? (
+                            <div className='w-100'>
+                              <div class="smallSpinner mx-auto"></div>
+                            </div>
+                          ) : (
+                            "Save"
+                          )}
                         </button>
                       </td>
-                        </tr>
-                      </>
-                    ))}
+                    </tr>
+                  )}
+                  {currentUser.rollSelect === 'Editor' && (
+                    <tr
+                      style={{
+                        background: '#EFF0F5',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.client.brideName}
+                        <br />
+                        <img src={Heart} alt="" />
+                        <br />
+                        {task.client.groomName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.taskName}
+                      </td>
+
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.assignBy.firstName} {task.assignBy.lastName}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {dayjs(task.deadlineDate).format('DD/MM/YYYY')}
+                      </td>
+                      <td
+                        className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}
+                      >
+                        {task.completionDate ? dayjs(task.completionDate).format('DD/MM/YYYY') : 'Not yet completed'}
+
+                      </td>
+
+                    </tr>
+                  )}
+
                 </>
-            </tbody>
-          </Table>
+              ))}
+            </>
+          </tbody>
+        </Table>
+      ) : (
+        <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+          <div class="spinner"></div>
+        </div>
+      )}
     </>
   );
 }

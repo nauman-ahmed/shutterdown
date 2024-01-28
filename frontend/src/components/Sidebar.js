@@ -56,8 +56,6 @@ const SideBar = () => {
               <Menu>
                 {currentUser.rollSelect == 'Manager' && (
                   <>
-
-
                     <SubMenu className={activeMenu == 1 ? 'active' : ''}
                       icon={activeMenu == 1 ? (
                         <img
@@ -332,7 +330,7 @@ const SideBar = () => {
                     </MenuItem>
                   </SubMenu>
                 )}
-               
+
 
                 {currentUser.rollSelect == 'Manager' && (
                   <MenuItem
@@ -356,7 +354,7 @@ const SideBar = () => {
                 )}
 
 
-                
+
                 <MenuItem
                   icon={
                     <img
@@ -406,6 +404,12 @@ const SideBar = () => {
                     >
                       Tasks
                     </MenuItem>
+
+                  </>
+                )}
+
+                {currentUser.rollSelect == 'Manager' && (
+                  <>
                     <MenuItem
                       icon={
                         activeMenu == 6 ? (
@@ -425,37 +429,32 @@ const SideBar = () => {
                     >
                       Reports
                     </MenuItem>
+                    <MenuItem
+                      icon={
+                        activeMenu == 7 ? (
+                          <img src={ActiveTeam} width={30}></img>
+                        ) : (
+                          <img
+                            src="/images/sidebar/teams.png"
+                            width={20}
+                          ></img>
+                        )
+                      }
+                      className={activeMenu == 7 ? 'active active_color' : ''}
+                      onClick={() => {
+                        setActiveMenu(7);
+                        navigate('/MyProfile/Team');
+                      }}
+                    >
+                      Team
+                    </MenuItem>
                   </>
-                )}
-
-                {currentUser.rollSelect == 'Manager' && (
-
-
-                  <MenuItem
-                    icon={
-                      activeMenu == 7 ? (
-                        <img src={ActiveTeam} width={30}></img>
-                      ) : (
-                        <img
-                          src="/images/sidebar/teams.png"
-                          width={20}
-                        ></img>
-                      )
-                    }
-                    className={activeMenu == 7 ? 'active active_color' : ''}
-                    onClick={() => {
-                      setActiveMenu(7);
-                      navigate('/MyProfile/Team');
-                    }}
-                  >
-                    Team
-                  </MenuItem>
                 )}
                 <MenuItem
                   icon={
                     <img src="/images/sidebar/logout.png" width={20}></img>
                   }
-                  onClick={()=>{
+                  onClick={() => {
                     Cookies.remove('currentUser');
                     navigate('/')
                   }}

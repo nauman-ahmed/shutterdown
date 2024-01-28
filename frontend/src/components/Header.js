@@ -26,6 +26,7 @@ const Header = (args) => {
   const targetNoti = useRef(null);
 
   const { profileData, GetDataProfile } = useAuthContext();
+  const currentUser = JSON.parse(Cookies.get('currentUser'));
 
   useEffect(() => {
     GetDataProfile();
@@ -43,7 +44,7 @@ const Header = (args) => {
             <div className="w-100 hide_nav_profile">
               <div className="w-100 d-flex align-items-center justify-content-between">
                 <h4 className="heading"></h4>
-                <div className="search_div d-flex align-items-center justify-content-between">
+                {/* <div className="search_div d-flex align-items-center justify-content-between">
                   <input
                     className="input_search"
                     type="text"
@@ -51,9 +52,9 @@ const Header = (args) => {
                     aria-label="Search"
                   />
                   <img src="/images/navbar/search.png" width={25}></img>
-                </div>
+                </div> */}
                 <div className="d-flex align-items-center">
-                  <img
+                  {/* <img
                     ref={targetNoti}
                     onClick={() => setShowNoti(!showNoti)}
                     src="/images/navbar/noti.png"
@@ -63,7 +64,7 @@ const Header = (args) => {
                     }}
                     width={25}
                     height={25}
-                  />
+                  /> */}
                   <div className="name_div_flex">
                     <img
                       src="/images/navbar/oval.png"
@@ -73,7 +74,7 @@ const Header = (args) => {
                       style={{ position: "absolute", cursor: "pointer" }}
                     />
                     <div className="name_div">
-                      <p style={{ marginBottom: 0 }}>{`${profileData?.firstName.charAt(0).toUpperCase() + profileData?.firstName.slice(1).toLowerCase()} ${profileData?.lastName.charAt(0).toUpperCase() + profileData?.lastName.slice(1).toLowerCase()}`}</p>
+                      <p style={{ marginBottom: 0 }}>{`${currentUser?.firstName.charAt(0).toUpperCase() + currentUser?.firstName.slice(1).toLowerCase()} ${currentUser?.lastName.charAt(0).toUpperCase() + currentUser?.lastName.slice(1).toLowerCase()}`}</p>
                     </div>
                   </div>
                 </div>
@@ -111,7 +112,7 @@ const Header = (args) => {
                   </p>
                 </div>
 
-                <div onClick={()=> navigate('/MyProfile/Attendence')} className="d-flex align-items-center mt-2 non_active_path">
+                <div onClick={() => navigate('/MyProfile/Attendence')} className="d-flex align-items-center mt-2 non_active_path">
                   <img src="/images/navbar/attendence.png" width={15}></img>
                   <p className="popover_txt">Attendence</p>
                 </div>

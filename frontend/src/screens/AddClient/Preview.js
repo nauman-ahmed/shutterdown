@@ -13,15 +13,18 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 import { updateClintData } from '../../redux/clientBookingForm';
 
 function Preview() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const [requesting, setRequesting] = useState(false)
   const clientData = useSelector((state) => state.clientData);
   const [eventIndex, setEventIndex] = useState(0)
   const submitClient = async () => {
+    setRequesting(true)
     const user = JSON.parse(localStorage.getItem('loginUser'));
-    await SaveClientForm({ ...clientData, userID: user?.data?.User._id })
-    dispatch(updateClintData({ albums: [""] }))
-    window.notify("Cliend has been Added", "success")
-    navigate('/MyProfile/AddClient/Form-I')
+    await SaveClientForm({ ...clientData, userID: user?.data?.User._id });
+    setRequesting(false);
+    dispatch(updateClintData({ albums: [""] }));
+    window.notify("Client has been Added", "success");
+    navigate('/MyProfile/AddClient/Form-I');
   };
   const target = useRef(null);
   const navigate = useNavigate();
@@ -146,7 +149,7 @@ function Preview() {
                 name="drones"
                 disabled={true}
                 className='forminput'
-                value={ clientData?.events && clientData?.events[eventIndex]?.drones}
+                value={clientData?.events && clientData?.events[eventIndex]?.drones}
                 required={true}
                 // onChange={(e) => updateEventValues(e)}
                 placeholder={'Location'}
@@ -394,7 +397,13 @@ function Preview() {
           <Col xs="3" sm="2" className="me-3">
             <div className="centerAlign mt40 mb15">
               <Button className="submit_btn submit" onClick={submitClient}>
-                Save
+                {requesting ? (
+                  <div className='w-100'>
+                    <div class="smallSpinner mx-auto"></div>
+                  </div>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </div>
           </Col>

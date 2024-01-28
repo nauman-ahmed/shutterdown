@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {useSelector, useDispatch} from 'react-redux';
 import "../assets/css/common.css";
 import "../assets/css/Profile.css";
 import "react-calendar/dist/Calendar.css";
@@ -10,16 +11,18 @@ import Heart from "../assets/Profile/Heart.svg";
 import { getEvents } from "../API/Event";
 import dayjs from 'dayjs';
 import Cookies from "js-cookie";
+import { updateAllEvents } from "../redux/eventsSlice";
 
 function CalenderBar(props) {
-  const [EventsList, setEventsList] = useState([]);
+  const EventsList = useSelector(state => state.allEvents);
+  const dispatch = useDispatch()
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const getEventsData = async () => {
     try {
       const res = await getEvents();
       if (currentUser.rollSelect == 'Manager') {
-        setEventsList(res.data);
-      } else if (currentUser.rollSelect == 'Shooter') {
+        dispatch(updateAllEvents(res.data));
+      } else if (currentUser.rollSelect == 'Shooter' || currentUser.rollSelect == 'Editor') {
         const eventsToShow = res.data.map(event => {
           if (event?.shootDirector.some(director => director._id == currentUser._id)) {
             return { ...event, userRole: 'Shoot Director' };
@@ -41,7 +44,7 @@ function CalenderBar(props) {
             return null;
           }
         });
-        setEventsList(eventsToShow);
+        dispatch(updateAllEvents(eventsToShow));
       }
     } catch (error) {
       console.log(error);
@@ -68,110 +71,111 @@ function CalenderBar(props) {
   return (
     <>
       <div className="CalenderComponent mobile_hide_calendar">
-        <div className="Text20Semi">{getCurrentMonthAndYear()}</div>
-        <div className="calendar-container">
-          <Calendar
-            tileClassName={({ date }) => {
-              let count = 0
-              for (let index = 0; index < EventsList.length; index++) {
-                if (EventsList[index]) {
+        {EventsList ? (
+          <>
+            <div className="Text20Semi">{getCurrentMonthAndYear()}</div>
+            <div className="calendar-container">
+              <Calendar tileClassName={({ date }) => {
+                let count = 0
+                for (let index = 0; index < EventsList?.length; index++) {
+                  if (EventsList[index]) {
 
-                  const initialDate = new Date(EventsList[index].eventDate)
-                  const targetDate = new Date(date);
+                    const initialDate = new Date(EventsList[index].eventDate)
+                    const targetDate = new Date(date);
 
-                  const initialDatePart = initialDate.toISOString().split("T")[0];
-                  const targetDatePart = targetDate.toISOString().split("T")[0];
+                    const initialDatePart = initialDate.toISOString().split("T")[0];
+                    const targetDatePart = targetDate.toISOString().split("T")[0];
 
-                  if (initialDatePart === targetDatePart) {
-                    count += 1
+                    if (initialDatePart === targetDatePart) {
+                      count += 1
+                    }
                   }
                 }
-              }
-
-              if (count == 1) {
-                return "highlight5"
-              } else if (count == 2) {
-                return "highlight3"
-              }
-              else if (count >= 3) {
-                return "highlight1"
-              }
-
-
-            }}
-            onChange={() => null}
-          />
-        </div>
-        {props.Attendence && (
-          <div className="summaryBox">
-            <div className="R_A_Justify1">
-              <Button
-                className="submit_btn submit summary"
-                style={{ marginRight: '10px' }}
-              >
-                Summary
-              </Button>
-              <img src={Chat} style={{ marginRight: '15px' }} />
+                if (count == 1) {
+                  return "highlight5"
+                } else if (count == 2) {
+                  return "highlight3"
+                }
+                else if (count >= 3) {
+                  return "highlight1"
+                }
+              }}
+                onChange={() => null}
+              />
             </div>
-            <Table
-              // bordered
-              hover
-              striped
-              responsive
-              style={{ marginTop: '15px' }}
-            >
-              <thead>
-                <tr className="Text10S gray3 alignTop">
-                  <th>Date</th>
-                  <th>Couple </th>
-                  <th>Location</th>
-                  <th>Photographer: Cinematographer</th>
-                </tr>
-              </thead>
-              <tbody className="Text10S alignCenter">
-                {EventsList.map((event, i) => (
-                  <>
-                    {event && (
-                      <tr>
-                        <td
-                          className="primary2"
-                          style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                        >
-                          {dayjs(event?.eventDate).format('DD-MM-YYYY')}
-                        </td>
-                        <td
-                          className="primary2"
-                          style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                        >
-                          {event?.client?.brideName}
-                          <br />
-                          <img src={Heart} />
-                          {event?.client?.groomName}
-                        </td>
-                        <td
-                          className="green"
-                          style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                        >
-                          {event?.location}
-                        </td>
-                        <td
-                          className="primary2"
-                          style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                        >
-                          ({event?.photographers},{event?.cinematographers})
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                ))}
-              </tbody>
-            </Table>
+            {props.Attendence && (
+              <div className="summaryBox">
+                <div className="R_A_Justify1">
+                  <Button
+                    className="submit_btn submit summary"
+                    style={{ marginRight: '10px' }}
+                  >
+                    Summary
+                  </Button>
+                  <img src={Chat} style={{ marginRight: '15px' }} />
+                </div>
+                <Table
+                  // bordered
+                  hover
+                  striped
+                  responsive
+                  style={{ marginTop: '15px' }}
+                >
+                  <thead>
+                    <tr className="Text10S gray3 alignTop">
+                      <th>Date</th>
+                      <th>Couple </th>
+                      <th>Location</th>
+                      <th>Photographer: Cinematographer</th>
+                    </tr>
+                  </thead>
+                  <tbody className="Text10S alignCenter">
+                    {EventsList?.map((event, i) => (
+                      <>
+                        {event && (
+                          <tr>
+                            <td
+                              className="primary2"
+                              style={{ paddingTop: '15px', paddingBottom: '15px' }}
+                            >
+                              {dayjs(event?.eventDate).format('DD-MM-YYYY')}
+                            </td>
+                            <td
+                              className="primary2"
+                              style={{ paddingTop: '15px', paddingBottom: '15px' }}
+                            >
+                              {event?.client?.brideName}
+                              <br />
+                              <img src={Heart} />
+                              {event?.client?.groomName}
+                            </td>
+                            <td
+                              className="green"
+                              style={{ paddingTop: '15px', paddingBottom: '15px' }}
+                            >
+                              {event?.location}
+                            </td>
+                            <td
+                              className="primary2"
+                              style={{ paddingTop: '15px', paddingBottom: '15px' }}
+                            >
+                              ({event?.photographers},{event?.cinematographers})
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+            <div class="spinner"></div>
           </div>
         )}
       </div>
-      {/* <div style={{ display: 'none' }}>
-        <ClientHeader getCalenderData={getCalenderData} />
-      </div> */}
     </>
   );
 }

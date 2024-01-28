@@ -1,18 +1,19 @@
 const mongoose=require('mongoose')
 const taskSchema=mongoose.Schema({
-    ClientId:{
+    client:{
         type: mongoose.Types.ObjectId,
-        ref: 'Booking'
+        ref: 'Client'
     },
-    eventId:{
-        type: mongoose.Types.ObjectId,
-        ref: 'Event'
+    deadlineDate:{
+        type:Date
     },
-    companyDate:{
-        type:String
+    assignDate:{
+        type:Date,
+        required : true,
+        default : Date.now()
     },
     completionDate:{
-        type:String
+        type:Date
     },
     assignTo:{
         type: mongoose.Types.ObjectId,
@@ -28,5 +29,5 @@ const taskSchema=mongoose.Schema({
 })
 
 
-const taskModel=mongoose.model("task",taskSchema)
+const taskModel=mongoose.model("Task",taskSchema)
 module.exports=taskModel
