@@ -73,7 +73,7 @@ export const GetSignInApi = async (data) => {
   }).catch(err => {
     console.log(err);
     if(err.response?.status === 404){
-      window.notify(err.response.data, 'error')
+      window.notify(err.response.data.message, 'error')
     }
     Cookies.remove('currentUser');
   });
