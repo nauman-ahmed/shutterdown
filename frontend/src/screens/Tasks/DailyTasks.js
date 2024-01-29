@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
-import CoomonDropDown from "../../components/CoomonDropDown";
-import RowHeaderDropDown from "../../components/RowHeaderDropDown";
 import "../../assets/css/tableRoundHeader.css";
 import ClientHeader from "../../components/ClientHeader";
-import axios from "axios";
 import { getAllTasks, getEditorTasks, updateTaskData } from "../../API/TaskApi";
-
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

@@ -1,8 +1,6 @@
 import React from "react";
-import SideBar from "../../components/Sidebar";
-import Header from "../../components/Header";
 import CalenderBar from "../../components/CalenderBar";
-import AttendenceHeader from "./AttendenceHeader";
+// import AttendenceHeader from "./AttendenceHeader";
 import Logs from "./Logs";
 import ProfileHeader from "../../components/ProfileHeader";
 
@@ -14,7 +12,7 @@ const Attendence = (props) => {
           <div className="main_content">
             <div style={{ width: '100%' }}>
               <ProfileHeader attendence />
-              <AttendenceHeader attendenceSettings={'attendenceSettings'}   />
+              {/* <AttendenceHeader attendenceSettings={'attendenceSettings'}   /> */}
             </div>
             <CalenderBar Attendence />
           </div>

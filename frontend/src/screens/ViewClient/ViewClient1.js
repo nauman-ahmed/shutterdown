@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate,useLocation } from "react-router-dom";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
-import Heart from "../../assets/Profile/Heart.svg";
-import CoomonDropDown from "../../components/CoomonDropDown";
 import dayjs from "dayjs";
-import axios from "axios";
+
 function ViewClient1(props) {
   const [clientInfo,setClientInfo] = useState([])
   const location=useLocation()

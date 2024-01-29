@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
-import CoomonDropDown from "../../components/CoomonDropDown";
-import RowHeaderDropDown from "../../components/RowHeaderDropDown";
 import "../../assets/css/tableRoundHeader.css";
 import { getAllTasks } from "../../API/TaskApi";
 import dayjs from "dayjs";

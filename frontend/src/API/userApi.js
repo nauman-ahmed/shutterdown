@@ -7,8 +7,6 @@ export const GetsignUPData = async (data, phoneNo) => {
 
   const { firstName, lastName, email, password, confirmPassword,rollSelect } = data;
 
-  console.log(data);
-
   const res = await axios.post(BASE_URL+'/Signup', {
     Headers: {
       'Content-Type': 'application/json',
@@ -62,8 +60,6 @@ export const checkExistEmail=async(data)=>{
 }
 export const GetSignInApi = async (data) => {
   const { email, password } = data;
-  console.log(data);
-  console.log(BASE_URL);
   await axios.post(BASE_URL, {
     Headers: {
       'Content-Type': 'application/json',
@@ -76,7 +72,7 @@ export const GetSignInApi = async (data) => {
   
   }).catch(err => {
     console.log(err);
-    if(err.response.status === 404){
+    if(err.response?.status === 404){
       window.notify(err.response.data, 'error')
     }
     Cookies.remove('currentUser');

@@ -4,7 +4,6 @@ import SummaryOut from "../../assets/Profile/SummaryOut.svg";
 import SummaryIn from "../../assets/Profile/SummaryIn.svg";
 import WhiteTick from "../../assets/Profile/WhiteTick.svg";
 import Next from "../../assets/Profile/Next.svg";
-import CommonInputText from "../../components/CommonInputText";
 
 function Summary(props) {
   const [summary, setSummary] = useState(true);

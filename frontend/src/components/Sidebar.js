@@ -32,8 +32,7 @@ const SideBar = () => {
   const toggle = () => {
     setMobileSideBar(false);
   };
-  const [currentUser, setCurrentUser] = useState(JSON.parse(Cookies.get('currentUser')));
-  console.log(currentUser);
+  const currentUser= Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   return (
     <>
       <div

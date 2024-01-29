@@ -53,21 +53,6 @@ export const checkOutUser = async (data) => {
     }
 }
 
-export const getMyAttendence = async (Id) => {
-    try {
-
-        const res = await axios.get(BASE_URL + '/MyProfile/Attendence/' + Id, {
-            Headers: {
-                "Content-Type": "application/json"
-            },
-        },
-        )
-
-        return res.data
-    } catch (error) {
-
-    }
-}
 export const getUserAttendence = async (Id) => {
     try {
         const user = JSON.parse(Cookies.get('currentUser'))

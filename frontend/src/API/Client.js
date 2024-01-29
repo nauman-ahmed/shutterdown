@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from "./index"
 import Cookies from 'js-cookie';
-const currentUser = JSON.parse(Cookies.get('currentUser'));
+const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
+
+
 export const SaveClientForm = async (data) => {
   try {
     const dataToSend = { ...data, userID: currentUser._id }
@@ -84,18 +86,7 @@ export const addAlbumsDeliverables = async (client) => {
   }
 };
 
-export const getClientBasicInfo = async () => {
-  try {
-    const res = await axios.get(BASE_URL + `/Client/ViewClient`,
-      {
-        Headers: { 'Content-Type': 'application/json' },
-      }
-    );
-    return res.data
-  } catch (error) {
-    console.log(error)
-  }
-}
+
 export const getClients = async () => {
   try {
     const res = await axios.get(BASE_URL + `/Client/getAllClients`,
@@ -121,30 +112,3 @@ export const getClientById = async (clientId) => {
   }
 }
 
-export const getClientAllInfo = async ({ clientId }) => {
-  try {
-    const res = await axios.post(BASE_URL + `/MyProfile/Client/ParticularClient/ClientInfo`,
-      {
-        Headers: { 'Content-Type': 'application/json' },
-        clientId: clientId
-      }
-    );
-    return res.data
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-export const getClientAllShootDetails = async ({ clientId }) => {
-  try {
-    const res = await axios.post(BASE_URL + `/MyProfile/Client/ParticularClient/shootDetails`,
-      {
-        Headers: { 'Content-Type': 'application/json' },
-        clientId: clientId
-      }
-    );
-    return res.data
-  } catch (error) {
-    console.log(error)
-  }
-}

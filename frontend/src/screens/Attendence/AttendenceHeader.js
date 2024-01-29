@@ -8,8 +8,6 @@ import AttendenceHistory from '../../assets/Profile/AttendenceHistory.svg';
 import Home from '../../assets/Profile/Home.svg';
 import WebClock from '../../assets/Profile/WebClock.svg';
 import { useNavigate } from 'react-router-dom';
-import CoomonDropDown from '../../components/CoomonDropDown';
-import CommonDropText from '../../components/CommonDropText';
 import axios from 'axios';
 import Spinner from 'react-bootstrap/Spinner';
 

@@ -1,7 +1,6 @@
 const userModel = require('../models/userSchema')
 const AttendenceSchema = require('../models/AttendenceSchema')
 const AttendaceModel = require('../models/AttendenceSchema');
-const EditorShooterModel = require('../models/EditorShooterAttendenceSchema')
 
 const EditorData = async (req, res) => {
     try {

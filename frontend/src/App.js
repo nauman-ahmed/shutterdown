@@ -51,9 +51,11 @@ import EmailVerification from './screens/EmailVerification/EmailVerification';
 import { ToastContainer } from 'react-toastify';
 import AuthContextProvider from './config/context';
 import LoginWithGoogle from './screens/login/LoginWithGoogle';
-import AttendenceSettings from './screens/Attendence/AttendenceSettings';
-import EditorAttendence from './screens/Attendence/EditorAttendence';
-import ShooterAttendence from './screens/Attendence/ShooterAttendence';
+// import AttendenceSettings from './screens/Attendence/AttendenceSettings';
+import UserAttendence from './screens/Attendence/Attendence';
+
+
+
 function App() {
   const location = useLocation();
   const [shooter, setShooter] = useState(false);
@@ -122,11 +124,11 @@ function App() {
               <Route exact path="/Photographer" element={<Tasks />}>
                 <Route path="DailyTasks" element={<DailyTasks />} />
               </Route>
-              <Route
+              {/* <Route
                 exact
                 path="/Attendence"
                 element={<AttendenceSettings />}
-              ></Route>
+              ></Route> */}
               <Route exact path="/Attendee" element={<MobileAttendence />}>
                 <Route path="WebClock" element={<WebClock />} />
                 <Route path="WFHome" element={<WFHome />} />
@@ -138,11 +140,11 @@ function App() {
             ''
           )}
           <Route path="/Attendee" element={<MobileAttendence />} />
-          <Route
+          {/* <Route
             path="Myprofile/AttendenceSettings"
             element={<AttendenceSettings />}
-          />
-          <Route path="/Myprofile/Attendence" element={<EditorAttendence />} />
+          /> */}
+          <Route path="/Myprofile/Attendence" element={<UserAttendence />} />
           <Route exact path="/MyProfile/AddClient" element={<AddClient />}>
             <Route path="Form-I" element={<FormI />} />
             <Route path="Form-II" element={<FormII />} />

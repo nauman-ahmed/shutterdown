@@ -1,10 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
-import CoomonDropDown from "../../components/CoomonDropDown";
-import Collapsible from "react-collapsible";
 import DeleiveryDropDown from "../../components/DeleiveryDropDown";
 
 function ParticularClient(props) {

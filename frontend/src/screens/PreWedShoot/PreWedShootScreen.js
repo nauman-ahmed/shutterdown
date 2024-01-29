@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import dayjs from "dayjs";
 import { getClients, updateClient } from "../../API/Client";
 import Select from 'react-select'
-import { useAuthContext } from "../../config/context";
 import Cookies from "js-cookie";
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
@@ -58,7 +57,6 @@ function PreWedShootScreen(props) {
       console.log(error, "error")
     }
   }
-  console.log(useAuthContext());
   useEffect(() => {
     getAllClients();
   }, [])

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import '../assets/css/clients.css';
-import CoomonDropDown from './CoomonDropDown';
 import ActiveCalender from '../assets/Profile/ActiveCalender.svg';
 import ListView from '../assets/Profile/ListView.svg';
 import UnactiveCalender from '../assets/Profile/UnactiveCalender.svg';

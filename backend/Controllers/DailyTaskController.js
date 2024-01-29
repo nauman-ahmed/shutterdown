@@ -1,8 +1,4 @@
-const addClientSchema = require('../models/ClientModel');
-const clientSchema = require('../models/ClientModel');
 const taskSchema = require('../models/TaskSchema');
-const userSchema = require('../models/userSchema');
-
 
 const addTask = async (req, res) => {
   try {
@@ -18,8 +14,6 @@ const addTask = async (req, res) => {
 const getAllTasks = async (req, res) => {
   try {
     const tasks = await taskSchema.find().populate("client assignBy assignTo")
-
-    // const Editor=await userSchema.find({rollSelect:"Editor"})
     res.status(200).json(tasks);
   } catch (error) {
     console.log(error, 'taskData');
@@ -49,7 +43,6 @@ const updateTaskData = async (req, res) => {
    }
 }
 module.exports = {
-
   addTask,
   getAllTasks,
   getEditorTasks,

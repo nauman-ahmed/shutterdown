@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Row, Table } from 'reactstrap';
 import "../../assets/css/Profile.css";
-import axios from "axios";
-import { postAttendenceData, getMyAttendence, checkInUser, checkOutUser, getUserAttendence } from "../../API/AttendenceApi"
+import { checkInUser, checkOutUser, getUserAttendence } from "../../API/AttendenceApi"
 import { format } from 'date-fns';
 
 function Logs(props) {

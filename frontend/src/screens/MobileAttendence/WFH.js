@@ -5,7 +5,6 @@ import ShiftLocate from "../../assets/Profile/ShiftLocate.svg";
 import ShiftOut from "../../assets/Profile/ShiftOut.svg";
 import GreenCircle from "../../assets/Profile/GreenCircle.svg";
 import RedCircle from "../../assets/Profile/RedCircle.svg";
-import CommonInputText from "../../components/CommonInputText";
 
 function WFHome(props) {
   return (
@@ -33,7 +32,7 @@ function WFHome(props) {
         hourly required
       </div>
       <div style={{ width: "85%", marginLeft: "25px" }}>
-        <CommonInputText textArea divstyle="mt25" placeholder="Reason" />
+        <textarea className="forminput h100 alignTop mt25" placeholder="Reason" />
         <div className="Text12 gray mt25">Notify</div>
         <input
           type="text"
