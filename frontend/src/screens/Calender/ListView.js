@@ -269,6 +269,7 @@ function ListView() {
                     <th className="tableBody">Date</th>
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Event Type</th>
+                    <th className="tableBody">Status</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
                     <th className="tableBody">Save</th>
