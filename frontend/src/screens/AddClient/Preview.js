@@ -12,6 +12,8 @@ import { SaveClientForm } from "../../API/Client"
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import { updateClintData } from '../../redux/clientBookingForm';
 import Cookies from 'js-cookie';
+import { getEvents } from '../../API/Event';
+import { updateAllEvents } from '../../redux/eventsSlice';
 
 function Preview() {
   const dispatch = useDispatch();
@@ -22,6 +24,8 @@ function Preview() {
     setRequesting(true)
     await SaveClientForm(clientData);
     setRequesting(false);
+    const storedEvents = await getEvents();
+    dispatch(updateAllEvents(storedEvents.data))
     dispatch(updateClintData({ albums: [""] }));
     navigate('/MyProfile/AddClient/Form-I');
   };

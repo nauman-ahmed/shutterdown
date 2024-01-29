@@ -162,7 +162,7 @@ function Cinematography(props) {
               borderless
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '130%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '130%', marginTop: '15px'} : { width: '100%', marginTop: '15px'}}
             >
               <thead>
                 {currentUser?.rollSelect == "Manager" && (

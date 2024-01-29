@@ -86,6 +86,7 @@ function DailyTasks(props) {
                   <th className="tableBody">Assign By</th>
                   <th className="tableBody">Deadline</th>
                   <th className="tableBody">Completion Date</th>
+                  <th className="tableBody">Save</th>
                 </tr>
               )}
             </thead>
@@ -101,7 +102,7 @@ function DailyTasks(props) {
             <>
               {tasks?.map((task, index) => (
                 <>
-                  <div style={index === 0 ? { marginTop: '15px' } : {marginTop : '0px'}} />
+                  <div style={index === 0 ? { marginTop: '15px' } : { marginTop: '0px' }} />
                   {currentUser.rollSelect === 'Manager' && (
                     <tr
                       style={{
@@ -258,8 +259,31 @@ function DailyTasks(props) {
                           paddingBottom: '15px',
                         }}
                       >
-                        {task.completionDate ? dayjs(task.completionDate).format('DD/MM/YYYY') : 'Not yet completed'}
-
+                        <input
+                          type="date"
+                          name="completion_date"
+                          className="JobInput"
+                          onChange={(e) => {
+                            let temp = [...tasks]
+                            temp[index]["completionDate"] = e.target.value
+                            setTasks(temp)
+                          }}
+                          value={task.completionDate ? dayjs(task.completionDate).format('YYYY-MM-DD') : null}
+                        />
+                      </td>
+                      <td>
+                        <button className="mt-3"
+                          style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
+                          onClick={() => updatingIndex === null && updateTask(index)}
+                        >
+                          {updatingIndex === index ? (
+                            <div className='w-100'>
+                              <div class="smallSpinner mx-auto"></div>
+                            </div>
+                          ) : (
+                            "Save"
+                          )}
+                        </button>
                       </td>
 
                     </tr>

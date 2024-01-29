@@ -36,6 +36,24 @@ export const assignEventTeam = async (data) => {
     }
 }
 
+export const updateEventData = async (data) => {
+    try {
+        const res = await axios.patch(BASE_URL +
+            '/updateEvent',
+            {
+                Headers: {
+                    'Content-Type': 'application/json',
+                },
+                data
+            }
+        ).then(()=>{
+            window.notify('Details updated Successfully!', 'success')
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const getEvents = async () => {
     try {
         const res = await axios.get(BASE_URL +

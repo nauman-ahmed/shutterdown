@@ -17,6 +17,8 @@ import Select from 'react-select'
 import { updateClintData } from '../../redux/clientBookingForm';
 import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
+import { getEvents } from '../../API/Event';
+import { updateAllEvents } from '../../redux/eventsSlice';
 
 function FormII() {
   var travelSelect = useRef(null);
@@ -26,6 +28,8 @@ function FormII() {
   var sameDayPhotoEditorsSelect = useRef(null);
   var sameDayVideoEditorsSelect = useRef(null);
   var tentativeSelect = useRef(null);
+  const [allEvents, setAllEvents] = useState(null);
+
   const dispatch = useDispatch();
   const clientData = useSelector(state => state.clientData);
   const [eventValues, setEventValues] = useState(null);
@@ -40,6 +44,9 @@ function FormII() {
     const updatedEvents = clientData?.events ? [...clientData?.events] : [];
     updatedEvents.push(eventValues);
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
+    const updatedStoredEvents = [...allEvents];
+    updatedStoredEvents.push(eventValues);
+    setAllEvents(updatedStoredEvents);
     travelSelect?.current?.clearValue()
     photographersSelect.current.clearValue()
     cinematographersSelect.current.clearValue()
@@ -47,6 +54,11 @@ function FormII() {
     sameDayPhotoEditorsSelect.current.clearValue()
     sameDayVideoEditorsSelect.current.clearValue()
     tentativeSelect.current.clearValue();
+  }
+  const getStoredEvents = async () => {
+    const storedEvents = await getEvents();
+    setAllEvents(storedEvents.data);
+    dispatch(updateAllEvents(storedEvents.data))
   }
   const handleDeleteEvent = (event, index) => {
     let updatedEvents = [...clientData?.events];
@@ -67,6 +79,7 @@ function FormII() {
     if (!clientData.form1Submitted) {
       navigate('/MyProfile/AddClient/Form-I')
     }
+    getStoredEvents();
   }, [])
   const handleAddDate = (date) => {
     setEventValues({ ...eventValues, eventDate: date })
@@ -134,17 +147,6 @@ function FormII() {
   };
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  // const setClass = (date) => {
-  //   const dateobj = clientData?.events?.find((x) => {
-  //     return (
-  //       date.getDay() === new Date(x.start).getDay() &&
-  //       date.getMonth() === new Date(x.start).getMonth() &&
-  //       date.getDate() === new Date(x.start).getDate()
-  //     );
-  //   });
-  //   return dateobj ? dateobj.colorName : '';
-  // };
-  // console.log(clientData);
   return (
     <>
       <div className="mt18">
@@ -506,8 +508,8 @@ function FormII() {
                 }}
                 tileClassName={({ date }) => {
                   let count = 0;
-                  for (let index = 0; index < clientData?.events?.length; index++) {
-                    const initialDate = new Date(clientData?.events[index].eventDate)
+                  for (let index = 0; index < allEvents?.length; index++) {
+                    const initialDate = new Date(allEvents[index].eventDate)
                     const targetDate = new Date(date);
                     const initialDatePart = initialDate.toISOString().split("T")[0];
                     const targetDatePart = targetDate.toISOString().split("T")[0];
@@ -523,6 +525,25 @@ function FormII() {
                     return "highlight1"
                   }
                 }}
+                // tileDisabled={({ date }) => {
+                //   let count = 0;
+                //   for (let index = 0; index < allEvents?.length; index++) {
+                //     const initialDate = new Date(allEvents[index].eventDate)
+                //     const targetDate = new Date(date);
+                //     const initialDatePart = initialDate.toISOString().split("T")[0];
+                //     const targetDatePart = targetDate.toISOString().split("T")[0];
+                //     if (initialDatePart === targetDatePart) {
+                //       count += 1
+                //     }
+                //   }
+                //   if (count == 1) {
+                //     return "highlight5"
+                //   } else if (count == 2) {
+                //     return "highlight3"
+                //   } else if (count >= 3) {
+                //     return "highlight1"
+                //   }
+                // }}
               />
             </div>
           </Tooltip>

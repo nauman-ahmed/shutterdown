@@ -7,9 +7,7 @@ const AddEvent = async (req, res) => {
     try {
         const newEvent = new EventModel(req.body.data);
         const client = await ClientModel.findById(req.body.data.client)
-        console.log(client);
         client.events.push(newEvent._id);
-        console.log(client);
         await newEvent.save();
         await client.save();
         res.status(200).json('Event Added SucccessFully');
@@ -22,7 +20,7 @@ const AddEvent = async (req, res) => {
 const AssignTeam = async (req, res) => {
     try {
         // console.log(req.body.data);
-        const event = await EventModel.findById(req.body.data);
+        const event = await EventModel.findById(req.body.data._id);
         const photographersIds = req.body.data.choosenPhotographers?.map(user => user._id);
         const cinematographersIds = req.body.data.choosenCinematographers?.map(user => user._id);
         const droneFlyersIds = req.body.data.droneFlyers?.map(user => user._id);
@@ -41,6 +39,18 @@ const AssignTeam = async (req, res) => {
         event.shootDirector = directorIds;
         console.log(event);
         await event.save();
+        res.status(200).json('Event Added SucccessFully');
+    } catch (error) {
+        console.log(error, 'error');
+    }
+};
+const updateEvent = async (req, res) => {
+    try {
+        // console.log(req.body.data);
+        const event = await EventModel.findByIdAndUpdate(req.body.data._id, req.body.data);
+        
+        console.log(event);
+        
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {
         console.log(error, 'error');
@@ -71,4 +81,4 @@ const DeleteEvent = async (req, res) => {
 };
 
 
-module.exports = { AddEvent, DeleteEvent, getEvents, AssignTeam }
+module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam }

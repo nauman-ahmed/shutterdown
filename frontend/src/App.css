@@ -107,19 +107,19 @@ abbr[title] {
 }
 
 .highlight1 {
-  background: #f84e4e;
+  background: #f84e4e !important;
   border-radius: 50%;
   color: white;
 }
 
 .highlight2 {
-  background: #add8e6;
+  background: #add8e6 !important;
   border-radius: 50%;
   color: white;
 }
 
 .highlight3 {
-  background: #fff065;
+  background: #fff065 !important;
   border-radius: 50%;
   color: white;
 }
@@ -161,7 +161,7 @@ abbr[title] {
 }
 
 .highlight5 {
-  background: #20b2aa;
+  background: #20b2aa !important;
   border-radius: 50%;
   color: white;
 }
@@ -176,6 +176,9 @@ abbr[title] {
   background: #00fa9a;
   border-radius: 50%;
   color: white;
+}
+.table-responsive{
+  padding-bottom: 90px !important;
 }
 
 .highlight8 {

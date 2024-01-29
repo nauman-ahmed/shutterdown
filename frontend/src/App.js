@@ -14,14 +14,12 @@ import Profile from './screens/myProfile/Profile';
 import Job from './screens/myProfile/Job';
 import Documents from './screens/myProfile/Documents';
 import Assets from './screens/myProfile/Assets';
-import Attendence from './screens/Attendence/Attendence';
 import AddClient from './screens/AddClient';
 import FormI from './screens/AddClient/Form-I';
 import FormII from './screens/AddClient/Form-II';
 import Preview from './screens/AddClient/Preview';
 import ViewClient from './screens/ViewClient/ViewClient';
 import Client from './screens/ViewClient';
-import ViewClient1 from './screens/ViewClient/ViewClient1';
 import ParticularClient from './screens/ViewClient/ParticularClient';
 import ClientInfo from './screens/ViewClient/ClientInfo';
 import ShootDetails from './screens/ViewClient/ShootDetails';
@@ -152,7 +150,6 @@ function App() {
           </Route>
           <Route exact path="/MyProfile/Client" element={<Client />}>
             <Route path="ViewClient" element={<ViewClient />} />
-            <Route path="ViewClient-I" element={<ViewClient1 />} />
             <Route path="ParticularClient" element={<ParticularClient />}>
               <Route path="ClientInfo/:clientId" element={<ClientInfo />} />
               <Route path="ShootDetails/:clientId" element={<ShootDetails />} />

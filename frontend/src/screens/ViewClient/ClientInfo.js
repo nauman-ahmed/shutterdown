@@ -8,8 +8,10 @@ import { getClientById } from "../../API/Client"
 import Calendar from "react-calendar";
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import Select from 'react-select';
-import { addEvent, deleteEvent } from '../../API/Event';
+import { addEvent, deleteEvent, getEvents } from '../../API/Event';
 import { MdDelete } from "react-icons/md";
+import { useDispatch } from "react-redux";
+import { updateAllEvents } from "../../redux/eventsSlice";
 
 function ClientInfo() {
   const [clientData, setClientData] = useState(null)
@@ -17,10 +19,18 @@ function ClientInfo() {
   const [newEventModel, setNewEventModel] = useState(false);
   const [newEvent, setNewEvent] = useState({ client: clientId })
   const [showCalender, setShowCalender] = useState(false);
+  const [allEvents, setAllEvents] = useState(null);
+  const dispatch = useDispatch();
+  const getStoredEvents = async () => {
+    const storedEvents = await getEvents();
+    setAllEvents(storedEvents.data);
+    dispatch(updateAllEvents(storedEvents.data))
+  }
 
   const target = useRef(null);
   useEffect(() => {
-    getIdData()
+    getIdData();
+    getStoredEvents();
   }, [])
   let travelByOptions = [
     {
@@ -96,6 +106,7 @@ function ClientInfo() {
       setNewEventModel(false);
       window.notify('Event added successfully!', 'success');
       getIdData();
+      getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -214,6 +225,7 @@ function ClientInfo() {
                 <td><MdDelete onClick={async ()=>{
                    await deleteEvent(event._id);
                    getIdData();
+                   getStoredEvents();
                    }} className="text-danger cursor-pointer fs-3"/></td>
               </tr>
             )
@@ -253,8 +265,8 @@ function ClientInfo() {
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
-                        for (let index = 0; index < clientData?.events?.length; index++) {
-                          const initialDate = new Date(clientData?.events[index].eventDate)
+                        for (let index = 0; index < allEvents?.length; index++) {
+                          const initialDate = new Date(allEvents[index].eventDate)
                           const targetDate = new Date(date);
                           const initialDatePart = initialDate.toISOString().split("T")[0];
                           const targetDatePart = targetDate.toISOString().split("T")[0];

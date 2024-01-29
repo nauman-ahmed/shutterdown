@@ -18,6 +18,11 @@ const eventSchema = mongoose.Schema({
     travelBy: {
         type: String,
     },
+    eventStatus : {
+        type : String,
+        default : 'Yet to start',
+        required : true
+    },
     photographers: {
         type: Number,
     },

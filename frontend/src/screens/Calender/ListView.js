@@ -12,7 +12,7 @@ import Plane from '../../assets/Profile/Plane.svg';
 import ShootDropDown from '../../components/ShootDropDown';
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
-import { assignEventTeam, getEvents } from '../../API/Event';
+import { assignEventTeam, getEvents, updateEventData } from '../../API/Event';
 import { getAllUsers } from '../../API/userApi';
 import Cookies from 'js-cookie';
 import CalenderImg from '../../assets/Profile/Calender.svg';
@@ -98,6 +98,20 @@ function ListView() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+  const customStyles2 = {
+    option: (defaultStyles, state) => ({
+      ...defaultStyles,
+      color: state.isSelected ? "white" : "black",
+      backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
+    }),
+    control: (defaultStyles) => ({
+      ...defaultStyles,
+      backgroundColor: "#EFF0F5",
+      padding: "2px",
+      border: "none",
+    }),
+    singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
+  };
   useEffect(() => {
     getEventsData();
   }, []);
@@ -155,6 +169,18 @@ function ListView() {
       return;
     }
   };
+  const onStatusUpdate = async (event, index) => {
+    try {
+      
+
+      setUpdatingIndex(index);
+      await updateEventData(event);
+      setUpdatingIndex(null);
+    } catch (error) {
+      toast.error('It seems like nothing to update');
+      return;
+    }
+  };
 
 
 
@@ -204,13 +230,14 @@ function ListView() {
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table striped
               responsive
-              style={{ marginTop: '15px' }}>
+              style={{ marginTop: '15px', width : '130%' }}>
               <thead>
                 {currentUser.rollSelect == 'Manager' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple : Location</th>
                     <th className="tableBody">Date : Travel</th>
                     <th className='tableBody'>Event Type</th>
+                    <th className='tableBody'>Status</th>
                     <th className="tableBody">Shoot Director</th>
                     <th className="tableBody">
                       Photographer
@@ -244,6 +271,7 @@ function ListView() {
                     <th className="tableBody">Event Type</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
+                    <th className="tableBody">Save</th>
                   </tr>
                 )}
               </thead>
@@ -284,6 +312,9 @@ function ListView() {
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.eventType}</p>
+                              </td>
+                              <td className="tableBody Text14Semi primary2">
+                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.eventStatus || 'Yet to start'}</p>
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -514,6 +545,21 @@ function ListView() {
                               <td className="tableBody Text14Semi primary2">
                                 {event?.eventType}
                               </td>
+                              <td
+                                style={{
+                                  paddingTop: '15px',
+                                  paddingBottom: '15px',
+                                }}
+                                className="tableBody Text14Semi primary2"   >
+                                <Select value={event?.eventStatus ? { value: event?.eventStatus, label: event?.eventStatus } : null} name='eventStatus' onChange={(selected) => {
+                                  const updatedEvents = [...eventsForShow];
+                                  updatedEvents[index].eventStatus = selected.value;
+                                  setEventsForShow(updatedEvents)
+                                }} styles={customStyles2} options={[
+                                  { value: 'Yet to Start', label: 'Yet to Start' },
+                                  { value: 'In Progress', label: 'In Progress' },
+                                  { value: 'Completed', label: 'Completed' }]} required />
+                              </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
                               </td>
@@ -524,7 +570,19 @@ function ListView() {
                                   {event?.location}
                                 </div>
                               </td>
-
+                              <td>
+                                <button
+                                  style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
+                                  onClick={() => onStatusUpdate(event, index)}>
+                                  {updatingIndex == index ? (
+                                    <div className='w-100'>
+                                      <div class="smallSpinner mx-auto"></div>
+                                    </div>
+                                  ) : (
+                                    "Save"
+                                  )}
+                                </button>
+                              </td>
                             </tr>
                           )}
                         </>
