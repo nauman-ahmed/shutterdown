@@ -3,8 +3,6 @@ const app = express();
 const userRouter = require('./Routes/userRoutes');
 const clientRouter = require('./Routes/AddClientRoutes');
 const viewClientRouter = require('./Routes/ViewClientRoutes');
-const previewClientRouter = require('./Routes/MyProfileRoutes');
-const MyProfileRouter = require('./Routes/userRoutes');
 const DailyTaskRouter = require('./Routes/DailyTaskRoutes');
 const AttendenceRouter = require('./Routes/AttendenceRoutes');
 const Database = require('./DataBase/db');
@@ -31,9 +29,7 @@ app.use(clientRouter);
 app.use(eventRouter);
 
 app.use('/', AttendenceRouter);
-app.use('/', previewClientRouter);
 app.use('/', viewClientRouter);
-app.use('/', MyProfileRouter);
 app.use('/', DailyTaskRouter);
 
 
