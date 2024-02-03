@@ -11,6 +11,7 @@ import CalenderNoti from "../assets/Profile/CalenderNoti.svg";
 import NotiSelect from "../assets/Profile/NotiSelect.svg";
 import { useAuthContext } from "../config/context";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
 
 
 const Header = (args) => {
@@ -21,13 +22,12 @@ const Header = (args) => {
   const [path, setCurrentPath] = useState("");
   const [notiTab, setNotiTab] = useState("1");
   const location = useLocation(); // React Hook
-
   const target = useRef(null);
   const targetNoti = useRef(null);
 
   const { profileData, GetDataProfile } = useAuthContext();
-  const currentUser = JSON.parse(Cookies.get('currentUser'));
-
+  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
+  const dispatch = useDispatch();
   useEffect(() => {
     GetDataProfile();
   }, [])
@@ -65,7 +65,7 @@ const Header = (args) => {
                     width={25}
                     height={25}
                   /> */}
-                  <div className="name_div_flex">
+                  <div className="name_div_flex mb-1">
                     <img
                       src="/images/navbar/oval.png"
                       ref={target}

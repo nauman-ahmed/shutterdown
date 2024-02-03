@@ -1,5 +1,6 @@
 const express=require("express")
-const router=express.Router()
+const router=express.Router();
+
 const myProfileRouter=require('../Controllers/MyProfileController')
 router.get("/MyProfile/Profile/:id",myProfileRouter.ProfileHeaderFunction)
 router.put('/MyProfile/About/:id',myProfileRouter.UpdateManagerFunction);

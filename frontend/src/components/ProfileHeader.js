@@ -12,26 +12,14 @@ import { Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Last } from "react-bootstrap/esm/PageItem";
 import { useAuthContext } from "../config/context";
+import Cookies from "js-cookie";
+import BASE_URL from "../API";
 
 
 function ProfileHeader({ attendence = false, profile = false }) {
   const [selected, setSelectedTab] = useState(1);
   const navigate = useNavigate();
-
-
-  // This is Data of Profile Function start....
-
-  const { profileData, GetDataProfile } = useAuthContext();
-
-  useEffect(() => {
-    GetDataProfile();
-  }, [])
-
-  // This is Data of Profile Function End....
-
-
- 
- 
+  const user = JSON.parse(Cookies.get('currentUser'));
   let Data3 = [
     {
       title: "About",
@@ -73,14 +61,21 @@ function ProfileHeader({ attendence = false, profile = false }) {
     },
   ];
   const [timePage, setTimePage] = useState(true);
-
   return (
     <div style={{ width: "100%" }}>
       {!attendence && (
         <div className="rowBox Profile_Web_hide">
-          <div className="ProfileBox Text50Semi">{`${profileData?.firstName.charAt(0).toUpperCase()}${profileData?.lastName.charAt(0).toUpperCase()}`}</div>
+          {user?.photo ? (
+          <div className="ProfileBoxForImg w-25 Text50Semi">
+            <img className="w-100 h-100 imgRadius" src={BASE_URL + '/' + user.photo} />
+          </div>
+          ) : (
+            <div className="ProfileBox Text50Semi">
+            {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+          </div>
+          )}
           <div className="ProfileRightBox">
-            <div className="Text20Semi padding_leftSmall">{`${profileData?.firstName.charAt(0).toUpperCase() + profileData?.firstName.slice(1).toLowerCase()} ${profileData?.lastName.charAt(0).toUpperCase() + profileData?.lastName.slice(1).toLowerCase()}`}</div>
+            <div className="Text20Semi padding_leftSmall">{`${user?.firstName.charAt(0).toUpperCase() + user?.firstName.slice(1).toLowerCase()} ${user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1).toLowerCase()}`}</div>
             <div className="padding_leftSmall rowalign mtsmall">
               <div
                 className="d-flex align-items-center justify-content-between"
@@ -88,15 +83,15 @@ function ProfileHeader({ attendence = false, profile = false }) {
               >
                 <div className="d-flex align-items-center">
                   <img src={locate} className="marginrightsmall" />
-                  <p className="title_profile">{profileData?.currentAddress}</p>
+                  <p className="title_profile">{user?.currentAddress}</p>
                 </div>
                 <div className="d-flex align-items-center">
                   <img src={mail} className="marginrightsmall" />
-                  <p className="title_profile">{profileData?.email}</p>
+                  <p className="title_profile">{user?.email}</p>
                 </div>
                 <div className="d-flex align-items-center">
                   <img src={phone} className="marginrightsmall" />
-                  <p className="title_profile">{profileData?.phoneNo}</p>
+                  <p className="title_profile">{user?.phoneNo}</p>
                 </div>
                 <div className="d-flex align-items-center">
                   <img src={ID} className="marginrightsmall" />
@@ -115,7 +110,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
                     JOB TITLE
                   </div>
                   <div className=" mtsmall">
-                    Photographer
+                    {user.jobTitle}
                   </div>
                 </div>
                 <div>
@@ -123,7 +118,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
                     EMP NO
                   </div>
                   <div className=" mtsmall">
-                  {profileData?.EmployeeNumber}
+                    {user?.employeeNumber}
                   </div>
                 </div>
               </div>
@@ -246,7 +241,6 @@ function ProfileHeader({ attendence = false, profile = false }) {
           </div>
         </div>
       )}
-
       <Outlet />
     </div>
   );

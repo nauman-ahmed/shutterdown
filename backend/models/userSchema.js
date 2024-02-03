@@ -17,75 +17,93 @@ const userSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    // required: true,
+    required: true,
   },
   rollSelect: {
     type: String,
     required: true,
   },
-  About:{
-    type:String,
+  about: {
+    type: String,
   },
-  AboutMyJob:{
-    type:String
+  aboutJob: {
+    type: String
   },
-  interestAndHobbies:{
-    type:String
+  interestHobbies: {
+    type: String
   },
-  middleName:{
-    type:String,
+  middleName: {
+    type: String,
   },
-   
-    Gender:{
-      type:String
-    },
-    DOB:{
-type:String
-    },
-    BloodGroup:{
-type:String
-    },
-    maritalStatus:{
-      type:String
-    },
-  physicalHandicaped:{
-    type:String,
+  gender: {
+    type: String
   },
-    workEmail:{
-      type:String
-    },
-    workPhone:{
-      type:String
-    },
-    currentAddress:{
-      type:String
-    },
-    permanentAddress:{
-      type:String
-    },
-    Experience:{
-      type:String
-    },
-    EmployeeNumber:{
-      type:String
-    },
-    DateOfJoining:{
-      type:String
-    },
-    JobTitle:{
-      type:String
-    },
-    jobType:{
-      type:String
-    },
-    shiftTiming:{
-      type:String
-    },
-    leavePlan:{
-      type:String
-    }
-    
-  
+  DOB: {
+    type: Date
+  },
+  bloodGroup: {
+    type: String
+  },
+  maritalStatus: {
+    type: String
+  },
+  physicallyHandicapped: {
+    type: String,
+  },
+  workEmail: {
+    type: String
+  },
+  workPhone: {
+    type: String
+  },
+  currentAddress: {
+    type: String
+  },
+  permanentAddress: {
+    type: String
+  },
+  experience: {
+    type: String
+  },
+  employeeNumber: {
+    type: String
+  },
+  dateOfJoining: {
+    type: Date
+  },
+  jobTitle: {
+    type: String
+  },
+  jobType: {
+    type: String
+  },
+  shiftTiming: {
+    type: String
+  },
+  leavePlan: {
+    type: String
+  },
+  adharCard : {
+    type : String
+  },
+  panCard : {
+    type : String
+  },
+  drivingLicense : {
+    type : String
+  },
+  voterID : {
+    type : String
+  },
+  passport : {
+    type : String
+  },
+  photo : {
+    type : String
+  },
+  signature : {
+    type : String
+  }
 });
 const userModel = mongoose.model('user', userSchema);
 module.exports = userModel;

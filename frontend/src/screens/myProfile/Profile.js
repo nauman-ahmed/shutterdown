@@ -1,203 +1,74 @@
 import React, { useEffect, useState } from "react";
 import { Col, Row } from "reactstrap";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import axios from "axios"
 import "../../assets/css/Profile.css";
-import { useAuthContext } from "../../config/context";
 import Cookies from "js-cookie";
-
+import { updateUserData } from "../../API/userApi";
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
 
 function Profile() {
-  
-  
-  
-  // const [profileData, setProfileData] = useState()
-
-  const [primaryValue, setPrimaryValue] = useState({})
-
-  const [contactValue, setContactValue] = useState({})
-
-  const [addressValue, setAddressValue] = useState({})
-
-  const [experienceValue, setExperienceValue] = useState({})
-
-  // This is Function Model of Primary Start....
-
-  const handlePrimary = e => {
-    setPrimaryValue(s => ({ ...s, [e.target.name]: e.target.value }))
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    getUserData();
+  }, [])
+  const getUserData = async () => {
+    const currentUser = JSON.parse(Cookies.get('currentUser'));
+    setUserData(currentUser);
   }
-
-  const handleUpdatePrimary = async (e) => {
-    e.preventDefault();
-
+  const [updating, setUpdating] = useState(false);
+  const handleChange = e => {
+    setUserData({ ...userData, [e.target.name]: e.target.value })
+  }
+  const handleUpdateUserData = async (e) => {
     try {
-      let user = JSON.parse(Cookies.get('currentUser'))
-      let id = user._id
-
-      const res = await axios.put(
-        `http://localhost:5001/MyProfile/Profile/${id}`,
-        {
-          Headers: {
-            'Content-Type': 'application/json',
-          },
-          primaryValue
-        }
-      );
-      if (res !== null) {
-        GetDataProfile();
+      console.log(userData.firstName.length);
+      if (userData.firstName.length == 0 || userData.lastName.length == 0 || userData.email.length == 0 || userData?.phoneNo.length == 0) {
+        toast.error('First Name, Last Name, Email and phone is required!');
+      } else {
+        setUpdating(true);
+        e.preventDefault();
+        await updateUserData(userData).catch(err => setUpdating(false));
+        setPrimaryModal(false);
+        setContactModel(false);
+        setAddressModel(false);
+        setExperienceModel(false);
+        setUpdating(false);
       }
     } catch (error) {
-      console.log(error, "error")
+      setUpdating(false);
     }
-    setPrimaryModal(!primaryModal);
   }
-
-  // This is Function Model of Primary End....
-
-  const handleContact = e => {
-    setContactValue(s => ({ ...s, [e.target.name]: e.target.value }))
-  }
-
-  const handleUpdateContact = async (e) => {
-    e.preventDefault();
-
-    try {
-      let user = JSON.parse(Cookies.get('currentUser'))
-      let id = user._id
-
-      const res = await axios.put(
-        `http://localhost:5001/MyProfile/Profile/${id}`,
-        {
-          Headers: {
-            'Content-Type': 'application/json',
-          },
-          contactValue
-        }
-      );
-      if (res !== null) {
-        GetDataProfile();
-      }
-    } catch (error) {
-      console.log(error, "error")
-    }
-
-    setContactModel(!contactModel)
-
-  }
-
-  // This is function Model of Contact start.....
-
-  const handleAddress = e => {
-    setAddressValue(s => ({ ...s, [e.target.name]: e.target.value }))
-  }
-
-  const handleUpdateAddress = async (e) => {
-    e.preventDefault();
-
-    try {
-      let user = JSON.parse(Cookies.get('currentUser'))
-      let id = user._id
-
-      const res = await axios.put(
-        `http://localhost:5001/MyProfile/Profile/${id}`,
-        {
-          Headers: {
-            'Content-Type': 'application/json',
-          },
-          addressValue
-        }
-      );
-      if (res !== null) {
-        GetDataProfile();
-      }
-    } catch (error) {
-      console.log(error, "error")
-    }
-
-    setAddressModel(!addressModel)
-  }
-
-  // This is function Model of Contact End.....
-
-  // This is Function Model of Experience Start....
-
-  const handleExperience = e => {
-    setExperienceValue(s => ({ ...s, [e.target.name]: e.target.value }))
-  }
-
-  const handleUpdateExperience = async (e) => {
-    e.preventDefault();
-    try {
-      let user = JSON.parse(Cookies.get('currentUser'))
-      let id = user._id
-
-      const res = await axios.put(
-        `http://localhost:5001/MyProfile/Profile/${id}`,
-        {
-          Headers: {
-            'Content-Type': 'application/json',
-          },
-          experienceValue
-        }
-      );
-      if (res !== null) {
-        GetDataProfile();
-      }
-    } catch (error) {
-      console.log(error, "error")
-    }
-    
-    setExperienceModel(!experienceModel)
-
-  }
-
-
-  // This is Function Model of Experience End....
-
-  // This is Modal State Start....
-
   const [primaryModal, setPrimaryModal] = useState(false);
-  const primary = () => {
-    setPrimaryValue(profileData)
+  const primary = async () => {
+    await getUserData();
     setPrimaryModal(!primaryModal);
   }
-
+  const closeAll = async () => {
+    await getUserData();
+    setUpdating(false);
+    setPrimaryModal(false);
+    setContactModel(false);
+    setAddressModel(false);
+    setExperienceModel(false);
+  }
   const [contactModel, setContactModel] = useState(false);
   const contact = () => {
-    setContactValue(profileData)
     setContactModel(!contactModel);
   }
-  
   const [addressModel, setAddressModel] = useState(false)
   const address = () => {
-    setAddressValue(profileData)
     setAddressModel(!addressModel)
   }
-
   const [experienceModel, setExperienceModel] = useState(false)
   const experience = () => {
-    setExperienceValue(profileData)
     setExperienceModel(!experienceModel)
   }
 
-
-  // This is Modal State End....
-
-
-  // This is Get Data of User Profile start......
-
-  const {profileData,GetDataProfile} = useAuthContext();
-
-  useEffect(() => {
-    GetDataProfile();
-  }, [])
-
-  // This is Get Data of User Profile End......
-
   return (
-    <div className="">
+    <div>
       {
-        profileData
+        userData
           ? <>
             <Row className="W90 mb-5">
               <Col xs="12" sm="6" className="pr6">
@@ -212,35 +83,35 @@ function Profile() {
                       <Row>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">First Name</div>
-                          <div className="Text10N black mt12">{profileData?.firstName}</div>
+                          <div className="Text10N black mt12">{userData?.firstName}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Middle Name</div>
-                          <div className="Text10N black mt12">{profileData?.middleName}</div>
+                          <div className="Text10N black mt12">{userData?.middleName}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Last Name</div>
-                          <div className="Text10N black mt12">{profileData?.lastName}</div>
+                          <div className="Text10N black mt12">{userData?.lastName}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Gender</div>
-                          <div className="Text10N black mt12">{profileData?.Gender}</div>
+                          <div className="Text10N black mt12">{userData?.gender}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">DOB</div>
-                          <div className="Text10N black mt12">{profileData?.DOB}</div>
+                          <div className="Text10N black mt12">{dayjs(userData?.DOB).format('DD/MM/YYYY')}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Blood Group</div>
-                          <div className="Text10N black mt12">{profileData?.BloodGroup}</div>
+                          <div className="Text10N black mt12">{userData?.bloodGroup}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Marital Status</div>
-                          <div className="Text10N black mt12">{profileData?.maritalStatus}</div>
+                          <div className="Text10N black mt12">{userData?.maritalStatus}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Physically handicapped</div>
-                          <div className="Text10N black mt12">{profileData?.physicalHandicaped}</div>
+                          <div className="Text10N black mt12">{userData?.physicallyHandicapped}</div>
                         </Col>
                       </Row>
                     </div>
@@ -259,19 +130,19 @@ function Profile() {
                       <Row>
                         <Col xs="6" sm="6">
                           <div className="Text10N gray mt12">Work Email</div>
-                          <div className="Text10N black mt12">{profileData?.workEmail}</div>
+                          <div className="Text10N black mt12">{userData?.workEmail}</div>
                         </Col>
                         <Col xs="6" sm="6">
                           <div className="Text10N gray mt12">Personal Email</div>
-                          <div className="Text10N black mt12">{profileData?.email}</div>
+                          <div className="Text10N black mt12">{userData?.email}</div>
                         </Col>
                         <Col xs="6" sm="6">
                           <div className="Text10N gray mt12">Mobile Phone</div>
-                          <div className="Text10N black mt12">{profileData.phoneNo}</div>
+                          <div className="Text10N black mt12">{userData?.phoneNo}</div>
                         </Col>
                         <Col xs="6" sm="6">
                           <div className="Text10N gray mt12">Work Phone</div>
-                          <div className="Text10N black mt12">{profileData?.workPhone}</div>
+                          <div className="Text10N black mt12">{userData?.workPhone}</div>
                         </Col>
                       </Row>
                     </div>
@@ -290,11 +161,11 @@ function Profile() {
                       <Row>
                         <Col xs="12" sm="12">
                           <div className="Text10N gray mt12">Current Address</div>
-                          <div className="Text10N black mt12">{profileData?.currentAddress}</div>
+                          <div className="Text10N black mt12">{userData?.currentAddress}</div>
                         </Col>
                         <Col xs="12" sm="12">
                           <div className="Text10N gray mt12">Permanent Address</div>
-                          <div className="Text10N black mt12">{profileData?.permanentAddress}</div>
+                          <div className="Text10N black mt12">{userData?.permanentAddress}</div>
                         </Col>
                       </Row>
                     </div>
@@ -312,7 +183,7 @@ function Profile() {
                     <div>
                       <Row>
                         <Col xs="12" sm="12">
-                          <div className="Text10N black mt12">{profileData?.Experience}</div>
+                          <div className="Text10N black mt12">{userData?.experience}</div>
                         </Col>
                       </Row>
                     </div>
@@ -321,56 +192,54 @@ function Profile() {
               </Col>
             </Row>
           </>
-          : <></>
+          : <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+            <div class="spinner"></div>
+          </div>
       }
-
-
-      {/* This is Primary Modal Section Start */}
-
       <Modal isOpen={primaryModal} primary={primary} centered={true} fullscreen="md" size="lg">
         <ModalHeader primary={primary}>Primary Details</ModalHeader>
         <ModalBody>
           <div>
             <Row>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">First_Name</div>
-                <input type="text" name="first_name" placeholder="First_Name" defaultValue={primaryValue.firstName} className="PrimaryModel" onChange={handlePrimary} />
+                <div className="label">First Name</div>
+                <input type="text" name="firstName" placeholder="First_Name" defaultValue={userData?.firstName} className="PrimaryModel" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">Middle_Name</div>
-                <input type="text" name="middle_name" className="PrimaryModel" defaultValue={primaryValue.middle_name} placeholder="Middle_Name" onChange={handlePrimary} />
+                <div className="label">Middle Name</div>
+                <input type="text" name="middleName" className="PrimaryModel" defaultValue={userData?.middleName} placeholder="Middle_Name" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">Last_Name</div>
-                <input type="text" name="last_name" placeholder="Last_Name" defaultValue={primaryValue.lastName} className="PrimaryModel" onChange={handlePrimary} />
+                <div className="label">Last Name</div>
+                <input type="text" name="lastName" placeholder="Last_Name" defaultValue={userData?.lastName} className="PrimaryModel" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
                 <div className="label">Gender</div>
-                <select name="gender" className="PrimaryModelDrop" defaultValue={primaryValue.Gender} onChange={handlePrimary}>
+                <select name="gender" className="PrimaryModelDrop" defaultValue={userData?.gender} onChange={handleChange}>
                   <option value="">Select</option>
-                  <option value="male">Male</option>
+                  <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </select>
               </Col>
               <Col xl="4" sm="6" className="p-2">
                 <div className="label">DOB</div>
-                <input type="date" name="DOB" placeholder="Date Of Birth" defaultValue={primaryValue.DOB} className="PrimaryModel" onChange={handlePrimary} />
+                <input type="date" name="DOB" placeholder="Date_Of_Birth" value={dayjs(userData?.DOB).format('YYYY-MM-DD')} className="PrimaryModel" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">Blood_Group</div>
-                <input type="text" name="blood_group" className="PrimaryModel" defaultValue={primaryValue.BloodGroup} placeholder="blood_group" onChange={handlePrimary} />
+                <div className="label">Blood Group</div>
+                <input type="text" name="bloodGroup" className="PrimaryModel" defaultValue={userData?.bloodGroup} placeholder="Blood_Group" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">Marital_Status</div>
-                <select name="marital_status" placeholder="Marital_Status" defaultValue={primaryValue.maritalStatus} className="PrimaryModelDrop" onChange={handlePrimary}>
+                <div className="label">Marital Status</div>
+                <select name="maritalStatus" placeholder="Marital_Status" defaultValue={userData?.maritalStatus} className="PrimaryModelDrop" onChange={handleChange}>
                   <option value="">Select</option>
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
                 </select>
               </Col>
               <Col xl="4" sm="6" className="p-2">
-                <div className="label">Physically_handicapped</div>
-                <select name="physically_handicapped" className="PrimaryModelDrop" defaultValue={primaryValue.physicalHandicaped} onChange={handlePrimary}>
+                <div className="label">Physically Handicapped</div>
+                <select name="physicallyHandicapped" className="PrimaryModelDrop" defaultValue={userData?.physicallyHandicapped} onChange={handleChange}>
                   <option value="">Select</option>
                   <option value="Yes">Yes</option>
                   <option value="No">No</option>
@@ -380,10 +249,16 @@ function Profile() {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button className="Update_btn Update" onClick={handleUpdatePrimary}>
-            Update
+          <Button className="Update_btn btnWidth Update" onClick={!updating && handleUpdateUserData}>
+            {updating ? (
+              <div className='w-100'>
+                <div class="smallSpinner mx-auto"></div>
+              </div>
+            ) : (
+              'Update'
+            )}
           </Button>
-          <Button color="danger" onClick={primary}>
+          <Button color="danger" onClick={closeAll}>
             Cancel
           </Button>
         </ModalFooter>
@@ -399,28 +274,34 @@ function Profile() {
         <ModalBody>
           <Row>
             <Col xl="6" sm="6" className="p-2">
-              <div className="label">Work_Email</div>
-              <input type="email" name="work_email" placeholder="Work_Email" defaultValue={contactValue.workEmail} className="ContactModel" onChange={handleContact} />
+              <div className="label">Work Email</div>
+              <input type="email" name="workEmail" placeholder="Work_Email" defaultValue={userData?.workEmail} className="ContactModel" onChange={handleChange} />
             </Col>
             <Col xl="6" sm="6" className="p-2">
-              <div className="label">Personal_Email</div>
-              <input type="email" name="personal_email" placeholder="Personal_Email" defaultValue={contactValue.email} className="ContactModel" onChange={handleContact} />
+              <div className="label">Personal Email</div>
+              <input type="email" name="email" placeholder="Personal_Email" defaultValue={userData?.email} className="ContactModel" onChange={handleChange} />
             </Col>
             <Col xl="6" sm="6" className="p-2">
-              <div className="label">Mobile_Phone</div>
-              <input type="text" name="mobile_phone" className="ContactModel" defaultValue={contactValue.phoneNo} placeholder="Mobile_Phone" onChange={handleContact} />
+              <div className="label">Mobile Phone</div>
+              <input type="text" name="phoneNo" className="ContactModel" defaultValue={userData?.phoneNo} placeholder="Mobile_Phone" onChange={handleChange} />
             </Col>
             <Col xl="6" sm="6" className="p-2">
-              <div className="label">Work_Phone</div>
-              <input type="text" name="work_phone" placeholder="Work_Phone" defaultValue={contactValue.workPhone} className="ContactModel" onChange={handleContact} />
+              <div className="label">Work Phone</div>
+              <input type="text" name="workPhone" placeholder="Work_Phone" defaultValue={userData?.workPhone} className="ContactModel" onChange={handleChange} />
             </Col>
           </Row>
         </ModalBody>
         <ModalFooter>
-          <Button className="Update_btn" onClick={handleUpdateContact}>
-            Update
+          <Button className="Update_btn btnWidth" onClick={!updating && handleUpdateUserData}>
+            {updating ? (
+              <div className='w-100'>
+                <div class="smallSpinner mx-auto"></div>
+              </div>
+            ) : (
+              'Update'
+            )}
           </Button>
-          <Button color="danger" onClick={contact}>
+          <Button color="danger" onClick={closeAll}>
             Cancel
           </Button>
         </ModalFooter>
@@ -435,21 +316,27 @@ function Profile() {
         <ModalBody>
           <Row>
             <Col xl="12" sm="12" className="p-2">
-              <div className="label">Current_Address</div>
-              <input type="text" name="current_address" placeholder="Current_Address" defaultValue={addressValue.currentAddress} className="ContactModel" onChange={handleAddress} />
+              <div className="label">Current Address</div>
+              <input type="text" name="currentAddress" placeholder="Current_Address" defaultValue={userData?.currentAddress} className="ContactModel" onChange={handleChange} />
             </Col>
             <Col xl="12" sm="12" className="p-2">
               <div className="label">Permanent_Address</div>
-              <input type="text" name="permanent_address"
-                placeholder="Permanent_Address" className="ContactModel" defaultValue={addressValue.permanentAddress} onChange={handleAddress} />
+              <input type="text" name="permanentAddress"
+                placeholder="Permanent_Address" className="ContactModel" defaultValue={userData?.permanentAddress} onChange={handleChange} />
             </Col>
           </Row>
         </ModalBody>
         <ModalFooter>
-          <Button className="Update_btn Update" onClick={handleUpdateAddress}>
-            Update
+          <Button className="Update_btn Update" onClick={!updating && handleUpdateUserData}>
+            {updating ? (
+              <div className='w-100'>
+                <div class="smallSpinner mx-auto"></div>
+              </div>
+            ) : (
+              'Update'
+            )}
           </Button>
-          <Button color="danger" onClick={address}>
+          <Button color="danger" onClick={closeAll}>
             Cancel
           </Button>
         </ModalFooter>
@@ -466,7 +353,7 @@ function Profile() {
           <Row>
             <Col xl="12" sm="12">
               <div className="label">Experience</div>
-              <select onChange={handleExperience} className="PrimaryModelDrop" name="experience" defaultValue={experienceValue.Experience}>
+              <select onChange={handleChange} className="PrimaryModelDrop" name="experience" defaultValue={userData?.experience}>
                 <option value="">Select</option>
                 <option value="0 to 1 year">0 to 1 year</option>
                 <option value="1 to 2 year">1 to 2 year</option>
@@ -478,10 +365,16 @@ function Profile() {
 
         </ModalBody>
         <ModalFooter>
-          <Button className="Update_btn Update" onClick={handleUpdateExperience}>
-            Update
+          <Button className="Update_btn Update" onClick={!updating && handleUpdateUserData}>
+            {updating ? (
+              <div className='w-100'>
+                <div class="smallSpinner mx-auto"></div>
+              </div>
+            ) : (
+              'Update'
+            )}
           </Button>
-          <Button color="danger" onClick={experience}>
+          <Button color="danger" onClick={closeAll}>
             Cancel
           </Button>
         </ModalFooter>

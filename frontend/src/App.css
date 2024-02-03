@@ -171,7 +171,12 @@ abbr[title] {
   border-radius: 50%;
   color: white;
 }
-
+.btnWidth {
+  width: 90px;
+}
+.imgRadius {
+  border-radius: 10px;
+}
 .highlight7 {
   background: #00fa9a;
   border-radius: 50%;

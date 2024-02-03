@@ -20,9 +20,11 @@ import ActiveReport from "../assets/Profile/ActiveReport.svg";
 import UnActiveChecklist from "../assets/Profile/UnActiveChecklist.svg";
 import ActiveTeam from "../assets/Profile/ActiveTeam.png";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
 
 const SideBar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const [activeMenu, setActiveMenu] = useState(15);
   const [currentSubMenuIndex, setCurrentSubMenuIndex] = useState(15);
   const [mobileSideBar, setMobileSideBar] = useState(false);

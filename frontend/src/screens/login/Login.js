@@ -13,13 +13,14 @@ import { GetSignInWithGoogleData } from '../../API/userApi';
 import { checkExistEmail } from '../../API/userApi';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useDispatch } from 'react-redux';
 const Login = () => {
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
     email: '',
     password: '',
   });
-
+  const dispatch = useDispatch();
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const handleOnChange = (e) => {
@@ -41,7 +42,6 @@ const Login = () => {
         const user = Cookies.get('currentUser');
         console.log(user);
         if (user) {
-      
           setSuccess(true);
           // localStorage.setItem('userEmail', JSON.stringify(response?.data?.User._id));
           // const shooter = JSON.parse(localStorage.getItem('loginUser'));

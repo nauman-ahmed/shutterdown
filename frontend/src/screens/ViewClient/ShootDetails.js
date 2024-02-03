@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import axios from 'axios';
 import { getClientAllShootDetails, getClientById } from "../../API/Client"
 import { getAllUsers } from "../../API/userApi"
+import BASE_URL from "../../API";
 
 function ShootDetails(props) {
 
@@ -50,13 +51,20 @@ function ShootDetails(props) {
                   height: '200px',
                 }}
               >
-                <img
-                  src={Photo2}
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                />
+                {clientData?.userID?.photo ? (
+
+                  <img className="imgRadius"
+                    src={BASE_URL + '/' + clientData?.userID?.photo}
+                    style={{
+                      width: '232px',
+                      height: '200px',
+                    }}
+                  />
+                ) : (
+                  <div className="ProfileBox Text50Semi">
+                    {`${clientData?.userID?.firstName.charAt(0).toUpperCase()}${clientData?.userID?.lastName.charAt(0).toUpperCase()}`}
+                  </div>
+                )}
               </div>
               <div style={{ padding: '20px' }}>
                 <text className="Text14Semi">
@@ -79,13 +87,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
 
                 <div style={{ padding: '20px' }}>
@@ -99,7 +112,6 @@ function ShootDetails(props) {
                     </h3>
                   </blockquote>
                 </div>
-
               </div>
             )}
             {teamToShow?.choosenPhotographers?.length > 0 && teamToShow?.choosenPhotographers?.map((user, ind) =>
@@ -110,13 +122,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">
@@ -129,7 +146,6 @@ function ShootDetails(props) {
                     </h3>
                   </blockquote>
                 </div>
-
               </div>
             )}
 
@@ -142,13 +158,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
 
                 <div style={{ padding: '20px' }}>
@@ -173,13 +194,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
 
                 <div style={{ padding: '20px' }}>
@@ -204,13 +230,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">
@@ -234,13 +265,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">
@@ -264,13 +300,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">
@@ -294,13 +335,18 @@ function ShootDetails(props) {
                     height: '200px',
                   }}
                 >
-                  <img
-                    src={Photo2}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
-                  />
+                  {user?.photo ?
+                    <img className="imgRadius"
+                      src={BASE_URL + '/' + user.photo}
+                      style={{
+                        width: '232px',
+                        height: '200px',
+                      }}
+                    />
+                    : <div className="ProfileBox Text50Semi">
+                      {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+                    </div>
+                  }
                 </div>
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">

@@ -5,14 +5,8 @@ import CalenderBar from "../../components/CalenderBar";
 import ProfileHeader from "../../components/ProfileHeader";
 
 const MyProfile = () => {
-
-
-
-
   return (
     <>
-      {/* <Header />
-      <SideBar /> */}
       <div className="main_content">
         <ProfileHeader />
         <CalenderBar />

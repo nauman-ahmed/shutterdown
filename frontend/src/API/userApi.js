@@ -5,9 +5,9 @@ import { toast } from 'react-toastify';
 
 export const GetsignUPData = async (data, phoneNo) => {
 
-  const { firstName, lastName, email, password, confirmPassword,rollSelect } = data;
+  const { firstName, lastName, email, password, confirmPassword, rollSelect } = data;
 
-  const res = await axios.post(BASE_URL+'/Signup', {
+  const res = await axios.post(BASE_URL + '/Signup', {
     Headers: {
       'Content-Type': 'application/json',
     },
@@ -16,12 +16,12 @@ export const GetsignUPData = async (data, phoneNo) => {
     lastName: lastName,
     email: email,
     phoneNo: phoneNo,
-    password: password, 
+    password: password,
     confirmPassword: confirmPassword,
-    rollSelect:rollSelect
+    rollSelect: rollSelect
   });
 
-   localStorage.setItem('res', JSON.stringify(res));
+  localStorage.setItem('res', JSON.stringify(res));
 };
 export const GetSignInWithGoogleData = async (data, phoneNo) => {
 
@@ -41,21 +41,21 @@ export const GetSignInWithGoogleData = async (data, phoneNo) => {
     rollSelect: rollSelect,
   });
   localStorage.setItem('loginUser', JSON.stringify(res));
-  localStorage.setItem("res",JSON.stringify(res))
+  localStorage.setItem("res", JSON.stringify(res))
 };
-export const checkExistEmail=async(data)=>{
+export const checkExistEmail = async (data) => {
   try {
-    const res=await axios.post("http://localhost:5002/",{
-      Headers:{
-        "Content-Type":"application/json"
+    const res = await axios.post("http://localhost:5002/", {
+      Headers: {
+        "Content-Type": "application/json"
       },
       data
     })
     localStorage.setItem('loginUser', JSON.stringify(res));
     localStorage.setItem('res', JSON.stringify(res));
-    
+
   } catch (error) {
-    console.log(error,"error")
+    console.log(error, "error")
   }
 }
 export const GetSignInApi = async (data) => {
@@ -67,22 +67,35 @@ export const GetSignInApi = async (data) => {
     email: email,
     password: password,
   }).then(res => {
-    Cookies.set('currentUser', JSON.stringify(res.data.User))
+    Cookies.set('currentUser', JSON.stringify(res.data.User));
     toast.success('Logged in successfully!')
-  
   }).catch(err => {
     console.log(err);
-    if(err.response?.status === 404){
+    if (err.response?.status === 404) {
       window.notify(err.response.data.message, 'error')
     }
     Cookies.remove('currentUser');
   });
-
 };
+
+export const GetUserData = async () => {
+  const user = JSON.parse(Cookies.get('currentUser'));
+  const { email, password } = user;
+  await axios.post(BASE_URL, {
+    Headers: {
+      'Content-Type': 'application/json',
+    },
+    email: email,
+    password: password,
+  }).then(res => {
+    Cookies.set('currentUser', JSON.stringify(res.data.User));
+  })
+};
+
 export const verifyEmail = async (data) => {
   const { email, password } = data;
   try {
-    const res = await axios.post(BASE_URL+'/emailVerify', {
+    const res = await axios.post(BASE_URL + '/emailVerify', {
       Headers: {
         'Content-Type': 'application/json',
       },
@@ -97,7 +110,7 @@ export const verifyEmail = async (data) => {
 export const newPass = async (data) => {
   const { password } = data;
   try {
-    const res = await axios.put(BASE_URL+'/ResetPassword', {
+    const res = await axios.put(BASE_URL + '/ResetPassword', {
       Headers: {
         'Content-Type': 'application/json',
       },
@@ -111,10 +124,25 @@ export const newPass = async (data) => {
     alert(error.toString());
   }
 };
+export const updateUserData = async (userData) => {
+  try {
+    console.log(userData);
+    await axios.post(BASE_URL + '/update-userInfo', userData).then(async (res) => {
+      console.log(res);
+      await GetUserData();
+      toast.success('Details Updated Successfully!')
+    }).catch(err => {
+      console.log(err);
+    })
+  } catch (error) {
+    console.log(error);
+    toast.error('Error in updating Details')
+  }
+}
 
 export const getAllUsers = async () => {
   try {
-    const res = await axios.get(BASE_URL+'/getAllUsers', {
+    const res = await axios.get(BASE_URL + '/getAllUsers', {
       Headers: {
         'Content-Type': 'application/json',
       },
@@ -128,7 +156,7 @@ export const getAllUsers = async () => {
 
 export const getEditors = async () => {
   try {
-    const res = await axios.get(BASE_URL+'/getEditors', {
+    const res = await axios.get(BASE_URL + '/getEditors', {
       Headers: {
         'Content-Type': 'application/json',
       },
