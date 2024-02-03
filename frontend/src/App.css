@@ -177,6 +177,9 @@ abbr[title] {
 .imgRadius {
   border-radius: 10px;
 }
+.pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layou{
+  margin-right: -20px !important;
+}
 .highlight7 {
   background: #00fa9a;
   border-radius: 50%;

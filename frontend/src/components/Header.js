@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Nav, Navbar, Form, FormControl } from "react-bootstrap";
+import { Nav, Navbar, Form, FormControl, Modal, ModalHeader, ModalBody, Row, Col, ModalFooter, Button } from "react-bootstrap";
 import "../assets/css/navbar.css";
 import "../assets/css/common.css";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -12,11 +12,14 @@ import NotiSelect from "../assets/Profile/NotiSelect.svg";
 import { useAuthContext } from "../config/context";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
+import { updateUserData } from "../API/userApi";
+import { toast } from "react-toastify";
+import "../assets/css/Profile.css";
 
 
 const Header = (args) => {
-
   const navigate = useNavigate();
+  const [validationMessage, setValidationMessage] = useState(null);
   const [show, setShow] = useState(false);
   const [showNoti, setShowNoti] = useState(false);
   const [path, setCurrentPath] = useState("");
@@ -24,23 +27,115 @@ const Header = (args) => {
   const location = useLocation(); // React Hook
   const target = useRef(null);
   const targetNoti = useRef(null);
-
-  const { profileData, GetDataProfile } = useAuthContext();
+  const [updating, setUpdating] = useState(false);
+  const [modal, setModal] = useState(false);
+  const toggle = async () => {
+    setUpdating(false);
+    setModal(!modal);
+    setShow(false)
+  }
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    getUserData();
+  }, [])
+  const getUserData = async () => {
+    const currentUser = JSON.parse(Cookies.get('currentUser'));
+    setUserData(currentUser);
+  }
+  const [confirmPassword, setConfirmPassword] = useState(null);
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   const dispatch = useDispatch();
-  useEffect(() => {
-    GetDataProfile();
-  }, [])
 
+
+  function CheckPassword(submittedPassword) {
+    if (submittedPassword?.length < 8) {
+      setValidationMessage('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (
+      !/[a-z]/.test(submittedPassword) ||
+      !/[A-Z]/.test(submittedPassword) ||
+      !/[0-9]/.test(submittedPassword)
+    ) {
+      setValidationMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
+      return;
+    }
+
+    // Password is valid
+    setValidationMessage('Password is valid!');
+  }
+
+  const handleChange = e => {
+    setUserData({ ...userData, [e.target.name]: e.target.value })
+  }
+
+  const handleUpdateUserData = async (e) => {
+    try {
+      e.preventDefault();
+      if (validationMessage != 'Password is valid!') {
+        toast.error(validationMessage);
+        return
+      }
+      if (userData?.password.length == 0 || userData?.password !== confirmPassword) {
+        toast.error('Confirm Password not matched!');
+        return
+      }
+      setUpdating(true);
+      await updateUserData(userData).finally(setUpdating(false));
+      setModal(false);
+      setUpdating(false);
+    } catch (error) {
+      setUpdating(false);
+    }
+  }
+  console.log(modal);
 
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location]);
   return (
     <>
+      <Modal show={modal} onHide={toggle} centered={true} fullscreen="lg" size="md">
+        <ModalHeader ><b>Change Password</b></ModalHeader>
+        <ModalBody>
+          <Row>
+            <Col xl="10" sm="10" className="p-2">
+              <div className="label">New Password</div>
+              <input type="password" name="password" placeholder="New_Password" className="JobInput" onChange={(e) => {
+                CheckPassword(e.target.value);
+                handleChange(e);
+              }} />
+              {validationMessage && (
+                <p className={`${validationMessage === 'Password is valid!' ? 'text-success' : 'text-danger'} `}>{validationMessage}</p>
+              )}
+            </Col>
+            <Col xl="10" sm="10" className="p-2">
+              <div className="label">Confirm New Password</div>
+              <input type="password" className="JobInput" placeholder="Confirm Password" onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }} />
+            </Col>
+          </Row>
+        </ModalBody>
+        <ModalFooter>
+          <Button className="Update_btn btnWidth Update" onClick={!updating && handleUpdateUserData}>
+            {updating ? (
+              <div className='w-100'>
+                <div class="smallSpinner mx-auto"></div>
+              </div>
+            ) : (
+              'Update'
+            )}
+          </Button>
+          <Button color="btn-danger btn" onClick={toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
       <div className="set_header_width">
         <div className="navbar_container">
-          <Navbar expand="lg" fixed="top">
+          <Navbar expand="lg" fixed="top" style={{left : '7px'}}>
             <div className="w-100 hide_nav_profile">
               <div className="w-100 d-flex align-items-center justify-content-between">
                 <h4 className="heading"></h4>
@@ -81,6 +176,7 @@ const Header = (args) => {
               </div>
             </div>
           </Navbar>
+
         </div>
 
         <Overlay
@@ -100,7 +196,9 @@ const Header = (args) => {
                       : "d-flex flex-row align-items-center mt-1 non_active_path"
                   }
                 >
-                  <img src="/images/navbar/profile_active.png" width={15}></img>
+                  <img style={{
+                    filter : 'brightness(0)'
+                  }} src="/images/navbar/profile_active.png" width={15}></img>
                   <p
                     className={
                       path == "/MyProfile" ? "active_popover" : "popover_txt"
@@ -112,12 +210,18 @@ const Header = (args) => {
                   </p>
                 </div>
 
-                <div onClick={() => navigate('/MyProfile/Attendence')} className="d-flex align-items-center mt-2 non_active_path">
+                <div onClick={() => navigate('/MyProfile/Attendence')} className={
+                    path == "/MyProfile/Attendence"
+                      ? "d-flex flex-row align-items-center  active_path"
+                      : "d-flex flex-row align-items-center mt-1 non_active_path"
+                  }>
                   <img src="/images/navbar/attendence.png" width={15}></img>
-                  <p className="popover_txt">Attendence</p>
+                  <p className={
+                      path == "/MyProfile/Attendence" ? "active_popover" : "popover_txt"
+                    }>Attendence</p>
                 </div>
 
-                <div className="d-flex align-items-center mt-2 non_active_path">
+                <div onClick={toggle} className="d-flex align-items-center mt-2 non_active_path">
                   <img
                     src="/images/navbar/change_password.png"
                     width={15}
@@ -201,6 +305,8 @@ const Header = (args) => {
             </Tooltip>
           )}
         </Overlay>
+
+
       </div>
     </>
   );

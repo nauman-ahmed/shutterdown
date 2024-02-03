@@ -15,7 +15,7 @@
 }
 .pro-sidebar > .pro-sidebar-inner{
     background: white !important;
-    width: 17vw;
+    width: fit-content;
     border-radius: 0px 30px 0px 0px;
 
 }
