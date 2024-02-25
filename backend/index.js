@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const eventRouter = require('./Routes/EventRouter');
+const deliverableRouter = require('./Routes/deliverableRouter');
 dotenv.config({ path: './config.env' });
 const PORT = 5002;
 // const path = require('path');
@@ -27,6 +28,7 @@ app.use('/', userRouter);
 
 app.use(clientRouter);
 app.use(eventRouter);
+app.use(deliverableRouter);
 
 app.use('/', AttendenceRouter);
 app.use('/', viewClientRouter);

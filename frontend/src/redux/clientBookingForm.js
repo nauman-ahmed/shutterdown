@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 
-const initialState = {albums : [""]};
+const initialState = { albums: [""], deliverables: { photos: true } };
 
 const ClientBookingForm = createSlice({
     name: 'ClientBookingData',
     initialState,
     reducers: {
-        updateClintData(state,action) {
+        updateClintData(state, action) {
             return action.payload;
         },
     },

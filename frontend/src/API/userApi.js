@@ -161,6 +161,19 @@ export const getEditors = async () => {
         'Content-Type': 'application/json',
       },
     });
+    console.log(res);
+    return res.data
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+export const getShooters = async () => {
+  try {
+    const res = await axios.get(BASE_URL + '/getShooters', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return res.data
   } catch (error) {
     alert(error.toString());

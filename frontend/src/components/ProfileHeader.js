@@ -107,10 +107,10 @@ function ProfileHeader({ attendence = false, profile = false }) {
               >
                 <div>
                   <div className="Text12Semi">
-                    JOB TITLE
+                    Sub Role
                   </div>
                   <div className=" mtsmall">
-                    {user.jobTitle}
+                    {user.subRole || 'Not Selected'}
                   </div>
                 </div>
                 <div>

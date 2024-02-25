@@ -64,13 +64,18 @@ const SideBar = () => {
     if (location.pathname.startsWith('/MyProfile/Attendence')) {
       setCurrentTab('Attendence');
     }
+    if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
+      setCurrentTab('Tasks');
+    }
+    if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
+      setCurrentTab('Tasks Reports');
+    }
     if (location.pathname.startsWith('/MyProfile/Reports')) {
       setCurrentTab('Reports');
     }
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
     }
-
   }, [])
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
@@ -94,14 +99,20 @@ const SideBar = () => {
     if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
       setCurrentTab('Albums');
     }
+    if (location.pathname.startsWith('/MyProfile/Deliverables/PreWed-Deliverables')) {
+      setCurrentTab('PreWed-Deliverables');
+    }
     if (location.pathname.startsWith('/MyProfile/CheckLists')) {
       setCurrentTab('Checklists');
     }
     if (location.pathname.startsWith('/MyProfile/Attendence')) {
       setCurrentTab('Attendence');
     }
-    if (location.pathname.startsWith('/MyProfile/Tasks')) {
+    if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
       setCurrentTab('Tasks');
+    }
+    if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
+      setCurrentTab('Tasks Reports');
     }
     if (location.pathname.startsWith('/MyProfile/Reports')) {
       setCurrentTab('Reports');
@@ -109,18 +120,15 @@ const SideBar = () => {
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
     }
-
   }, [location])
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
-  console.log(currentTab);
-  console.log(activeMenu);
   return (
     <>
       <div
         className="mobile_hide"
         style={{ display: 'flex', height: '100%', position: 'absolute' }}
       >
-        <ProSidebar style={{marginRight : '-20px'}}>
+        <ProSidebar style={{ marginRight: '-20px' }}>
           <SidebarHeader>
             <div
               className="logotext drawerLogo"
@@ -300,9 +308,9 @@ const SideBar = () => {
 
                 {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
                   <SubMenu
-                    className={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' ? 'active' : ''}
+                    className={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'PreWed-Deliverables' || currentTab == 'Albums' ? 'active' : ''}
                     icon={
-                      activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' ? (
+                      activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? (
                         <img
                           src="/images/sidebar/deliverables.png"
                           width={20}
@@ -314,7 +322,7 @@ const SideBar = () => {
                         ></img>
                       )
                     }
-                    open={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' ? true : false}
+                    open={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? true : false}
                     title="Deliverables"
                     onOpenChange={() => {
                       setActiveMenu(4);
@@ -402,6 +410,33 @@ const SideBar = () => {
                     >
                       Albums
                     </MenuItem>
+                    <MenuItem
+                      icon={
+                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables' ? (
+                          <img
+                            src="/images/sidebar/oval_active.png"
+                            width={10}
+                          ></img>
+                        ) : (
+                          <img
+                            src="/images/sidebar/oval.png"
+                            width={10}
+                          ></img>
+                        )
+                      }
+                      onClick={() => {
+                        setCurrentSubMenuIndex(6);
+                        navigate('/MyProfile/Deliverables/PreWed-Deliverables');
+                        setCurrentTab(null)
+                      }}
+                      className={
+                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables'
+                          ? 'active_submenu'
+                          : ''
+                      }
+                    >
+                      Pre-Wedding
+                    </MenuItem>
                   </SubMenu>
                 )}
 
@@ -454,26 +489,80 @@ const SideBar = () => {
                 {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
                   <>
 
-                    <MenuItem
+
+                    <SubMenu
+                      className={activeMenu == 5 || currentTab == 'Tasks' ? 'active' : ''}
                       icon={
                         activeMenu == 5 || currentTab == 'Tasks' ? (
-                          <img src={ActiveTask} width={20}></img>
+                          <img src={ActiveTask} width={20} />
                         ) : (
-                          <img
-                            src="/images/sidebar/tasks.png"
-                            width={20}
-                          ></img>
+                          <img src="/images/sidebar/tasks.png"
+                            width={20} />
                         )
                       }
-                      className={activeMenu == 5 || currentTab == 'Tasks' ? 'active active_color' : ''}
-                      onClick={() => {
-                        setActiveMenu(5);
-                        navigate('/MyProfile/Tasks/DailyTasks');
+                      title="Tasks"
+                      open={activeMenu == 5 || currentTab == 'Tasks' ? true : false}
+                      onOpenChange={() => {
                         setCurrentTab(null)
+                        setActiveMenu(5);
                       }}
                     >
-                      Tasks
-                    </MenuItem>
+
+
+                      <MenuItem
+                        icon={
+                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks' ? (
+                            <img
+                              src="/images/sidebar/oval_active.png"
+                              width={10}
+                            ></img>
+                          ) : (
+                            <img
+                              src="/images/sidebar/oval.png"
+                              width={10}
+                            ></img>
+                          )
+                        }
+                        onClick={() => {
+                          setCurrentSubMenuIndex(0);
+                          navigate('/MyProfile/Tasks/DailyTasks');
+                          setCurrentTab(null)
+                        }}
+                        className={
+                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks'
+                            ? 'active_submenu'
+                            : ''
+                        }
+                      >Actual Tasks
+                      </MenuItem>
+                      <MenuItem
+                        icon={
+                          (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports' ? (
+                            <img
+                              src="/images/sidebar/oval_active.png"
+                              width={10}
+                            ></img>
+                          ) : (
+                            <img
+                              src="/images/sidebar/oval.png"
+                              width={10}
+                            ></img>
+                          )
+                        }
+                        onClick={() => {
+                          setCurrentSubMenuIndex(1);
+                          navigate('/MyProfile/Tasks/Reports');
+                          setCurrentTab(null)
+                        }}
+                        className={
+                          (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports'
+                            ? 'active_submenu'
+                            : ''
+                        }
+                      >
+                        Reports
+                      </MenuItem>
+                    </SubMenu>
 
                   </>
                 )}

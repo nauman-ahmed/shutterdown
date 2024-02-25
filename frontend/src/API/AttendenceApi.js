@@ -30,7 +30,7 @@ export const checkInUser = async (data) => {
         })
     } catch (error) {
         console.log(error);
-        if(error.response.status == 303){
+        if(error.response?.status == 303){
             toast.error(error.response.data.message)
         }
     }

@@ -16,9 +16,15 @@ import { getEvents } from '../../API/Event';
 import { updateAllEvents } from '../../redux/eventsSlice';
 
 function Preview() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [requesting, setRequesting] = useState(false)
   const clientData = useSelector((state) => state.clientData);
+  useEffect(() => {
+    if (!clientData) {
+      navigate('/MyProfile/AddClient/Form-I')
+    }
+  }, [clientData])
   const [eventIndex, setEventIndex] = useState(0)
   const submitClient = async () => {
     setRequesting(true)
@@ -30,7 +36,6 @@ function Preview() {
     navigate('/MyProfile/AddClient/Form-I');
   };
   const target = useRef(null);
-  const navigate = useNavigate();
 
   return (
     <>
@@ -89,7 +94,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3">
+          <Col xs="6" sm="3" className='me-3'>
             <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Travel By
@@ -103,6 +108,22 @@ function Preview() {
                 required={true}
                 // onChange={(e) => updateEventValues(e)}
                 placeholder={'Location'}
+              />
+            </div>
+          </Col>
+          <Col xs="6" sm="3">
+            <div className='mt25'>
+              <div className="Text16N" style={{ marginBottom: '6px' }}>
+                Shoot Directors
+              </div>
+              <Input
+                type="text"
+                disabled={true}
+                className='forminput'
+                value={clientData?.events && clientData?.events[eventIndex]?.shootDirectors}
+                required={true}
+                // onChange={(e) => updateEventValues(e)}
+                placeholder={'Shoot Directors'}
               />
             </div>
           </Col>
@@ -212,6 +233,19 @@ function Preview() {
             </div>
           </Col>
         </Row>
+        <Row>
+          <Col xs="6" sm="3" className="pr5 mt-3 text16N">
+            <input
+              type="checkbox"
+              name="isWedding"
+              style={{ marginLeft: "20px" }}
+              checked={clientData?.events && clientData?.events[eventIndex]?.isWedding}
+              disabled={true}
+            />
+            {"   "}
+            Wedding
+          </Col>
+        </Row>
         <div className='mt-5'>
           <Table
             bordered
@@ -246,7 +280,7 @@ function Preview() {
                         />
                       </div>
                     </td>
-                    <td>{i + 1} ) {event.eventType}</td>
+                    <td>{i + 1} : {event.eventType}</td>
                     <td className="primary2">{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
                     <td className="primary2">{event.location}</td>
                     <td className="primary2">{event.travelBy}</td>
@@ -277,17 +311,60 @@ function Preview() {
             />
             {"   "}
             Pre Wedding Videos
-            <input
-              type="checkbox"
-              name="photos"
-              style={{ marginLeft: "20px" }}
-              checked={clientData?.deliverables?.photos}
-              disabled={true}
-            />
-            {"   "}
-            Photos
           </div>
         </div>
+        {(clientData?.deliverables?.preWeddingVideos || clientData?.preWeddingPhotos) && (
+          <>
+            <p className='mt-5 text16N mb-0 fw-bold'>For Pre-Wedding :</p>
+            <Row >
+              <Col xs="6" sm="3" className='me-2'>
+                <div className='mt25'>
+                  <div className="Text16N" style={{ marginBottom: '6px' }}>
+                    Photographers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedAssistants"
+                    disabled={true}
+                    className='forminput'
+                    value={clientData?.preWedPhotographers}
+                    required={true}
+                  />
+                </div>
+              </Col>
+              <Col xs="6" sm="3" className='me-2'>
+                <div className='mt25'>
+                  <div className="Text16N" style={{ marginBottom: '6px' }}>
+                    Cinematograpers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedCinematographers"
+                    disabled={true}
+                    className='forminput'
+                    value={clientData?.preWedCinematographers}
+                    required={true}
+                  />
+                </div>
+              </Col>
+              <Col xs="6" sm="3" className='me-2'>
+                <div className='mt25'>
+                  <div className="Text16N" style={{ marginBottom: '6px' }}>
+                    Assistants
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedAssistants"
+                    disabled={true}
+                    className='forminput'
+                    value={clientData?.preWedAssistants}
+                    required={true}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </>
+        )}
         <Row>
           {clientData?.albums?.map((albumValue, i) => {
             return (
@@ -399,7 +476,7 @@ function Preview() {
           </Col>
           <Col xs="3" sm="2" className="me-3">
             <div className="centerAlign mt40 mb15">
-              <Button className="submit_btn submit" onClick={submitClient}>
+              <Button className="submit_btn submit" onClick={!requesting && submitClient}>
                 {requesting ? (
                   <div className='w-100'>
                     <div class="smallSpinner mx-auto"></div>

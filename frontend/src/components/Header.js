@@ -89,7 +89,6 @@ const Header = (args) => {
       setUpdating(false);
     }
   }
-  console.log(modal);
 
   useEffect(() => {
     setCurrentPath(location.pathname);

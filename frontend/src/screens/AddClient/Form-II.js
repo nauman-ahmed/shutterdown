@@ -28,7 +28,8 @@ function FormII() {
   var sameDayPhotoEditorsSelect = useRef(null);
   var sameDayVideoEditorsSelect = useRef(null);
   var tentativeSelect = useRef(null);
-  const [allEvents, setAllEvents] = useState(null);
+  var shootDirectorsSelect = useRef(null);
+  const [allEvents, setAllEvents] = useState([]);
 
   const dispatch = useDispatch();
   const clientData = useSelector(state => state.clientData);
@@ -54,6 +55,7 @@ function FormII() {
     sameDayPhotoEditorsSelect.current.clearValue()
     sameDayVideoEditorsSelect.current.clearValue()
     tentativeSelect.current.clearValue();
+    shootDirectorsSelect.current.clearValue()
   }
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
@@ -66,7 +68,7 @@ function FormII() {
     dispatch(updateClintData({ ...clientData, events: updatedEvents }))
   }
   const updateDeliverables = (e) => {
-    var updatedDeliverables = { ...clientData?.deliverables } || {};
+    var updatedDeliverables = { ...clientData?.deliverables } || { photos: true };
     updatedDeliverables = { ...updatedDeliverables, [e.target.name]: e.target.checked };
     dispatch(updateClintData({ ...clientData, deliverables: updatedDeliverables }))
   }
@@ -219,6 +221,25 @@ function FormII() {
                 }} styles={customStyles} options={travelByOptions} required={true} />
               </div>
             </Col>
+            <Col xs="6" sm="3">
+              <div className='mt25'>
+                <div className="Text16N" style={{ marginBottom: '6px' }}>
+                  Shoot Directors
+                </div>
+                <Select ref={shootDirectorsSelect} name='travelBy' className='w-50' onChange={(selected) => {
+                  setEventValues({ ...eventValues, shootDirectors: selected?.value });
+                }} styles={customStyles} options={[
+                  {
+                    value: '0',
+                    label: '0',
+                  },
+                  {
+                    value: '1',
+                    label: '1',
+                  },
+                ]} required={true} />
+              </div>
+            </Col>
           </Row>
           <Row>
             <Col xs="4" sm="3" className="pr5">
@@ -284,6 +305,25 @@ function FormII() {
               </div>
             </Col>
           </Row>
+          <Row className='mt-2'>
+            <Col xs="6" sm="3">
+              <div className='mt25'>
+                <div className="Text16N mt-5" style={{ marginBottom: '6px' }}>
+                  <input
+                    onChange={(e) => {
+                      setEventValues({ ...eventValues, isWedding: e.target.checked })
+                    }}
+                    className='mx-2'
+                    type="checkbox"
+                    name="isWedding"
+                    style={{ marginLeft: "20px" }}
+                    checked={eventValues?.isWedding}
+                    disabled={false}
+                  />Wedding
+                </div>
+              </div>
+            </Col>
+          </Row>
           <Button type='submit' className="add_album album mt-4">
             Add Event
           </Button>
@@ -309,7 +349,7 @@ function FormII() {
               {clientData?.events?.map((event, i) => {
                 return (
                   <tr>
-                    <td>{i + 1} ) {event.eventType}</td>
+                    <td>{i + 1} : {event.eventType}</td>
                     <td className="primary2">{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
                     <td className="primary2">{event.location}</td>
                     <td className="primary2">{event.travelBy}</td>
@@ -356,7 +396,7 @@ function FormII() {
               />
               {"   "}
               Pre Wedding Videos
-              <input
+              {/* <input
                 onChange={(e) => {
                   updateDeliverables(e)
                 }}
@@ -368,8 +408,57 @@ function FormII() {
               />
               {"   "}
               Photos
+               */}
             </div>
           </div>
+          {(clientData?.deliverables?.preWeddingVideos || clientData?.deliverables?.preWeddingPhotos) && (
+            <>
+              <p className='mt-5 text16N mb-0 fw-bold'>For Pre-Wedding :</p>
+              <Row >
+                <Col xs="6" sm="3">
+                  <div className='mt25'>
+                    <div className="Text16N" style={{ marginBottom: '6px' }}>
+                      Photographers
+                    </div>
+                    <Select value={clientData?.preWedPhotographers ? { value: clientData?.preWedPhotographers, label: clientData?.preWedPhotographers } : null} name='preWedPhotographers' className='w-50' onChange={(selected) => {
+                      dispatch(updateClintData({ ...clientData, preWedPhotographers: selected?.value }))
+                    }} styles={customStyles} options={numberOptions} required />
+                  </div>
+                </Col>
+                <Col xs="6" sm="3">
+                  <div className='mt25'>
+                    <div className="Text16N" style={{ marginBottom: '6px' }}>
+                      Cinematograpers
+                    </div>
+                    <Select value={clientData?.preWedCinematographers ? { value: clientData?.preWedCinematographers, label: clientData?.preWedCinematographers } : null} name='preWedCinematographers' className='w-50' onChange={(selected) => {
+                      dispatch(updateClintData({ ...clientData, preWedCinematographers: selected?.value }))
+                    }} styles={customStyles} options={numberOptions} required />
+                  </div>
+                </Col>
+                <Col xs="6" sm="3">
+                  <div className='mt25'>
+                    <div className="Text16N" style={{ marginBottom: '6px' }}>
+                      Assistants
+                    </div>
+                    <Select value={clientData?.preWedAssistants ? { value: clientData?.preWedAssistants, label: clientData?.preWedAssistants } : null} name='preWedAssistants' className='w-50' onChange={(selected) => {
+                      dispatch(updateClintData({ ...clientData, preWedAssistants: selected?.value }))
+                    }} styles={customStyles} options={numberOptions} required />
+                  </div>
+                </Col>
+                <Col xs="6" sm="3">
+                  <div className='mt25'>
+                    <div className="Text16N" style={{ marginBottom: '6px' }}>
+                      Drone Flyers
+                    </div>
+                    <Select value={clientData?.preWedDroneFlyers ? { value: clientData?.preWedDroneFlyers, label: clientData?.preWedDroneFlyers } : null} name='preWedDroneFlyerss' className='w-50' onChange={(selected) => {
+                      dispatch(updateClintData({ ...clientData, preWedDroneFlyers: selected?.value }))
+                    }} styles={customStyles} options={numberOptions} required />
+                  </div>
+                </Col>
+              </Row>
+            </>
+          )}
+
           <Row>
             <Col xl="10" sm="8">
               <Row>
@@ -525,25 +614,25 @@ function FormII() {
                     return "highlight1"
                   }
                 }}
-                // tileDisabled={({ date }) => {
-                //   let count = 0;
-                //   for (let index = 0; index < allEvents?.length; index++) {
-                //     const initialDate = new Date(allEvents[index].eventDate)
-                //     const targetDate = new Date(date);
-                //     const initialDatePart = initialDate.toISOString().split("T")[0];
-                //     const targetDatePart = targetDate.toISOString().split("T")[0];
-                //     if (initialDatePart === targetDatePart) {
-                //       count += 1
-                //     }
-                //   }
-                //   if (count == 1) {
-                //     return "highlight5"
-                //   } else if (count == 2) {
-                //     return "highlight3"
-                //   } else if (count >= 3) {
-                //     return "highlight1"
-                //   }
-                // }}
+              // tileDisabled={({ date }) => {
+              //   let count = 0;
+              //   for (let index = 0; index < allEvents?.length; index++) {
+              //     const initialDate = new Date(allEvents[index].eventDate)
+              //     const targetDate = new Date(date);
+              //     const initialDatePart = initialDate.toISOString().split("T")[0];
+              //     const targetDatePart = targetDate.toISOString().split("T")[0];
+              //     if (initialDatePart === targetDatePart) {
+              //       count += 1
+              //     }
+              //   }
+              //   if (count == 1) {
+              //     return "highlight5"
+              //   } else if (count == 2) {
+              //     return "highlight3"
+              //   } else if (count >= 3) {
+              //     return "highlight1"
+              //   }
+              // }}
               />
             </div>
           </Tooltip>

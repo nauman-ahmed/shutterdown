@@ -12,18 +12,22 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
 import Cookies from 'js-cookie';
+import ClientHeader from '../../components/ClientHeader';
+import { getPhotos, updateDeliverable } from '../../API/Deliverables';
 
 
 function Photos() {
 
   const [editors, setEditors] = useState(null);
   const [allClients, setAllClients] = useState(null);
+  const [allDeliverables, setAllDeliverables] = useState(null);
   const [filterFor, setFilterFor] = useState('day')
   const toggle = () => {
     setShow(!show);
   };
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
+  const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [filteringDay, setFilteringDay] = useState(null);
   const filterByDay = (date) => {
     setFilteringDay(date)
@@ -46,16 +50,17 @@ function Photos() {
 
   const fetchData = async () => {
     try {
-      const data = await getClients();
+      const data = await getPhotos();
       const res = await getEditors();
-      setEditors(res.editors);
+      setEditors(res.editors.filter(user => user.subRole === 'Photographer'));
+      console.log(data);
       if (currentUser?.rollSelect == 'Manager') {
-        setAllClients(data)
-        setClientsForShow(data)
+        setAllDeliverables(data)
+        setDeliverablesForShow(data)
       } else if (currentUser?.rollSelect == 'Editor') {
-        const clientsToShow = data.filter(client => client.photosDeliverables?.editor._id == currentUser._id);
-        setAllClients(clientsToShow);
-        setClientsForShow(clientsToShow)
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
+        setAllDeliverables(deliverablesToShow);
+        setDeliverablesForShow(deliverablesToShow);
       }
     } catch (error) {
       console.log(error)
@@ -85,28 +90,28 @@ function Photos() {
 
   const handleSaveData = async (index) => {
     try {
-      const client = allClients[index];
-      if (!client.photosDeliverables) {
-        window.notify('Please Select the values!', 'error');
-        return
-      } else if (!client.photosDeliverables.editor) {
-        window.notify('Please Select Editor!', 'error');
-        return
-      } else if (!client.photosDeliverables.weddingDate) {
-        window.notify('Please Select Wedding Date!', 'error');
-        return
-      } else if (!client.photosDeliverables.companyDeadline) {
-        window.notify('Please Provide Company Deadline!', 'error');
-        return
-      } else if (!client.photosDeliverables.status) {
-        window.notify('Please Select any Status!', 'error');
-        return
-      } else if (!client.photosDeliverables.clientRevision) {
-        window.notify('Please Select Client Revisions!', 'error');
-        return
-      }
+      const deliverable = allDeliverables[index];
+      // if (!client.photosDeliverables) {
+      //   window.notify('Please Select the values!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.editor) {
+      //   window.notify('Please Select Editor!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.weddingDate) {
+      //   window.notify('Please Select Wedding Date!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.companyDeadline) {
+      //   window.notify('Please Provide Company Deadline!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.status) {
+      //   window.notify('Please Select any Status!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.clientRevision) {
+      //   window.notify('Please Select Client Revisions!', 'error');
+      //   return
+      // }
       setUpdatingIndex(index);
-      await addPhotosDeliverables(client)
+      await updateDeliverable(deliverable)
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
@@ -115,7 +120,8 @@ function Photos() {
 
   return (
     <>
-      {clientsForShow ? (
+      <ClientHeader filter title="Photos" />
+      {deliverablesForShow ? (
         <>
           <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
             marginTop: '-70px',
@@ -161,31 +167,34 @@ function Photos() {
               borderless
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '130%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                {currentUser.rollSelect == 'Manager' && (
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Deliverable</th>
+                  <th className="tableBody">Editor</th>
+                  <th className="tableBody">Wedding Date</th>
+                  <th className="tableBody">Client Deadline</th>
+                  <th className="tableBody">First Delivery Date</th>
+                  <th className="tableBody">Final Delivery Date</th>
+                  <th className="tableBody">Status</th>
+                  {/* <th className="tableBody">Suggestions</th> */}
+                  <th className="tableBody">Client Revisions</th>
+                  <th className="tableBody">Client Ratings</th>
+                  {currentUser.rollSelect == 'Manager' && (
+                    <th className="tableBody">Save</th>
+                  )}
+                </tr>
+                {/* {currentUser?.rollSelect == 'Editor' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
-                    <th className="tableBody">Editor</th>
-                    <th className="tableBody">Wedding Date</th>
-                    <th className="tableBody">Company Deadline</th>
-                    <th className="tableBody">Status</th>
-                    <th className="tableBody">Suggestions</th>
-                    <th className="tableBody">Client Revisions</th>
-                    <th className="tableBody">Save</th>
-                  </tr>
-                )}
-                {currentUser?.rollSelect == 'Editor' && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Client:</th>
-                    <th className="tableBody">Deliverable</th>
                     <th className="tableBody">Company Deadline</th>
                     <th className="tableBody">Status</th>
                     <th className="tableBody">Save</th>
                   </tr>
-                )}
+                )} */}
               </thead>
               <tbody
                 className="Text12"
@@ -195,7 +204,7 @@ function Photos() {
                   // background: "#EFF0F5",
                 }}
               >
-                {clientsForShow?.map((client, index) => {
+                {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
                       {index == 0 && <div style={{ marginTop: '15px' }} />}
@@ -213,7 +222,7 @@ function Photos() {
                             }}
                             className="tableBody Text14Semi primary2"
                           >
-                            {client.brideName}
+                            {deliverable?.client?.brideName}
                             <div
                               style={{
                                 fontSize: '12px',
@@ -223,7 +232,7 @@ function Photos() {
                             >
                               <img src={Heart} />
                               <br />
-                              {client.groomName}
+                              {deliverable.client?.groomName}
                             </div>
                           </td>
                           <td
@@ -234,11 +243,8 @@ function Photos() {
                             }}
                           >
                             <div>
-                              long Films : {client.longFilms}
-                              <br />
-                              Reels : {client.reels}
-                              <br />
-                              {client.promos === 'Yes' && 'Promos'}
+                              {deliverable.deliverableName}
+
                             </div>
 
                           </td>
@@ -249,11 +255,10 @@ function Photos() {
                               paddingBottom: '15px',
                             }} >
 
-                            <Select value={client.photosDeliverables?.editor ? { value: client?.photosDeliverables?.editor.firstName, label: client?.photosDeliverables?.editor?.firstName } : null} name='editor' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].photosDeliverables = client.photosDeliverables || {};
-                              updatedClients[index].photosDeliverables.editor = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].editor = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={editors?.map(editor => {
                               return ({ value: editor, label: editor.firstName })
                             })} required />
@@ -264,14 +269,7 @@ function Photos() {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}  >
-                            <Select value={client.photosDeliverables?.weddingDate ? { value: client?.photosDeliverables.weddingDate, label: dayjs(client?.photosDeliverables?.weddingDate).format('DD-MM-YYYY') } : null} name='photosDeliverablesDate' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].photosDeliverables = client.photosDeliverables || {};
-                              updatedClients[index].photosDeliverables.weddingDate = selected.value;
-                              setAllClients(updatedClients)
-                            }} styles={customStyles} options={client.events?.map(event => {
-                              return ({ value: event.eventDate, label: dayjs(event.eventDate).format('DD-MM-YYYY') })
-                            })} required />
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -280,17 +278,45 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                           >
+                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+
                             <input
                               type="date"
-                              name="companyDeadline"
+                              name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedClients = [...allClients]
-                                updatedClients[index].photosDeliverables = client?.photosDeliverables || {};
-                                updatedClients[index].photosDeliverables.companyDeadline = e.target.value;
-                                setAllClients(updatedClients);
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
                               }}
-                              value={client.photosDeliverables?.companyDeadline ? dayjs(client.photosDeliverables?.companyDeadline).format('YYYY-DD-MM') : null}
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}>
+
+                            <input
+                              type="date"
+                              name="finalDeliveryDate"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
                             />
                           </td>
                           <td
@@ -299,17 +325,16 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                             className="tableBody Text14Semi primary2"   >
-                            <Select value={client.photosDeliverables?.status ? { value: client?.photosDeliverables?.status, label: client?.photosDeliverables?.status } : null} name='photosDeliverablesStatus' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].photosDeliverables = client.photosDeliverables || {};
-                              updatedClients[index].photosDeliverables.status = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].status = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 'Yet to Start', label: 'Yet to Start' },
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          <td
+                          {/* <td
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -317,25 +342,38 @@ function Photos() {
                             }}
                             className="tableBody">
                             {client.suggestion}
-                          </td>
-                          <td
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                              width: '10%',
-                            }}
-                            className="tableBody"
-                          >
+                          </td> */}
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
                             {' '}
-                            <Select value={client.photosDeliverables?.clientRevision ? { value: client?.photosDeliverables?.clientRevision, label: client?.photosDeliverables?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].photosDeliverables = client.photosDeliverables || {};
-                              updatedClients[index].photosDeliverables.clientRevision = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].clientRevision = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
                               { value: 3, label: 3 }]} required />
+                          </td>
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {' '}
+                            <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].clientRating = selected.value;
+                              setAllDeliverables(updatedDeliverables)
+                            }} styles={customStyles} options={[
+                              { value: 1, label: 1 },
+                              { value: 2, label: 2 },
+                              { value: 3, label: 3 },
+                              { value: 4, label: 4 },
+                              { value: 5, label: 5 }]} required />
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -344,7 +382,7 @@ function Photos() {
                               paddingBottom: '15px',
                             }} >
                             <button className="btn btn-primary "
-                              onClick={(e) => handleSaveData(index)} >
+                              onClick={(e) => updatingIndex === null && handleSaveData(index)} >
                               {updatingIndex == index ? (
                                 <div className='w-100'>
                                   <div class="smallSpinner mx-auto"></div>
@@ -359,7 +397,7 @@ function Photos() {
                       {currentUser?.rollSelect == 'Editor' && (
                         <tr
                           style={{
-                            // background: '#EFF0F5',
+                            background: '#EFF0F5',
                             borderRadius: '8px',
                           }}
                         >
@@ -370,7 +408,7 @@ function Photos() {
                             }}
                             className="tableBody Text14Semi primary2"
                           >
-                            {client.brideName}
+                            {deliverable?.client?.brideName}
                             <div
                               style={{
                                 fontSize: '12px',
@@ -380,27 +418,34 @@ function Photos() {
                             >
                               <img src={Heart} />
                               <br />
-                              {client.groomName}
+                              {deliverable?.client?.groomName}
                             </div>
                           </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
+                          <td className="tableBody Text14Semi primary2"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}
-                          >
+                            }} >
                             <div>
-                              long Films : {client.longFilms}
-                              <br />
-                              Reels : {client.reels}
-                              <br />
-                              {client.promos === 'Yes' && 'Promos'}
+                              {deliverable?.deliverableName} : {deliverable?.quantity}
                             </div>
-
                           </td>
-
-
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }} >
+                            {deliverable?.editor?.firstName}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}  >
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
+                          </td>
                           <td
                             className="tableBody Text14Semi primary2"
                             style={{
@@ -408,18 +453,48 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                           >
+                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+
                             <input
                               type="date"
-                              name="companyDeadline"
-                              className="dateInput text-center"
+                              name="firstDeliveryDate"
+                              className="dateInput"
                               onChange={(e) => {
-                                const updatedClients = [...allClients]
-                                updatedClients[index].photosDeliverables = client?.photosDeliverables || {};
-                                updatedClients[index].photosDeliverables.companyDeadline = e.target.value;
-                                setAllClients(updatedClients);
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
                               }}
-                              value={client.photosDeliverables?.companyDeadline ? dayjs(client.photosDeliverables?.companyDeadline).format('YYYY-DD-MM') : null}
-                              readOnly />
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              readOnly={true}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}>
+
+                            <input
+                              type="date"
+                              name="finalDeliveryDate"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              readOnly={true}
+                            />
                           </td>
                           <td
                             style={{
@@ -427,35 +502,27 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                             className="tableBody Text14Semi primary2"   >
-                            <Select value={client.photosDeliverables?.status ? { value: client?.photosDeliverables?.status, label: client?.photosDeliverables?.status } : null} name='photosDeliverablesStatus' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].photosDeliverables = client.photosDeliverables || {};
-                              updatedClients[index].photosDeliverables.status = selected.value;
-                              setAllClients(updatedClients)
-                            }} styles={customStyles} options={[
-                              { value: 'Yet to Start', label: 'Yet to Start' },
-                              { value: 'In Progress', label: 'In Progress' },
-                              { value: 'Completed', label: 'Completed' }]} required />
+                            {deliverable?.status}
                           </td>
 
-
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }} >
-                            <button className="btn btn-primary "
-                              onClick={(e) => handleSaveData(index)} >
-                              {updatingIndex == index ? (
-                                <div className='w-100'>
-                                  <div class="smallSpinner mx-auto"></div>
-                                </div>
-                              ) : (
-                                "Save"
-                              )}
-                            </button>
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {deliverable?.clientRevision}
+                            
                           </td>
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {deliverable?.clientRating}
+                           
+                          </td>
+
+                          
                         </tr>
                       )}
 

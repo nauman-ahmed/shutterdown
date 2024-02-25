@@ -7,25 +7,25 @@ function ParticularClient(props) {
   const [selected, setSelectedTab] = useState(1);
   const { clientId } = useParams()
   const navigate = useNavigate();
-  
+
   let Data3 = [
     {
       title: "Client info",
-      link: "ClientInfo/"+clientId,
+      link: "ClientInfo/" + clientId,
       id: 1,
     },
     {
       title: "Shoot Details",
-      link: "ShootDetails/"+clientId,
+      link: "ShootDetails/" + clientId,
       id: 2,
     },
     {
       title: "Deliverables",
-      link: "Deliverable/"+clientId,
+      link: "Deliverable/" + clientId,
       id: 3,
     },
   ];
-  
+
   const [active, setActive] = useState(false);
   const [activeMenu, setActiveMenu] = useState(1);
   const DropDownV = useRef();
@@ -48,20 +48,17 @@ function ParticularClient(props) {
                 setSelectedTab(i.id);
               }}
             >
-              {i.id === 3 ? (
-                <DeleiveryDropDown selection={i.id !== selected} />
-              ) : (
-                <div
-                  key={i.id}
-                  className={
-                    i.id == selected
-                      ? "itemsbox Text12 active_profile_tab activeClient "
-                      : "itemsbox Text12 non_active_profile_tab"
-                  }
-                >
-                  {i.title}
-                </div>
-              )}
+              <div
+                key={i.id}
+                className={
+                  i.id == selected
+                    ? "itemsbox Text12 active_profile_tab activeClient "
+                    : "itemsbox Text12 non_active_profile_tab"
+                }
+              >
+                {i.title}
+              </div>
+
               {i.id == selected ? (
                 <img
                   src="/images/focus_arrow.png"

@@ -19,6 +19,7 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 import Select from 'react-select'
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
+import { IoIosWarning } from "react-icons/io";
 
 function ListView() {
   const [allEvents, setAllEvents] = useState([]);
@@ -118,49 +119,49 @@ function ListView() {
 
   const onSubmitHandler = async (event, index) => {
     try {
-      if (event.sameDayVideoEditor !== "No") {
-        if (!event.sameDayVideoMakers || event.sameDayVideoMakers.length < 1) {
-          toast.error('Please Select same Day video Makers, as required!');
-          return;
-        }
-      }
+      // if (event.sameDayVideoEditor !== "No") {
+      //   if (!event.sameDayVideoMakers || event.sameDayVideoMakers.length < 1) {
+      //     toast.error('Please Select same Day video Makers, as required!');
+      //     return;
+      //   }
+      // }
 
-      if (event.sameDayPhotoEditor !== 'No') {
-        if (!event.sameDayPhotoMakers || event.sameDayPhotoMakers.length < 2) {
-          toast.error('Please Select same day Photo Makers, as required');
-          return;
-        }
-      }
+      // if (event.sameDayPhotoEditor !== 'No') {
+      //   if (!event.sameDayPhotoMakers || event.sameDayPhotoMakers.length < 2) {
+      //     toast.error('Please Select same day Photo Makers, as required');
+      //     return;
+      //   }
+      // }
 
-      if (!event.choosenCinematographers || event.choosenCinematographers.length !== event.cinematographers) {
-        toast.error('Please Select Cinematographers, as required!');
-        return;
-      }
+      // if (!event.choosenCinematographers || event.choosenCinematographers.length !== event.cinematographers) {
+      //   toast.error('Please Select Cinematographers, as required!');
+      //   return;
+      // }
 
-      if (!event.droneFlyers || event.droneFlyers.length !== event.drones) {
-        toast.error('Please Select Drone Flyers , as required!');
-        return;
-      }
+      // if (!event.droneFlyers || event.droneFlyers.length !== event.drones) {
+      //   toast.error('Please Select Drone Flyers , as required!');
+      //   return;
+      // }
 
-      if (!event.manager || event.manager.length !== 1) {
-        toast.error('Please Select Manager!');
-        return;
-      }
+      // if (!event.manager || event.manager.length !== 1) {
+      //   toast.error('Please Select Manager!');
+      //   return;
+      // }
 
-      if (!event.assistants || event.assistants.length !== 1) {
-        toast.error('Please Select  Assisstance');
-        return;
-      }
+      // if (!event.assistants || event.assistants.length !== 1) {
+      //   toast.error('Please Select  Assisstance');
+      //   return;
+      // }
 
-      if (!event.choosenPhotographers || event.choosenPhotographers.length !== event.photographers) {
-        toast.error('Please Select Photographers, as required!');
-        return;
-      }
+      // if (!event.choosenPhotographers || event.choosenPhotographers.length !== event.photographers) {
+      //   toast.error('Please Select Photographers, as required!');
+      //   return;
+      // }
 
-      if (!event.shootDirector || event.shootDirector.length !== 1) {
-        toast.error('Please Select shoot Director, as required!');
-        return;
-      }
+      // if (!event.shootDirector || event.shootDirector.length !== 1) {
+      //   toast.error('Please Select shoot Director, as required!');
+      //   return;
+      // }
       setUpdatingIndex(index);
       await assignEventTeam(event);
       setUpdatingIndex(null);
@@ -171,7 +172,7 @@ function ListView() {
   };
   const onStatusUpdate = async (event, index) => {
     try {
-      
+
 
       setUpdatingIndex(index);
       await updateEventData(event);
@@ -230,7 +231,7 @@ function ListView() {
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table striped
               responsive
-              style={{ marginTop: '15px', width : '130%' }}>
+              style={{ marginTop: '15px', width: '180%' }}>
               <thead>
                 {currentUser.rollSelect == 'Manager' && (
                   <tr className="logsHeader Text16N1">
@@ -272,7 +273,7 @@ function ListView() {
                     <th className="tableBody">Status</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
-                    <th className="tableBody">Save</th>
+                    {/* <th className="tableBody">Save</th> */}
                   </tr>
                 )}
               </thead>
@@ -282,6 +283,49 @@ function ListView() {
                   borderWidth: '0px 1px 0px 1px',
                 }}>
                 {eventsForShow?.map((event, index) => {
+                  let errorText = '';
+                  if (event.sameDayVideoEditor !== "No") {
+                    if (!event.sameDayVideoMakers || event.sameDayVideoMakers.length < 1) {
+                      errorText += 'Same Day Video Makers are not complete \n'
+                    }
+                  }
+
+                  if (event.sameDayPhotoEditor !== 'No') {
+                    if (!event.sameDayPhotoMakers || event.sameDayPhotoMakers.length < 2) {
+                      errorText += 'Same Day Photo Makerasare not complete \n'
+
+                    }
+                  }
+
+                  if (!event.choosenCinematographers || event.choosenCinematographers.length !== event.cinematographers) {
+                    errorText += 'Cinematographers are not complete \n'
+
+                  }
+
+                  if (!event.droneFlyers || event.droneFlyers.length !== event.drones) {
+                    errorText += 'Drone Flyers are not complete \n'
+
+                  }
+
+                  if (!event.manager || event.manager.length !== 1) {
+                    errorText += 'Manager not selected \n'
+
+                  }
+
+                  if (!event.assistants || event.assistants.length !== 1) {
+                    errorText += 'Assistants are not complete \n'
+
+                  }
+
+                  if (!event.choosenPhotographers || event.choosenPhotographers.length !== event.photographers) {
+                    errorText += 'Photographers are not complete \n'
+
+                  }
+
+                  if (!event.shootDirector || event.shootDirector.length !== 1) {
+                    errorText += 'Shoot Director not selected \n'
+
+                  }
                   return (
                     <>
                       {event && (
@@ -291,15 +335,20 @@ function ListView() {
                               background: index % 2 === 0 ? '' : '#F6F6F6',
                             }}>
                               <td className="tableBody Text14Semi primary2">
-                                {event?.client?.groomName}
-                                <br />
-                                <img src={Heart} />
-                                <br />
-                                {event?.client?.brideName}
-                                <br />
-                                <div className="mt-2" style={{ color: "green" }}>
-                                  {event?.location}
-                                </div>
+                              <div className='d-flex flex-row'>
+                                {errorText.length > 0 && <ButtonWithHoverBox buttonText='error' hoverText={errorText} />}
+                                  <div className={`${errorText.length === 0 && 'ms-4'}`}>
+                                    {event?.client?.groomName}
+                                    <br />
+                                    <img src={Heart} />
+                                    <br />
+                                    {event?.client?.brideName}
+                                    <br />
+                                    <div className="mt-2" style={{ color: "green" }}>
+                                      {event?.location}
+                                    </div>
+                                  </div>
+                              </div>
                               </td>
                               <td style={{
                                 width: '90px',
@@ -552,14 +601,15 @@ function ListView() {
                                   paddingBottom: '15px',
                                 }}
                                 className="tableBody Text14Semi primary2"   >
-                                <Select value={event?.eventStatus ? { value: event?.eventStatus, label: event?.eventStatus } : null} name='eventStatus' onChange={(selected) => {
+                                {event?.eventStatus}
+                                {/* <Select value={event?.eventStatus ? { value: event?.eventStatus, label: event?.eventStatus } : null} name='eventStatus' onChange={(selected) => {
                                   const updatedEvents = [...eventsForShow];
                                   updatedEvents[index].eventStatus = selected.value;
                                   setEventsForShow(updatedEvents)
                                 }} styles={customStyles2} options={[
                                   { value: 'Yet to Start', label: 'Yet to Start' },
                                   { value: 'In Progress', label: 'In Progress' },
-                                  { value: 'Completed', label: 'Completed' }]} required />
+                                  { value: 'Completed', label: 'Completed' }]} required /> */}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
@@ -571,7 +621,7 @@ function ListView() {
                                   {event?.location}
                                 </div>
                               </td>
-                              <td>
+                              {/* <td>
                                 <button
                                   style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
                                   onClick={() => onStatusUpdate(event, index)}>
@@ -583,7 +633,7 @@ function ListView() {
                                     "Save"
                                   )}
                                 </button>
-                              </td>
+                              </td> */}
                             </tr>
                           )}
                         </>
@@ -623,5 +673,52 @@ function ListView() {
     </>
   );
 }
+const ButtonWithHoverBox = ({ buttonText, hoverText }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = (e) => {
+    console.log('entered');
+    const buttonRect = e.target.getBoundingClientRect();
+
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <IoIosWarning className='fs-3 text-danger' onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave} />
+      {/* <button
+
+      >
+        {buttonText}
+      </button> */}
+      {isHovered && (
+        <div
+          style={{
+            position: 'absolute',
+            display: 'block',
+            width: '300px',
+            top: 30,
+            left: 20,
+            zIndex: 9999, // Ensure it's above other elements
+            background: 'silver',
+            borderRadius: '10px',
+            color: 'red',
+            padding: '10px',
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          {hoverText}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 export default ListView;

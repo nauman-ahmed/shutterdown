@@ -1,33 +1,37 @@
-const mongoose=require('mongoose')
-const taskSchema=mongoose.Schema({
-    client:{
+const mongoose = require('mongoose')
+const taskSchema = mongoose.Schema({
+    client: {
         type: mongoose.Types.ObjectId,
         ref: 'Client'
     },
-    deadlineDate:{
-        type:Date
+    deadlineDate: {
+        type: Date
     },
-    assignDate:{
-        type:Date,
-        required : true,
-        default : Date.now()
+    assignDate: {
+        type: Date,
+        required: true,
+        default: Date.now()
     },
-    completionDate:{
-        type:Date
+    ended: {
+        type: Boolean,
+        default: false
     },
-    assignTo:{
+    completionDate: {
+        type: Date
+    },
+    assignTo: {
         type: mongoose.Types.ObjectId,
         ref: 'user'
     },
-    assignBy:{
+    assignBy: {
         type: mongoose.Types.ObjectId,
         ref: 'user'
     },
-    taskName:{
-        type:String
+    taskName: {
+        type: String
     }
 })
 
 
-const taskModel=mongoose.model("Task",taskSchema)
-module.exports=taskModel
+const taskModel = mongoose.model("Task", taskSchema)
+module.exports = taskModel

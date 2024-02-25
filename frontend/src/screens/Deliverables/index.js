@@ -11,7 +11,6 @@ function Deliverables(props) {
     <>
       <div className="main_content">
         <div className="CalenderViewWidth">
-          <ClientHeader filter title="Cinematography" />
           <Outlet />
         </div>
         <CalenderBar Attendence />

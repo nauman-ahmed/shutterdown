@@ -23,11 +23,18 @@ const eventSchema = mongoose.Schema({
         default : 'Yet to start',
         required : true
     },
+    isWedding : {
+        type : Boolean,
+        default : false
+    },
     photographers: {
         type: Number,
     },
     cinematographers: {
         type: Number,
+    },
+    shootDirectors : {
+        type : Number
     },
     drones: {
         type: Number

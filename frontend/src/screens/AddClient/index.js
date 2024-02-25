@@ -11,7 +11,7 @@ const AddClient = () => {
       {/* <Header />
       <SideBar /> */}
       <div className="main_content">
-        <div style={{ width: "100%", paddingRight: "20px" }}>
+        <div style={{ width: "100%", padding: "0px 20px" }}>
           <ClientHeader title="Add Client" />
           <div className="Text24Semi alignCenter">Client Booking Form</div>
           <div>

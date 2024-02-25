@@ -12,11 +12,14 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
 import Cookies from 'js-cookie';
+import ClientHeader from '../../components/ClientHeader';
+import { getCinematography, updateDeliverable } from '../../API/Deliverables';
 
 
 function Cinematography(props) {
   const [editors, setEditors] = useState(null);
-  const [allClients, setAllClients] = useState(null);
+  const [allDeliverables, setAllDeliverables] = useState(null);
+  const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [clientsForShow, setClientsForShow] = useState(null);
   const [filterFor, setFilterFor] = useState('day')
   const toggle = () => {
@@ -40,19 +43,21 @@ function Cinematography(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
+  const [allClients, setAllClients] = useState([])
   const fetchData = async () => {
     try {
-      const data = await getClients();
+      const data = await getCinematography();
       const res = await getEditors();
       if (currentUser.rollSelect == 'Manager') {
-        setAllClients(data);
-        setClientsForShow(data);
+        setAllDeliverables(data);
+        console.log(data);
+        setDeliverablesForShow(data);
       } else if (currentUser.rollSelect == 'Editor') {
-        const clientsToShow = data.filter(client => client.cinematography?.editor._id == currentUser._id);
-        setAllClients(clientsToShow);
-        setClientsForShow(clientsToShow)
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
+        setAllDeliverables(deliverablesToShow);
+        setDeliverablesForShow(deliverablesToShow);
       }
-      setEditors(res.editors)
+      setEditors(res.editors.filter(user => user.subRole === 'Videographer'))
     } catch (error) {
       console.log(error)
     }
@@ -61,9 +66,9 @@ function Cinematography(props) {
     fetchData()
   }, [])
 
-  useEffect(() => {
-    setClientsForShow(allClients)
-  }, [allClients])
+  // useEffect(() => {
+  //   setClientsForShow(allClients)
+  // }, [allClients])
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -85,28 +90,10 @@ function Cinematography(props) {
 
   const handleSaveData = async (index) => {
     try {
-      const client = allClients[index];
-      if (!client.cinematography) {
-        window.notify('Please Select the values!', 'error');
-        return
-      } else if (!client.cinematography.editor) {
-        window.notify('Please Select Editor!', 'error');
-        return
-      } else if (!client.cinematography.weddingDate) {
-        window.notify('Please Select Wedding Date!', 'error');
-        return
-      } else if (!client.cinematography.companyDeadline) {
-        window.notify('Please Provide Company Deadline!', 'error');
-        return
-      } else if (!client.cinematography.status) {
-        window.notify('Please Select any Status!', 'error');
-        return
-      } else if (!client.cinematography.clientRevision) {
-        window.notify('Please Select Client Revisions!', 'error');
-        return
-      }
+      const deliverable = allDeliverables[index];
+
       setUpdatingIndex(index);
-      await addCinematography(client)
+      await updateDeliverable(deliverable)
       setUpdatingIndex(null)
     } catch (error) {
       console.log(error);
@@ -114,9 +101,9 @@ function Cinematography(props) {
   };
 
   return (
-
     <>
-      {clientsForShow ? (
+      <ClientHeader filter title="Cinematography" />
+      {deliverablesForShow ? (
         <>
           <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
             marginTop: '-70px',
@@ -162,31 +149,40 @@ function Cinematography(props) {
               borderless
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '130%', marginTop: '15px'} : { width: '100%', marginTop: '15px'}}
+              style={currentUser.rollSelect == 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '150%', marginTop: '15px' }}
             >
               <thead>
-                {currentUser?.rollSelect == "Manager" && (
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Deliverable</th>
+                  <th className="tableBody">Editor</th>
+                  <th className="tableBody">Wedding Date</th>
+                  <th className="tableBody">Client Deadline</th>
+                  <th className="tableBody">First Delivery Date</th>
+                  <th className="tableBody">Final Delivery Date</th>
+                  <th className="tableBody">Status</th>
+                  {/* <th className="tableBody">Suggestions</th> */}
+                  <th className="tableBody">Client Revisions</th>
+                  <th className="tableBody">Client Ratings</th>
+                  {currentUser?.rollSelect == "Manager" && (
+                    <th className="tableBody">Save</th>
+                  )}
+                </tr>
+                {/* {currentUser?.rollSelect == 'Editor' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
                     <th className="tableBody">Editor</th>
                     <th className="tableBody">Wedding Date</th>
-                    <th className="tableBody">Company Deadline</th>
+                    <th className="tableBody">Client Deadline</th>
+                    <th className="tableBody">First Delivery Date</th>
+                    <th className="tableBody">Final Delivery Date</th>
                     <th className="tableBody">Status</th>
-                    <th className="tableBody">Suggestions</th>
                     <th className="tableBody">Client Revisions</th>
+                    <th className="tableBody">Client Ratings</th>
                     <th className="tableBody">Save</th>
                   </tr>
-                )}
-                {currentUser?.rollSelect == 'Editor' && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Client:</th>
-                    <th className="tableBody">Deliverable</th>
-                    <th className="tableBody">Company Deadline</th>
-                    <th className="tableBody">Status</th>
-                    <th className="tableBody">Save</th>
-                  </tr>
-                )}
+                )} */}
               </thead>
               <tbody
                 className="Text12"
@@ -196,7 +192,7 @@ function Cinematography(props) {
                   // background: "#EFF0F5",
                 }}
               >
-                {clientsForShow?.map((client, index) => {
+                {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
                       {index == 0 && <div style={{ marginTop: '15px' }} />}
@@ -214,7 +210,7 @@ function Cinematography(props) {
                             }}
                             className="tableBody Text14Semi primary2"
                           >
-                            {client.brideName}
+                            {deliverable?.client?.brideName}
                             <div
                               style={{
                                 fontSize: '12px',
@@ -224,24 +220,17 @@ function Cinematography(props) {
                             >
                               <img src={Heart} />
                               <br />
-                              {client.groomName}
+                              {deliverable?.client?.groomName}
                             </div>
                           </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
+                          <td className="tableBody Text14Semi primary2"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}
-                          >
+                            }} >
                             <div>
-                              long Films : {client.longFilms}
-                              <br />
-                              Reels : {client.reels}
-                              <br />
-                              {client.promos === 'Yes' && 'Promos'}
+                              {deliverable?.deliverableName} : {deliverable?.quantity}
                             </div>
-
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -250,11 +239,10 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                             }} >
 
-                            <Select value={client.cinematography?.editor ? { value: client?.cinematography?.editor.firstName, label: client?.cinematography?.editor?.firstName } : null} name='editor' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].cinematography = client.cinematography || {};
-                              updatedClients[index].cinematography.editor = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].editor = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={editors?.map(editor => {
                               return ({ value: editor, label: editor.firstName })
                             })} required />
@@ -265,14 +253,7 @@ function Cinematography(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}  >
-                            <Select value={client.cinematography?.weddingDate ? { value: client?.cinematography.weddingDate, label: dayjs(client?.cinematography?.weddingDate).format('DD-MM-YYYY') } : null} name='cinematographyDate' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].cinematography = client.cinematography || {};
-                              updatedClients[index].cinematography.weddingDate = selected.value;
-                              setAllClients(updatedClients)
-                            }} styles={customStyles} options={client.events?.map(event => {
-                              return ({ value: event.eventDate, label: dayjs(event.eventDate).format('DD-MM-YYYY') })
-                            })} required />
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -281,17 +262,45 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                             }}
                           >
+                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+
                             <input
                               type="date"
-                              name="companyDeadline"
+                              name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedClients = [...allClients]
-                                updatedClients[index].cinematography = client?.cinematography || {};
-                                updatedClients[index].cinematography.companyDeadline = e.target.value;
-                                setAllClients(updatedClients);
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
                               }}
-                              value={client.cinematography?.companyDeadline ? dayjs(new Date(client.cinematography?.companyDeadline)).format('YYYY-MM-DD') : null}
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}>
+
+                            <input
+                              type="date"
+                              name="finalDeliveryDate"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
                             />
                           </td>
                           <td
@@ -300,52 +309,55 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                             }}
                             className="tableBody Text14Semi primary2"   >
-                            <Select value={client.cinematography?.status ? { value: client?.cinematography?.status, label: client?.cinematography?.status } : null} name='cinematographyStatus' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].cinematography = client.cinematography || {};
-                              updatedClients[index].cinematography.status = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].status = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 'Yet to Start', label: 'Yet to Start' },
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          <td
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                              width: '10%',
-                            }}
-                            className="tableBody">
-                            {client.suggestion}
-                          </td>
-                          <td
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                              width: '10%',
-                            }}
-                            className="tableBody"
-                          >
+
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
                             {' '}
-                            <Select value={client.cinematography?.clientRevision ? { value: client?.cinematography?.clientRevision, label: client?.cinematography?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].cinematography = client.cinematography || {};
-                              updatedClients[index].cinematography.clientRevision = selected.value;
-                              setAllClients(updatedClients)
+                            <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].clientRevision = selected.value;
+                              setAllDeliverables(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
                               { value: 3, label: 3 }]} required />
                           </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {' '}
+                            <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].clientRating = selected.value;
+                              setAllDeliverables(updatedDeliverables)
+                            }} styles={customStyles} options={[
+                              { value: 1, label: 1 },
+                              { value: 2, label: 2 },
+                              { value: 3, label: 3 },
+                              { value: 4, label: 4 },
+                              { value: 5, label: 5 }]} required />
+                          </td>
+                          <td className="tableBody Text14Semi primary2"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }} >
                             <button className="btn btn-primary "
-                              onClick={(e) => handleSaveData(index)} >
+                              onClick={(e) => updatingIndex === null && handleSaveData(index)} >
                               {updatingIndex == index ? (
                                 <div className='w-100'>
                                   <div class="smallSpinner mx-auto"></div>
@@ -360,6 +372,7 @@ function Cinematography(props) {
                       {currentUser?.rollSelect == 'Editor' && (
                         <tr
                           style={{
+                            background: '#EFF0F5',
                             borderRadius: '8px',
                           }}
                         >
@@ -370,7 +383,7 @@ function Cinematography(props) {
                             }}
                             className="tableBody Text14Semi primary2"
                           >
-                            {client.brideName}
+                            {deliverable?.client?.brideName}
                             <div
                               style={{
                                 fontSize: '12px',
@@ -380,62 +393,17 @@ function Cinematography(props) {
                             >
                               <img src={Heart} />
                               <br />
-                              {client.groomName}
+                              {deliverable?.client?.groomName}
                             </div>
                           </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
+                          <td className="tableBody Text14Semi primary2"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}
-                          >
+                            }} >
                             <div>
-                              long Films : {client.longFilms}
-                              <br />
-                              Reels : {client.reels}
-                              <br />
-                              {client.promos === 'Yes' && 'Promos'}
+                              {deliverable?.deliverableName} : {deliverable?.quantity}
                             </div>
-
-                          </td>
-
-
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                            <input
-                              type="date"
-                              name="companyDeadline"
-                              className="dateInput text-center"
-                              onChange={(e) => {
-                                const updatedClients = [...allClients]
-                                updatedClients[index].cinematography = client?.cinematography || {};
-                                updatedClients[index].cinematography.companyDeadline = e.target.value;
-                                setAllClients(updatedClients);
-                              }}
-                              value={client.cinematography?.companyDeadline ? dayjs(new Date(client.cinematography?.companyDeadline)).format('YYYY-MM-DD') : null}
-                              readOnly />
-                          </td>
-                          <td
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                            className="tableBody Text14Semi primary2"   >
-                            <Select value={client.cinematography?.status ? { value: client?.cinematography?.status, label: client?.cinematography?.status } : null} name='cinematographyStatus' onChange={(selected) => {
-                              const updatedClients = [...allClients];
-                              updatedClients[index].cinematography = client.cinematography || {};
-                              updatedClients[index].cinematography.status = selected.value;
-                              setAllClients(updatedClients)
-                            }} styles={customStyles} options={[
-                              { value: 'Yet to Start', label: 'Yet to Start' },
-                              { value: 'In Progress', label: 'In Progress' },
-                              { value: 'Completed', label: 'Completed' }]} required />
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -443,17 +411,93 @@ function Cinematography(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }} >
-                            <button className="btn btn-primary "
-                              onClick={(e) => handleSaveData(index)} >
-                              {updatingIndex == index ? (
-                                <div className='w-100'>
-                                  <div class="smallSpinner mx-auto"></div>
-                                </div>
-                              ) : (
-                                "Save"
-                              )}
-                            </button>
+                            {deliverable?.editor?.firstName}
                           </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}  >
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+
+                            <input
+                              type="date"
+                              name="firstDeliveryDate"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              readOnly={true}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}>
+
+                            <input
+                              type="date"
+                              name="finalDeliveryDate"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              readOnly={true}
+                            />
+                          </td>
+                          <td
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                            className="tableBody Text14Semi primary2"   >
+                            {deliverable?.status}
+                          </td>
+
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {deliverable?.clientRevision}
+                            
+                          </td>
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {deliverable?.clientRating}
+                           
+                          </td>
+
+                          
                         </tr>
                       )}
 

@@ -5,27 +5,16 @@ const ClientSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  albums: [{
-    type: String
-  }],
   groomName: {
     type: String,
   },
   phoneNumber: {
     type: String,
   },
-  deliverables: {
-    type: Object
-  },
-  promos: {
-    type: String
-  },
-  longFilms: {
-    type: Number
-  },
-  reels: {
-    type: Number
-  },
+  deliverables: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Deliverable'
+  }],
   hardDrives: {
     type: Number
   },
@@ -41,58 +30,26 @@ const ClientSchema = mongoose.Schema({
   suggestion: {
     type: String,
   },
+  preWedding: {
+    type: Boolean
+  },
+  preWedPhotographers: {
+    type: Number
+  },
+  preWedCinematographers: {
+    type: Number
+  },
+  preWedAssistants: {
+    type: Number
+  },
+  preWedDroneFlyers: {
+    type: Number
+  },
   preWeddingDetails: {
     type: Object,
   },
   checklistDetails: {
     type: Object
-  },
-  cinematography: {
-    editor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user'
-    },
-    weddingDate: {
-      type: Date
-    },
-    companyDeadline: {
-      type: Date
-    },
-    status: {
-      type: String
-    },
-    clientRevision: {
-      type: Number
-    }
-  },
-  photosDeliverables: {
-    editor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user'
-    },
-    weddingDate: {
-      type: Date
-    },
-    companyDeadline: {
-      type: Date
-    },
-    status: {
-      type: String
-    },
-    clientRevision: {
-      type: Number
-    }
-  },
-  albumsDeliverables: {
-    editor : {
-      type : mongoose.Schema.Types.ObjectId,
-      ref : 'user'
-    },
-    
-    status : {
-      type : String
-    },
-    
   },
   events: [{
     type: mongoose.Types.ObjectId,

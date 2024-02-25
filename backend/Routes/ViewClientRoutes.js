@@ -4,6 +4,7 @@ const ClientController = require('../Controllers/ClientController')
 
 // router.get('/MyProfile/Client/ViewClient',ViewClientController.getViewClientData);
 router.get('/Client/getAllClients', ClientController.getAllClients);
+router.get('/Client/getPreWedClients', ClientController.getPreWedClients);
 router.get('/Client/getClientById/:clientId', ClientController.getClientById);
 // router.post('/MyProfile/Client/ParticularClient/shootDetails',ViewClientController.shootDetails);
 

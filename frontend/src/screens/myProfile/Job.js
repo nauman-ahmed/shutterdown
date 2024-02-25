@@ -12,8 +12,8 @@ function Job() {
   useEffect(() => {
     getUserData();
   }, [])
+  const currentUser = JSON.parse(Cookies.get('currentUser'));
   const getUserData = async () => {
-    const currentUser = JSON.parse(Cookies.get('currentUser'));
     setUserData(currentUser);
   }
   const [updating, setUpdating] = useState(false);
@@ -69,6 +69,10 @@ function Job() {
                       <div className="Text10N black mt12">{userData?.jobType}</div>
                     </Col>
                     <Col xs="6" sm="6">
+                      <div className="Text10N gray mt12">Sub Role</div>
+                      <div className="Text10N black mt12">{userData?.subRole}</div>
+                    </Col>
+                    <Col xs="6" sm="6">
                       <div className="Text10N gray mt12">Shift Timing</div>
                       <div className="Text10N black mt12">{userData?.shiftTiming}</div>
                     </Col>
@@ -111,6 +115,25 @@ function Job() {
                 <option value="">Select</option>
                 <option value="Full Time">Full Time</option>
                 <option value="Part Time">Part Time</option>
+              </select>
+            </Col>
+            <Col xl="6" sm="6" className="p-2">
+              <div className="label">Sub Role</div>
+              <select name="subRole" className="JobInputDrop" placeholder="Job_Type" defaultValue={userData?.subRole} onChange={handleChange}>
+                <option value="">Select</option>
+                {currentUser.rollSelect === 'Editor' && (
+                  <>
+                    <option value="Videographer">Videographer</option>
+                    <option value="Photographer">Photographer</option>
+                  </>
+                )}
+                {currentUser.rollSelect === 'Shooter' && (
+                  <>
+                    <option value="Videographer">Cinematographer</option>
+                    <option value="Photographer">Photographer</option>
+                    <option value="Photographer">Drone Flyer</option>
+                  </>
+                )}
               </select>
             </Col>
             <Col xl="12" sm="12" className="p-2">

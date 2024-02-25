@@ -76,6 +76,7 @@ function DailyTasks(props) {
                   <th className="tableBody">Assign By</th>
                   <th className="tableBody">Deadline</th>
                   <th className="tableBody">Completion Date</th>
+                  <th className="tableBody">End Tasks</th>
                   <th className="tableBody">Save</th>
                 </tr>
               )}
@@ -187,6 +188,21 @@ function DailyTasks(props) {
                           }}
                           value={task.completionDate ? dayjs(task.completionDate).format('YYYY-MM-DD') : null}
                         />
+                      </td>
+                      <td className="tableBody Text14Semi primary2"
+                        style={{
+                          paddingTop: '15px',
+                          paddingBottom: '15px',
+                        }}>
+                        <input type="checkbox"
+                          name="endTask"
+                          className="JobInput mt-3"
+                          onChange={(e) => {
+                            let temp = [...tasks]
+                            temp[index]["ended"] = e.target.checked
+                            setTasks(temp)
+                          }} checked={task.ended} />
+
                       </td>
                       <td>
                         <button className="mt-3"

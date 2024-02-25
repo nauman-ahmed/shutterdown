@@ -83,6 +83,7 @@ export const addAlbumsDeliverables = async (client) => {
     ).then(() => { window.notify('Albums Deliverable added successfully!', 'success') });
   } catch (error) {
     console.log(error, "error")
+    return
   }
 };
 
@@ -99,6 +100,19 @@ export const getClients = async () => {
     console.log(error)
   }
 }
+export const getPreWedClients = async () => {
+  try {
+    const res = await axios.get(BASE_URL + `/Client/getPreWedClients`,
+      {
+        Headers: { 'Content-Type': 'application/json' },
+      }
+    );
+    return res.data
+  } catch (error) {
+    console.log(error)
+    return
+  }
+}
 export const getClientById = async (clientId) => {
   try {
     const res = await axios.get(BASE_URL + `/Client/getClientById/${clientId}`,
@@ -107,6 +121,21 @@ export const getClientById = async (clientId) => {
       }
     );
     return res.data
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const addPreWedData = async (client)=>{
+  try {
+    await axios.post(BASE_URL +
+      '/add-PreWedData',
+      {
+        Headers: {
+          'Content-Type': 'application/json',
+        },
+        client
+      }
+    ).then(() => { window.notify('Pre-Wedding Assigned successfully!', 'success') });
   } catch (error) {
     console.log(error);
   }

@@ -253,10 +253,20 @@ const getEditors = async (req, res) => {
     console.log("error")
   }
 };
+const getShooters = async (req, res) => {
+  try {
+    const shooters = await userSchema.find({ rollSelect: 'Shooter' });
+    res.json({ shooters })
+    console.log('gone');
+  } catch (error) {
+    console.log("error")
+  }
+};
 
 
 module.exports = {
   RegisterPostRequest,
+  getShooters,
   SignInPostRequest,
   verifyEmail,
   newPassword,

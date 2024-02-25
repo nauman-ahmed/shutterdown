@@ -16,7 +16,8 @@ const upload = multer({storage : storage});
 router.post('/Signup', userController.RegisterPostRequest);
 router.post('/signInWithGoogle', userController.RegisterPostRequest);
 router.get('/getAllUsers',userController.getAllUsers)
-router.get('/getEditors',userController.getEditors)
+router.get('/getEditors',userController.getEditors);
+router.get('/getShooters',userController.getShooters);
 router.post('/', userController.SignInPostRequest);
 router.post('/emailVerify', userController.verifyEmail);
 router.put("/ResetPassword",userController.newPassword);

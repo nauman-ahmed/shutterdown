@@ -1,23 +1,23 @@
-import React, { useRef, useState } from "react";
-import { Table } from "reactstrap";
-import "../../assets/css/Profile.css";
-import Heart from "../../assets/Profile/Heart.svg";
-import "../../assets/css/tableRoundHeader.css";
-import { useEffect } from "react";
+import React, { useEffect, useRef, useState } from 'react';
+import { Form, Table } from 'reactstrap';
+import '../../assets/css/Profile.css';
+import Heart from '../../assets/Profile/Heart.svg';
+import '../../assets/css/tableRoundHeader.css';
 import 'react-toastify/dist/ReactToastify.css';
-import Select from 'react-select'
-import { addAlbumsDeliverables, getClients } from "../../API/Client";
-import { getEditors } from "../../API/userApi";
+import dayjs from 'dayjs';
+import { addphotosDeliverables, addPhotosDeliverables, getClients } from '../../API/Client';
+import { getEditors } from '../../API/userApi';
+import Select from 'react-select';
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
-import dayjs from "dayjs";
-import Cookies from "js-cookie";
-import ClientHeader from "../../components/ClientHeader";
-import { getAlbums, updateDeliverable } from "../../API/Deliverables";
-import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+import ClientHeader from '../../components/ClientHeader';
+import { getPhotos, getPreWeds, updateDeliverable } from '../../API/Deliverables';
 
-function Albums(props) {
+
+function PreWedDeliverables() {
+
   const [editors, setEditors] = useState(null);
   const [allClients, setAllClients] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
@@ -25,7 +25,6 @@ function Albums(props) {
   const toggle = () => {
     setShow(!show);
   };
-  const [updatingIndex, setUpdatingIndex] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
@@ -41,26 +40,28 @@ function Albums(props) {
     setClientsForShow(allClients.filter(clientData => {
       return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
     }))
-  }
+  };
+  const [updatingIndex, setUpdatingIndex] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
   useEffect(() => {
     setClientsForShow(allClients)
   }, [allClients])
+
   const fetchData = async () => {
     try {
-      const data = await getAlbums();
+      const data = await getPreWeds();
       const res = await getEditors();
-      setEditors(res.editors)
+      setEditors(res.editors);
+      console.log(data);
       if (currentUser?.rollSelect == 'Manager') {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
-      } else if (currentUser.rollSelect == 'Editor') {
+      } else if (currentUser?.rollSelect == 'Editor') {
         const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
-
     } catch (error) {
       console.log(error)
     }
@@ -69,7 +70,7 @@ function Albums(props) {
     fetchData()
   }, [])
 
-  const navigate = useNavigate();
+
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -90,18 +91,27 @@ function Albums(props) {
   const handleSaveData = async (index) => {
     try {
       const deliverable = allDeliverables[index];
-      // if (!client.albumsDeliverables) {
+      // if (!client.photosDeliverables) {
       //   window.notify('Please Select the values!', 'error');
       //   return
-      // } else if (!client.albumsDeliverables.editor) {
+      // } else if (!client.photosDeliverables.editor) {
       //   window.notify('Please Select Editor!', 'error');
       //   return
-      // } else if (!client.albumsDeliverables.status) {
+      // } else if (!client.photosDeliverables.weddingDate) {
+      //   window.notify('Please Select Wedding Date!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.companyDeadline) {
+      //   window.notify('Please Provide Company Deadline!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.status) {
       //   window.notify('Please Select any Status!', 'error');
+      //   return
+      // } else if (!client.photosDeliverables.clientRevision) {
+      //   window.notify('Please Select Client Revisions!', 'error');
       //   return
       // }
       setUpdatingIndex(index);
-      await updateDeliverable(deliverable);
+      await updateDeliverable(deliverable)
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
@@ -110,7 +120,7 @@ function Albums(props) {
 
   return (
     <>
-      <ClientHeader filter title="Albums" />
+      <ClientHeader filter title="Pre-Wedding" />
       {deliverablesForShow ? (
         <>
           <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
@@ -157,42 +167,54 @@ function Albums(props) {
               borderless
               responsive
               className="tableViewClient"
-              style={{ width: '150%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
                 <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client</th>
-                  <th className="tableBody">Album</th>
+                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Deliverable</th>
                   <th className="tableBody">Editor</th>
                   <th className="tableBody">Wedding Date</th>
                   <th className="tableBody">Client Deadline</th>
                   <th className="tableBody">First Delivery Date</th>
                   <th className="tableBody">Final Delivery Date</th>
                   <th className="tableBody">Status</th>
-                  <th className="tableBody">Action</th>
+                  {/* <th className="tableBody">Suggestions</th> */}
+                  <th className="tableBody">Client Revisions</th>
                   <th className="tableBody">Client Ratings</th>
-
-                  {currentUser?.rollSelect == 'Manager' && (
+                  {currentUser.rollSelect == 'Manager' && (
                     <th className="tableBody">Save</th>
                   )}
                 </tr>
-
+                {/* {currentUser?.rollSelect == 'Editor' && (
+                  <tr className="logsHeader Text16N1">
+                    <th className="tableBody">Client:</th>
+                    <th className="tableBody">Deliverable</th>
+                    <th className="tableBody">Company Deadline</th>
+                    <th className="tableBody">Status</th>
+                    <th className="tableBody">Save</th>
+                  </tr>
+                )} */}
               </thead>
-              <tbody className="Text12"
+              <tbody
+                className="Text12"
                 style={{
                   textAlign: 'center',
                   borderWidth: '0px 1px 0px 1px',
                   // background: "#EFF0F5",
-                }}>
+                }}
+              >
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
                       {index == 0 && <div style={{ marginTop: '15px' }} />}
                       {currentUser?.rollSelect == 'Manager' && (
-                        <tr style={{
-                          background: '#EFF0F5',
-                          borderRadius: '8px',
-                        }}>
+                        <tr
+                          style={{
+                            background: '#EFF0F5',
+                            borderRadius: '8px',
+                          }}
+                        >
                           <td
                             style={{
                               paddingTop: '15px',
@@ -200,7 +222,7 @@ function Albums(props) {
                             }}
                             className="tableBody Text14Semi primary2"
                           >
-                            {deliverable.client?.brideName}
+                            {deliverable?.client?.brideName}
                             <div
                               style={{
                                 fontSize: '12px',
@@ -210,7 +232,7 @@ function Albums(props) {
                             >
                               <img src={Heart} />
                               <br />
-                              {deliverable?.client?.groomName}
+                              {deliverable.client?.groomName}
                             </div>
                           </td>
                           <td
@@ -233,7 +255,7 @@ function Albums(props) {
                               paddingBottom: '15px',
                             }} >
 
-                            <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
+                            <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
                               const updatedDeliverables = [...allDeliverables];
                               updatedDeliverables[index].editor = selected.value;
                               setAllDeliverables(updatedDeliverables)
@@ -312,15 +334,29 @@ function Albums(props) {
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          <td
-                            onClick={() => navigate('https://web.whatsapp.com/')}
+                          {/* <td
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width: '10%',
                             }}
-                            className="tableBody Text14Semi primary2"
-                          >
-                            Reminder/Yes or No
+                            className="tableBody">
+                            {client.suggestion}
+                          </td> */}
+                          <td style={{
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            width: '10%',
+                          }} className="tableBody">
+                            {' '}
+                            <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
+                              const updatedDeliverables = [...allDeliverables];
+                              updatedDeliverables[index].clientRevision = selected.value;
+                              setAllDeliverables(updatedDeliverables)
+                            }} styles={customStyles} options={[
+                              { value: 1, label: 1 },
+                              { value: 2, label: 2 },
+                              { value: 3, label: 3 }]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',
@@ -339,7 +375,6 @@ function Albums(props) {
                               { value: 4, label: 4 },
                               { value: 5, label: 5 }]} required />
                           </td>
-
                           <td
                             className="tableBody Text14Semi primary2"
                             style={{
@@ -359,7 +394,7 @@ function Albums(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser.rollSelect == 'Editor' && (
+                      {currentUser?.rollSelect == 'Editor' && (
                         <tr
                           style={{
                             background: '#EFF0F5',
@@ -490,10 +525,12 @@ function Albums(props) {
 
                         </tr>
                       )}
+
                       <div style={{ marginTop: '15px' }} />
                     </>
                   )
                 }
+
                 )}
               </tbody>
             </Table>
@@ -512,7 +549,6 @@ function Albums(props) {
                   }}
                 />
               </div>
-
             </Overlay>
           </div>
         </>
@@ -521,8 +557,9 @@ function Albums(props) {
           <div class="spinner"></div>
         </div>
       )}
+
     </>
-  )
+  );
 }
 
-export default Albums;
+export default PreWedDeliverables;

@@ -3,7 +3,7 @@ import CommonDropText from '../../components/CommonDropText';
 
 import { FormGroup, Input, Label, Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -19,7 +19,7 @@ import axios from 'axios';
 
 const Signup = (props) => {
   const navigate = useNavigate();
-  const location=useLocation()
+  const location = useLocation()
   const [successToast, setSuccessToast] = useState(false)
   const [StatusCode, setStatusCode] = useState()
   const [phone, setPhone] = useState();
@@ -27,7 +27,7 @@ const Signup = (props) => {
   const [isMatch, setIsMatch] = useState(false);
   const [rollSelect, setRollSelect] = useState("Select")
   const [rollOpen, setRollOpen] = useState(false)
-  const [signInData,setSignInData]=useState()
+  const [signInData, setSignInData] = useState()
 
   const [inputData, setInputData] = useState({
     firstName: '',
@@ -37,7 +37,7 @@ const Signup = (props) => {
     confirmPassword: '',
     phoneNo: phone,
   });
-// console.log(`This is Roll ${inputData.rollSelect}`)
+  // console.log(`This is Roll ${inputData.rollSelect}`)
   let Roll = [
     {
       check: 'roll',
@@ -46,18 +46,18 @@ const Signup = (props) => {
     },
     {
       check: 'roll',
-      title: "Shooter",
+      title: "Editor",
       id: 2,
     },
     {
       check: 'roll',
-      title: "Editor",
+      title: "Shooter",
       id: 3,
-    },
+    }
   ];
 
-useEffect(()=>{
-  const response=JSON.parse(localStorage.getItem('res'))
+  useEffect(() => {
+    const response = JSON.parse(localStorage.getItem('res'))
 
     const signInWithGoogle = JSON.parse(
       localStorage.getItem('signInWithGoogle')
@@ -68,14 +68,14 @@ useEffect(()=>{
     setSignInData(signInWithGoogle)
 
 
-},[])
-const inputData1={
-  firstName:signInData?.data?.given_name,
-  lastName:signInData?.data?.family_name,
-  email:signInData?.data?.email,
-  
-}
-  let registerData = {...inputData,rollSelect}
+  }, [])
+  const inputData1 = {
+    firstName: signInData?.data?.given_name,
+    lastName: signInData?.data?.family_name,
+    email: signInData?.data?.email,
+
+  }
+  let registerData = { ...inputData, rollSelect }
 
   const handleOnChangeFunction = (e) => {
     const { name, value } = e.target;
@@ -83,15 +83,15 @@ const inputData1={
     setError(false);
     setIsMatch(false);
   };
-  const { firstName, lastName, email, password, confirmPassword,roll  } = inputData;
-  
-const RegisterData={...inputData,rollSelect}
-const RegisterData2={...inputData1,rollSelect}
+  const { firstName, lastName, email, password, confirmPassword, roll } = inputData;
+
+  const RegisterData = { ...inputData, rollSelect }
+  const RegisterData2 = { ...inputData1, rollSelect }
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-  
-    if(roll === 'Select'){
+
+    if (roll === 'Select') {
       setError(true);
     }
     if (firstName === '') {
@@ -116,9 +116,9 @@ const RegisterData2={...inputData1,rollSelect}
       setIsMatch(true);
     } else {
 
-        
+
       try {
-          setError(false);
+        setError(false);
         await GetsignUPData(RegisterData, phone);
 
         const res = JSON.parse(localStorage.getItem("res"))
@@ -137,34 +137,34 @@ const RegisterData2={...inputData1,rollSelect}
 
     }
   };
-  const handleSignInwithGoogleFunction=async(e)=>{
-    if (phone==='') {
+  const handleSignInwithGoogleFunction = async (e) => {
+    if (phone === '') {
       setError(true)
     }
-    if (roll==="select") {
+    if (roll === "select") {
       setError(true)
     }
-    else{
+    else {
       e.preventDefault()
       setError(false)
-      await GetSignInWithGoogleData(RegisterData2,phone)
-        const response = JSON.parse(localStorage.getItem('loginUser'));
-        if (response.status === 200) {
-        
-          localStorage.setItem(
-            'userEmail',
-            JSON.stringify(response?.data?.User._id)
-          );
-          const shooter = JSON.parse(localStorage.getItem('loginUser'));
-          if (shooter.data.User.rollSelect === 'Shooter') {
-            navigate('/photographer-CalenderView/View');
-          } else {
-            navigate('/MyProfile');
-          }
+      await GetSignInWithGoogleData(RegisterData2, phone)
+      const response = JSON.parse(localStorage.getItem('loginUser'));
+      if (response.status === 200) {
+
+        localStorage.setItem(
+          'userEmail',
+          JSON.stringify(response?.data?.User._id)
+        );
+        const shooter = JSON.parse(localStorage.getItem('loginUser'));
+        if (shooter.data.User.rollSelect === 'Shooter') {
+          navigate('/photographer-CalenderView/View');
         } else {
-          toast.error('Invalid Credentials');
+          navigate('/MyProfile');
         }
-     
+      } else {
+        toast.error('Invalid Credentials');
+      }
+
     }
   }
   const signin = () => {
