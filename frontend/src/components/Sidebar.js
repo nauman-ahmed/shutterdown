@@ -535,35 +535,38 @@ const SideBar = () => {
                         }
                       >Actual Tasks
                       </MenuItem>
-                      <MenuItem
-                        icon={
-                          (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports' ? (
-                            <img
-                              src="/images/sidebar/oval_active.png"
-                              width={10}
-                            ></img>
-                          ) : (
-                            <img
-                              src="/images/sidebar/oval.png"
-                              width={10}
-                            ></img>
-                          )
-                        }
-                        onClick={() => {
-                          setCurrentSubMenuIndex(1);
-                          navigate('/MyProfile/Tasks/Reports');
-                          setCurrentTab(null)
-                        }}
-                        className={
-                          (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports'
-                            ? 'active_submenu'
-                            : ''
-                        }
-                      >
-                        Reports
-                      </MenuItem>
+                      {currentUser.rollSelect == 'Manager' ?
+                        <MenuItem
+                          icon={
+                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports' ? (
+                              <img
+                                src="/images/sidebar/oval_active.png"
+                                width={10}
+                              ></img>
+                            ) : (
+                              <img
+                                src="/images/sidebar/oval.png"
+                                width={10}
+                              ></img>
+                            )
+                          }
+                          onClick={() => {
+                            setCurrentSubMenuIndex(1);
+                            navigate('/MyProfile/Tasks/Reports');
+                            setCurrentTab(null)
+                          }}
+                          className={
+                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports'
+                              ? 'active_submenu'
+                              : ''
+                          }
+                        >
+                          Reports
+                        </MenuItem>
+                        :
+                        null
+                      }
                     </SubMenu>
-
                   </>
                 )}
 

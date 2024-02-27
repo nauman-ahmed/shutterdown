@@ -261,6 +261,7 @@ function Preview() {
                 <th>Date</th>
                 <th>Location</th>
                 <th>Travel By</th>
+                <th>Wedding Event</th>
               </tr>
             </thead>
             <tbody className="Text14Semi alignCenter">
@@ -284,6 +285,7 @@ function Preview() {
                     <td className="primary2">{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
                     <td className="primary2">{event.location}</td>
                     <td className="primary2">{event.travelBy}</td>
+                    <td className="primary2">{event.isWedding ? "Yes" : "No"}</td>
                   </tr>
                 ))
               )}

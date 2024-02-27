@@ -58,7 +58,7 @@ function Photos() {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
       } else if (currentUser?.rollSelect == 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id == currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -167,41 +167,41 @@ function Photos() {
               borderless
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '175%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client:</th>
-                  <th className="tableBody">Deliverable</th>
-                  <th className="tableBody">Editor</th>
-                  <th className="tableBody">Wedding Date</th>
-                  <th className="tableBody">Client Deadline</th>
-                  <th className="tableBody">First Delivery Date</th>
-                  <th className="tableBody">Final Delivery Date</th>
-                  <th className="tableBody">Status</th>
-                  {/* <th className="tableBody">Suggestions</th> */}
-                  <th className="tableBody">Client Revisions</th>
-                  <th className="tableBody">Client Ratings</th>
-                  {currentUser.rollSelect == 'Manager' && (
-                    <th className="tableBody">Save</th>
-                  )}
-                </tr>
-                {/* {currentUser?.rollSelect == 'Editor' && (
+                {currentUser?.rollSelect == 'Editor' ?
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
+                    <th className="tableBody">Editor</th>
                     <th className="tableBody">Company Deadline</th>
                     <th className="tableBody">Status</th>
-                    <th className="tableBody">Save</th>
                   </tr>
-                )} */}
+                  :currentUser?.rollSelect == 'Manager' ?
+                    <tr className="logsHeader Text16N1">
+                      <th className="tableBody">Client:</th>
+                      <th className="tableBody">Deliverable</th>
+                      <th className="tableBody">Editor</th>
+                      <th className="tableBody">Wedding Date</th>
+                      <th className="tableBody">Client Deadline</th>
+                      <th className="tableBody">Company Deadline</th>
+                      <th className="tableBody">First Delivery Date</th>
+                      <th className="tableBody">Final Delivery Date</th>
+                      <th className="tableBody">Status</th>
+                      <th className="tableBody">Client Revisions</th>
+                      <th className="tableBody">Client Ratings</th>
+                      <th className="tableBody">Save</th>
+                    </tr>
+                  :
+                  null
+                }
               </thead>
               <tbody
                 className="Text12"
                 style={{
                   textAlign: 'center',
                   borderWidth: '0px 1px 0px 1px',
-                  // background: "#EFF0F5",
                 }}
               >
                 {deliverablesForShow?.map((deliverable, index) => {
@@ -219,6 +219,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -240,6 +241,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                           >
                             <div>
@@ -253,6 +255,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -279,6 +282,25 @@ function Photos() {
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
+                            <input
+                              type="date"
+                              name="companyDeadline"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].companyDeadline = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                            />
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -323,6 +345,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -443,58 +466,8 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-
-                            <input
-                              type="date"
-                              name="firstDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}>
-
-                            <input
-                              type="date"
-                              name="finalDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
+                            }} >
+                            {deliverable?.companyDeadline}
                           </td>
                           <td
                             style={{
@@ -504,25 +477,6 @@ function Photos() {
                             className="tableBody Text14Semi primary2"   >
                             {deliverable?.status}
                           </td>
-
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRevision}
-                            
-                          </td>
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRating}
-                           
-                          </td>
-
-                          
                         </tr>
                       )}
 

@@ -53,7 +53,7 @@ function Cinematography(props) {
         console.log(data);
         setDeliverablesForShow(data);
       } else if (currentUser.rollSelect == 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id == currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -65,10 +65,6 @@ function Cinematography(props) {
   useEffect(() => {
     fetchData()
   }, [])
-
-  // useEffect(() => {
-  //   setClientsForShow(allClients)
-  // }, [allClients])
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -138,7 +134,7 @@ function Cinematography(props) {
                 }} styles={customStyles}
                   options={[
                     { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                    { value: 'month', label: 'Month' }]} /> 
               </div>
             </div>
 
@@ -149,40 +145,37 @@ function Cinematography(props) {
               borderless
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '150%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '175%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client:</th>
-                  <th className="tableBody">Deliverable</th>
-                  <th className="tableBody">Editor</th>
-                  <th className="tableBody">Wedding Date</th>
-                  <th className="tableBody">Client Deadline</th>
-                  <th className="tableBody">First Delivery Date</th>
-                  <th className="tableBody">Final Delivery Date</th>
-                  <th className="tableBody">Status</th>
-                  {/* <th className="tableBody">Suggestions</th> */}
-                  <th className="tableBody">Client Revisions</th>
-                  <th className="tableBody">Client Ratings</th>
-                  {currentUser?.rollSelect == "Manager" && (
-                    <th className="tableBody">Save</th>
-                  )}
-                </tr>
-                {/* {currentUser?.rollSelect == 'Editor' && (
+                {currentUser?.rollSelect == 'Editor' ?
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
                     <th className="tableBody">Editor</th>
-                    <th className="tableBody">Wedding Date</th>
-                    <th className="tableBody">Client Deadline</th>
-                    <th className="tableBody">First Delivery Date</th>
-                    <th className="tableBody">Final Delivery Date</th>
+                    <th className="tableBody">Company Deadline</th>
                     <th className="tableBody">Status</th>
-                    <th className="tableBody">Client Revisions</th>
-                    <th className="tableBody">Client Ratings</th>
-                    <th className="tableBody">Save</th>
                   </tr>
-                )} */}
+                  :
+                  currentUser?.rollSelect == 'Manager' ?
+                    <tr className="logsHeader Text16N1">
+                      <th className="tableBody">Client:</th>
+                      <th className="tableBody">Deliverable</th>
+                      <th className="tableBody">Editor</th>
+                      <th className="tableBody">Wedding Date</th>
+                      <th className="tableBody">Client Deadline</th>
+                      <th className="tableBody">Company Deadline</th>
+                      <th className="tableBody">First Delivery Date</th>
+                      <th className="tableBody">Final Delivery Date</th>
+                      <th className="tableBody">Status</th>
+                      {/* <th className="tableBody">Suggestions</th> */}
+                      <th className="tableBody">Client Revisions</th>
+                      <th className="tableBody">Client Ratings</th>
+                      <th className="tableBody">Save</th>
+                    </tr>
+                  :
+                  null
+                }
               </thead>
               <tbody
                 className="Text12"
@@ -207,6 +200,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -227,6 +221,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }} >
                             <div>
                               {deliverable?.deliverableName} : {deliverable?.quantity}
@@ -237,6 +232,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -252,6 +248,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}  >
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
                           </td>
@@ -260,6 +257,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
@@ -269,6 +267,27 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
+                            }}
+                          >
+                            <input
+                              type="date"
+                              name="companyDeadline"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].companyDeadline = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                              width:"10%"
                             }}
                           >
 
@@ -289,6 +308,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}>
 
                             <input
@@ -307,6 +327,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"15%"
                             }}
                             className="tableBody Text14Semi primary2"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -337,7 +358,7 @@ function Cinematography(props) {
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
-                            width: '10%',
+                            width: '15%',
                           }} className="tableBody">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
@@ -355,6 +376,7 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }} >
                             <button className="btn btn-primary "
                               onClick={(e) => updatingIndex === null && handleSaveData(index)} >
@@ -418,58 +440,9 @@ function Cinematography(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-
-                            <input
-                              type="date"
-                              name="firstDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}>
-
-                            <input
-                              type="date"
-                              name="finalDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
+                            {dayjs(deliverable?.companyDeadline).format('DD-MM-YYYY')}
                           </td>
                           <td
                             style={{
@@ -479,25 +452,6 @@ function Cinematography(props) {
                             className="tableBody Text14Semi primary2"   >
                             {deliverable?.status}
                           </td>
-
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRevision}
-                            
-                          </td>
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRating}
-                           
-                          </td>
-
-                          
                         </tr>
                       )}
 

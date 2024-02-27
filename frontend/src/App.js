@@ -205,7 +205,10 @@ function App() {
             element={currentUser ? <CheckListsPage /> : <Navigate to='/' replace />}
           ></Route>
           <Route exact path="/MyProfile/Reports" element={currentUser ? <ReportsScreen /> : <Navigate to='/' replace />} />
-          <Route exact path="/MyProfile/Tasks/Reports" element={currentUser ? <ReportsScreen /> : <Navigate to='/' replace />} />
+          {editor ?
+            null:
+            <Route exact path="/MyProfile/Tasks/Reports" element={currentUser ? <ReportsScreen /> : <Navigate to='/' replace />} />
+          }
           <Route exact path="/MyProfile/Team" element={currentUser ? <TeamScreen /> : <Navigate to='/' replace />} />
           <Route
             exact

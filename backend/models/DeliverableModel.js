@@ -22,6 +22,9 @@ const deliverableSchema = mongoose.Schema({
     clientDeadline: {
         type: Date
     },
+    companyDeadline: {
+        type: Date
+    },
     editor: {
         type : mongoose.Types.ObjectId,
         ref : 'user'

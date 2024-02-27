@@ -30,6 +30,7 @@ function FormII() {
   var tentativeSelect = useRef(null);
   var shootDirectorsSelect = useRef(null);
   const [allEvents, setAllEvents] = useState([]);
+  const [weddingAssigned, setWeddingAssigned] = useState(false);
 
   const dispatch = useDispatch();
   const clientData = useSelector(state => state.clientData);
@@ -44,6 +45,10 @@ function FormII() {
     }
     const updatedEvents = clientData?.events ? [...clientData?.events] : [];
     updatedEvents.push(eventValues);
+    const isWeddingAvailable = updatedEvents.filter(events => events.isWedding == true)
+    if(isWeddingAvailable.length > 0){
+      setWeddingAssigned(true)
+    }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
     const updatedStoredEvents = [...allEvents];
     updatedStoredEvents.push(eventValues);
@@ -65,6 +70,10 @@ function FormII() {
   const handleDeleteEvent = (event, index) => {
     let updatedEvents = [...clientData?.events];
     updatedEvents.splice(index, 1)
+    const isWeddingAvailable = updatedEvents.filter(events => events.isWedding == true)
+    if(isWeddingAvailable.length == 0){
+      setWeddingAssigned(false)
+    }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }))
   }
   const updateDeliverables = (e) => {
@@ -192,6 +201,24 @@ function FormII() {
                 />
               </div>
             </Col>
+            <Col xs="6" sm="3">
+              <div style={{ marginLeft: '10px' }}>
+                <div className="Text16N" style={{ marginBottom: '6px' }}>
+                  Is This Wedding Event
+                </div>
+                <input
+                    onChange={(e) => {
+                      setEventValues({ ...eventValues, isWedding: e.target.checked })
+                    }}
+                    className='mx-2'
+                    type="checkbox"
+                    name="isWedding"
+                    style={{ marginTop: "20px" }}
+                    checked={eventValues?.isWedding}
+                    disabled={weddingAssigned}
+                  />
+              </div>
+            </Col>
           </Row>
           <Row>
             <Col xs="4" sm="3" className="pr5">
@@ -216,7 +243,7 @@ function FormII() {
                 <div className="Text16N" style={{ marginBottom: '6px' }}>
                   Travel By
                 </div>
-                <Select ref={travelSelect} name='travelBy' className='w-50' onChange={(selected) => {
+                <Select ref={travelSelect} name='travelBy' className='w-75' onChange={(selected) => {
                   setEventValues({ ...eventValues, travelBy: selected?.value });
                 }} styles={customStyles} options={travelByOptions} required={true} />
               </div>
@@ -305,7 +332,7 @@ function FormII() {
               </div>
             </Col>
           </Row>
-          <Row className='mt-2'>
+          {/* <Row className='mt-2'>
             <Col xs="6" sm="3">
               <div className='mt25'>
                 <div className="Text16N mt-5" style={{ marginBottom: '6px' }}>
@@ -323,7 +350,7 @@ function FormII() {
                 </div>
               </div>
             </Col>
-          </Row>
+          </Row> */}
           <Button type='submit' className="add_album album mt-4">
             Add Event
           </Button>
@@ -342,6 +369,7 @@ function FormII() {
                 <th>Date</th>
                 <th>Location</th>
                 <th>Travel By</th>
+                <th>Wedding Event</th>
                 <th>Delete</th>
               </tr>
             </thead>
@@ -353,6 +381,7 @@ function FormII() {
                     <td className="primary2">{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
                     <td className="primary2">{event.location}</td>
                     <td className="primary2">{event.travelBy}</td>
+                    <td className="primary2">{event.isWedding ? "Yes" : "No"}</td>
                     <td className="primary2">
                       <AiFillDelete
                         onClick={() => handleDeleteEvent(event, i)}

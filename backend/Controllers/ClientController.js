@@ -152,7 +152,7 @@ const getPreWedClients = async (req, res) => {
         { path: 'droneFlyers', model: 'user' },
         { path: 'assistants', model: 'user' },
       ]
-    }).populate('userID');
+    }).populate('userID').populate('events');
 
     res.status(200).json(clients);
   } catch (error) {

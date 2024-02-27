@@ -54,21 +54,21 @@ function ListView() {
         setEventsForShow(res.data);
       } else if (currentUser.rollSelect == 'Shooter') {
         const eventsToShow = res.data.map(event => {
-          if (event.shootDirector.some(director => director._id == currentUser._id)) {
+          if (event?.shootDirector.some(director => director._id == currentUser._id)) {
             return { ...event, userRole: 'Shoot Director' };
-          } else if (event.choosenPhotographers.some(photographer => photographer._id == currentUser._id)) {
+          } else if (event?.choosenPhotographers.some(photographer => photographer._id == currentUser._id)) {
             return { ...event, userRole: 'Photographer' };
-          } else if (event.choosenCinematographers.some(cinematographer => cinematographer._id == currentUser._id)) {
+          } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id == currentUser._id)) {
             return { ...event, userRole: 'Cinematographer' };
-          } else if (event.droneFlyers.some(flyer => flyer._id == currentUser._id)) {
+          } else if (event?.droneFlyers.some(flyer => flyer._id == currentUser._id)) {
             return { ...event, userRole: 'Drone Flyer' };
           } else if (event.manager.some(manager => manager._id == currentUser._id)) {
             return { ...event, userRole: 'Manager' };
-          } else if (event.sameDayPhotoMakers.some(photoMaker => photoMaker._id == currentUser._id)) {
+          } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id == currentUser._id)) {
             return { ...event, userRole: 'Same Day Photos Maker' };
-          } else if (event.sameDayVideoMakers.some(videoMaker => videoMaker._id == currentUser._id)) {
+          } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id == currentUser._id)) {
             return { ...event, userRole: 'Same Day Video Maker' };
-          } else if (event.assistants.some(assistant => assistant._id == currentUser._id)) {
+          } else if (event?.assistants.some(assistant => assistant._id == currentUser._id)) {
             return { ...event, userRole: 'Assistant' };
           } else {
             return null;
@@ -273,7 +273,6 @@ function ListView() {
                     <th className="tableBody">Status</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
-                    {/* <th className="tableBody">Save</th> */}
                   </tr>
                 )}
               </thead>
@@ -284,45 +283,45 @@ function ListView() {
                 }}>
                 {eventsForShow?.map((event, index) => {
                   let errorText = '';
-                  if (event.sameDayVideoEditor !== "No") {
-                    if (!event.sameDayVideoMakers || event.sameDayVideoMakers.length < 1) {
+                  if (event?.sameDayVideoEditor !== "No") {
+                    if (!event?.sameDayVideoMakers || event?.sameDayVideoMakers.length < 1) {
                       errorText += 'Same Day Video Makers are not complete \n'
                     }
                   }
 
-                  if (event.sameDayPhotoEditor !== 'No') {
-                    if (!event.sameDayPhotoMakers || event.sameDayPhotoMakers.length < 2) {
+                  if (event?.sameDayPhotoEditor !== 'No') {
+                    if (!event?.sameDayPhotoMakers || event?.sameDayPhotoMakers.length < 2) {
                       errorText += 'Same Day Photo Makerasare not complete \n'
 
                     }
                   }
 
-                  if (!event.choosenCinematographers || event.choosenCinematographers.length !== event.cinematographers) {
+                  if (!event?.choosenCinematographers || event?.choosenCinematographers.length !== event.cinematographers) {
                     errorText += 'Cinematographers are not complete \n'
 
                   }
 
-                  if (!event.droneFlyers || event.droneFlyers.length !== event.drones) {
+                  if (!event?.droneFlyers || event?.droneFlyers.length !== event.drones) {
                     errorText += 'Drone Flyers are not complete \n'
 
                   }
 
-                  if (!event.manager || event.manager.length !== 1) {
+                  if (!event?.manager || event?.manager.length !== 1) {
                     errorText += 'Manager not selected \n'
 
                   }
 
-                  if (!event.assistants || event.assistants.length !== 1) {
+                  if (!event?.assistants || event?.assistants.length !== 1) {
                     errorText += 'Assistants are not complete \n'
 
                   }
 
-                  if (!event.choosenPhotographers || event.choosenPhotographers.length !== event.photographers) {
+                  if (!event?.choosenPhotographers || event?.choosenPhotographers.length !== event.photographers) {
                     errorText += 'Photographers are not complete \n'
 
                   }
 
-                  if (!event.shootDirector || event.shootDirector.length !== 1) {
+                  if (!event?.shootDirector || event?.shootDirector.length !== 1) {
                     errorText += 'Shoot Director not selected \n'
 
                   }

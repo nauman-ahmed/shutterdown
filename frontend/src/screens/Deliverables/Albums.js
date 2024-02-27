@@ -56,7 +56,7 @@ function Albums(props) {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
       } else if (currentUser.rollSelect == 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor._id == currentUser._id);
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id == currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -108,6 +108,19 @@ function Albums(props) {
     }
   };
 
+  const openWhatsAppChat = (contact,message) => {
+
+    // const chatUrl = `whatsapp://send?abid=${contactParam}&text=Hello%2C%20World!`;
+    // window.open(chatUrl, '_blank');
+
+    const baseUrl = 'https://web.whatsapp.com/';
+    const contactParam = encodeURIComponent(contact);
+    const messageParam = encodeURIComponent(message);
+    const chatUrl = `${baseUrl}send?phone=${contactParam}&text=${messageParam}`;
+    window.open(chatUrl, '_blank');
+
+  }
+
   return (
     <>
       <ClientHeader filter title="Albums" />
@@ -157,26 +170,34 @@ function Albums(props) {
               borderless
               responsive
               className="tableViewClient"
-              style={{ width: '150%', marginTop: '15px' }}
+              style={currentUser.rollSelect == 'Manager' ? { width: '175%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client</th>
-                  <th className="tableBody">Album</th>
-                  <th className="tableBody">Editor</th>
-                  <th className="tableBody">Wedding Date</th>
-                  <th className="tableBody">Client Deadline</th>
-                  <th className="tableBody">First Delivery Date</th>
-                  <th className="tableBody">Final Delivery Date</th>
-                  <th className="tableBody">Status</th>
-                  <th className="tableBody">Action</th>
-                  <th className="tableBody">Client Ratings</th>
-
-                  {currentUser?.rollSelect == 'Manager' && (
-                    <th className="tableBody">Save</th>
-                  )}
-                </tr>
-
+                {currentUser?.rollSelect == 'Editor' ?
+                  <tr className="logsHeader Text16N1">
+                    <th className="tableBody">Client</th>
+                    <th className="tableBody">Album</th>
+                    <th className="tableBody">Editor</th>
+                    <th className="tableBody">Company Deadline</th>
+                    <th className="tableBody">Status</th>
+                  </tr>
+                  :currentUser?.rollSelect == 'Manager' ?
+                    <tr className="logsHeader Text16N1">
+                      <th className="tableBody">Client</th>
+                      <th className="tableBody">Album</th>
+                      <th className="tableBody">Editor</th>
+                      <th className="tableBody">Wedding Date</th>
+                      <th className="tableBody">Client Deadline</th>
+                      <th className="tableBody">Company Deadline</th>
+                      <th className="tableBody">First Delivery Date</th>
+                      <th className="tableBody">Final Delivery Date</th>
+                      <th className="tableBody">Status</th>
+                      <th className="tableBody">Action</th>
+                      <th className="tableBody">Client Ratings</th>
+                      <th className="tableBody">Save</th>
+                    </tr>
+                  : null
+                }
               </thead>
               <tbody className="Text12"
                 style={{
@@ -197,6 +218,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -218,6 +240,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                           >
                             <div>
@@ -265,6 +288,25 @@ function Albums(props) {
                               paddingBottom: '15px',
                             }}
                           >
+                            <input
+                              type="date"
+                              name="companyDeadline"
+                              className="dateInput"
+                              onChange={(e) => {
+                                const updatedDeliverables = [...allDeliverables]
+                                updatedDeliverables[index].companyDeadline = e.target.value;
+                                setAllDeliverables(updatedDeliverables);
+                              }}
+                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2"
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                            }}
+                          >
 
                             <input
                               type="date"
@@ -301,6 +343,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -313,10 +356,11 @@ function Albums(props) {
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
                           <td
-                            onClick={() => navigate('https://web.whatsapp.com/')}
+                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber,"HI This is shutter down ")}
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"15%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -404,62 +448,12 @@ function Albums(props) {
                             {deliverable?.editor?.firstName}
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}
-                          >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}
-                          >
-
-                            <input
-                              type="date"
-                              name="firstDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
-                          </td>
-                          <td
-                            className="tableBody Text14Semi primary2"
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                            }}>
-
-                            <input
-                              type="date"
-                              name="finalDeliveryDate"
-                              className="dateInput"
-                              onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
-                                updatedDeliverables[index].finalDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
-                              }}
-                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              readOnly={true}
-                            />
+                            className="tableBody Text14Semi primary2"   >
+                            {deliverable?.companyDeadline}
                           </td>
                           <td
                             style={{
@@ -469,25 +463,6 @@ function Albums(props) {
                             className="tableBody Text14Semi primary2"   >
                             {deliverable?.status}
                           </td>
-
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRevision}
-
-                          </td>
-                          <td style={{
-                            paddingTop: '15px',
-                            paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
-                            {deliverable?.clientRating}
-
-                          </td>
-
-
                         </tr>
                       )}
                       <div style={{ marginTop: '15px' }} />

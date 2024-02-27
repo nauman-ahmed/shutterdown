@@ -5,10 +5,14 @@ import Heart from "../../assets/Profile/Heart.svg";
 import "../../assets/css/tableRoundHeader.css";
 import { getAllTasks } from "../../API/TaskApi";
 import dayjs from "dayjs";
+import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 function Reports(props) {
 
+  const navigate = useNavigate();
   const [allTasks, setAllTasks] = useState(null);
+  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
 
   const getTaskData = async () => {
     try {
@@ -21,6 +25,10 @@ function Reports(props) {
   }
 
   useEffect(() => {
+    console.log(currentUser)
+    if(currentUser.rollSelect == "Editor" || currentUser.rollSelect == "Shooter" ){
+      navigate('/MyProfile/Tasks/DailyTasks')
+    }
     getTaskData();
   }, [])
 
@@ -47,6 +55,7 @@ function Reports(props) {
               <th className="tableBody">Status</th>
               <th className="tableBody">Deadline</th>
               <th className="tableBody">Completion Date</th>
+              <th className="tableBody">Task Ended</th>
               <th className="tableBody">Delay</th>
             </tr>
           </thead>
@@ -156,7 +165,16 @@ function Reports(props) {
                       paddingBottom: "15px",
                     }}
                   >
-                    {task.completionDate ? dayjs(task.deadlineDate).diff(task.completionDate, 'day') : 0}
+                    {task.ended ? "Yes" : "No"}
+                  </td>
+                  <td
+                    className="tableBody Text14Semi primary2"
+                    style={{
+                      paddingTop: "15px",
+                      paddingBottom: "15px",
+                    }}
+                  >
+                    {task.completionDate ? dayjs(task.completionDate).isBefore(task.deadlineDate) ? 0 :  Math.abs(dayjs(task.deadlineDate).diff(task.completionDate, 'day')) : 0}
 
                   </td>
                 </tr>
