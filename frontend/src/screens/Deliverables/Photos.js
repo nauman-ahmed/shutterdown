@@ -255,7 +255,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width:"20%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -271,6 +271,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}  >
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
                           </td>
@@ -279,6 +280,7 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
+                              width:"10%"
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}

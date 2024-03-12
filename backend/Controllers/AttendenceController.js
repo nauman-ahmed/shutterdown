@@ -33,11 +33,22 @@ const checkInUser = async (req, res) => {
         if (alreadyCheckedIn) {
             res.status(303).json({ message: 'user already checked In!' })
         } else {
-            const newCheckIn = new AttendaceModel({
-                userID: userId,
-                currentDate: dateOnly,
-                checkInTime: new Date()
-            });
+            let notAtHome;
+            if(req.body.data == null){
+                notAtHome = {
+                    userID: userId,
+                    currentDate: dateOnly,
+                    checkInTime: new Date()
+                }
+            }else{
+                notAtHome = {
+                    userID: userId,
+                    currentDate: dateOnly,
+                    checkInTime: new Date(),
+                    fromHome:true
+                }
+            }
+            const newCheckIn = new AttendaceModel(notAtHome);
             await newCheckIn.save();
             res.status(200).json({ message: 'Checked In successfully!' })
         }

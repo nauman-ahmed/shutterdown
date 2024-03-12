@@ -15,6 +15,10 @@ const AttendenceSchema=mongoose.Schema({
     },
     currentDate:{
         type:String,
+    },
+    fromHome:{
+        type:Boolean,
+        default:false
     }
 })
 const AttendenceModel=mongoose.model("Attendence",AttendenceSchema)

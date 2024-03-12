@@ -73,7 +73,6 @@ function PreWedShootScreen(props) {
           }
 
         }
-        console.log("Nauman Client",clientsToShow)
         setPreWedClients(clientsToShow);
         setClientsForShow(clientsToShow);
       }
@@ -103,6 +102,7 @@ function PreWedShootScreen(props) {
 
   const handleSaveData = async (index) => {
     try {
+      console.log("handleSaveData")
       const client = preWedClients[index];
       // if (!client.preWeddingDetails) {
       //   window.notify('Please Select the values!', 'error');
@@ -235,13 +235,13 @@ function PreWedShootScreen(props) {
                          userChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.photographers = Array.isArray(client?.preWeddingDetails?.photographers) ? [...client?.preWedClients?.photographers, userObj] : [userObj];
+                           updatedClients[index].preWeddingDetails.photographers = Array.isArray(client?.preWeddingDetails?.photographers) ? [...client?.preWeddingDetails?.photographers, userObj] : [userObj];
                            setPreWedClients(updatedClients)
                          }}
                          userUnChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            if (updatedClients[index].preWeddingDetails?.photographers) {
-                             updatedClients[index].preWeddingDetails.photographers = updatedClients[index].preWeddingDetails.photographers.filter(photographer => photographer !== userObj);
+                             updatedClients[index].preWeddingDetails.photographers = updatedClients[index].preWeddingDetails.photographers.filter(photographer => photographer._id !== userObj._id);
                            }
                            setPreWedClients(updatedClients);
                          }}
@@ -262,13 +262,13 @@ function PreWedShootScreen(props) {
                          userChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.cinematographers = Array.isArray(client?.preWeddingDetails?.cinematographers) ? [...client?.preWedClients?.cinematographers, userObj] : [userObj];
+                           updatedClients[index].preWeddingDetails.cinematographers = Array.isArray(client?.preWeddingDetails?.cinematographers) ? [...client?.preWeddingDetails?.cinematographers, userObj] : [userObj];
                            setPreWedClients(updatedClients)
                          }}
                          userUnChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            if (updatedClients[index].preWeddingDetails?.cinematographers) {
-                             updatedClients[index].preWeddingDetails.cinematographers = updatedClients[index].preWeddingDetails.cinematographers.filter(cinematographer => cinematographer !== userObj);
+                             updatedClients[index].preWeddingDetails.cinematographers = updatedClients[index].preWeddingDetails.cinematographers.filter(cinematographer => cinematographer._id !== userObj._id);
                            }
                            setPreWedClients(updatedClients);
                          }}
@@ -292,13 +292,13 @@ function PreWedShootScreen(props) {
                          userChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.assistants = Array.isArray(client?.preWeddingDetails?.assistants) ? [...client?.preWedClients?.assistants, userObj] : [userObj];
+                           updatedClients[index].preWeddingDetails.assistants = Array.isArray(client?.preWeddingDetails?.assistants) ? [...client?.preWeddingDetails?.assistants, userObj] : [userObj];
                            setPreWedClients(updatedClients)
                          }}
                          userUnChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            if (updatedClients[index].preWeddingDetails?.assistants) {
-                             updatedClients[index].preWeddingDetails.assistants = updatedClients[index].preWeddingDetails.assistants.filter(assistant => assistant !== userObj);
+                             updatedClients[index].preWeddingDetails.assistants = updatedClients[index].preWeddingDetails.assistants.filter(assistant => assistant._id !== userObj._id);
                            }
                            setPreWedClients(updatedClients);
                          }}
@@ -322,13 +322,13 @@ function PreWedShootScreen(props) {
                          userChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.droneFlyers = Array.isArray(client?.preWeddingDetails?.droneFlyers) ? [...client?.preWedClients?.droneFlyers, userObj] : [userObj];
+                           updatedClients[index].preWeddingDetails.droneFlyers = Array.isArray(client?.preWeddingDetails?.droneFlyers) ? [...client?.preWeddingDetails?.droneFlyers, userObj] : [userObj];
                            setPreWedClients(updatedClients)
                          }}
                          userUnChecked={(userObj) => {
                            const updatedClients = [...preWedClients];
                            if (updatedClients[index].preWeddingDetails?.droneFlyers) {
-                             updatedClients[index].preWeddingDetails.droneFlyers = updatedClients[index].preWeddingDetails.droneFlyers.filter(flyer => flyer !== userObj);
+                             updatedClients[index].preWeddingDetails.droneFlyers = updatedClients[index].preWeddingDetails.droneFlyers.filter(flyer => flyer._id !== userObj._id);
                            }
                            setPreWedClients(updatedClients);
                          }}

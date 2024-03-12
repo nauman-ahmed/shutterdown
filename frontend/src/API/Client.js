@@ -135,7 +135,8 @@ export const addPreWedData = async (client)=>{
         },
         client
       }
-    ).then(() => { window.notify('Pre-Wedding Assigned successfully!', 'success') });
+    )
+    window.notify('Pre-Wedding Assigned successfully!', 'success')
   } catch (error) {
     console.log(error);
   }

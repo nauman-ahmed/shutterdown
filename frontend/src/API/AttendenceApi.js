@@ -17,13 +17,14 @@ export const postAttendenceData = async (data) => {
 
     }
 }
-export const checkInUser = async (data) => {
+export const checkInUser = async (data=null) => {
     try {
         const user = JSON.parse(Cookies.get('currentUser'));
         await axios.post(BASE_URL + '/MyProfile/Attendence/checkIn/' + user._id, {
             Headers: {
                 "Content-Type": "application/json"
             },
+            data
         }).then(res=>{
             console.log(res);
             toast.success(res.data.message)

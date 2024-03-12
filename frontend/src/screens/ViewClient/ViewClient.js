@@ -122,7 +122,6 @@ function ViewClient() {
                 <th className="tableBody" style={{ width: '33%' }}>
                   Wedding Dates
                 </th>
-                <th className="tableBody"></th>
               </tr>
             </thead>
             <tbody
@@ -165,16 +164,13 @@ function ViewClient() {
                     >
                       {client.events.map((eventData) => {
                         return (
+                          eventData.isWedding &&
                           <p className='mb-0'>
                             {dayjs(eventData.eventDate).format('DD-MMM-YYYY')}
                           </p>
                         )
                       })}
                     </td>
-                    <td
-                      style={{ paddingTop: '15px', paddingBottom: '15px' }}
-                      className="tableBody"
-                    ></td>
                   </tr>
                   <div style={{ marginTop: '15px' }} />
                 </>
