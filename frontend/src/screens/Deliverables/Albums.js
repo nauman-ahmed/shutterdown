@@ -25,6 +25,7 @@ function Albums(props) {
   const toggle = () => {
     setShow(!show);
   };
+  const [filterBy, setFilterBy] = useState(null)
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
@@ -37,16 +38,45 @@ function Albums(props) {
       return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
     }))
   }
-  const filterByMonth = (date) => {
-    setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
-    }))
-  }
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  useEffect(() => {
-    setClientsForShow(allClients)
-  }, [allClients])
+
+
+  const sortingOptions = [
+    {
+      title: 'No Sorting',
+      id: 1
+    },
+    {
+      title: 'Ascending',
+      id: 2
+    },
+    {
+      title: 'Descending',
+      id: 3
+    }
+  ]
+  const statusOptions = [
+    {
+      title: 'Any',
+      id: 1
+    },
+    {
+      title: 'Yet to Start',
+      id: 2
+    },
+    {
+      title: 'In Progress',
+      id: 3
+    },
+    {
+      title: 'Completed',
+      id: 4
+    },
+  ]
+  const editorsOptions = editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
+    return { title: editor.firstName, id: i + 2 }
+  })]
   const fetchData = async () => {
     try {
       const data = await getAlbums();
@@ -69,7 +99,40 @@ function Albums(props) {
     fetchData()
   }, [])
 
-  const navigate = useNavigate();
+  const applyFilter = (filterValue) => {
+    setDeliverablesForShow(null)
+    if (filterBy === 'Assigned Editor') {
+      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
+    } else if (filterBy === 'Current Status') {
+      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
+    } else if (filterBy === 'Deadline sorting') {
+      console.log(filterValue);
+      let sortedArray;
+      if (filterValue === 'No Sorting') {
+        sortedArray = [...allDeliverables]; // Create a new array
+      } else {
+        sortedArray = [...allDeliverables].sort((a, b) => {
+          const dateA = new Date(a.clientDeadline);
+          const dateB = new Date(b.clientDeadline);
+          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+        });
+      }
+      setDeliverablesForShow([...sortedArray]);
+    }else if (filterBy === 'Wedding Date sorting') {
+      console.log(filterValue);
+      let sortedArray;
+      if (filterValue === 'No Sorting') {
+        sortedArray = [...allDeliverables]; // Create a new array
+      } else {
+        sortedArray = [...allDeliverables].sort((a, b) => {
+          const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
+          const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
+          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+        });
+      }
+      setDeliverablesForShow([...sortedArray]);
+    }
+  }
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -90,16 +153,6 @@ function Albums(props) {
   const handleSaveData = async (index) => {
     try {
       const deliverable = allDeliverables[index];
-      // if (!client.albumsDeliverables) {
-      //   window.notify('Please Select the values!', 'error');
-      //   return
-      // } else if (!client.albumsDeliverables.editor) {
-      //   window.notify('Please Select Editor!', 'error');
-      //   return
-      // } else if (!client.albumsDeliverables.status) {
-      //   window.notify('Please Select any Status!', 'error');
-      //   return
-      // }
       setUpdatingIndex(index);
       await updateDeliverable(deliverable);
       setUpdatingIndex(null);
@@ -108,7 +161,7 @@ function Albums(props) {
     }
   };
 
-  const openWhatsAppChat = (contact,message) => {
+  const openWhatsAppChat = (contact, message) => {
 
     // const chatUrl = `whatsapp://send?abid=${contactParam}&text=Hello%2C%20World!`;
     // window.open(chatUrl, '_blank');
@@ -120,49 +173,43 @@ function Albums(props) {
     window.open(chatUrl, '_blank');
 
   }
+  console.log(deliverablesForShow)
 
   return (
     <>
-      <ClientHeader filter title="Albums" />
+      <ClientHeader options={filterBy === 'Assigned Editor' ? editorsOptions : filterBy === 'Wedding Date sorting' || filterBy === 'Deadline sorting' ? sortingOptions : filterBy === 'Current Status' ? statusOptions : [{ title: 'No any filter Choosen', id: null }]} applyFilter={applyFilter} filter title="Albums" />
       {deliverablesForShow ? (
         <>
-          <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
-            marginTop: '-70px',
-            marginBottom: '30px'
+          <div className='w-75 d-flex flex-row  mx-auto align-items-end justify-content-end' style={{
+            marginTop: '-50px',
+            // marginBottom: '30px'
           }} ref={target}>
 
-            <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50'>
-                {filterFor === 'day' ?
-                  <div
-                    className={`forminput R_A_Justify1`}
-                    onClick={toggle}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img src={CalenderImg} />
-                  </div>
-                  :
-                  <input type='month' onChange={(e) => {
-                    filterByMonth(new Date(e.target.value))
-                  }} className='forminput R_A_Justify mt-1' />
-                }
-              </div>
-              <div className='w-50 px-2 '>
-                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterFor) {
-                    setClientsForShow(allClients)
-                    setFilteringDay('');
+            <div className='w-50 d-flex flex-row align-items-center justify-content-end'>
+              <div style={{ width: '300px' }} className=' ms-2 d-flex justify-content-end'>
+                <p className='Text16N1 fw-bold pt-2'>Filter By :</p>
+                <Select value={{ value: filterBy || null, label: filterBy || 'Filter By...' }} className='w-75' onChange={(selected) => {
+                  if (selected.value !== filterBy) {
+                    if (selected.value === 'Assigned Editor') {
+                      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false))
+                    } else if (selected.value === 'Unassigned Editor') {
+                      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+                    }
                   }
-                  setFilterFor(selected.value);
+                  setFilterBy(selected.value);
                   setShow(false)
                 }} styles={customStyles}
-                  options={[
-                    { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                options={currentUser?.rollSelect === 'Manager' ? [
+                    { value: 'Assigned Editor', label: 'Assigned Editor' },
+                    { value: 'Unassigned Editor', label: 'Unassigned Editor' },
+                    { value: 'Wedding Date sorting', label: 'Wedding Date sorting' },
+                    { value: 'Deadline sorting', label: 'Deadline sorting' },
+                    { value: 'Current Status', label: 'Current Status' },
+                  ] : [
+                    { value: 'Current Status', label: 'Current Status' },
+                  ]} />
               </div>
             </div>
-
           </div>
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table
@@ -181,7 +228,7 @@ function Albums(props) {
                     <th className="tableBody">Company Deadline</th>
                     <th className="tableBody">Status</th>
                   </tr>
-                  :currentUser?.rollSelect == 'Manager' ?
+                  : currentUser?.rollSelect == 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody">Client</th>
                       <th className="tableBody">Album</th>
@@ -196,7 +243,7 @@ function Albums(props) {
                       <th className="tableBody">Client Ratings</th>
                       <th className="tableBody">Save</th>
                     </tr>
-                  : null
+                    : null
                 }
               </thead>
               <tbody className="Text12"
@@ -205,6 +252,7 @@ function Albums(props) {
                   borderWidth: '0px 1px 0px 1px',
                   // background: "#EFF0F5",
                 }}>
+
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
@@ -218,7 +266,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width: "10%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -240,7 +288,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width: "10%"
                             }}
                           >
                             <div>
@@ -254,7 +302,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"20%"
+                              width: "20%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -270,7 +318,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width: "10%"
                             }}  >
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
                           </td>
@@ -279,7 +327,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width: "10%"
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
@@ -346,7 +394,7 @@ function Albums(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
+                              width: "10%"
                             }}
                             className="tableBody Text14Semi primary2"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -359,11 +407,11 @@ function Albums(props) {
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
                           <td
-                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber,"HI This is shutter down ")}
+                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber, "HI This is shutter down ")}
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"15%"
+                              width: "15%"
                             }}
                             className="tableBody Text14Semi primary2"
                           >
@@ -471,8 +519,9 @@ function Albums(props) {
                       <div style={{ marginTop: '15px' }} />
                     </>
                   )
-                }
-                )}
+                })}
+
+
               </tbody>
             </Table>
             <Overlay rootClose={true}

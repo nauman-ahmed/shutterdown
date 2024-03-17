@@ -53,7 +53,6 @@ function DailyTasks(props) {
     <>
       <ToastContainer />
       <ClientHeader
-        filter
         title={'Daily Tasks'}
         updateData={getTaskData}
       />

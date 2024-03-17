@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext, useRef, } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import dayjs from "dayjs";
-import { addPreWedData, getClients, getPreWedClients, updateClient } from "../../API/Client";
+import { addPreWedData, getPreWedClients } from "../../API/Client";
 import Select from 'react-select'
 import Cookies from "js-cookie";
 import CalenderImg from '../../assets/Profile/Calender.svg';
@@ -13,8 +13,9 @@ import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
 import { getShooters } from "../../API/userApi";
 import ShootDropDown from "../../components/ShootDropDown";
+import ClientHeader from "../../components/ClientHeader";
 
-function PreWedShootScreen(props) {
+function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
@@ -28,21 +29,40 @@ function PreWedShootScreen(props) {
     setFilteringDay(date)
     setShow(!show);
     setClientsForShow(preWedClients.filter(clientData => {
-      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
+      const weddingEvent = clientData.events.find(eventData => eventData.isWedding === true);
+      if (weddingEvent) {
+        return new Date(weddingEvent.eventDate).getTime() === (new Date(date)).getTime()
+      } else {
+        return false
+      }
     }))
   }
   const filterByMonth = (date) => {
     setClientsForShow(preWedClients.filter(clientData => {
-      return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
+      const weddingEvent = clientData.events.find(eventData => eventData.isWedding === true);
+      if (weddingEvent) {
+        return new Date(weddingEvent.eventDate).getFullYear() === date.getFullYear() && new Date(weddingEvent.eventDate).getMonth() === date.getMonth()
+      } else {
+        return false
+      }
     }))
   }
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
-  const [shooters, setShooters] = useState([]);
-  useEffect(() => {
-    setClientsForShow(preWedClients)
-  }, [preWedClients])
-  const getClients = async (req, res) => {
+
+  const filterOptions = [
+    {
+      title: 'All',
+      id: 1,
+    },
+    {
+      title: 'Date Assigned',
+      id: 2,
+    },
+    {
+      title: 'Date Unassigned',
+      id: 3,
+    },
+  ];
+  const getClients = async () => {
     try {
       const allPreWedClients = await getPreWedClients();
       const res = await getShooters();
@@ -55,7 +75,6 @@ function PreWedShootScreen(props) {
           return client.preWeddingDetails?.photographers?.some(photographer => photographer._id == currentUser._id) || client.preWeddingDetails?.cinematographers?.some(cinematographer => cinematographer._id == currentUser._id) || client.preWeddingDetails?.assistants?.some(assistant => assistant._id == currentUser._id) || client.preWeddingDetails?.droneFlyers?.some(flyer => flyer._id == currentUser._id)
         });
         for (let client_index = 0; client_index < clientsToShow.length; client_index++) {
-
           if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(photographer => photographer._id == currentUser._id)) {
             clientsToShow[client_index].userRole = "Photographer"
             break
@@ -80,6 +99,24 @@ function PreWedShootScreen(props) {
       console.log(error, "error")
     }
   }
+
+  const applyFilter = (filterTitle) => {
+    console.log('run');
+    console.log(preWedClients);
+    if (filterTitle === 'Date Assigned') {
+      setClientsForShow(preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate))
+    } else if (filterTitle === 'Date Unassigned') {
+      setClientsForShow(preWedClients.filter(client => !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDate))
+    }else {
+      getClients()
+    }
+  }
+  const target = useRef(null);
+  const [show, setShow] = useState(false);
+  const [shooters, setShooters] = useState([]);
+  // useEffect(() => {
+  //   setClientsForShow(preWedClients)
+  // }, [preWedClients])
   useEffect(() => {
     getClients();
   }, [])
@@ -102,7 +139,6 @@ function PreWedShootScreen(props) {
 
   const handleSaveData = async (index) => {
     try {
-      console.log("handleSaveData")
       const client = preWedClients[index];
       // if (!client.preWeddingDetails) {
       //   window.notify('Please Select the values!', 'error');
@@ -123,6 +159,7 @@ function PreWedShootScreen(props) {
   };
   return (
     <>
+      <ClientHeader applyFilter={applyFilter} options={filterOptions} filter title="Pre-Wed Shoots" />
       {clientsForShow ? (
         <>
           <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
@@ -169,22 +206,22 @@ function PreWedShootScreen(props) {
               hover
               borderless
               responsive
-              style={{ width: '150%', marginTop: '15px' }} 
+              style={{ width: '150%', marginTop: '15px' }}
             >
               <thead>
-              {currentUser.rollSelect == 'Manager' && (
-                   <tr className="logsHeader Text16N1">
-                   <th className="tableBody">Couple</th>
-                   <th className="tableBody">Wedding Date</th>
-                   <th className="tableBody">POC</th>
-                   <th className="tableBody">Photographers</th>
-                   <th className="tableBody">Cinematographers</th>
-                   <th className="tableBody">Assistants</th>
-                   <th className="tableBody">Drone Flyers</th>
-                   <th className="tableBody">Shoot Date</th>
-                   <th className="tableBody">Status</th>
-                   <th className="tableBody">Save</th>
-                 </tr>
+                {currentUser.rollSelect == 'Manager' && (
+                  <tr className="logsHeader Text16N1">
+                    <th className="tableBody">Couple</th>
+                    <th className="tableBody">Wedding Date</th>
+                    <th className="tableBody">POC</th>
+                    <th className="tableBody">Photographers</th>
+                    <th className="tableBody">Cinematographers</th>
+                    <th className="tableBody">Assistants</th>
+                    <th className="tableBody">Drone Flyers</th>
+                    <th className="tableBody">Shoot Date</th>
+                    <th className="tableBody">Status</th>
+                    <th className="tableBody">Save</th>
+                  </tr>
                 )}
                 {currentUser.rollSelect == 'Shooter' && (
                   <tr className="logsHeader Text16N1">
@@ -195,7 +232,6 @@ function PreWedShootScreen(props) {
                     <th className="tableBody">Status</th>
                   </tr>
                 )}
-               
               </thead>
               <tbody className="Text12"
                 style={{
@@ -205,249 +241,246 @@ function PreWedShootScreen(props) {
                 {clientsForShow?.map((client, index) => {
                   return (
                     <>
-                     {currentUser.rollSelect == 'Manager' &&
-                     <tr
-                     style={{
-                       background: index % 2 === 0 ? '' : '#F6F6F6',
-                     }}
-                   >
-                     <td className="tableBody Text14Semi primary2">
-                       {client.brideName}
-                       <br />
-                       <img src={Heart} />
-                       <br />
-                       {client.groomName}
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <>
-                         {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD/MM/YYYY')}<br />
-                       </>
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       {client.userID?.firstName}{' '}{client.userID?.lastName}
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <ShootDropDown
-                         teble={true}
-                         allowedPersons={client.preWedPhotographers}
-                         usersToShow={shooters}
-                         existedUsers={client?.preWeddingDetails?.photographers}
-                         userChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.photographers = Array.isArray(client?.preWeddingDetails?.photographers) ? [...client?.preWeddingDetails?.photographers, userObj] : [userObj];
-                           setPreWedClients(updatedClients)
-                         }}
-                         userUnChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           if (updatedClients[index].preWeddingDetails?.photographers) {
-                             updatedClients[index].preWeddingDetails.photographers = updatedClients[index].preWeddingDetails.photographers.filter(photographer => photographer._id !== userObj._id);
-                           }
-                           setPreWedClients(updatedClients);
-                         }}
-                       />
-                       {Array.isArray(client?.preWeddingDetails?.photographers) && client?.preWeddingDetails?.photographers?.map((photographer) => {
-                         return (
-                           <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{photographer.firstName} {photographer.lastName}</p>
-                         )
-                       })
-                       }
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <ShootDropDown
-                         teble={true}
-                         allowedPersons={client?.preWedCinematographers}
-                         usersToShow={shooters}
-                         existedUsers={client?.preWeddingDetails?.cinematographers}
-                         userChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.cinematographers = Array.isArray(client?.preWeddingDetails?.cinematographers) ? [...client?.preWeddingDetails?.cinematographers, userObj] : [userObj];
-                           setPreWedClients(updatedClients)
-                         }}
-                         userUnChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           if (updatedClients[index].preWeddingDetails?.cinematographers) {
-                             updatedClients[index].preWeddingDetails.cinematographers = updatedClients[index].preWeddingDetails.cinematographers.filter(cinematographer => cinematographer._id !== userObj._id);
-                           }
-                           setPreWedClients(updatedClients);
-                         }}
-                       />
-                       {Array.isArray(client?.preWeddingDetails?.cinematographers) &&
-                         client?.preWeddingDetails?.cinematographers?.map((cinematographer) => {
-                           return (
+                      {currentUser.rollSelect == 'Manager' &&
+                        <tr
+                          style={{
+                            background: index % 2 === 0 ? '' : '#F6F6F6',
+                          }}
+                        >
+                          <td className="tableBody Text14Semi primary2">
+                            {client.brideName}
+                            <br />
+                            <img src={Heart} />
+                            <br />
+                            {client.groomName}
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <>
+                              {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD/MM/YYYY')}<br />
+                            </>
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            {client.userID?.firstName}{' '}{client.userID?.lastName}
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <ShootDropDown
+                              teble={true}
+                              allowedPersons={client.preWedPhotographers}
+                              usersToShow={shooters}
+                              existedUsers={client?.preWeddingDetails?.photographers}
+                              userChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                client.preWeddingDetails = { ...client.preWeddingDetails } || {}
+                                updatedClients[index].preWeddingDetails.photographers = Array.isArray(client?.preWeddingDetails?.photographers) ? [...client?.preWeddingDetails?.photographers, userObj] : [userObj];
+                                setPreWedClients(updatedClients)
+                              }}
+                              userUnChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                if (updatedClients[index].preWeddingDetails?.photographers) {
+                                  updatedClients[index].preWeddingDetails.photographers = updatedClients[index].preWeddingDetails.photographers.filter(photographer => photographer._id !== userObj._id);
+                                }
+                                setPreWedClients(updatedClients);
+                              }}
+                            />
+                            {Array.isArray(client?.preWeddingDetails?.photographers) && client?.preWeddingDetails?.photographers?.map((photographer) => {
+                              return (
+                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{photographer.firstName} {photographer.lastName}</p>
+                              )
+                            })
+                            }
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <ShootDropDown
+                              teble={true}
+                              allowedPersons={client?.preWedCinematographers}
+                              usersToShow={shooters}
+                              existedUsers={client?.preWeddingDetails?.cinematographers}
+                              userChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                client.preWeddingDetails = { ...client.preWeddingDetails } || {}
+                                updatedClients[index].preWeddingDetails.cinematographers = Array.isArray(client?.preWeddingDetails?.cinematographers) ? [...client?.preWeddingDetails?.cinematographers, userObj] : [userObj];
+                                setPreWedClients(updatedClients)
+                              }}
+                              userUnChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                if (updatedClients[index].preWeddingDetails?.cinematographers) {
+                                  updatedClients[index].preWeddingDetails.cinematographers = updatedClients[index].preWeddingDetails.cinematographers.filter(cinematographer => cinematographer._id !== userObj._id);
+                                }
+                                setPreWedClients(updatedClients);
+                              }}
+                            />
+                            {Array.isArray(client?.preWeddingDetails?.cinematographers) &&
+                              client?.preWeddingDetails?.cinematographers?.map((cinematographer) => {
+                                return (
 
-                             <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{cinematographer.firstName} {cinematographer.lastName}</p>
-                           )
-                         }
-                         )
-                       }
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <ShootDropDown
-                         teble={true}
-                         allowedPersons={client?.preWedAssistants}
-                         usersToShow={shooters}
-                         existedUsers={client?.preWeddingDetails?.assistants}
-                         userChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.assistants = Array.isArray(client?.preWeddingDetails?.assistants) ? [...client?.preWeddingDetails?.assistants, userObj] : [userObj];
-                           setPreWedClients(updatedClients)
-                         }}
-                         userUnChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           if (updatedClients[index].preWeddingDetails?.assistants) {
-                             updatedClients[index].preWeddingDetails.assistants = updatedClients[index].preWeddingDetails.assistants.filter(assistant => assistant._id !== userObj._id);
-                           }
-                           setPreWedClients(updatedClients);
-                         }}
-                       />
-                       {Array.isArray(client?.preWeddingDetails?.assistants) &&
-                         client?.preWeddingDetails?.assistants?.map((assistant) => {
-                           return (
-                             <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{assistant.firstName} {assistant.lastName}</p>
-                           )
-                         }
-                         )
-                       }
-                     </td>
+                                  <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{cinematographer.firstName} {cinematographer.lastName}</p>
+                                )
+                              }
+                              )
+                            }
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <ShootDropDown
+                              teble={true}
+                              allowedPersons={client?.preWedAssistants}
+                              usersToShow={shooters}
+                              existedUsers={client?.preWeddingDetails?.assistants}
+                              userChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                client.preWeddingDetails = { ...client.preWeddingDetails } || {}
+                                updatedClients[index].preWeddingDetails.assistants = Array.isArray(client?.preWeddingDetails?.assistants) ? [...client?.preWeddingDetails?.assistants, userObj] : [userObj];
+                                setPreWedClients(updatedClients)
+                              }}
+                              userUnChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                if (updatedClients[index].preWeddingDetails?.assistants) {
+                                  updatedClients[index].preWeddingDetails.assistants = updatedClients[index].preWeddingDetails.assistants.filter(assistant => assistant._id !== userObj._id);
+                                }
+                                setPreWedClients(updatedClients);
+                              }}
+                            />
+                            {Array.isArray(client?.preWeddingDetails?.assistants) &&
+                              client?.preWeddingDetails?.assistants?.map((assistant) => {
+                                return (
+                                  <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{assistant.firstName} {assistant.lastName}</p>
+                                )
+                              }
+                              )
+                            }
+                          </td>
 
-                     <td className="tableBody Text14Semi primary2">
-                       <ShootDropDown
-                         teble={true}
-                         allowedPersons={client?.preWedDroneFlyers}
-                         usersToShow={shooters}
-                         existedUsers={client?.preWeddingDetails?.droneFlyers}
-                         userChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           client.preWeddingDetails = { ...client.preWeddingDetails } || {}
-                           updatedClients[index].preWeddingDetails.droneFlyers = Array.isArray(client?.preWeddingDetails?.droneFlyers) ? [...client?.preWeddingDetails?.droneFlyers, userObj] : [userObj];
-                           setPreWedClients(updatedClients)
-                         }}
-                         userUnChecked={(userObj) => {
-                           const updatedClients = [...preWedClients];
-                           if (updatedClients[index].preWeddingDetails?.droneFlyers) {
-                             updatedClients[index].preWeddingDetails.droneFlyers = updatedClients[index].preWeddingDetails.droneFlyers.filter(flyer => flyer._id !== userObj._id);
-                           }
-                           setPreWedClients(updatedClients);
-                         }}
-                       />
-                       {Array.isArray(client?.preWeddingDetails?.droneFlyers) &&
-                         client?.preWeddingDetails?.droneFlyers?.map((flyer) => {
-                           return (
-                             <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{flyer.firstName} {flyer.lastName}</p>
-                           )
-                         }
-                         )
-                       }
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <div className="d-flex flex-column">
-
-
-                         <input
-                           type="date"
-                           name="shootStartDate"
-                           className="dateInput"
-                           onChange={(e) => {
-                             const updatedClients = [...preWedClients]
-                             updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
-                             updatedClients[index].preWeddingDetails.shootStartDate = e.target.value;
-                             setPreWedClients(updatedClients)
-                           }}
-                           readOnly={currentUser.rollSelect == 'Shooter'}
-                           value={client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : null}
-                         />
-                         TO
-                         <input
-                           type="date"
-                           name="shootEndDate"
-                           className="dateInput"
-                           onChange={(e) => {
-                             const updatedClients = [...preWedClients]
-                             updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
-                             updatedClients[index].preWeddingDetails.shootEndDate = e.target.value;
-                             setPreWedClients(updatedClients)
-                           }}
-                           readOnly={currentUser.rollSelect == 'Shooter'}
-                           value={client.preWeddingDetails?.shootEndDate ? new Date(client.preWeddingDetails.shootEndDate).toISOString().split('T')[0] : null}
-                         />
-                       </div>
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       {currentUser.rollSelect == 'Manager' ? (
-                         <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
-                           const updatedClients = [...preWedClients];
-                           updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
-                           updatedClients[index].preWeddingDetails.status = selected.value;
-                           setPreWedClients(updatedClients)
-                         }} styles={customStyles} options={[
-                           { value: 'Yet to Start', label: 'Yet to Start' },
-                           { value: 'In Progress', label: 'In Progress' },
-                           { value: 'Completed', label: 'Completed' }]} required />
-                       ) : (
-                         <>
-                           {client.preWeddingDetails?.status || 'Not Filled'}
-                         </>
-                       )}
-                     </td>
-                     <td>
-                         <button
-                           style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
-                           onClick={() => updatingIndex == null && handleSaveData(index)}
-                         >
-                           {updatingIndex == index ? (
-                             <div className='w-100'>
-                               <div class="smallSpinner mx-auto"></div>
-                             </div>
-                           ) : (
-                             "Save"
-                           )}
-                         </button>
-                       </td>
-                   </tr>
-                     }
+                          <td className="tableBody Text14Semi primary2">
+                            <ShootDropDown
+                              teble={true}
+                              allowedPersons={client?.preWedDroneFlyers}
+                              usersToShow={shooters}
+                              existedUsers={client?.preWeddingDetails?.droneFlyers}
+                              userChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                client.preWeddingDetails = { ...client.preWeddingDetails } || {}
+                                updatedClients[index].preWeddingDetails.droneFlyers = Array.isArray(client?.preWeddingDetails?.droneFlyers) ? [...client?.preWeddingDetails?.droneFlyers, userObj] : [userObj];
+                                setPreWedClients(updatedClients)
+                              }}
+                              userUnChecked={(userObj) => {
+                                const updatedClients = [...preWedClients];
+                                if (updatedClients[index].preWeddingDetails?.droneFlyers) {
+                                  updatedClients[index].preWeddingDetails.droneFlyers = updatedClients[index].preWeddingDetails.droneFlyers.filter(flyer => flyer._id !== userObj._id);
+                                }
+                                setPreWedClients(updatedClients);
+                              }}
+                            />
+                            {Array.isArray(client?.preWeddingDetails?.droneFlyers) &&
+                              client?.preWeddingDetails?.droneFlyers?.map((flyer) => {
+                                return (
+                                  <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{flyer.firstName} {flyer.lastName}</p>
+                                )
+                              }
+                              )
+                            }
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <div className="d-flex flex-column">
+                              <input
+                                type="date"
+                                name="shootStartDate"
+                                className="dateInput"
+                                onChange={(e) => {
+                                  const updatedClients = [...preWedClients]
+                                  updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                                  updatedClients[index].preWeddingDetails.shootStartDate = e.target.value;
+                                  setPreWedClients(updatedClients)
+                                }}
+                                readOnly={currentUser.rollSelect == 'Shooter'}
+                                value={client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : ''}
+                              />
+                              TO
+                              <input
+                                type="date"
+                                name="shootEndDate"
+                                className="dateInput"
+                                onChange={(e) => {
+                                  const updatedClients = [...preWedClients]
+                                  updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                                  updatedClients[index].preWeddingDetails.shootEndDate = e.target.value;
+                                  setPreWedClients(updatedClients)
+                                }}
+                                readOnly={currentUser.rollSelect == 'Shooter'}
+                                value={client.preWeddingDetails?.shootEndDate ? new Date(client.preWeddingDetails.shootEndDate).toISOString().split('T')[0] : ''}
+                              />
+                            </div>
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            {currentUser.rollSelect == 'Manager' ? (
+                              <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
+                                const updatedClients = [...preWedClients];
+                                updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                                updatedClients[index].preWeddingDetails.status = selected.value;
+                                setPreWedClients(updatedClients)
+                              }} styles={customStyles} options={[
+                                { value: 'Yet to Start', label: 'Yet to Start' },
+                                { value: 'In Progress', label: 'In Progress' },
+                                { value: 'Completed', label: 'Completed' }]} required />
+                            ) : (
+                              <>
+                                {client.preWeddingDetails?.status || 'Not Filled'}
+                              </>
+                            )}
+                          </td>
+                          <td>
+                            <button
+                              style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
+                              onClick={() => updatingIndex == null && handleSaveData(index)}
+                            >
+                              {updatingIndex == index ? (
+                                <div className='w-100'>
+                                  <div class="smallSpinner mx-auto"></div>
+                                </div>
+                              ) : (
+                                "Save"
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      }
                       {currentUser.rollSelect == 'Shooter' &&
-                     <tr
-                     style={{
-                       background: index % 2 === 0 ? '' : '#F6F6F6',
-                     }}
-                   >
-                     <td className="tableBody Text14Semi primary2">
-                       {client.brideName}
-                       <br />
-                       <img src={Heart} />
-                       <br />
-                       {client.groomName}
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <>
-                        {client.userID?.firstName}{' '}{client.userID?.lastName}
-                       </>
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <>
-                       {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"} to {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"}
-                       </>
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <>
+                        <tr
+                          style={{
+                            background: index % 2 === 0 ? '' : '#F6F6F6',
+                          }}
+                        >
+                          <td className="tableBody Text14Semi primary2">
+                            {client.brideName}
+                            <br />
+                            <img src={Heart} />
+                            <br />
+                            {client.groomName}
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <>
+                              {client.userID?.firstName}{' '}{client.userID?.lastName}
+                            </>
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <>
+                              {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"} to {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"}
+                            </>
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <>
 
-                       {client.userRole}
-                       </>
-                     </td>
-                     <td className="tableBody Text14Semi primary2">
-                       <>
-                        {client.preWeddingDetails?.status || 'Not Filled'}
-                       </>
-                     </td>
-                   </tr>
-                     }
+                              {client.userRole}
+                            </>
+                          </td>
+                          <td className="tableBody Text14Semi primary2">
+                            <>
+                              {client.preWeddingDetails?.status || 'Not Filled'}
+                            </>
+                          </td>
+                        </tr>
+                      }
                     </>
                   )
                 }
-
                 )}
               </tbody>
             </Table>

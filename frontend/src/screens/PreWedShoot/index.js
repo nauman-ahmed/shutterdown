@@ -9,7 +9,6 @@ function PreWedShoot(props) {
     <>
       <div className="main_content">
         <div style={{ paddingRight: "10px" }} className="CalenderViewWidth">
-          <ClientHeader filter title="Calender View" />
           <Outlet />
         </div>
         <CalenderBar Attendence />

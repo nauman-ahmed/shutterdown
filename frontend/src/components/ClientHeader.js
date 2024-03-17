@@ -79,25 +79,10 @@ function ClientHeader(props) {
       fetchClientsData()
     }
   }, [])
+  const handleFilters = (value)=>{
+    props.applyFilter(value)
+  }
 
-  const data = [
-    {
-      title: 'Date',
-      id: 1,
-    },
-    {
-      title: 'Task Unassigned',
-      id: 2,
-    },
-    {
-      title: 'Client',
-      id: 3,
-    },
-    {
-      title: 'Task',
-      id: 4,
-    },
-  ];
 
   const handleTaskSubmit = async () => {
     setModal(!modal);
@@ -105,7 +90,7 @@ function ClientHeader(props) {
     setTaskData(null);
     props.updateData();
   };
-
+  const options = props.options;
 
   return (
     <>
@@ -168,12 +153,16 @@ function ClientHeader(props) {
               className="nav_popover"
               style={{ width: '200px', paddingTop: '10px' }}
             >
-              {data.map((i) => {
-                const selected = i.id == filterType ? true : false;
+              {options?.map((option, i) => {
+                const selected = option.id == filterType ? true : false;
                 return (
                   <div
                     className="rowalign"
-                    onClick={() => setFilterType(i.id)}
+                    onClick={() => {
+                      handleFilters(option.title)
+                      setFilterType(option.id);
+                      setShow(false)
+                    }}
                     style={{
                       width: '200px',
                       padding: '10px',
@@ -190,7 +179,7 @@ function ClientHeader(props) {
                         marginLeft: '15px',
                       }}
                     >
-                      {i.title}
+                      {option.title}
                     </div>
                   </div>
                 );
