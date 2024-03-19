@@ -28,6 +28,7 @@ import { getClients } from '../API/Client';
 import Heart from '../assets/Profile/Heart.svg';
 import Select from 'react-select';
 import { getEditors } from '../API/userApi';
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 
 function ClientHeader(props) {
@@ -37,7 +38,8 @@ function ClientHeader(props) {
   const [taskData, setTaskData] = useState({});
   const [allClients, setAllClients] = useState();
   const [editors, setEditors] = useState();
-
+  const [parentFilter, setParentFilter] = useState(null)
+  const [childFilter, setChildFilter] = useState(null)
   const [show, setShow] = useState(false);
   const [filterType, setFilterType] = useState(1);
 
@@ -79,8 +81,19 @@ function ClientHeader(props) {
       fetchClientsData()
     }
   }, [])
-  const handleFilters = (value)=>{
+  const handleChildFilter = (value) => {
     props.applyFilter(value)
+  }
+  const handleParentFilter = (value) => {
+    if (value === 'All' || value === 'Date Assigned' || value === 'Date Unassigned') {
+      props.applyFilter(value);
+      setShow(false)
+    } else {
+      if(value === 'Unassigned Editor'){
+        setShow(false)
+      }
+      props.selectFilter(value)
+    }
   }
 
 
@@ -91,7 +104,7 @@ function ClientHeader(props) {
     props.updateData();
   };
   const options = props.options;
-
+  const currentFilter = props.currentFilter
   return (
     <>
       <div className="R_A_Justify mb15">
@@ -153,37 +166,88 @@ function ClientHeader(props) {
               className="nav_popover"
               style={{ width: '200px', paddingTop: '10px' }}
             >
-              {options?.map((option, i) => {
-                const selected = option.id == filterType ? true : false;
+              {options.map((optionObj, i) => {
+                const selected = optionObj.id == parentFilter ? true : false;
                 return (
-                  <div
-                    className="rowalign"
-                    onClick={() => {
-                      handleFilters(option.title)
-                      setFilterType(option.id);
-                      setShow(false)
-                    }}
-                    style={{
-                      width: '200px',
-                      padding: '10px',
-                      cursor: 'pointer',
-                      background: selected ? '#666DFF' : '',
-                      paddingLeft: '15px',
-                    }}
-                  >
-                    <img src={selected ? ActiveFilter : UnactiveFilter} />
+                  <>
                     <div
-                      className="Text16N"
+                      className={`rowalign ${(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') ? " " : " d-flex flex-row justify-content-between"} `}
+                      onClick={() => {
+                        if (currentFilter !== optionObj.title) {
+                          setParentFilter(optionObj.id);
+                          handleParentFilter(optionObj.title);
+                          setChildFilter(null)
+                        } else {
+                          setParentFilter(null)
+                        }
+                      }}
                       style={{
-                        color: selected ? 'white' : '',
-                        marginLeft: '15px',
+                        width: '200px',
+                        height: '40px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        background: (selected && (optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned')) ? '#666DFF' : '',
+                        paddingLeft: '4px',
                       }}
                     >
-                      {option.title}
+                      {(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') && (
+                        <img src={selected ? ActiveFilter : UnactiveFilter} />
+                      )}
+                      <div
+                        className="Text16N "
+                        style={{
+                          color: (selected && (optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned')) ? 'white' : 'black',
+                          marginLeft: '15px',
+                        }}
+                      >
+                        {optionObj.title}
+                      </div>
+                      {optionObj.title !== 'Unassigned Editor' && optionObj.title !== 'All' && optionObj.title !== 'Date Assigned' && optionObj.title !== 'Date Unassigned' && (
+                        selected ? <IoIosArrowUp className='text-black' /> : <IoIosArrowDown className='text-black' />
+                      )}
                     </div>
-                  </div>
-                );
+                    {selected && (
+                      <>
+                        {optionObj?.filters?.map((option, i) => {
+                          const childSelected = (option.id == childFilter && selected) ? true : false;
+                          return (
+                            <div
+                              className="rowalign d-flex align-item-center"
+                              onClick={() => {
+                                handleChildFilter(option.title)
+                                setChildFilter(option.id);
+                                setShow(false)
+                              }}
+                              style={{
+                                width: '200px',
+                                height: '35px',
+                                padding: '8px',
+                                cursor: 'pointer',
+                                background: childSelected ? '#666DFF' : '',
+                                paddingLeft: '15px',
+                              }}
+                            >
+                              <img src={childSelected ? ActiveFilter : UnactiveFilter} />
+                              <div
+                                className="Text16N"
+                                style={{
+                                  color: childSelected ? 'white' : '',
+                                  marginLeft: '15px',
+                                }}
+                              >
+                                {option.title}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                  </>
+                )
               })}
+
+
             </div>
           </Tooltip>
         )}

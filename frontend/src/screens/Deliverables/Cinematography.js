@@ -19,7 +19,7 @@ function Cinematography(props) {
   const [editors, setEditors] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
-  const [filterBy, setFilterBy] = useState('Deliverable')
+  const [filterBy, setFilterBy] = useState(null)
   const toggle = () => {
     setShow(!show);
   };
@@ -37,61 +37,146 @@ function Cinematography(props) {
   //     return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
   //   }))
   // }
-  const deliverablesOptions = [
+  const filterOptions = currentUser.rollSelect === 'Manager' ? [
     {
-      title: 'All',
+      title: 'Deliverable',
       id: 1,
+      filters: [
+        {
+          title: 'All',
+          id: 1,
+        },
+        {
+          title: 'Promo',
+          id: 2,
+        },
+        {
+          title: 'Reel',
+          id: 3,
+        },
+        {
+          title: 'Long Film',
+          id: 4,
+        },
+      ]
     },
     {
-      title: 'Promo',
+      title: 'Assigned Editor',
       id: 2,
+      filters: editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
+        return { title: editor.firstName, id: i + 2 }
+      })]
     },
     {
-      title: 'Reel',
+      title: 'Unassigned Editor',
       id: 3,
+      filters: []
     },
     {
-      title: 'Long Film',
+      title: 'Wedding Date sorting',
       id: 4,
+      filters: [
+        {
+          title: 'No Sorting',
+          id: 1
+        },
+        {
+          title: 'Ascending',
+          id: 2
+        },
+        {
+          title: 'Descending',
+          id: 3
+        }
+      ]
     },
-  ]
+    {
+      title: 'Deadline sorting',
+      id: 5,
+      filters: [
+        {
+          title: 'No Sorting',
+          id: 1
+        },
+        {
+          title: 'Ascending',
+          id: 2
+        },
+        {
+          title: 'Descending',
+          id: 3
+        }
+      ]
+    },
+    {
+      title: 'Current Status',
+      id: 6,
+      filters: [
+        {
+          title: 'Any',
+          id: 1
+        },
+        {
+          title: 'Yet to Start',
+          id: 2
+        },
+        {
+          title: 'In Progress',
+          id: 3
+        },
+        {
+          title: 'Completed',
+          id: 4
+        },
+      ]
+    },
+  ] : [{
+    title: 'Deliverable',
+    id: 1,
+    filters: [
+      {
+        title: 'All',
+        id: 1,
+      },
+      {
+        title: 'Promo',
+        id: 2,
+      },
+      {
+        title: 'Reel',
+        id: 3,
+      },
+      {
+        title: 'Long Film',
+        id: 4,
+      },
+    ]
+  },
+  {
+    title: 'Current Status',
+    id: 6,
+    filters: [
+      {
+        title: 'Any',
+        id: 1
+      },
+      {
+        title: 'Yet to Start',
+        id: 2
+      },
+      {
+        title: 'In Progress',
+        id: 3
+      },
+      {
+        title: 'Completed',
+        id: 4
+      },
+    ]
+  },
+]
 
-  const sortingOptions = [
-    {
-      title: 'No Sorting',
-      id: 1
-    },
-    {
-      title: 'Ascending',
-      id: 2
-    },
-    {
-      title: 'Descending',
-      id: 3
-    }
-  ]
-  const statusOptions = [
-    {
-      title: 'Any',
-      id: 1
-    },
-    {
-      title: 'Yet to Start',
-      id: 2
-    },
-    {
-      title: 'In Progress',
-      id: 3
-    },
-    {
-      title: 'Completed',
-      id: 4
-    },
-  ]
 
-  const editorsOptions = editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
-    return { title: editor.firstName, id: i + 2 }
-  })]
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
@@ -171,7 +256,18 @@ function Cinematography(props) {
     menuList: (defaultStyles) => ({ ...defaultStyles, zIndex: 9999 }), // Set a higher zIndex
     menuPortal: (defaultStyles) => ({ ...defaultStyles, zIndex: 9999 }), // Set a higher zIndex
   };
-
+  const changeFilter = (filterType) => {
+    if (filterType !== filterBy) {
+      if (filterType === 'Assigned Editor') {
+        setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false))
+      } else if (filterType === 'Unassigned Editor') {
+        setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+      } else {
+        setDeliverablesForShow(allDeliverables)
+      }
+    }
+    setFilterBy(filterType);
+  }
   const handleSaveData = async (index) => {
     try {
       const deliverable = allDeliverables[index];
@@ -185,45 +281,9 @@ function Cinematography(props) {
 
   return (
     <>
-      <ClientHeader applyFilter={applyFilter} options={filterBy === 'Deliverable' ? deliverablesOptions : filterBy === 'Assigned Editor' ? editorsOptions : filterBy === 'Wedding Date sorting' || filterBy === 'Deadline sorting' ? sortingOptions : filterBy === 'Current Status' ? statusOptions : [{ title: 'No any filter Choosen', id: null }]} filter title="Cinematography" />
+      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} applyFilter={applyFilter} options={filterOptions} filter title="Cinematography" />
       {deliverablesForShow ? (
         <>
-          <div className='w-75 d-flex flex-row  mx-auto align-items-end justify-content-end' style={{
-            marginTop: '-50px',
-            // marginBottom: '30px'
-          }} ref={target}>
-
-            <div className='w-50 d-flex flex-row align-items-center justify-content-end'>
-              <div style={{ width: '300px' }} className=' ms-2 d-flex justify-content-end'>
-                <p className='Text16N1 fw-bold pt-2'>Filter By :</p>
-                <Select value={{ value: filterBy || null, label: filterBy || 'Filter By...' }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterBy) {
-                    if (selected.value === 'Assigned Editor') {
-                      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false))
-                    } else if (selected.value === 'Unassigned Editor') {
-                      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-                    } else {
-                      setDeliverablesForShow(allDeliverables)
-                    }
-                  }
-                  setFilterBy(selected.value);
-                  setShow(false)
-                }} styles={customStyles}
-                  options={currentUser?.rollSelect === 'Manager' ? [
-                    { value: 'Deliverable', label: 'Deliverable' },
-                    { value: 'Assigned Editor', label: 'Assigned Editor' },
-                    { value: 'Unassigned Editor', label: 'Unassigned Editor' },
-                    { value: 'Wedding Date sorting', label: 'Wedding Date sorting' },
-                    { value: 'Deadline sorting', label: 'Deadline sorting' },
-                    { value: 'Current Status', label: 'Current Status' },
-                  ] : [
-                    { value: 'Deliverable', label: 'Deliverable' },
-                    { value: 'Current Status', label: 'Current Status' },
-                  ]} />
-              </div>
-            </div>
-
-          </div>
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table
               hover
