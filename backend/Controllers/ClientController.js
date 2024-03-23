@@ -43,14 +43,14 @@ const AddClientFunction = async (req, res) => {
     await reelDeliverable.save().then(() => {
       deliverables.push(reelDeliverable._id)
     })
-    if (req.body.data.deliverables.preWeddingPhotos === true) {
+    if (req.body.data?.deliverables?.preWeddingPhotos === true) {
       client.preWedding = true
       const preWedPhotosDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Pre-Wedding Photos', quantity: req.body.data.reels, clientDeadline })
       await preWedPhotosDeliverable.save().then(() => {
         deliverables.push(preWedPhotosDeliverable._id)
       })
     }
-    if (req.body.data.deliverables.preWeddingVideos === true) {
+    if (req.body.data?.deliverables?.preWeddingVideos === true) {
       client.preWedding = true
       const preWedVideosDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Pre-Wedding Videos', quantity: req.body.data.reels, clientDeadline })
       await preWedVideosDeliverable.save().then(() => {

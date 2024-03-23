@@ -8,6 +8,7 @@ const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('curren
 export const SaveClientForm = async (data) => {
   try {
     const dataToSend = { ...data, userID: currentUser._id }
+    console.log(dataToSend);
     const res = await axios.post(BASE_URL +
       '/AddClient',
       {
@@ -18,7 +19,7 @@ export const SaveClientForm = async (data) => {
       }
     ).then(() => {
       window.notify("Client has been Added", "success");
-    });
+    }).catch(err => console.log(err));
   } catch (error) {
     console.log(error, "error")
   }
