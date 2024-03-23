@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import "../assets/css/common.css";
 import "../assets/css/Profile.css";
 import "react-calendar/dist/Calendar.css";
@@ -83,8 +83,8 @@ function CalenderBar(props) {
                     const initialDate = new Date(EventsList[index].eventDate)
                     const targetDate = new Date(date);
 
-                    const initialDatePart = initialDate.toISOString().split("T")[0];
-                    const targetDatePart = targetDate.toISOString().split("T")[0];
+                    const initialDatePart = initialDate instanceof Date && !isNaN(initialDate) ? initialDate.toISOString().split("T")[0] : '';
+                    const targetDatePart = targetDate instanceof Date && !isNaN(targetDate) ? targetDate.toISOString().split("T")[0] : '';
 
                     if (initialDatePart === targetDatePart) {
                       count += 1
@@ -130,7 +130,7 @@ function CalenderBar(props) {
                     </tr>
                   </thead>
                   <tbody className="Text10S alignCenter">
-                    {EventsList?.map((event, i) => (
+                    {EventsList && EventsList?.map((event, i) => (
                       <>
                         {event && (
                           <tr>
