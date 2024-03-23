@@ -106,9 +106,7 @@ function CheckLists(props) {
     <>
       {clientsForShow ? (
         <>
-          <div className='w-50 d-flex flex-row  mx-auto align-items-center' style={{
-            marginTop: '-70px',
-            marginBottom: '30px'
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
           }} ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>

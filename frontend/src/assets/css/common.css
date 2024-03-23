@@ -420,6 +420,13 @@ Label {
     line-height: 59px;
     color: #000000;
 }
+.Text38Semi {
+    font-family: 'Roboto Regular';
+    font-style: normal;
+    font-size: 38px;
+    line-height: 59px;
+    color: #000000;
+}
 
 .Text24Semi {
     font-family: 'Roboto Medium';

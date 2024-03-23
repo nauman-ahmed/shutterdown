@@ -20,7 +20,18 @@
   src: url("./assets/fonts/Roboto-Bold.ttf");
 }
 
-
+.widthForFilters{
+  width:  50%;
+  margin-top: -70px;
+  margin-bottom: 30px;
+}
+@media only screen and (max-width: 500px){
+  .widthForFilters{
+    width: 100% !important;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+}
 
 .calendar-container {
   margin-top: 30px;

@@ -142,8 +142,8 @@ const login =  useGoogleLogin({
                 <input
                   className={
                     error && email.length < 1
-                      ? 'input_field border border-danger'
-                      : 'input_field'
+                      ? 'input_field border w-100 border-danger'
+                      : 'input_field w-100'
                   }
                   type="email"
                   placeholder="Enter your email"
@@ -162,7 +162,7 @@ const login =  useGoogleLogin({
                 style={{ marginTop: -10 }}
               >
                 <input
-                  className={'input_field "'}
+                  className={'input_field w-100'}
                   name="password"
                   type="password"
                   placeholder="**********"

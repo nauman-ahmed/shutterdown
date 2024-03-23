@@ -81,7 +81,7 @@ function Logs(props) {
   }
 
   return (
-    <div className="Profile_Web_hide">
+    <div>
       {attendaces ? (
         <>
           <Row>
@@ -97,18 +97,18 @@ function Logs(props) {
 
                 <div className="plt12" style={{ paddingTop: '15px' }}>
                   <Row>
-                    <Col xs={4} sm={6} className>
-                      <Button className="submit_btn submit" onClick={() => checkInHandler()}>
+                    <Col xs={6} sm={6} className="px-1">
+                      <Button className="submit_btn submit m-1" onClick={() => checkInHandler()}>
                         Check In
                       </Button>
-                      <Button type="submit" className="submit_btn submit" style={{ marginLeft:"5px" }} onClick={async () => {
+                      <Button type="submit" className="submit_btn submit m-1" style={{ marginLeft:"5px" }} onClick={async () => {
                         await checkOutUser();
                         getUserAttendaces();
                       }}>
                         Check Out
                       </Button>
                     </Col>
-                    <Col xs={4} sm={6}>
+                    <Col xs={6} sm={6} className="px-1">
                       <Button className="submit" style={{ width:"auto" }} onClick={() => checkInHandler({home:"yes"})}>
                         Check In From Home
                       </Button>
@@ -127,7 +127,7 @@ function Logs(props) {
           >
             <thead>
               <tr className="logsHeader Text16N1 gray2">
-                <th className="tableBody">Dates</th>
+                <th className="tableBody">Date</th>
                 <th className="tableBody">Checked In Time</th>
                 <th className="tableBody">Checked Out Time</th>
                 <th className="tableBody">Checked In From Home</th>

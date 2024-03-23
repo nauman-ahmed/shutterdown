@@ -304,8 +304,6 @@ const Header = (args) => {
             </Tooltip>
           )}
         </Overlay>
-
-
       </div>
     </>
   );

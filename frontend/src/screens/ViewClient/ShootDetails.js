@@ -30,9 +30,6 @@ function ShootDetails(props) {
       console.log(error);
     }
   };
-
-
-  console.log(clientData);
   return (
     <div>
       <div>
@@ -45,23 +42,14 @@ function ShootDetails(props) {
               About Team
             </div>
             <div className="shootCardBox">
-              <div
-                style={{
-                  width: '232px',
-                  height: '200px',
-                }}
-              >
+              <div className="w-25">
                 {clientData?.userID?.photo ? (
 
-                  <img className="imgRadius"
+                  <img className="imgRadius w-100 h-100"
                     src={BASE_URL + '/' + clientData?.userID?.photo}
-                    style={{
-                      width: '232px',
-                      height: '200px',
-                    }}
                   />
                 ) : (
-                  <div className="ProfileBox Text50Semi">
+                  <div className="ProfileBox Text38Semi p-2">
                     {`${clientData?.userID?.firstName.charAt(0).toUpperCase()}${clientData?.userID?.lastName.charAt(0).toUpperCase()}`}
                   </div>
                 )}
@@ -81,21 +69,12 @@ function ShootDetails(props) {
 
             {teamToShow?.shootDirector?.length > 0 && teamToShow?.shootDirector?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -116,21 +95,13 @@ function ShootDetails(props) {
             )}
             {teamToShow?.choosenPhotographers?.length > 0 && teamToShow?.choosenPhotographers?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
+
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -152,21 +123,12 @@ function ShootDetails(props) {
 
             {teamToShow?.choosenCinematographers.length > 0 && teamToShow.choosenCinematographers?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -188,21 +150,12 @@ function ShootDetails(props) {
             )}
             {teamToShow?.droneFlyers?.length > 0 && teamToShow.droneFlyers?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -224,21 +177,13 @@ function ShootDetails(props) {
             )}
             {teamToShow?.manager.length > 0 && teamToShow?.manager?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
+                      
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -259,21 +204,13 @@ function ShootDetails(props) {
             )}
             {teamToShow?.assistants.length > 0 && teamToShow?.assistants?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
+                     
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -294,21 +231,12 @@ function ShootDetails(props) {
             )}
             {teamToShow?.sameDayPhotoMakers.length > 0 && teamToShow?.sameDayPhotoMakers?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -329,21 +257,12 @@ function ShootDetails(props) {
             )}
             {teamToShow?.sameDayVideoMakers.length > 0 && teamToShow?.sameDayVideoMakers?.map((user, ind) =>
               <div className="shootCardBox mt-5">
-                <div
-                  style={{
-                    width: '232px',
-                    height: '200px',
-                  }}
-                >
+              <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius"
+                    <img className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
-                      style={{
-                        width: '232px',
-                        height: '200px',
-                      }}
                     />
-                    : <div className="ProfileBox Text50Semi">
+                    : <div className="ProfileBox Text38Semi p-2">
                       {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
                     </div>
                   }
@@ -381,7 +300,7 @@ function ShootDetails(props) {
                 <th style={{ whiteSpace: 'nowrap' }}>
                   Drone Flyer
                 </th>
-                <th>Detail</th>
+                <th>Team Detail</th>
               </tr>
             </thead>
             <tbody
@@ -445,16 +364,16 @@ function ShootDetails(props) {
                       </div>
                     }
                   </td>
-                  <td style={{ paddingTop: '30px' }}>
+                  <td>
                     <Button
-                      className="submit_btn submit shootDetailsBtn"
+                      className="submit_btn submit w-100 p-1 shootDetailsBtn"
                       style={{ marginRight: '10px' }}
                       onClick={() => {
                         setTeamView(true);
                         setTeamToShow(event)
                       }}
                     >
-                      About the Team
+                      Team
                     </Button>
                   </td>
                 </tr>
