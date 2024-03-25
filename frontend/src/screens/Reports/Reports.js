@@ -37,7 +37,7 @@ function Reports(props) {
     <>
       {allTasks ? (
         <Table
-          // bordered
+          bordered
           hover
           borderless
           responsive
@@ -47,7 +47,7 @@ function Reports(props) {
         >
           <thead>
             <tr className="logsHeader Text16N1">
-              <th className="tableBody">Client:</th>
+              <th className="tableBody">Client</th>
               <th className="tableBody">Task Assigned</th>
               <th className="tableBody">Task Assigned Date</th>
               <th className="tableBody">Assigned By</th>

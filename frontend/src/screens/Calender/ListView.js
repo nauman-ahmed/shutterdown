@@ -233,8 +233,8 @@ function ListView() {
               <thead>
                 {currentUser.rollSelect == 'Manager' && (
                   <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Couple : Location</th>
-                    <th className="tableBody">Date : Travel</th>
+                    <th className="tableBody">Couple Location</th>
+                    <th className="tableBody">Travel Date</th>
                     <th className='tableBody'>Event Type</th>
                     <th className='tableBody'>Status</th>
                     <th className="tableBody">Shoot Director</th>

@@ -197,7 +197,7 @@ function FormII() {
                   value={eventValues?.eventType || ""}
                   required={true}
                   onChange={(e) => updateEventValues(e)}
-                  placeholder={'Event_Type'}
+                  placeholder={'Event Type'}
                 />
               </div>
             </Col>

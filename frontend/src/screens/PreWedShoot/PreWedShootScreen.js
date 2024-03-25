@@ -202,7 +202,7 @@ function PreWedShootScreen() {
             <ToastContainer />
             <Table
               hover
-              borderless
+              bordered
               responsive
               style={{ width: '150%', marginTop: '15px' }}
             >

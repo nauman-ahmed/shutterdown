@@ -151,11 +151,11 @@ function CheckLists(props) {
           >
             <thead>
               <tr className="logsHeader Text16N1">
-                <th className="tableBody">Client:</th>
-                <th className="tableBody">Created OnBo. W’App Group</th>
-                <th className="tableBody">Light SOP Sent Date</th>
-                <th className="tableBody">Quesnr. sent date</th>
-                <th className="tableBody">Iternary Collection</th>
+                <th className="tableBody">Client</th>
+                <th className="tableBody">WhatsApp Group</th>
+                <th className="tableBody">SOP Date</th>
+                <th className="tableBody">Questionnaire Date</th>
+                <th className="tableBody">Itinerary Status</th>
                 <th className="tableBody">Save</th>
               </tr>
             </thead>

@@ -59,7 +59,7 @@ function DailyTasks(props) {
       {tasks ? (
         <Table
           hover
-          borderless
+          bordered
           responsive
           className="tableViewClient"
           style={{ width: '100%', marginTop: '15px' }}
@@ -69,7 +69,7 @@ function DailyTasks(props) {
             <thead>
               {currentUser.rollSelect === 'Manager' && (
                 <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Client</th>
                   <th className="tableBody">Task</th>
                   <th className="tableBody">Assign To</th>
                   <th className="tableBody">Assign By</th>
@@ -81,7 +81,7 @@ function DailyTasks(props) {
               )}
               {currentUser.rollSelect === 'Editor' && (
                 <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Client:</th>
+                  <th className="tableBody">Client</th>
                   <th className="tableBody">Task</th>
                   <th className="tableBody">Assign By</th>
                   <th className="tableBody">Deadline</th>

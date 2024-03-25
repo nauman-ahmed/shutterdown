@@ -268,7 +268,7 @@ function PreWedDeliverables() {
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table
               hover
-              borderless
+              bordered
               responsive
               className="tableViewClient"
               style={currentUser.rollSelect == 'Manager' ? { width: '200%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}

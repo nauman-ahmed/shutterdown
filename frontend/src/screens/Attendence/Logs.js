@@ -119,7 +119,7 @@ function Logs(props) {
             </Col>
           </Row>
           <Table
-            // bordered
+            bordered
             hover
             borderless
             responsive

@@ -82,7 +82,7 @@ function FormI() {
                 value={formValues?.brideName}
                 required={true}
                 onChange={(e) => updateValues(e)}
-                placeholder={'Bride_Name'}
+                placeholder={'Bride Name'}
               />
             </div>
           </Col>
@@ -99,7 +99,7 @@ function FormI() {
                 value={formValues?.groomName}
                 required={true}
                 onChange={(e) => updateValues(e)}
-                placeholder={'Groom_Name'}
+                placeholder={'Groom Name'}
               />
             </div>
           </Col>
@@ -120,7 +120,7 @@ function FormI() {
                     setFormValues({ ...formValues, phoneNumber: value })
                   }}
                   value={formValues?.phoneNumber}
-                  placeholder="Phone_Number"
+                  placeholder="Phone Number"
                   inputClass={'forminput phoneinput'}
                 />
               </div>
@@ -140,7 +140,7 @@ function FormI() {
                 className='forminput'
                 style={{ color: '#666DFF !important' }}
                 required={true}
-                placeholder={'Email_Id'}
+                placeholder={'Email Id'}
               />
             </div>
           </Col>

@@ -119,13 +119,13 @@ function ClientInfo() {
             className="logsHeader Text16N1"
             style={{ background: '#EFF0F5', borderWidth: '1px !important' }}>
             <th>Client</th>
-            <th>Phone number</th>
+            <th>Phone Number</th>
             <th>POC</th>
-            <th>Album: Type</th>
-            <th>Pre-wedding Photos</th>
-            <th>Pre-wedding Videos</th>
+            <th>Album</th>
+            <th>Pre Wedding Photos</th>
+            <th>Pre Wedding Videos</th>
             <th>HDD</th>
-            <th>Long-Film</th>
+            <th>Long Film</th>
             <th>Reels</th>
             <th>Promo</th>
             <th>Payment status</th>
