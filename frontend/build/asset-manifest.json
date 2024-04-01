@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.7bd3ecff.css",
-    "main.js": "/static/js/main.ba1f9f80.js",
+    "main.js": "/static/js/main.eb90c6a9.js",
     "static/media/banner.png": "/static/media/banner.88a1950b5134d9307c18.png",
     "static/media/signup_banner.png": "/static/media/signup_banner.9f3f3cf20bdfe0ed44a9.png",
     "static/media/reset_banner.png": "/static/media/reset_banner.a0145705a0b34c6ef905.png",
@@ -67,10 +67,10 @@
     "static/media/DropDownOvalActive.svg": "/static/media/DropDownOvalActive.9cd5cebe5de7341c251c0faff8ce6bb4.svg",
     "static/media/DropDownOvalUnActive.svg": "/static/media/DropDownOvalUnActive.bc2f2384d529161eb41b175cc411a3b2.svg",
     "main.7bd3ecff.css.map": "/static/css/main.7bd3ecff.css.map",
-    "main.ba1f9f80.js.map": "/static/js/main.ba1f9f80.js.map"
+    "main.eb90c6a9.js.map": "/static/js/main.eb90c6a9.js.map"
   },
   "entrypoints": [
     "static/css/main.7bd3ecff.css",
-    "static/js/main.ba1f9f80.js"
+    "static/js/main.eb90c6a9.js"
   ]
 }

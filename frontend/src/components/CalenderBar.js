@@ -21,9 +21,9 @@ function CalenderBar(props) {
     try {
       const res = await getEvents();
       if (currentUser.rollSelect == 'Manager') {
-        dispatch(updateAllEvents(res.data));
+        dispatch(updateAllEvents(res?.data));
       } else if (currentUser.rollSelect == 'Shooter' || currentUser.rollSelect == 'Editor') {
-        const eventsToShow = res.data.map(event => {
+        const eventsToShow = res.data?.map(event => {
           if (event?.shootDirector.some(director => director._id == currentUser._id)) {
             return { ...event, userRole: 'Shoot Director' };
           } else if (event?.choosenPhotographers.some(photographer => photographer._id == currentUser._id)) {

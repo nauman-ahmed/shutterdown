@@ -16,15 +16,17 @@ dotenv.config({ path: './config.env' });
 const path = require('path');
 const PORT = 5002;
 
-app.use(express.static(path.join(__dirname, "frontend/build")));
-app.get("*", function (_, res) {
-    res.setHeader("Content-Type", "text/html");
-    res.sendFile(
-        path.join(__dirname, "frontend/build/index.html"),
-        function (err) {
-            res.status(500).send(err);
-        }, 
-    );
+
+
+// app.use(cors());
+// Set CORS headers manually
+// Add middleware to set CORS headers
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET', 'POST', 'OPTIONS','PATCH','DELETE','POST','PUT')
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
 });
 
 app.use(cors());
@@ -44,7 +46,16 @@ app.use(deliverableRouter);
 app.use('/', AttendenceRouter);
 app.use('/', viewClientRouter);
 app.use('/', DailyTaskRouter);
-
+app.use(express.static(path.join(__dirname, "frontend/build")));
+app.get("*", function (_, res) {
+  res.setHeader("Content-Type", "text/html");
+  res.sendFile(
+    path.join(__dirname, "frontend/build/index.html"),
+    function (err) {
+      res.status(500).send(err);
+    },
+  );
+});
 
 app.listen(PORT, () => {
   try {
