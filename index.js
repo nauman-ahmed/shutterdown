@@ -16,16 +16,16 @@ dotenv.config({ path: './config.env' });
 const path = require('path');
 const PORT = 5002;
 
-// app.use(express.static(path.join(__dirname, "frontend/build")));
-// app.get("*", function (_, res) {
-//     res.setHeader("Content-Type", "text/html");
-//     res.sendFile(
-//         path.join(__dirname, "frontend/build/index.html"),
-//         function (err) {
-//             res.status(500).send(err);
-//         }, 
-//     );
-// });
+app.use(express.static(path.join(__dirname, "frontend/build")));
+app.get("*", function (_, res) {
+    res.setHeader("Content-Type", "text/html");
+    res.sendFile(
+        path.join(__dirname, "frontend/build/index.html"),
+        function (err) {
+            res.status(500).send(err);
+        }, 
+    );
+});
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
