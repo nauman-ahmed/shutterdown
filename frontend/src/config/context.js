@@ -19,7 +19,7 @@ export default function AuthContextProvider({ children }) {
             let user = JSON.parse(Cookies.get('currentUser'));
             // console.log(ID);
             const res = await axios.get(
-                `https://shutter-down-backend.onrender.com/MyProfile/Profile/${user._id}`,
+                `https://shutter-down.onrender.com/MyProfile/Profile/${user._id}`,
                 {
                     Headers: {
                         'Content-Type': 'application/json',
