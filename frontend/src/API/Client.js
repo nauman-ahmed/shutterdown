@@ -18,9 +18,11 @@ export const SaveClientForm = async (data) => {
         data: dataToSend
       }
     ).then(() => {
+      return true
       window.notify("Client has been Added", "success");
     }).catch(err => console.log(err));
   } catch (error) {
+    return false
     console.log(error, "error")
   }
 };

@@ -54,7 +54,7 @@ import LoginWithGoogle from './screens/login/LoginWithGoogle';
 import UserAttendence from './screens/Attendence/Attendence';
 import Cookies from 'js-cookie';
 import PreWedDeliverables from './screens/Deliverables/PreWeds';
-
+import BASE_URL from './API';
 
 
 function App() {
@@ -62,7 +62,7 @@ function App() {
   const [shooter, setShooter] = useState(false);
   const [editor, setEditor] = useState(false);
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
-
+console.log(BASE_URL);
   return (
     <AuthContextProvider>
       <>

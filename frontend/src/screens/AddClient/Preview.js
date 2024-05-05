@@ -28,12 +28,14 @@ function Preview() {
   const [eventIndex, setEventIndex] = useState(0)
   const submitClient = async () => {
     setRequesting(true)
-    await SaveClientForm(clientData);
+   const saveResult = await SaveClientForm(clientData);
     setRequesting(false);
     const storedEvents = await getEvents();
     dispatch(updateAllEvents(storedEvents.data))
     dispatch(updateClintData({ albums: [""] }));
-    navigate('/MyProfile/AddClient/Form-I');
+    if(saveResult){
+      navigate('/MyProfile/AddClient/Form-I');
+    }
   };
   const target = useRef(null);
 

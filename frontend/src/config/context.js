@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-
+import BASE_URL from '../API'
 const AuthContext = createContext()
 
 export default function AuthContextProvider({ children }) {
@@ -19,7 +19,7 @@ export default function AuthContextProvider({ children }) {
             let user = JSON.parse(Cookies.get('currentUser'));
             // console.log(ID);
             const res = await axios.get(
-                `https://shutter-down.onrender.com/MyProfile/Profile/${user._id}`,
+                `${BASE_URL}/MyProfile/Profile/${user._id}`,
                 {
                     Headers: {
                         'Content-Type': 'application/json',

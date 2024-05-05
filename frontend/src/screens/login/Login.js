@@ -23,6 +23,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [logingIn, setLoginIn] = useState(false)
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setInputData({ ...inputData, [name]: value });
@@ -38,7 +39,9 @@ const Login = () => {
       setError(true);
     } else {
       try {
+        setLoginIn(true)
         await GetSignInApi(inputData);
+        setLoginIn(false)
         const user = Cookies.get('currentUser');
         console.log(user);
         if (user) {
@@ -190,7 +193,9 @@ const login =  useGoogleLogin({
 
                 // onClick={() => home()}
               >
-                Sign In
+              {logingIn ? <div className='w-100'>
+                    <div class="smallSpinner mx-auto"></div>
+                  </div> : "Sign In"}
               </Button>{' '}
             </Form>
             <br />
