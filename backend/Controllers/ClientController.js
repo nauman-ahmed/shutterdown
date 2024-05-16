@@ -10,7 +10,7 @@ const AddClientFunction = async (req, res) => {
     const client = new ClientModel(req.body.data);
     let deliverables = [];
     let clientDeadline = null;
-    const eventIds = await Promise.all(req.body.data.events.map(async (eventData) => {
+    const eventIds = await Promise.all(req.body?.data?.events.map(async (eventData) => {
       const event = new EventModel({ ...eventData, client: client._id });
       if (event.isWedding) {
         const newDate = new Date(event.eventDate.getTime());
