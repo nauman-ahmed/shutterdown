@@ -154,7 +154,7 @@ function Documents() {
                         </div>
                         <div className="d-flex justify-content-between flex-row">
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadAdhar}>Upload</div>
                           </div>
                           {user?.adharCard && (
@@ -162,7 +162,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.adharCard} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.adharCard} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.adharCard} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -185,7 +185,7 @@ function Documents() {
                         <div className="d-flex justify-content-between">
 
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadPan}>Upload</div>
                           </div>
                           {user?.panCard && (
@@ -193,7 +193,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.panCard} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.panCard} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.panCard} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -216,7 +216,7 @@ function Documents() {
                         </div>
                         <div className="d-flex justify-content-between">
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadDrivingLicense}>Upload</div>
                           </div>
                           {user?.drivingLicense && (
@@ -224,7 +224,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.drivingLicense} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.drivingLicense} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.drivingLicense} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -247,7 +247,7 @@ function Documents() {
                         </div>
                         <div className="d-flex justify-content-between">
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadVoterIDCard}>Upload</div>
                           </div>
                           {user?.voterID && (
@@ -255,7 +255,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.voterID} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.voterID} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.voterID} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -278,7 +278,7 @@ function Documents() {
                         </div>
                         <div className="d-flex justify-content-between">
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadPassportCard}>Upload</div>
                           </div>
                           {user?.passport && (
@@ -286,7 +286,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.passport} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.passport} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.passport} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -312,7 +312,7 @@ function Documents() {
                         <div className="d-flex justify-content-between">
 
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadPhotoCard}>Upload</div>
                           </div>
                           {user?.photo && (
@@ -320,7 +320,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.photo} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.photo} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.photo} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -343,7 +343,7 @@ function Documents() {
                         <div className="d-flex justify-content-between">
 
                           <div className="detailsBox mt12">
-                            <img src={Plus} />
+                            <img alt="" src={Plus} />
                             <div className="Text10N gray" onClick={handleUploadSignatureCard}>Upload</div>
                           </div>
                           {user?.signature && (
@@ -351,7 +351,7 @@ function Documents() {
                               <a href={BASE_URL + '/' + user?.signature} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a href={BASE_URL + '/preview/' + user?.signature} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.signature} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>

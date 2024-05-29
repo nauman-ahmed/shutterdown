@@ -4,7 +4,7 @@ import BASE_URL from "./index"
 
 export const addEvent = async (data) => {
     try {
-        const res = await axios.post(BASE_URL +
+        await axios.post(BASE_URL +
             '/AddEvent',
             {
                 Headers: {
@@ -20,7 +20,7 @@ export const addEvent = async (data) => {
 
 export const assignEventTeam = async (data) => {
     try {
-        const res = await axios.patch(BASE_URL +
+        await axios.patch(BASE_URL +
             '/assignEventTeam',
             {
                 Headers: {
@@ -38,7 +38,7 @@ export const assignEventTeam = async (data) => {
 
 export const updateEventData = async (data) => {
     try {
-        const res = await axios.patch(BASE_URL +
+        await axios.patch(BASE_URL +
             '/updateEvent',
             {
                 Headers: {

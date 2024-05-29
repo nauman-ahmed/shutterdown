@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
-import axios from "axios";
 import { getClientById } from "../../API/Client";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -72,11 +71,11 @@ function Deliverable(props) {
                   <tr>
                     <td className="textPrimary Text14Semi" style={{ paddingBottom: "30px" }}>{deliverable.deliverableName}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi" >{dayjs(deliverable.clientDeadline).format('DD-MM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi" >{dayjs(deliverable.clientDeadline).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.status || 'Pending'}</td>
-                    <td className="textPrimary Text14Semi" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi" >{deliverable.finalDeliverDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi" >{deliverable.finalDeliverDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.clientRating || 'Not Assigned'}</td>
                   </tr>
                 )
@@ -127,11 +126,11 @@ function Deliverable(props) {
                   <tr>
                     <td className="textPrimary Text14Semi" style={{ paddingBottom: "30px" }}>{deliverable.deliverableName}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi" >{dayjs(deliverable.clientDeadline).format('DD-MM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi" >{dayjs(deliverable.clientDeadline).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.status || 'Pending'}</td>
-                    <td className="textPrimary Text14Semi" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi" >{deliverable.finalDeliverDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi" >{deliverable.finalDeliveryDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi" >{deliverable.clientRating || 'Not Assigned'}</td>
                   </tr>
                 )

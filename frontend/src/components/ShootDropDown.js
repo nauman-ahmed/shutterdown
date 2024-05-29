@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ButtonDropdown,
   DropdownItem,
@@ -6,16 +6,12 @@ import {
   DropdownToggle,
   Dropdown,
 } from 'reactstrap';
-import Bookadd from '../assets/Profile/Bookadd.svg';
-import EditBook from '../assets/Profile/EditBook.svg';
-import DeleteBook from '../assets/Profile/DeleteBook.svg';
 import ShootStar from '../assets/Profile/ShootStar.svg';
-import PropTypes from 'prop-types';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import Edit from '../assets/Profile/Edit.svg';
 
 function ShootDropDown(props) {
-  const { table, existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons } = props;
+  const { existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
 
@@ -38,14 +34,14 @@ function ShootDropDown(props) {
             }}
           >
             {
-              props?.data?.length == 0 ?
+              props?.data?.length === 0 ?
                 <div style={{ whiteSpace: 'nowrap' }}>
-                  <img src={ShootStar} style={{ marginRight: '5px' }} />
+                  <img alt='' src={ShootStar} style={{ marginRight: '5px' }} />
                   Select ({allowedPersons})
                 </div>
                 :
                 <div style={{ whiteSpace: 'nowrap' }}>
-                  <img src={Edit} /> ({allowedPersons})
+                  <img alt='' src={Edit} /> ({allowedPersons})
                 </div>
             }
 
@@ -80,7 +76,7 @@ function ShootDropDown(props) {
                       userUnChecked(user)
                     }
                   }}
-                  checked={existedUsers?.length > 0 && existedUsers?.some(existingUser => existingUser._id == user._id)}
+                  checked={existedUsers?.length > 0 && existedUsers?.some(existingUser => existingUser._id === user._id)}
                 />
               </DropdownItem>
             ))}

@@ -46,13 +46,13 @@ function Summary(props) {
 
           <div className="R_A_Justify">
             <div className="Text10S gray mt12">
-              <img src={SummaryIn} style={{ marginRight: "10px" }} />
+              <img alt="" src={SummaryIn} style={{ marginRight: "10px" }} />
               11:00 AM
               <br />
               IN
             </div>
             <div className="Text10S gray mt12">
-              <img src={SummaryOut} style={{ marginRight: "10px" }} />
+              <img alt="" src={SummaryOut} style={{ marginRight: "10px" }} />
               11:00 AM
               <br />
               IN
@@ -71,9 +71,9 @@ function Summary(props) {
               <div className="Text12 gray R_A_Evenly" style={{ width: "30%" }}>
                 10h 30m
                 <div className="greenTick R_A_Justify">
-                  <img src={WhiteTick} />
+                  <img alt="" src={WhiteTick} />
                 </div>
-                <img src={Next} />
+                <img alt="" src={Next} />
               </div>
             </div>
           ))}

@@ -1,89 +1,151 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Table } from 'reactstrap';
-import '../../assets/css/Profile.css';
-import Heart from '../../assets/Profile/Heart.svg';
-import Camera from '../../assets/Profile/Camera.svg';
-import Video from '../../assets/Profile/Video.svg';
-import Drone from '../../assets/Profile/Drone.svg';
-import Manager from '../../assets/Profile/Manager.svg';
-import Assistant from '../../assets/Profile/Assistant.svg';
-import Car from '../../assets/Profile/Car.svg';
-import Plane from '../../assets/Profile/Plane.svg';
-import ShootDropDown from '../../components/ShootDropDown';
-import dayjs from 'dayjs';
-import { ToastContainer, toast } from 'react-toastify';
-import { assignEventTeam, getEvents, updateEventData } from '../../API/Event';
-import { getAllUsers } from '../../API/userApi';
-import Cookies from 'js-cookie';
-import CalenderImg from '../../assets/Profile/Calender.svg';
-import Select from 'react-select'
-import Calendar from 'react-calendar';
-import { Overlay } from 'react-bootstrap';
-import { IoIosWarning } from "react-icons/io";
+import React, { useRef, useState, useEffect } from "react";
+import { Table } from "reactstrap";
+import "../../assets/css/Profile.css";
+import Heart from "../../assets/Profile/Heart.svg";
+import Camera from "../../assets/Profile/Camera.svg";
+import Video from "../../assets/Profile/Video.svg";
+import Drone from "../../assets/Profile/Drone.svg";
+import Manager from "../../assets/Profile/Manager.svg";
+import Assistant from "../../assets/Profile/Assistant.svg";
+import Car from "../../assets/Profile/Car.svg";
+import Plane from "../../assets/Profile/Plane.svg";
+import ShootDropDown from "../../components/ShootDropDown";
+import dayjs from "dayjs";
+import { ToastContainer, toast } from "react-toastify";
+import { assignEventTeam, getEvents } from "../../API/Event";
+import { getAllUsers } from "../../API/userApi";
+import Cookies from "js-cookie";
+import CalenderImg from "../../assets/Profile/Calender.svg";
+import Select from "react-select";
+import Calendar from "react-calendar";
+import { Overlay } from "react-bootstrap";
+import { IoIosArrowRoundUp, IoIosWarning } from "react-icons/io";
+import ClientHeader from "../../components/ClientHeader";
+import { IoIosArrowRoundDown } from "react-icons/io";
 
-function ListView() {
+function ListView(props) {
+  console.log(props.filter);
   const [allEvents, setAllEvents] = useState([]);
   const [eventsForShow, setEventsForShow] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
-  const currentUser = JSON.parse(Cookies.get('currentUser'));
-  const [filterFor, setFilterFor] = useState('day')
+  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const [filterFor, setFilterFor] = useState("day");
   const [updatingIndex, setUpdatingIndex] = useState(null);
+  const [ascending, setAscending] = useState(true);
   const toggle = () => {
     setShow(!show);
   };
   const [filteringDay, setFilteringDay] = useState(null);
   const filterByDay = (date) => {
-    setFilteringDay(date)
+    setFilteringDay(date);
     setShow(!show);
-    setEventsForShow(allEvents.filter(event => (new Date(event.eventDate)).getTime() === (new Date(date)).getTime()
-    ))
-  }
+    setEventsForShow(
+      allEvents.filter(
+        (event) =>
+          new Date(event.eventDate).getTime() === new Date(date).getTime()
+      )
+    );
+  };
   const filterByMonth = (date) => {
-    setEventsForShow(allEvents.filter(event => new Date(event.eventDate).getFullYear() === date.getFullYear() && new Date(event.eventDate).getMonth() === date.getMonth()
-    ))
-  }
+    setEventsForShow(
+      allEvents.filter(
+        (event) =>
+          new Date(event.eventDate).getFullYear() === date.getFullYear() &&
+          new Date(event.eventDate).getMonth() === date.getMonth()
+      )
+    );
+  };
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const getEventsData = async () => {
     try {
       const usersData = await getAllUsers();
-      setAllUsers(usersData.users)
+      setAllUsers(usersData.users);
       const res = await getEvents();
-      if (currentUser.rollSelect == 'Manager') {
-        setAllEvents(res.data);
-        setEventsForShow(res.data);
-      } else if (currentUser.rollSelect == 'Shooter') {
-        const eventsToShow = res.data.map(event => {
-          if (event?.shootDirector.some(director => director._id == currentUser._id)) {
-            return { ...event, userRole: 'Shoot Director' };
-          } else if (event?.choosenPhotographers.some(photographer => photographer._id == currentUser._id)) {
-            return { ...event, userRole: 'Photographer' };
-          } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id == currentUser._id)) {
-            return { ...event, userRole: 'Cinematographer' };
-          } else if (event?.droneFlyers.some(flyer => flyer._id == currentUser._id)) {
-            return { ...event, userRole: 'Drone Flyer' };
-          } else if (event.manager.some(manager => manager._id == currentUser._id)) {
-            return { ...event, userRole: 'Manager' };
-          } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id == currentUser._id)) {
-            return { ...event, userRole: 'Same Day Photos Maker' };
-          } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id == currentUser._id)) {
-            return { ...event, userRole: 'Same Day Video Maker' };
-          } else if (event?.assistants.some(assistant => assistant._id == currentUser._id)) {
-            return { ...event, userRole: 'Assistant' };
+      if (currentUser.rollSelect === "Manager") {
+        setAllEvents(res.data.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateA - dateB : dateB - dateA;
+        }));
+        setEventsForShow(res.data.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateA - dateB : dateB - dateA;
+        }));
+      } else if (currentUser.rollSelect === "Shooter") {
+        const eventsToShow = res.data.map((event) => {
+          if (
+            event?.shootDirector.some(
+              (director) => director._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Shoot Director" };
+          } else if (
+            event?.choosenPhotographers.some(
+              (photographer) => photographer._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Photographer" };
+          } else if (
+            event?.choosenCinematographers.some(
+              (cinematographer) => cinematographer._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Cinematographer" };
+          } else if (
+            event?.droneFlyers.some((flyer) => flyer._id === currentUser._id)
+          ) {
+            return { ...event, userRole: "Drone Flyer" };
+          } else if (
+            event.manager.some((manager) => manager._id === currentUser._id)
+          ) {
+            return { ...event, userRole: "Manager" };
+          } else if (
+            event?.sameDayPhotoMakers.some(
+              (photoMaker) => photoMaker._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Same Day Photos Maker" };
+          } else if (
+            event?.sameDayVideoMakers.some(
+              (videoMaker) => videoMaker._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Same Day Video Maker" };
+          } else if (
+            event?.assistants.some(
+              (assistant) => assistant._id === currentUser._id
+            )
+          ) {
+            return { ...event, userRole: "Assistant" };
           } else {
             return null;
           }
         });
-        setAllEvents(eventsToShow);
-        setEventsForShow(eventsToShow);
+        setAllEvents(eventsToShow.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateA - dateB : dateB - dateA;
+        }));
+        setEventsForShow(eventsToShow.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateA - dateB : dateB - dateA;
+        }));
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   useEffect(() => {
-    setEventsForShow(allEvents);
-  }, [allEvents])
+    setEventsForShow(allEvents.sort((a, b) => {
+      const dateA = new Date(a.eventDate);
+      const dateB = new Date(b.eventDate);
+      return ascending ? dateA - dateB : dateB - dateA;
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allEvents]);
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -99,22 +161,10 @@ function ListView() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
-  const customStyles2 = {
-    option: (defaultStyles, state) => ({
-      ...defaultStyles,
-      color: state.isSelected ? "white" : "black",
-      backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
-    }),
-    control: (defaultStyles) => ({
-      ...defaultStyles,
-      backgroundColor: "#EFF0F5",
-      padding: "2px",
-      border: "none",
-    }),
-    singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
-  };
+  
   useEffect(() => {
     getEventsData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmitHandler = async (event, index) => {
@@ -166,203 +216,297 @@ function ListView() {
       await assignEventTeam(event);
       setUpdatingIndex(null);
     } catch (error) {
-      toast.error('It seems like nothing to update');
+      toast.error("It seems like nothing to update");
       return;
     }
   };
-  const onStatusUpdate = async (event, index) => {
-    try {
+  
+  const getClientsForFilters = () => {
+    const seenClients = new Set();
+    return allEvents?.map((eventObj, i) => ({
+        title: `${eventObj?.client?.brideName} Weds ${eventObj?.client?.groomName}`,
+        id: i,
+        clientId: eventObj.client?._id,
+      })).filter(eventObj => {
+        if (eventObj.clientId && !seenClients.has(eventObj.clientId)) {
+          seenClients.add(eventObj.clientId);
+          return true;
+        }
+        return false;
+      });
+  }
 
+  const filterOptions = [
+    {
+      title: "clientsFromListView",
+      id: 1,
+      filters: getClientsForFilters(),
+    },
+  ];
 
-      setUpdatingIndex(index);
-      await updateEventData(event);
-      setUpdatingIndex(null);
-    } catch (error) {
-      toast.error('It seems like nothing to update');
-      return;
-    }
+  const applyFilter = (filterObj) => {
+    console.log(filterObj);
+    setEventsForShow(allEvents.filter((event) => event.client?._id === filterObj?.clientId));
   };
-
-
-
+  const applySorting = ()=>{
+    setEventsForShow(allEvents.sort((a, b) => {
+      const dateA = new Date(a.eventDate);
+      const dateB = new Date(b.eventDate);
+      return ascending ? dateB - dateA : dateA - dateB;
+    }));
+    setAscending(!ascending)
+  }
   return (
     <>
       <ToastContainer />
       {eventsForShow !== null ? (
         <>
-        <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
-          }} ref={target}>
-
-            <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50'>
-                {filterFor === 'day' ?
+          <ClientHeader
+            title="List View"
+            applyFilter={applyFilter}
+            options={filterOptions}
+            filter
+            calender
+          />
+          <div
+            className="widthForFilters d-flex flex-row  mx-auto align-items-center"
+            style={{}}
+            ref={target}
+          >
+            <div className="w-100 d-flex flex-row align-items-center">
+              <div className="w-50">
+                {filterFor === "day" ? (
                   <div
                     className={`forminput R_A_Justify1`}
                     onClick={toggle}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                   >
-                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img src={CalenderImg} />
+                    {filteringDay
+                      ? dayjs(filteringDay).format("DD-MMM-YYYY")
+                      : "Date"}
+                    <img alt="" src={CalenderImg} />
                   </div>
-                  :
-                  <input type='month' onChange={(e) => {
-                    filterByMonth(new Date(e.target.value))
-                  }} className='forminput R_A_Justify mt-1' />
-                }
+                ) : (
+                  <input
+                    type="month"
+                    onChange={(e) => {
+                      filterByMonth(new Date(e.target.value));
+                    }}
+                    className="forminput R_A_Justify mt-1"
+                  />
+                )}
               </div>
-              <div className='w-50 px-2 '>
-                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterFor) {
-                    setEventsForShow(allEvents)
-                    setFilteringDay('');
-                  }
-                  setFilterFor(selected.value);
-                  setShow(false)
-                }} styles={customStyles}
+              <div className="w-50 px-2 ">
+                <Select
+                  value={{ value: filterFor, label: filterFor }}
+                  className="w-75"
+                  onChange={(selected) => {
+                    if (selected.value !== filterFor) {
+                      setEventsForShow(allEvents);
+                      setFilteringDay("");
+                    }
+                    setFilterFor(selected.value);
+                    setShow(false);
+                  }}
+                  styles={customStyles}
                   options={[
-                    { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                    { value: "day", label: "Day" },
+                    { value: "month", label: "Month" },
+                  ]}
+                />
               </div>
             </div>
-
           </div>
-          <div style={{ overflowX: 'hidden', width: '100%' }}>
-            <Table striped
+          <div style={{ overflowX: "hidden", width: "100%" }}>
+            <Table
+              striped
               responsive
-              style={{ marginTop: '15px', width: '180%' }}>
+              style={{ marginTop: "15px", width: "180%" }}
+            >
               <thead>
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple Location</th>
-                    <th className="tableBody">Travel Date</th>
-                    <th className='tableBody'>Event Type</th>
-                    <th className='tableBody'>Status</th>
+                    <th className="tableBody">Travel {ascending ? <IoIosArrowRoundDown style={{color : '#666DFF'}} onClick={applySorting} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" onClick={applySorting} /> }</th>
+                    <th className="tableBody">Event Type</th>
+                    {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Director</th>
                     <th className="tableBody">
                       Photographer
-                      <img src={Camera} />
+                      <img alt="" src={Camera} />
                     </th>
                     <th className="tableBody">
                       Cinematographer
-                      <img src={Video} />
+                      <img alt="" src={Video} />
                     </th>
                     <th className="tableBody">
                       DroneFlyer
-                      <img src={Drone} />
+                      <img alt="" src={Drone} />
                     </th>
                     <th className="tableBody">
                       Manager
-                      <img src={Manager} />
+                      <img alt="" src={Manager} />
                     </th>
                     <th className="tableBody">
                       Assistant
-                      <img src={Assistant} />
+                      <img alt="" src={Assistant} />
                     </th>
                     <th className="tableBody">SameDay Photos</th>
                     <th className="tableBody">SameDay Videos</th>
                     <th className="tableBody">Team Assign</th>
                   </tr>
                 )}
-                {currentUser.rollSelect == 'Shooter' && (
+                {currentUser.rollSelect === "Shooter" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Date</th>
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Event Type</th>
-                    <th className="tableBody">Status</th>
+                    {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
                   </tr>
                 )}
               </thead>
-              <tbody className="Text12"
+              <tbody
+                className="Text12"
                 style={{
-                  textAlign: 'center',
-                  borderWidth: '0px 1px 0px 1px',
-                }}>
+                  textAlign: "center",
+                  borderWidth: "0px 1px 0px 1px",
+                }}
+              >
                 {eventsForShow?.map((event, index) => {
-                  let errorText = '';
+                  let errorText = "";
                   if (event?.sameDayVideoEditor !== "No") {
-                    if (!event?.sameDayVideoMakers || event?.sameDayVideoMakers.length < 1) {
-                      errorText += 'Same Day Video Makers are not complete \n'
+                    if (
+                      !event?.sameDayVideoMakers ||
+                      event?.sameDayVideoMakers.length < 1
+                    ) {
+                      errorText += "Same Day Video Makers are not complete \n";
                     }
                   }
 
-                  if (event?.sameDayPhotoEditor !== 'No') {
-                    if (!event?.sameDayPhotoMakers || event?.sameDayPhotoMakers.length < 2) {
-                      errorText += 'Same Day Photo Makerasare not complete \n'
-
+                  if (event?.sameDayPhotoEditor !== "No") {
+                    if (
+                      !event?.sameDayPhotoMakers ||
+                      event?.sameDayPhotoMakers.length < 2
+                    ) {
+                      errorText += "Same Day Photo Makerasare not complete \n";
                     }
                   }
 
-                  if (!event?.choosenCinematographers || event?.choosenCinematographers.length !== event.cinematographers) {
-                    errorText += 'Cinematographers are not complete \n'
-
+                  if (
+                    !event?.choosenCinematographers ||
+                    event?.choosenCinematographers.length !==
+                      event.cinematographers
+                  ) {
+                    errorText += "Cinematographers are not complete \n";
                   }
 
-                  if (!event?.droneFlyers || event?.droneFlyers.length !== event.drones) {
-                    errorText += 'Drone Flyers are not complete \n'
-
+                  if (
+                    !event?.droneFlyers ||
+                    event?.droneFlyers.length !== event.drones
+                  ) {
+                    errorText += "Drone Flyers are not complete \n";
                   }
 
                   if (!event?.manager || event?.manager.length !== 1) {
-                    errorText += 'Manager not selected \n'
-
+                    errorText += "Manager not selected \n";
                   }
 
                   if (!event?.assistants || event?.assistants.length !== 1) {
-                    errorText += 'Assistants are not complete \n'
-
+                    errorText += "Assistants are not complete \n";
                   }
 
-                  if (!event?.choosenPhotographers || event?.choosenPhotographers.length !== event.photographers) {
-                    errorText += 'Photographers are not complete \n'
-
+                  if (
+                    !event?.choosenPhotographers ||
+                    event?.choosenPhotographers.length !== event.photographers
+                  ) {
+                    errorText += "Photographers are not complete \n";
                   }
 
-                  if (!event?.shootDirector || event?.shootDirector.length !== 1) {
-                    errorText += 'Shoot Director not selected \n'
-
+                  if (
+                    !event?.shootDirector ||
+                    event?.shootDirector.length !== 1
+                  ) {
+                    errorText += "Shoot Director not selected \n";
                   }
                   return (
                     <>
                       {event && (
                         <>
-                          {currentUser.rollSelect == 'Manager' && (
-                            <tr style={{
-                              background: index % 2 === 0 ? '' : '#F6F6F6',
-                            }}>
+                          {currentUser.rollSelect === "Manager" && (
+                            <tr
+                              style={{
+                                background: index % 2 === 0 ? "" : "#F6F6F6",
+                              }}
+                            >
                               <td className="tableBody Text14Semi primary2">
-                              <div className='d-flex flex-row'>
-                                {errorText.length > 0 && <ButtonWithHoverBox buttonText='error' hoverText={errorText} />}
-                                  <div className={`${errorText.length === 0 && 'ms-4'}`}>
+                                <div className="d-flex flex-row">
+                                  {errorText.length > 0 && (
+                                    <ButtonWithHoverBox
+                                      buttonText="error"
+                                      hoverText={errorText}
+                                    />
+                                  )}
+                                  <div
+                                    className={`${
+                                      errorText.length === 0 && "ms-4"
+                                    }`}
+                                  >
                                     {event?.client?.groomName}
                                     <br />
-                                    <img src={Heart} />
+                                    <img alt="" src={Heart} />
                                     <br />
                                     {event?.client?.brideName}
                                     <br />
-                                    <div className="mt-2" style={{ color: "green" }}>
+                                    <div
+                                      className="mt-2"
+                                      style={{ color: "green" }}
+                                    >
                                       {event?.location}
                                     </div>
                                   </div>
-                              </div>
-                              </td>
-                              <td style={{
-                                width: '90px',
-                                marginLeft: 10,
-                              }} className="tableBody Text14Semi primary2">
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  {dayjs(event?.eventDate).format('DD MMM YYYY')}
                                 </div>
-                                {event?.travelBy == 'Car' || event?.travelBy == 'Bus' ?
-                                  <img src={Car} /> : event?.travelBy == 'By Air' ? <img src={Plane} /> : 'N/A'}
+                              </td>
+                              <td
+                                style={{
+                                  width: "90px",
+                                  marginLeft: 10,
+                                }}
+                                className="tableBody Text14Semi primary2"
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  {dayjs(event?.eventDate).format(
+                                    "DD-MMM-YYYY"
+                                  )}
+                                </div>
+                                {event?.travelBy === "Car" ||
+                                event?.travelBy === "Bus" ? (
+                                  <img alt="" src={Car} />
+                                ) : event?.travelBy === "By Air" ? (
+                                  <img alt="" src={Plane} />
+                                ) : (
+                                  "N/A"
+                                )}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.eventType}</p>
+                                <p
+                                  style={{
+                                    marginBottom: 0,
+                                    fontFamily: "Roboto Regular",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {event?.eventType}
+                                </p>
                               </td>
-                              <td className="tableBody Text14Semi primary2">
-                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.eventStatus || 'Yet to start'}</p>
-                              </td>
+                             
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
                                   teble={true}
@@ -371,20 +515,33 @@ function ListView() {
                                   existedUsers={event?.shootDirector}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].shootDirector = Array.isArray(event?.shootDirector) ? [...event?.shootDirector, userObj] : [userObj];
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[index].shootDirector =
+                                      Array.isArray(event?.shootDirector)
+                                        ? [...event?.shootDirector, userObj]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].shootDirector = event?.shootDirector.filter(director => director !== userObj);
+                                    updatedEvents[index].shootDirector =
+                                      event?.shootDirector.filter(
+                                        (director) => director !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.shootDirector) &&
-                                  event?.shootDirector?.map((director) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{director.firstName} {director.lastName}</p>
-                                  )
-                                }
+                                  event?.shootDirector?.map((director) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {director.firstName} {director.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -394,21 +551,38 @@ function ListView() {
                                   existedUsers={event?.choosenPhotographers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].choosenPhotographers = Array.isArray(event?.choosenPhotographers) ? [...event?.choosenPhotographers, userObj] : [userObj];
-                                    console.log(updatedEvents)
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[index].choosenPhotographers =
+                                      Array.isArray(event?.choosenPhotographers)
+                                        ? [
+                                            ...event?.choosenPhotographers,
+                                            userObj,
+                                          ]
+                                        : [userObj];
+                                    console.log(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].choosenPhotographers = event?.choosenPhotographers.filter(existingUser => existingUser !== userObj);
+                                    updatedEvents[index].choosenPhotographers =
+                                      event?.choosenPhotographers.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.choosenPhotographers) &&
-                                  event?.choosenPhotographers?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.choosenPhotographers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -418,18 +592,47 @@ function ListView() {
                                   existedUsers={event?.choosenCinematographers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].choosenCinematographers = Array.isArray(event?.choosenCinematographers) ? [...event?.choosenCinematographers, userObj] : [userObj];
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[
+                                      index
+                                    ].choosenCinematographers = Array.isArray(
+                                      event?.choosenCinematographers
+                                    )
+                                      ? [
+                                          ...event?.choosenCinematographers,
+                                          userObj,
+                                        ]
+                                      : [userObj];
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].choosenCinematographers = event?.choosenCinematographers.filter(existingUser => existingUser !== userObj);
+                                    updatedEvents[
+                                      index
+                                    ].choosenCinematographers =
+                                      event?.choosenCinematographers.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
-                                {Array.isArray(event?.choosenCinematographers) && event?.choosenCinematographers && event?.choosenCinematographers?.map((user) =>
-                                  <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                )}
+                                {Array.isArray(
+                                  event?.choosenCinematographers
+                                ) &&
+                                  event?.choosenCinematographers &&
+                                  event?.choosenCinematographers?.map(
+                                    (user) => (
+                                      <p
+                                        style={{
+                                          marginBottom: 0,
+                                          fontFamily: "Roboto Regular",
+                                          whiteSpace: "nowrap",
+                                        }}
+                                      >
+                                        {user.firstName} {user.lastName}
+                                      </p>
+                                    )
+                                  )}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -439,20 +642,34 @@ function ListView() {
                                   existedUsers={event?.droneFlyers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].droneFlyers = Array.isArray(event?.droneFlyers) ? [...event?.droneFlyers, userObj] : [userObj];
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[index].droneFlyers =
+                                      Array.isArray(event?.droneFlyers)
+                                        ? [...event?.droneFlyers, userObj]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].droneFlyers = event?.droneFlyers.filter(existingUser => existingUser !== userObj);
+                                    updatedEvents[index].droneFlyers =
+                                      event?.droneFlyers.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.droneFlyers) &&
-                                  event?.droneFlyers?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.droneFlyers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -462,20 +679,34 @@ function ListView() {
                                   existedUsers={event?.manager}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].manager = Array.isArray(event?.manager) ? [...event?.manager, userObj] : [userObj];
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[index].manager =
+                                      Array.isArray(event?.manager)
+                                        ? [...event?.manager, userObj]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].manager = event?.manager.filter(existingUser => existingUser !== userObj);
+                                    updatedEvents[index].manager =
+                                      event?.manager.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.manager) &&
-                                  event?.manager?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.manager?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 <ShootDropDown
@@ -485,24 +716,46 @@ function ListView() {
                                   existedUsers={event?.assistants}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].assistants = Array.isArray(event?.assistants) ? [...event?.assistants, userObj] : [userObj];
-                                    setAllEvents(updatedEvents)
+                                    updatedEvents[index].assistants =
+                                      Array.isArray(event?.assistants)
+                                        ? [...event?.assistants, userObj]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].assistants = event?.assistants.filter(existingUser => existingUser !== userObj);
+                                    updatedEvents[index].assistants =
+                                      event?.assistants.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.assistants) &&
-                                  event?.assistants?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.assistants?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.sameDayPhotoEditor}</p>
-                                {event?.sameDayPhotoEditor == 'Yes' && (
+                                <p
+                                  style={{
+                                    marginBottom: 0,
+                                    fontFamily: "Roboto Regular",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {event?.sameDayPhotoEditor}
+                                </p>
+                                {event?.sameDayPhotoEditor === "Yes" && (
                                   <ShootDropDown
                                     teble={true}
                                     allowedPersons={2}
@@ -510,26 +763,51 @@ function ListView() {
                                     existedUsers={event?.sameDayPhotoMakers}
                                     userChecked={(userObj) => {
                                       const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayPhotoMakers = Array.isArray(event?.sameDayPhotoMakers) ? [...event?.sameDayPhotoMakers, userObj] : [userObj];
-                                      setAllEvents(updatedEvents)
+                                      updatedEvents[index].sameDayPhotoMakers =
+                                        Array.isArray(event?.sameDayPhotoMakers)
+                                          ? [
+                                              ...event?.sameDayPhotoMakers,
+                                              userObj,
+                                            ]
+                                          : [userObj];
+                                      setAllEvents(updatedEvents);
                                     }}
                                     userUnChecked={(userObj) => {
                                       const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayPhotoMakers = event?.sameDayPhotoMakers.filter(existingUser => existingUser !== userObj);
+                                      updatedEvents[index].sameDayPhotoMakers =
+                                        event?.sameDayPhotoMakers.filter(
+                                          (existingUser) =>
+                                            existingUser !== userObj
+                                        );
                                       setAllEvents(updatedEvents);
                                     }}
                                   />
                                 )}
 
                                 {Array.isArray(event?.sameDayPhotoMakers) &&
-                                  event?.sameDayPhotoMakers?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.sameDayPhotoMakers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{event?.sameDayVideoEditor}</p>
-                                {event?.sameDayVideoEditor == 'Yes' && (
+                                <p
+                                  style={{
+                                    marginBottom: 0,
+                                    fontFamily: "Roboto Regular",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {event?.sameDayVideoEditor}
+                                </p>
+                                {event?.sameDayVideoEditor === "Yes" && (
                                   <ShootDropDown
                                     teble={true}
                                     allowedPersons={1}
@@ -537,29 +815,52 @@ function ListView() {
                                     existedUsers={event?.sameDayVideoMakers}
                                     userChecked={(userObj) => {
                                       const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayVideoMakers = Array.isArray(event?.sameDayVideoMakers) ? [...event?.sameDayVideoMakers, userObj] : [userObj];
-                                      setAllEvents(updatedEvents)
+                                      updatedEvents[index].sameDayVideoMakers =
+                                        Array.isArray(event?.sameDayVideoMakers)
+                                          ? [
+                                              ...event?.sameDayVideoMakers,
+                                              userObj,
+                                            ]
+                                          : [userObj];
+                                      setAllEvents(updatedEvents);
                                     }}
                                     userUnChecked={(userObj) => {
                                       const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayVideoMakers = event?.sameDayVideoMakers.filter(existingUser => existingUser !== userObj);
+                                      updatedEvents[index].sameDayVideoMakers =
+                                        event?.sameDayVideoMakers.filter(
+                                          (existingUser) =>
+                                            existingUser !== userObj
+                                        );
                                       setAllEvents(updatedEvents);
                                     }}
                                   />
                                 )}
 
                                 {Array.isArray(event?.sameDayVideoMakers) &&
-                                  event?.sameDayVideoMakers?.map((user) =>
-                                    <p style={{ marginBottom: 0, fontFamily: 'Roboto Regular', whiteSpace: 'nowrap' }}>{user.firstName} {user.lastName}</p>
-                                  )
-                                }
+                                  event?.sameDayVideoMakers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  ))}
                               </td>
                               <td>
                                 <button
-                                  style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
-                                  onClick={() => onSubmitHandler(event, index)}>
-                                  {updatingIndex == index ? (
-                                    <div className='w-100'>
+                                  style={{
+                                    backgroundColor: "#FFDADA",
+                                    borderRadius: "5px",
+                                    border: "none",
+                                    height: "30px",
+                                  }}
+                                  onClick={() => onSubmitHandler(event, index)}
+                                >
+                                  {updatingIndex === index ? (
+                                    <div className="w-100">
                                       <div class="smallSpinner mx-auto"></div>
                                     </div>
                                   ) : (
@@ -569,22 +870,35 @@ function ListView() {
                               </td>
                             </tr>
                           )}
-                          {currentUser.rollSelect == 'Shooter' && (
-                            <tr style={{
-                              background: index % 2 === 0 ? '' : '#F6F6F6',
-                            }}>
-                              <td style={{
-                                width: '120px',
-                                marginLeft: 10,
-                              }} className="tableBody Text14Semi primary2">
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  {dayjs(event?.eventDate).format('DD MMM YYYY')}
+                          {currentUser.rollSelect === "Shooter" && (
+                            <tr
+                              style={{
+                                background: index % 2 === 0 ? "" : "#F6F6F6",
+                              }}
+                            >
+                              <td
+                                style={{
+                                  width: "120px",
+                                  marginLeft: 10,
+                                }}
+                                className="tableBody Text14Semi primary2"
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  {dayjs(event?.eventDate).format(
+                                    "DD-MMM-YYYY"
+                                  )}
                                 </div>
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.client?.groomName}
                                 <br />
-                                <img src={Heart} />
+                                <img alt="" src={Heart} />
                                 <br />
                                 {event?.client?.brideName}
                                 <br />
@@ -594,51 +908,41 @@ function ListView() {
                               </td>
                               <td
                                 style={{
-                                  paddingTop: '15px',
-                                  paddingBottom: '15px',
+                                  paddingTop: "15px",
+                                  paddingBottom: "15px",
                                 }}
-                                className="tableBody Text14Semi primary2"   >
+                                className="tableBody Text14Semi primary2"
+                              >
                                 {event?.eventStatus}
-                                {/* <Select value={event?.eventStatus ? { value: event?.eventStatus, label: event?.eventStatus } : null} name='eventStatus' onChange={(selected) => {
-                                  const updatedEvents = [...eventsForShow];
-                                  updatedEvents[index].eventStatus = selected.value;
-                                  setEventsForShow(updatedEvents)
-                                }} styles={customStyles2} options={[
-                                  { value: 'Yet to Start', label: 'Yet to Start' },
-                                  { value: 'In Progress', label: 'In Progress' },
-                                  { value: 'Completed', label: 'Completed' }]} required /> */}
+                               
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                {event?.travelBy == 'Car' || event?.travelBy == 'Bus' ?
-                                  <img src={Car} /> : event?.travelBy == 'By Air' ? <img src={Plane} /> : 'N/A'}
-                                <div className="mt-2" style={{ color: "green" }}>
+                                {event?.travelBy === "Car" ||
+                                event?.travelBy === "Bus" ? (
+                                  <img alt="" src={Car} />
+                                ) : event?.travelBy === "By Air" ? (
+                                  <img alt="" src={Plane} />
+                                ) : (
+                                  "N/A"
+                                )}
+                                <div
+                                  className="mt-2"
+                                  style={{ color: "green" }}
+                                >
                                   {event?.location}
                                 </div>
                               </td>
-                              {/* <td>
-                                <button
-                                  style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
-                                  onClick={() => onStatusUpdate(event, index)}>
-                                  {updatingIndex == index ? (
-                                    <div className='w-100'>
-                                      <div class="smallSpinner mx-auto"></div>
-                                    </div>
-                                  ) : (
-                                    "Save"
-                                  )}
-                                </button>
-                              </td> */}
+                              
                             </tr>
                           )}
                         </>
                       )}
                     </>
-                  )
-                }
-                )}
+                  );
+                })}
               </tbody>
             </Table>
             <Overlay
@@ -662,20 +966,22 @@ function ListView() {
           </div>
         </>
       ) : (
-        <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+        <div
+          style={{ height: "400px" }}
+          className="d-flex justify-content-center align-items-center"
+        >
           <div class="spinner"></div>
         </div>
       )}
-
     </>
   );
 }
-const ButtonWithHoverBox = ({ buttonText, hoverText }) => {
+const ButtonWithHoverBox = ({ hoverText }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = (e) => {
-    console.log('entered');
-    const buttonRect = e.target.getBoundingClientRect();
+    console.log("entered");
+    
 
     setIsHovered(true);
   };
@@ -685,28 +991,27 @@ const ButtonWithHoverBox = ({ buttonText, hoverText }) => {
   };
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <IoIosWarning className='fs-3 text-danger' onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave} />
-      {/* <button
-
-      >
-        {buttonText}
-      </button> */}
+    <div style={{ position: "relative", display: "inline-block" }}>
+      <IoIosWarning
+        className="fs-3 text-danger"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      />
+      
       {isHovered && (
         <div
           style={{
-            position: 'absolute',
-            display: 'block',
-            width: '300px',
+            position: "absolute",
+            display: "block",
+            width: "300px",
             top: 30,
             left: 20,
             zIndex: 9999, // Ensure it's above other elements
-            background: 'silver',
-            borderRadius: '10px',
-            color: 'red',
-            padding: '10px',
-            boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+            background: "silver",
+            borderRadius: "10px",
+            color: "red",
+            padding: "10px",
+            boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
           }}
         >
           {hoverText}
@@ -715,7 +1020,5 @@ const ButtonWithHoverBox = ({ buttonText, hoverText }) => {
     </div>
   );
 };
-
-
 
 export default ListView;

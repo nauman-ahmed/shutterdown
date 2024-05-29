@@ -3,7 +3,7 @@ import CommonDropText from '../../components/CommonDropText';
 
 import { FormGroup, Input, Label, Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -12,16 +12,12 @@ import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { GetsignUPData } from '../../API/userApi';
 import { GetSignInWithGoogleData } from '../../API/userApi';
-import { checkExistEmail } from '../../API/userApi';
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
 
 const Signup = (props) => {
   const navigate = useNavigate();
-  const location = useLocation()
   const [successToast, setSuccessToast] = useState(false)
-  const [StatusCode, setStatusCode] = useState()
   const [phone, setPhone] = useState();
   const [error, setError] = useState(false);
   const [isMatch, setIsMatch] = useState(false);
@@ -57,14 +53,11 @@ const Signup = (props) => {
   ];
 
   useEffect(() => {
-    const response = JSON.parse(localStorage.getItem('res'))
+   
 
     const signInWithGoogle = JSON.parse(
       localStorage.getItem('signInWithGoogle')
     );
-    // if (response?.status===200) {
-    //   navigate("/MyProfile")
-    // }
     setSignInData(signInWithGoogle)
 
 
@@ -75,8 +68,7 @@ const Signup = (props) => {
     email: signInData?.data?.email,
 
   }
-  let registerData = { ...inputData, rollSelect }
-
+ 
   const handleOnChangeFunction = (e) => {
     const { name, value } = e.target;
     setInputData({ ...inputData, [name]: value });

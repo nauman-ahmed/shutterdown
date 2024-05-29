@@ -1,8 +1,5 @@
 import React from "react";
-import SideBar from "../../components/Sidebar";
-import Header from "../../components/Header";
 import CalenderBar from "../../components/CalenderBar";
-import ClientHeader from "../../components/ClientHeader";
 import { Outlet } from "react-router-dom";
 import "../../assets/css/Calender.css";
 
@@ -13,7 +10,7 @@ function Deliverables(props) {
         <div className="CalenderViewWidth">
           <Outlet />
         </div>
-        <CalenderBar Attendence />
+        <CalenderBar />
       </div>
     </>
   );

@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ClientSchema = mongoose.Schema({
   brideName: {
     type: String,
-    required: true
+    required: true,
   },
   groomName: {
     type: String,
@@ -11,12 +11,15 @@ const ClientSchema = mongoose.Schema({
   phoneNumber: {
     type: String,
   },
-  deliverables: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Deliverable'
-  }],
+  deliverables: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Deliverable",
+    },
+  ],
+  albums: [{ type: String }],
   hardDrives: {
-    type: Number
+    type: Number,
   },
   email: {
     type: String,
@@ -31,35 +34,47 @@ const ClientSchema = mongoose.Schema({
     type: String,
   },
   preWedding: {
-    type: Boolean
+    type: Boolean,
   },
   preWedPhotographers: {
+    type: Number,
+  },
+  promos: {
+    type: String,
+    enum : ["Yes", "No"]
+  },
+  longFilms: {
+    type: Number
+  },
+  reels: {
     type: Number
   },
   preWedCinematographers: {
-    type: Number
+    type: Number,
   },
   preWedAssistants: {
-    type: Number
+    type: Number,
   },
   preWedDroneFlyers: {
-    type: Number
+    type: Number,
   },
   preWeddingDetails: {
     type: Object,
   },
   checklistDetails: {
-    type: Object
+    type: Object,
   },
-  events: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Event'
-  }],
+  events: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
   userID: {
     type: mongoose.Types.ObjectId,
-    ref: 'user'
+    ref: "user",
   },
 });
 
-const ClientModel = mongoose.model('Client', ClientSchema);
+const ClientModel = mongoose.model("Client", ClientSchema);
 module.exports = ClientModel;

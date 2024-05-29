@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "../../assets/css/Profile.css";
 import { checkInUser, checkOutUser, getUserAttendence } from "../../API/AttendenceApi"
-import { format } from 'date-fns';
 import axios from 'axios';
 import {
   Modal,
-  ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
@@ -14,6 +12,7 @@ import {
   Col,
   Table,
 } from 'reactstrap';
+import dayjs from "dayjs";
 
 function Logs(props) {
   const [attendaces, setAttendaces] = useState(null);
@@ -143,19 +142,19 @@ function Logs(props) {
                     style={{ paddingTop: '15px', paddingBottom: '15px' }}
                     className="tableBody"
                   >
-                    {attendace.currentDate}
+                    {dayjs(attendace.currentDate).format("DD-MMM-YYYY")}
                   </td>
                   <td
                     className="tableBody"
                     style={{ paddingTop: '15px', paddingBottom: '15px' }}
                   >
-                    {attendace.checkInTime == "Not Marked" ? attendace.checkInTime : new Date(attendace.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    {attendace.checkInTime === "Not Marked" ? attendace.checkInTime : new Date(attendace.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </td>
                   <td
                     className="tableBody"
                     style={{ paddingTop: '15px', paddingBottom: '15px' }}
                   >
-                    {attendace.checkOutTime == "Not Marked" ? attendace.checkOutTime : new Date(attendace.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    {attendace.checkOutTime === "Not Marked" ? attendace.checkOutTime : new Date(attendace.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </td>
                   <td
                     className="tableBody"

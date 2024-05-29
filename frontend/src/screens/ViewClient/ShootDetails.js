@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table } from "reactstrap";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
-import Photo from "../../assets/Profile/Photo.png";
-import Photo2 from "../../assets/Profile/Photo2.png";
 import dayjs from "dayjs";
-import axios from 'axios';
-import { getClientAllShootDetails, getClientById } from "../../API/Client"
-import { getAllUsers } from "../../API/userApi"
+import {  getClientById } from "../../API/Client"
 import BASE_URL from "../../API";
 
 function ShootDetails(props) {
@@ -20,6 +16,7 @@ function ShootDetails(props) {
 
   useEffect(() => {
     getIdData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getIdData = async () => {
@@ -45,7 +42,7 @@ function ShootDetails(props) {
               <div className="w-25">
                 {clientData?.userID?.photo ? (
 
-                  <img className="imgRadius w-100 h-100"
+                  <img alt="" className="imgRadius w-100 h-100"
                     src={BASE_URL + '/' + clientData?.userID?.photo}
                   />
                 ) : (
@@ -71,7 +68,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                     />
                     : <div className="ProfileBox Text38Semi p-2">
@@ -97,7 +94,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
 
                     />
@@ -125,7 +122,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                     />
                     : <div className="ProfileBox Text38Semi p-2">
@@ -152,7 +149,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                     />
                     : <div className="ProfileBox Text38Semi p-2">
@@ -179,7 +176,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                       
                     />
@@ -206,7 +203,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                      
                     />
@@ -233,7 +230,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                     />
                     : <div className="ProfileBox Text38Semi p-2">
@@ -259,7 +256,7 @@ function ShootDetails(props) {
               <div className="shootCardBox mt-5">
               <div className="w-25">
                   {user?.photo ?
-                    <img className="imgRadius w-100 h-100"
+                    <img alt="" className="imgRadius w-100 h-100"
                       src={BASE_URL + '/' + user.photo}
                     />
                     : <div className="ProfileBox Text38Semi p-2">
@@ -316,12 +313,12 @@ function ShootDetails(props) {
                   <td className="Text14Semi primary2">
                     {clientData.brideName}
                     <br />
-                    <img src={Heart} />
+                    <img alt="" src={Heart} />
                     <br />
                     {clientData.groomName}
                   </td>
                   <td>{event.eventType}</td>
-                  <td>{dayjs(event.eventDate).format('YYYY-MM-DD')}</td>
+                  <td>{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
                   <td>{event.location}</td>
                   <td>{clientData.userID && clientData.userID?.firstName + " " + clientData.userID?.lastName}</td>
                   <td>

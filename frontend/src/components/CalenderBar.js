@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import "../assets/css/common.css";
 import "../assets/css/Profile.css";
@@ -20,25 +20,25 @@ function CalenderBar(props) {
   const getEventsData = async () => {
     try {
       const res = await getEvents();
-      if (currentUser.rollSelect == 'Manager') {
+      if (currentUser.rollSelect === 'Manager') {
         dispatch(updateAllEvents(res?.data));
-      } else if (currentUser.rollSelect == 'Shooter' || currentUser.rollSelect == 'Editor') {
+      } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
         const eventsToShow = res.data?.map(event => {
-          if (event?.shootDirector.some(director => director._id == currentUser._id)) {
+          if (event?.shootDirector.some(director => director._id === currentUser._id)) {
             return { ...event, userRole: 'Shoot Director' };
-          } else if (event?.choosenPhotographers.some(photographer => photographer._id == currentUser._id)) {
+          } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
             return { ...event, userRole: 'Photographer' };
-          } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id == currentUser._id)) {
+          } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
             return { ...event, userRole: 'Cinematographer' };
-          } else if (event?.droneFlyers.some(flyer => flyer._id == currentUser._id)) {
+          } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
             return { ...event, userRole: 'Drone Flyer' };
-          } else if (event?.manager.some(manager => manager._id == currentUser._id)) {
+          } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
             return { ...event, userRole: 'Manager' };
-          } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id == currentUser._id)) {
+          } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
             return { ...event, userRole: 'Same Day Photos Maker' };
-          } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id == currentUser._id)) {
+          } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
             return { ...event, userRole: 'Same Day Video Maker' };
-          } else if (event?.assistants.some(assistant => assistant._id == currentUser._id)) {
+          } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
             return { ...event, userRole: 'Assistant' };
           } else {
             return null;
@@ -53,6 +53,7 @@ function CalenderBar(props) {
 
   useEffect(() => {
     getEventsData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function getCurrentMonthAndYear() {
@@ -91,9 +92,9 @@ function CalenderBar(props) {
                     }
                   }
                 }
-                if (count == 1) {
+                if (count === 1) {
                   return "highlight5"
-                } else if (count == 2) {
+                } else if (count === 2) {
                   return "highlight3"
                 }
                 else if (count >= 3) {
@@ -112,7 +113,7 @@ function CalenderBar(props) {
                   >
                     Summary
                   </Button>
-                  <img src={Chat} style={{ marginRight: '15px' }} />
+                  <img alt="" src={Chat} style={{ marginRight: '15px' }} />
                 </div>
                 <Table
                   // bordered
@@ -138,7 +139,7 @@ function CalenderBar(props) {
                               className="primary2"
                               style={{ paddingTop: '15px', paddingBottom: '15px' }}
                             >
-                              {dayjs(event?.eventDate).format('DD-MM-YYYY')}
+                              {dayjs(event?.eventDate).format('DD-MMM-YYYY')}
                             </td>
                             <td
                               className="primary2"
@@ -146,7 +147,7 @@ function CalenderBar(props) {
                             >
                               {event?.client?.brideName}
                               <br />
-                              <img src={Heart} />
+                              <img alt="" src={Heart} />
                               {event?.client?.groomName}
                             </td>
                             <td

@@ -23,7 +23,7 @@ function Profile() {
   const handleUpdateUserData = async (e) => {
     try {
       console.log(userData.firstName.length);
-      if (userData.firstName.length == 0 || userData.lastName.length == 0 || userData.email.length == 0 || userData?.phoneNo.length == 0) {
+      if (userData.firstName.length === 0 || userData.lastName.length === 0 || userData.email.length === 0 || userData?.phoneNo.length === 0) {
         toast.error('First Name, Last Name, Email and phone is required!');
       } else {
         setUpdating(true);
@@ -99,7 +99,7 @@ function Profile() {
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">DOB</div>
-                          <div className="Text10N black mt12">{dayjs(userData?.DOB).format('DD/MM/YYYY')}</div>
+                          <div className="Text10N black mt12">{dayjs(userData?.DOB).format('DD-MMM-YYYY')}</div>
                         </Col>
                         <Col xs="6" sm="4">
                           <div className="Text10N gray mt12">Blood Group</div>
@@ -223,7 +223,7 @@ function Profile() {
               </Col>
               <Col xl="4" sm="6" className="p-2">
                 <div className="label">DOB</div>
-                <input type="date" name="DOB" placeholder="Date_Of_Birth" value={dayjs(userData?.DOB).format('YYYY-MM-DD')} className="PrimaryModel" onChange={handleChange} />
+                <input type="date" name="DOB" placeholder="Date_Of_Birth" value={dayjs(userData?.DOB).format('DD-MMM-YYYY')} className="PrimaryModel" onChange={handleChange} />
               </Col>
               <Col xl="4" sm="6" className="p-2">
                 <div className="label">Blood Group</div>

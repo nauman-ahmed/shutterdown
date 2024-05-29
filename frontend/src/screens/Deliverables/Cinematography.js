@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Form, Table } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { Table } from 'reactstrap';
 import '../../assets/css/Profile.css';
 import Heart from '../../assets/Profile/Heart.svg';
 import '../../assets/css/tableRoundHeader.css';
 import 'react-toastify/dist/ReactToastify.css';
 import dayjs from 'dayjs';
-import { addCinematography, getClients } from '../../API/Client';
 import { getEditors } from '../../API/userApi';
 import Select from 'react-select';
-import CalenderImg from '../../assets/Profile/Calender.svg';
-import Calendar from 'react-calendar';
-import { Overlay } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
 import { getCinematography, updateDeliverable } from '../../API/Deliverables';
@@ -20,23 +16,8 @@ function Cinematography(props) {
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [filterBy, setFilterBy] = useState(null)
-  const toggle = () => {
-    setShow(!show);
-  };
   const currentUser = JSON.parse(Cookies.get('currentUser'));
-  // const [filteringDay, setFilteringDay] = useState(null);
-  // const filterByDay = (date) => {
-  //   setFilteringDay(date)
-  //   setShow(!show);
-  //   // setDeliverablesForShow(allDeliverables.filter(deliverable => {
-  //   //   return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
-  //   // }))
-  // }
-  // const filterByMonth = (date) => {
-  //   setClientsForShow(allClients.filter(clientData => {
-  //     return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
-  //   }))
-  // }
+  
   const filterOptions = currentUser.rollSelect === 'Manager' ? [
     {
       title: 'Deliverable',
@@ -176,19 +157,16 @@ function Cinematography(props) {
   },
 ]
 
-
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
   const fetchData = async () => {
     try {
       const data = await getCinematography();
       const res = await getEditors();
-      if (currentUser.rollSelect == 'Manager') {
+      if (currentUser.rollSelect === 'Manager') {
         setAllDeliverables(data);
         setDeliverablesForShow(data);
-      } else if (currentUser.rollSelect == 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id == currentUser._id);
+      } else if (currentUser.rollSelect === 'Editor') {
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -199,6 +177,7 @@ function Cinematography(props) {
   }
   useEffect(() => {
     fetchData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
@@ -214,9 +193,9 @@ function Cinematography(props) {
       console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
-        sortedArray = [...allDeliverables]; // Create a new array
+        sortedArray = [...deliverablesForShow]; // Create a new array
       } else {
-        sortedArray = [...allDeliverables].sort((a, b) => {
+        sortedArray = [...deliverablesForShow].sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);
           return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
@@ -227,9 +206,9 @@ function Cinematography(props) {
       console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
-        sortedArray = [...allDeliverables]; // Create a new array
+        sortedArray = [...deliverablesForShow]; // Create a new array
       } else {
-        sortedArray = [...allDeliverables].sort((a, b) => {
+        sortedArray = [...deliverablesForShow].sort((a, b) => {
           const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
           const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
           return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
@@ -263,7 +242,10 @@ function Cinematography(props) {
       } else if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
-        setDeliverablesForShow(allDeliverables)
+        console.log(filterType);
+        if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
+          setDeliverablesForShow(allDeliverables)
+        }
       }
     }
     setFilterBy(filterType);
@@ -290,26 +272,26 @@ function Cinematography(props) {
               bordered
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '175%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect === 'Manager' ? { width: '190%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                {currentUser?.rollSelect == 'Editor' ?
+                {currentUser?.rollSelect === 'Editor' ?
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
                     <th className="tableBody">Editor</th>
-                    <th className="tableBody">Company Deadline</th>
+                    <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
                   </tr>
                   :
-                  currentUser?.rollSelect == 'Manager' ?
+                  currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody">Client:</th>
                       <th className="tableBody">Deliverable</th>
                       <th className="tableBody">Editor</th>
                       <th className="tableBody">Wedding Date</th>
                       <th className="tableBody">Client Deadline</th>
-                      <th className="tableBody">Company Deadline</th>
+                      <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
                       <th className="tableBody">Final Delivery Date</th>
                       <th className="tableBody">Status</th>
@@ -333,8 +315,8 @@ function Cinematography(props) {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
-                      {index == 0 && <div style={{ marginTop: '15px' }} />}
-                      {currentUser?.rollSelect == 'Manager' && (
+                      {index === 0 && <div style={{ marginTop: '15px' }} />}
+                      {currentUser?.rollSelect === 'Manager' && (
                         <tr
                           style={{
                             background: '#EFF0F5',
@@ -357,7 +339,7 @@ function Cinematography(props) {
                                 marginBottom: '5px',
                               }}
                             >
-                              <img src={Heart} />
+                              <img alt='' src={Heart} />
                               <br />
                               {deliverable?.client?.groomName}
                             </div>
@@ -395,7 +377,7 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                               width: "10%"
                             }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -405,7 +387,7 @@ function Cinematography(props) {
                               width: "10%"
                             }}
                           >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                            {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -525,7 +507,7 @@ function Cinematography(props) {
                             }} >
                             <button className="btn btn-primary "
                               onClick={(e) => updatingIndex === null && handleSaveData(index)} >
-                              {updatingIndex == index ? (
+                              {updatingIndex === index ? (
                                 <div className='w-100'>
                                   <div class="smallSpinner mx-auto"></div>
                                 </div>
@@ -536,7 +518,7 @@ function Cinematography(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect == 'Editor' && (
+                      {currentUser?.rollSelect === 'Editor' && (
                         <tr
                           style={{
                             background: '#EFF0F5',
@@ -558,7 +540,7 @@ function Cinematography(props) {
                                 marginBottom: '5px',
                               }}
                             >
-                              <img src={Heart} />
+                              <img alt='' src={Heart} />
                               <br />
                               {deliverable?.client?.groomName}
                             </div>
@@ -587,7 +569,7 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(deliverable?.companyDeadline).format('DD-MM-YYYY')}
+                            {dayjs(deliverable?.companyDeadline).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             style={{
@@ -608,25 +590,6 @@ function Cinematography(props) {
                 )}
               </tbody>
             </Table>
-            {/* <Overlay
-              rootClose={true}
-              onHide={() => setShow(false)}
-              target={target.current}
-              show={show}
-              placement="bottom"
-            >
-              <div>
-                <Calendar
-                  value={filteringDay}
-                  minDate={new Date(Date.now())}
-                  CalenderPress={toggle}
-                  onClickDay={(date) => {
-                    filterByDay(date);
-                  }}
-                />
-              </div>
-
-            </Overlay> */}
           </div>
         </>
       ) : (

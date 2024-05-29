@@ -1,16 +1,14 @@
 import React, { useRef, useState } from 'react';
 import '../assets/css/clients.css';
-import ActiveCalender from '../assets/Profile/ActiveCalender.svg';
-import ListView from '../assets/Profile/ListView.svg';
-import UnactiveCalender from '../assets/Profile/UnactiveCalender.svg';
-import ActiveListView from '../assets/Profile/ActiveListView.svg';
+import UnactiveCalender from '../assets/Profile/ActiveCalender.svg';
+import UnactiveListView from '../assets/Profile/ListView.svg';
+import ActiveCalender from '../assets/Profile/UnactiveCalender.svg';
+import ListView from '../assets/Profile/ActiveListView.svg';
 import ActiveFilter from '../assets/Profile/ActiveFilter.svg';
 import Filter from '../assets/Profile/Filter.svg';
 import UnactiveFilter from '../assets/Profile/UnactiveFilter.svg';
 import { useNavigate } from 'react-router-dom';
 import { Overlay, Tooltip } from 'react-bootstrap';
-import axios from 'axios';
-import Toast from 'reactstrap';
 import {
   Modal,
   ModalHeader,
@@ -32,7 +30,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 
 function ClientHeader(props) {
-  const [list, setList] = useState(true);
+  const [list, setList] = useState(window.location.pathname === "/MyProfile/Calender/View" ? false : true);
   const navigate = useNavigate();
   const target = useRef(null);
   const [taskData, setTaskData] = useState({});
@@ -41,7 +39,7 @@ function ClientHeader(props) {
   const [parentFilter, setParentFilter] = useState(null)
   const [childFilter, setChildFilter] = useState(null)
   const [show, setShow] = useState(false);
-  const [filterType, setFilterType] = useState(1);
+  // const [filterType, setFilterType] = useState(1);
 
   // This is Model section function and state Start...
   const currentUser = JSON.parse(Cookies.get('currentUser'))
@@ -80,6 +78,7 @@ function ClientHeader(props) {
     if (route[1].startsWith('/Tasks/DailyTasks') && currentUser.rollSelect === 'Manager') {
       fetchClientsData()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const handleChildFilter = (value) => {
     props.applyFilter(value)
@@ -105,6 +104,7 @@ function ClientHeader(props) {
   };
   const options = props.options;
   const currentFilter = props.currentFilter
+  console.log(list);
   return (
     <>
       <div className="R_A_Justify mb15">
@@ -117,12 +117,12 @@ function ClientHeader(props) {
               onClick={() => {
                 setShow(!show);
               }} >
-              <img src={Filter} />
+              <img alt='' src={Filter} />
             </div>
           )}
           {(currentUser.rollSelect === 'Manager' && route[1].startsWith('/Tasks/DailyTasks')) ? (
             <>
-              <div className="btn btn-primary me-1" onClick={toggle}>
+              <div style={{backgroundColor : '#666DFF'}} className="btn btn-primary me-1" onClick={toggle}>
                 Add Task
               </div>
             </>
@@ -133,20 +133,20 @@ function ClientHeader(props) {
               <div
                 className="calenderBox point"
                 onClick={() => {
-                  setList(true);
+                  setList(false);
                   navigate('/MyProfile/Calender/View');
                 }}
               >
-                <img src={!list ? ActiveCalender : UnactiveCalender} />
+                <img alt='' src={list ? UnactiveCalender : ActiveCalender} />
               </div>
               <div
                 className="calenderBox1 point"
                 onClick={() => {
-                  setList(false);
+                  setList(true);
                   navigate('/MyProfile/Calender/ListView');
                 }}
               >
-                <img src={list ? ActiveListView : ListView} />
+                <img alt='' src={list ? UnactiveListView : ListView} />
               </div>
             </>
           )}
@@ -167,9 +167,10 @@ function ClientHeader(props) {
               style={{ width: '200px', paddingTop: '10px' }}
             >
               {options.map((optionObj, i) => {
-                const selected = optionObj.id == parentFilter ? true : false;
+                const selected = optionObj.id === parentFilter ? true : false;
                 return (
                   <>
+                  {optionObj.title !== "clientsFromListView" && (
                     <div
                       className={`rowalign ${(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') ? " " : " d-flex flex-row justify-content-between"} `}
                       onClick={() => {
@@ -191,7 +192,7 @@ function ClientHeader(props) {
                       }}
                     >
                       {(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') && (
-                        <img src={selected ? ActiveFilter : UnactiveFilter} />
+                        <img alt='' src={selected ? ActiveFilter : UnactiveFilter} />
                       )}
                       <div
                         className="Text16N "
@@ -206,28 +207,37 @@ function ClientHeader(props) {
                         selected ? <IoIosArrowUp className='text-black' /> : <IoIosArrowDown className='text-black' />
                       )}
                     </div>
-                    {selected && (
+                  )}
+                    
+                    {(selected || optionObj.title === "clientsFromListView") && (
                       <>
                         {optionObj?.filters?.map((option, i) => {
-                          const childSelected = (option.id == childFilter && selected) ? true : false;
+                          const childSelected = (option.id === childFilter && (selected || optionObj.title === 'clientsFromListView')) ? true : false;
                           return (
                             <div
                               className="rowalign d-flex align-item-center"
                               onClick={() => {
+                                if(optionObj.title === 'clientsFromListView' || optionObj.title === 'Assign By' || optionObj.title === 'Assign To'){
+                                  handleChildFilter(option)
+                                } else {
                                 handleChildFilter(option.title)
+                                }
                                 setChildFilter(option.id);
                                 setShow(false)
                               }}
                               style={{
                                 width: '200px',
-                                height: '35px',
+                                height: optionObj.title === 'clientsFromListView' ? '45px' : '35px',
                                 padding: '8px',
                                 cursor: 'pointer',
                                 background: childSelected ? '#666DFF' : '',
                                 paddingLeft: '15px',
+                                lineHeight : '15px'
                               }}
                             >
-                              <img src={childSelected ? ActiveFilter : UnactiveFilter} />
+                              <img style={{
+                                height : '23px'
+                              }} alt='' src={childSelected ? ActiveFilter : UnactiveFilter} />
                               <div
                                 className="Text16N"
                                 style={{
@@ -271,10 +281,10 @@ function ClientHeader(props) {
             <Row className="p-3">
               <Col xl="4" sm="6" lg="4" className="p-2">
                 <div className="label">Client</div>
-                <Select value={taskData?.client ? { value: taskData?.client, label: <div className='d-flex justify-content-around'><span>{taskData?.client.brideName}</span>  <img src={Heart} /> <span>{taskData?.client.groomName}</span></div> } : null} onChange={(selected) => {
+                <Select value={taskData?.client ? { value: taskData?.client, label: <div className='d-flex justify-content-around'><span>{taskData?.client.brideName}</span>  <img alt='' src={Heart} /> <span>{taskData?.client.groomName}</span></div> } : null} onChange={(selected) => {
                   setTaskData({ ...taskData, client: selected.value })
                 }} styles={customStyles} options={allClients?.map(client => {
-                  return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img src={Heart} /> <span>{client.groomName}</span></div> }
+                  return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
                 })} required />
               </Col>
               <Col xl="4" sm="6" lg="4" className="p-2">

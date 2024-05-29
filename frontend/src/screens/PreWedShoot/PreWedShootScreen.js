@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, } from "react";
+import React, { useState, useEffect, useRef, } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
@@ -67,24 +67,24 @@ function PreWedShootScreen() {
       const allPreWedClients = await getPreWedClients();
       const res = await getShooters();
       setShooters(res.shooters)
-      if (currentUser.rollSelect == 'Manager') {
+      if (currentUser.rollSelect === 'Manager') {
         setPreWedClients(allPreWedClients);
         setClientsForShow(allPreWedClients);
-      } else if (currentUser.rollSelect == 'Shooter') {
+      } else if (currentUser.rollSelect === 'Shooter') {
         const clientsToShow = allPreWedClients.filter(client => {
-          return client.preWeddingDetails?.photographers?.some(photographer => photographer._id == currentUser._id) || client.preWeddingDetails?.cinematographers?.some(cinematographer => cinematographer._id == currentUser._id) || client.preWeddingDetails?.assistants?.some(assistant => assistant._id == currentUser._id) || client.preWeddingDetails?.droneFlyers?.some(flyer => flyer._id == currentUser._id)
+          return client.preWeddingDetails?.photographers?.some(photographer => photographer._id === currentUser._id) || client.preWeddingDetails?.cinematographers?.some(cinematographer => cinematographer._id === currentUser._id) || client.preWeddingDetails?.assistants?.some(assistant => assistant._id === currentUser._id) || client.preWeddingDetails?.droneFlyers?.some(flyer => flyer._id === currentUser._id)
         });
         for (let client_index = 0; client_index < clientsToShow.length; client_index++) {
-          if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(photographer => photographer._id == currentUser._id)) {
+          if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(photographer => photographer._id === currentUser._id)) {
             clientsToShow[client_index].userRole = "Photographer"
             break
-          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(cinematographer => cinematographer._id == currentUser._id)) {
+          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(cinematographer => cinematographer._id === currentUser._id)) {
             clientsToShow[client_index].userRole = "Cinematographer"
             break
-          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(flyer => flyer._id == currentUser._id)) {
+          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(flyer => flyer._id === currentUser._id)) {
             clientsToShow[client_index].userRole = "Drone Flyer"
             break
-          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(assistant => assistant == currentUser._id)) {
+          } else if (clientsToShow[client_index]?.preWeddingDetails.photographers?.some(assistant => assistant === currentUser._id)) {
             clientsToShow[client_index].userRole = "Assistant"
             break
           } else {
@@ -101,7 +101,6 @@ function PreWedShootScreen() {
   }
 
   const applyFilter = (filterTitle) => {
-    console.log('run');
     console.log(preWedClients);
     if (filterTitle === 'Date Assigned') {
       setClientsForShow(preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate))
@@ -119,6 +118,7 @@ function PreWedShootScreen() {
   // }, [preWedClients])
   useEffect(() => {
     getClients();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const customStyles = {
@@ -174,7 +174,7 @@ function PreWedShootScreen() {
                     style={{ cursor: 'pointer' }}
                   >
                     {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img src={CalenderImg} />
+                    <img alt="" src={CalenderImg} />
                   </div>
                   :
                   <input type='month' onChange={(e) => {
@@ -207,11 +207,11 @@ function PreWedShootScreen() {
               style={{ width: '150%', marginTop: '15px' }}
             >
               <thead>
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple</th>
                     <th className="tableBody">Wedding Date</th>
-                    <th className="tableBody">POC</th>
+                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Photographers</th>
                     <th className="tableBody">Cinematographers</th>
                     <th className="tableBody">Assistants</th>
@@ -221,10 +221,10 @@ function PreWedShootScreen() {
                     <th className="tableBody">Save</th>
                   </tr>
                 )}
-                {currentUser.rollSelect == 'Shooter' && (
+                {currentUser.rollSelect === 'Shooter' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple</th>
-                    <th className="tableBody">POC</th>
+                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Shoot Date</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Status</th>
@@ -239,7 +239,7 @@ function PreWedShootScreen() {
                 {clientsForShow?.map((client, index) => {
                   return (
                     <>
-                      {currentUser.rollSelect == 'Manager' &&
+                      {currentUser.rollSelect === 'Manager' &&
                         <tr
                           style={{
                             background: index % 2 === 0 ? '' : '#F6F6F6',
@@ -248,18 +248,18 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2">
                             {client.brideName}
                             <br />
-                            <img src={Heart} />
+                            <img alt="" src={Heart} />
                             <br />
                             {client.groomName}
                           </td>
                           <td className="tableBody Text14Semi primary2">
                             <>
-                              {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD/MM/YYYY')}<br />
+                              {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD-MMM-YYYY')}<br />
                             </>
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          {/* <td className="tableBody Text14Semi primary2">
                             {client.userID?.firstName}{' '}{client.userID?.lastName}
-                          </td>
+                          </td> */}
                           <td className="tableBody Text14Semi primary2">
                             <ShootDropDown
                               teble={true}
@@ -388,7 +388,7 @@ function PreWedShootScreen() {
                                   updatedClients[index].preWeddingDetails.shootStartDate = e.target.value;
                                   setPreWedClients(updatedClients)
                                 }}
-                                readOnly={currentUser.rollSelect == 'Shooter'}
+                                readOnly={currentUser.rollSelect === 'Shooter'}
                                 value={client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : ''}
                               />
                               TO
@@ -402,13 +402,13 @@ function PreWedShootScreen() {
                                   updatedClients[index].preWeddingDetails.shootEndDate = e.target.value;
                                   setPreWedClients(updatedClients)
                                 }}
-                                readOnly={currentUser.rollSelect == 'Shooter'}
+                                readOnly={currentUser.rollSelect === 'Shooter'}
                                 value={client.preWeddingDetails?.shootEndDate ? new Date(client.preWeddingDetails.shootEndDate).toISOString().split('T')[0] : ''}
                               />
                             </div>
                           </td>
                           <td className="tableBody Text14Semi primary2">
-                            {currentUser.rollSelect == 'Manager' ? (
+                            {currentUser.rollSelect === 'Manager' ? (
                               <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
                                 const updatedClients = [...preWedClients];
                                 updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
@@ -429,7 +429,7 @@ function PreWedShootScreen() {
                               style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
                               onClick={() => updatingIndex == null && handleSaveData(index)}
                             >
-                              {updatingIndex == index ? (
+                              {updatingIndex === index ? (
                                 <div className='w-100'>
                                   <div class="smallSpinner mx-auto"></div>
                                 </div>
@@ -440,7 +440,7 @@ function PreWedShootScreen() {
                           </td>
                         </tr>
                       }
-                      {currentUser.rollSelect == 'Shooter' &&
+                      {currentUser.rollSelect === 'Shooter' &&
                         <tr
                           style={{
                             background: index % 2 === 0 ? '' : '#F6F6F6',
@@ -449,15 +449,15 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2">
                             {client.brideName}
                             <br />
-                            <img src={Heart} />
+                            <img alt="" src={Heart} />
                             <br />
                             {client.groomName}
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          {/* <td className="tableBody Text14Semi primary2">
                             <>
                               {client.userID?.firstName}{' '}{client.userID?.lastName}
                             </>
-                          </td>
+                          </td> */}
                           <td className="tableBody Text14Semi primary2">
                             <>
                               {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"} to {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"}

@@ -41,6 +41,19 @@ export const getAllTasks = async () => {
     }
 }
 
+export const getPendingTasks = async () => {
+    try {
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getPendingTasks`, {
+            Headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        return res.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const getEditorTasks = async () => {
     try {
         const currentUser = JSON.parse(Cookies.get('currentUser'));

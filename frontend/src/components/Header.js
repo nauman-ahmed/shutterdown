@@ -1,17 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Nav, Navbar, Form, FormControl, Modal, ModalHeader, ModalBody, Row, Col, ModalFooter, Button } from "react-bootstrap";
+import { Navbar, Modal, ModalHeader, ModalBody, Row, Col, ModalFooter, Button } from "react-bootstrap";
 import "../assets/css/navbar.css";
 import "../assets/css/common.css";
 import Tooltip from "react-bootstrap/Tooltip";
 import Overlay from "react-bootstrap/Overlay";
 import { useLocation } from "react-router-dom";
-import Logo from "./Logo";
 import { useNavigate } from "react-router-dom";
 import CalenderNoti from "../assets/Profile/CalenderNoti.svg";
 import NotiSelect from "../assets/Profile/NotiSelect.svg";
-import { useAuthContext } from "../config/context";
 import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
 import { updateUserData } from "../API/userApi";
 import { toast } from "react-toastify";
 import "../assets/css/Profile.css";
@@ -44,8 +41,6 @@ const Header = (args) => {
   }
   const [confirmPassword, setConfirmPassword] = useState(null);
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
-  const dispatch = useDispatch();
-
 
   function CheckPassword(submittedPassword) {
     if (submittedPassword?.length < 8) {
@@ -73,11 +68,11 @@ const Header = (args) => {
   const handleUpdateUserData = async (e) => {
     try {
       e.preventDefault();
-      if (validationMessage != 'Password is valid!') {
+      if (validationMessage !== 'Password is valid!') {
         toast.error(validationMessage);
         return
       }
-      if (userData?.password.length == 0 || userData?.password !== confirmPassword) {
+      if (userData?.password.length === 0 || userData?.password !== confirmPassword) {
         toast.error('Confirm Password not matched!');
         return
       }
@@ -137,7 +132,7 @@ const Header = (args) => {
           <Navbar expand="lg" fixed="top" style={{left : '7px'}}>
             <div className="w-100 hide_nav_profile">
               <div className="w-100 d-flex align-items-center justify-content-between">
-                <h4 className="heading"></h4>
+                <h4 className="heading">{""}</h4>
                 {/* <div className="search_div d-flex align-items-center justify-content-between">
                   <input
                     className="input_search"
@@ -160,7 +155,7 @@ const Header = (args) => {
                     height={25}
                   /> */}
                   <div className="name_div_flex mb-1">
-                    <img
+                    <img alt=""
                       src="/images/navbar/oval.png"
                       ref={target}
                       onClick={() => setShow(!show)}
@@ -190,17 +185,17 @@ const Header = (args) => {
               <div className="nav_popover">
                 <div
                   className={
-                    path == "/MyProfile"
+                    path === "/MyProfile"
                       ? "d-flex flex-row align-items-center  active_path"
                       : "d-flex flex-row align-items-center mt-1 non_active_path"
                   }
                 >
-                  <img style={{
+                  <img alt="" style={{
                     filter : 'brightness(0)'
                   }} src="/images/navbar/profile_active.png" width={15}></img>
                   <p
                     className={
-                      path == "/MyProfile" ? "active_popover" : "popover_txt"
+                      path === "/MyProfile" ? "active_popover" : "popover_txt"
                     }
 
                     onClick={() => navigate('/MyProfile')}
@@ -210,18 +205,18 @@ const Header = (args) => {
                 </div>
 
                 <div onClick={() => navigate('/MyProfile/Attendence')} className={
-                    path == "/MyProfile/Attendence"
+                    path === "/MyProfile/Attendence"
                       ? "d-flex flex-row align-items-center  active_path"
                       : "d-flex flex-row align-items-center mt-1 non_active_path"
                   }>
-                  <img src="/images/navbar/attendence.png" width={15}></img>
+                  <img alt="" src="/images/navbar/attendence.png" width={15}></img>
                   <p className={
-                      path == "/MyProfile/Attendence" ? "active_popover" : "popover_txt"
+                      path === "/MyProfile/Attendence" ? "active_popover" : "popover_txt"
                     }>Attendence</p>
                 </div>
 
                 <div onClick={toggle} className="d-flex align-items-center mt-2 non_active_path">
-                  <img
+                  <img alt=""
                     src="/images/navbar/change_password.png"
                     width={15}
                   ></img>
@@ -235,7 +230,7 @@ const Header = (args) => {
                     navigate("/")
                   }}
                 >
-                  <img src="/images/navbar/logout.png" width={15}></img>
+                  <img alt="" src="/images/navbar/logout.png" width={15}></img>
                   <p className="popover_txt">Logout</p>
                 </div>
               </div>
@@ -257,7 +252,7 @@ const Header = (args) => {
               <div className="R_A_Justify tabsNotiDay">
                 <div
                   className={
-                    notiTab == "1"
+                    notiTab === "1"
                       ? "Text16N1 activeNotiTab point"
                       : "Text16N1 point"
                   }
@@ -267,7 +262,7 @@ const Header = (args) => {
                 </div>
                 <div
                   className={
-                    notiTab == "2"
+                    notiTab === "2"
                       ? "Text16N1 activeNotiTab point"
                       : "Text16N1 point"
                   }
@@ -281,7 +276,7 @@ const Header = (args) => {
                 <div className="notificationsBox mt12 R_A_Justify">
                   <div className="Circle" />
                   <div>
-                    <img src={CalenderNoti} />
+                    <img alt="" src={CalenderNoti} />
                   </div>
                   <div style={{ textAlign: "left" }}>
                     <div className="Text14Semi">
@@ -298,7 +293,7 @@ const Header = (args) => {
                       <text className="gray">Mussorie </text>
                     </div>
                   </div>
-                  <img src={NotiSelect} />
+                  <img alt="" src={NotiSelect} />
                 </div>
               ))}
             </Tooltip>

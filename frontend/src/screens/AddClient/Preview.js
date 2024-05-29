@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { SaveClientForm } from "../../API/Client";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import { updateClintData } from "../../redux/clientBookingForm";
-import Cookies from "js-cookie";
 import { getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 
@@ -25,12 +24,14 @@ function Preview() {
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientData]);
   useEffect(() => {
     console.log(clientData);
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [eventIndex, setEventIndex] = useState(0);
   const submitClient = async () => {
@@ -69,7 +70,7 @@ function Preview() {
                     dayjs(clientData?.events[eventIndex]?.eventDate).format(
                       "DD-MMM-YYYY"
                     )}
-                  <img src={CalenderImg} />
+                  <img alt="" src={CalenderImg} />
                 </div>
               </div>
             </div>

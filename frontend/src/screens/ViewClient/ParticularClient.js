@@ -1,7 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import "../../assets/css/Profile.css";
-import DeleiveryDropDown from "../../components/DeleiveryDropDown";
 
 function ParticularClient(props) {
   const [selected, setSelectedTab] = useState(1);
@@ -26,9 +25,6 @@ function ParticularClient(props) {
     },
   ];
 
-  const [active, setActive] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(1);
-  const DropDownV = useRef();
   return (
     <div>
       <div
@@ -41,7 +37,7 @@ function ParticularClient(props) {
               style={{
                 height: 20,
                 cursor: "pointer",
-                paddingTop: i.id == 3 ? "5px" : "10px",
+                paddingTop: i.id === 3 ? "5px" : "10px",
               }}
               onClick={() => {
                 navigate(i.link);
@@ -51,7 +47,7 @@ function ParticularClient(props) {
               <div
                 key={i.id}
                 className={
-                  i.id == selected
+                  i.id === selected
                     ? "itemsbox Text12 active_profile_tab activeClient "
                     : "itemsbox Text12 non_active_profile_tab"
                 }
@@ -59,8 +55,8 @@ function ParticularClient(props) {
                 {i.title}
               </div>
 
-              {i.id == selected ? (
-                <img
+              {i.id === selected ? (
+                <img alt=""
                   src="/images/focus_arrow.png"
                   width={15}
                   style={{ paddingTop: "5px" }}

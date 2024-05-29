@@ -11,6 +11,7 @@ function Job() {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     getUserData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const getUserData = async () => {
@@ -58,7 +59,7 @@ function Job() {
                     </Col>
                     <Col xs="6" sm="6">
                       <div className="Text10N gray mt12">Date of joining</div>
-                      <div className="Text10N black mt12">{dayjs(userData?.dateOfJoining).format('DD/MM/YYYY')}</div>
+                      <div className="Text10N black mt12">{dayjs(userData?.dateOfJoining).format('DD-MMM-YYYY')}</div>
                     </Col>
                     <Col xs="6" sm="6">
                       <div className="Text10N gray mt12">Job Title</div>
@@ -103,7 +104,7 @@ function Job() {
             </Col>
             <Col xl="6" sm="6" className="p-2">
               <div className="label">Date of Joining</div>
-              <input type="date" name="dateOfJoining" className="JobInput" placeholder="Date_of_Joining" defaultValue={dayjs(userData?.dateOfJoining).format('YYYY-MM-DD')} onChange={handleChange} />
+              <input type="date" name="dateOfJoining" className="JobInput" placeholder="Date_of_Joining" defaultValue={dayjs(userData?.dateOfJoining).format('DD-MMM-YYYY')} onChange={handleChange} />
             </Col>
             <Col xl="6" sm="6" className="p-2">
               <div className="label">Job Title</div>

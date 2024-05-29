@@ -30,7 +30,9 @@ const deliverableSchema = mongoose.Schema({
         ref : 'user'
     },
     status : {
-        type : String
+        type : String,
+        default : 'Yet to Start',
+        required : true
     },
     clientRevision : {
         type : Number

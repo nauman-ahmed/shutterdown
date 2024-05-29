@@ -20,7 +20,7 @@ const eventSchema = mongoose.Schema({
     },
     eventStatus : {
         type : String,
-        default : 'Yet to start',
+        default : 'Yet to Start',
         required : true
     },
     isWedding : {
@@ -72,10 +72,10 @@ const eventSchema = mongoose.Schema({
         ref: 'user'
     }],
     sameDayPhotoEditor: {
-        type: String
+        type: Number
     },
     sameDayVideoEditor: {
-        type: String
+        type: Number
     },
     tentative: {
         type: String

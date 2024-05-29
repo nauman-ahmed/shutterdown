@@ -1,26 +1,22 @@
-import React, { useState,useEffect } from 'react';
-import { FormGroup, Input, Label, Button, Form } from 'reactstrap';
+import React, { useState } from 'react';
+import { Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Logo from '../../components/Logo';
-import { GoogleLogin } from '@react-oauth/google';
 import { GetSignInApi } from '../../API/userApi';
-import jwt_decode from 'jwt-decode';
 import { useGoogleLogin } from '@react-oauth/google';
-import { GetSignInWithGoogleData } from '../../API/userApi';
 import { checkExistEmail } from '../../API/userApi';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useDispatch } from 'react-redux';
+
 const Login = () => {
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
     email: '',
     password: '',
   });
-  const dispatch = useDispatch();
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [logingIn, setLoginIn] = useState(false)
@@ -46,8 +42,7 @@ const Login = () => {
         console.log(user);
         if (user) {
           setSuccess(true);
-          // localStorage.setItem('userEmail', JSON.stringify(response?.data?.User._id));
-          // const shooter = JSON.parse(localStorage.getItem('loginUser'));
+         
           if (user.rollSelect==="Shooter") {
             navigate('/photographer-CalenderView/View');
           }
@@ -206,12 +201,12 @@ const login =  useGoogleLogin({
               style={{ marginTop: 10 }}
               onClick={login}
             >
-              <img
+              <img alt=''
                 src="/images/google.png"
                 width={20}
                 style={{ marginRight: 10, marginTop: -3 }}
                 onClick={login}
-              ></img>
+              />
               Sign in google
             </Button>
             {/* <GoogleLogin

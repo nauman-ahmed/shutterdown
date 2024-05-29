@@ -12,25 +12,19 @@ import Logo from "./Logo";
 import { useLocation, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import "../assets/css/sidebar.css";
-import { Button, Modal, ModalBody } from "reactstrap";
+import { Modal } from "reactstrap";
 import Checklist from "../assets/Profile/Checklist.svg";
-import ActiveDeleiverables from "../assets/Profile/ActiveDeleiverables.svg";
 import ActiveTask from "../assets/Profile/ActiveTask.svg";
 import ActiveReport from "../assets/Profile/ActiveReport.svg";
 import UnActiveChecklist from "../assets/Profile/UnActiveChecklist.svg";
 import ActiveTeam from "../assets/Profile/ActiveTeam.png";
 import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
 
 const SideBar = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
   const [activeMenu, setActiveMenu] = useState(15);
   const [currentSubMenuIndex, setCurrentSubMenuIndex] = useState(15);
   const [mobileSideBar, setMobileSideBar] = useState(false);
-  const [shooterHide, setShooterHide] = useState(false)
-  const [EditorHide, setEditorHide] = useState(false)
-  const [manager, setManager] = useState(false);
   const location = useLocation();
   const toggle = () => {
     setMobileSideBar(false);
@@ -76,6 +70,7 @@ const SideBar = () => {
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
@@ -142,23 +137,23 @@ const SideBar = () => {
           <SidebarContent>
             <>
               <Menu>
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <>
-                    <SubMenu className={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? 'active' : ''}
-                      icon={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? (
-                        <img
+                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? 'active' : ''}
+                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? (
+                        <img alt=""
                           src="/images/sidebar/clients_active.png"
                           width={30}
-                        ></img>
+                        />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/clients.png"
                           width={30}
-                        ></img>
+                          />
                       )
                       }
                       title="Clients"
-                      open={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? true : false}
+                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? true : false}
                       onOpenChange={() => {
                         setActiveMenu(1);
                         setCurrentTab(null)
@@ -166,16 +161,16 @@ const SideBar = () => {
                     >
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 0 && activeMenu == 1) || currentTab == 'Add Client' ? (
-                            <img
+                          (currentSubMenuIndex === 0 && activeMenu === 1) || currentTab === 'Add Client' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                            />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                            />
                           )
                         }
                         onClick={() => {
@@ -184,7 +179,7 @@ const SideBar = () => {
                           setCurrentTab(null);
                         }}
                         className={
-                          (currentSubMenuIndex == 0 && activeMenu == 1) || currentTab == 'Add Client'
+                          (currentSubMenuIndex === 0 && activeMenu === 1) || currentTab === 'Add Client'
                             ? 'active_submenu'
                             : ''
                         }
@@ -193,16 +188,16 @@ const SideBar = () => {
                       </MenuItem>
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 1 && activeMenu == 1) || currentTab == 'View Client' ? (
-                            <img
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                              />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                              />
                           )
                         }
                         onClick={() => {
@@ -211,7 +206,7 @@ const SideBar = () => {
                           setCurrentTab(null)
                         }}
                         className={
-                          (currentSubMenuIndex == 1 && activeMenu == 1) || currentTab == 'View Client'
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client'
                             ? 'active_submenu'
                             : ''
                         }
@@ -221,24 +216,24 @@ const SideBar = () => {
                     </SubMenu>
                   </>
                 )}
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Shooter') && (
+                {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Shooter') && (
                   <SubMenu
-                    className={activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? 'active' : ''}
+                    className={activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? 'active' : ''}
                     icon={
-                      activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? (
-                        <img
+                      activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? (
+                        <img alt=""
                           src="/images/sidebar/CalenderActive.png"
                           width={30}
-                        ></img>
+                          />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/calendar.png"
                           width={30}
-                        ></img>
+                          />
                       )
                     }
                     title="Calendar"
-                    open={activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? true : false}
+                    open={activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? true : false}
                     onOpenChange={() => {
                       setCurrentTab(null)
                       setActiveMenu(2);
@@ -246,16 +241,16 @@ const SideBar = () => {
                   >
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 0 && activeMenu == 2) || currentTab == 'Calender View' ? (
-                          <img
+                        (currentSubMenuIndex === 0 && activeMenu === 2) || currentTab === 'Calender View' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -264,7 +259,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 0 && activeMenu == 2) || currentTab == 'Calender View'
+                        (currentSubMenuIndex === 0 && activeMenu === 2) || currentTab === 'Calender View'
                           ? 'active_submenu'
                           : ''
                       }
@@ -273,16 +268,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 1 && activeMenu == 2) || currentTab == 'Pre-wed Shoot' ? (
-                          <img
+                        (currentSubMenuIndex === 1 && activeMenu === 2) || currentTab === 'Pre-wed Shoot' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -291,7 +286,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 1 && activeMenu == 2) || currentTab == 'Pre-wed Shoot'
+                        (currentSubMenuIndex === 1 && activeMenu === 2) || currentTab === 'Pre-wed Shoot'
                           ? 'active_submenu'
                           : ''
                       }
@@ -301,23 +296,23 @@ const SideBar = () => {
                   </SubMenu>
                 )}
 
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
+                {(currentUser.rollSelect ==='Manager' || currentUser.rollSelect === 'Editor') && (
                   <SubMenu
-                    className={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'PreWed-Deliverables' || currentTab == 'Albums' ? 'active' : ''}
+                    className={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'PreWed-Deliverables' || currentTab === 'Albums' ? 'active' : ''}
                     icon={
-                      activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? (
-                        <img
+                      activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? (
+                        <img alt=""
                           src="/images/sidebar/deliverables.png"
                           width={20}
-                        ></img>
+                          />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/deliverables.png"
                           width={20}
-                        ></img>
+                          />
                       )
                     }
-                    open={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? true : false}
+                    open={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? true : false}
                     title="Deliverables"
                     onOpenChange={() => {
                       setActiveMenu(4);
@@ -326,16 +321,16 @@ const SideBar = () => {
                   >
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 3 && activeMenu == 4) || currentTab == 'Cinematography' ? (
-                          <img
+                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -344,25 +339,25 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 3 && activeMenu === 4) || currentTab == 'Cinematography'
+                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography'
                           ? 'active_submenu'
                           : ''
                       }
                     >
-                      Cinematography
+                      Cinema
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 4 && activeMenu === 4) || currentTab == 'Photos' ? (
-                          <img
+                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -371,7 +366,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 4 && activeMenu == 4) || currentTab == 'Photos'
+                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos'
                           ? 'active_submenu'
                           : ''
                       }
@@ -380,16 +375,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 5 && activeMenu == 4) || currentTab == 'Albums' ? (
-                          <img
+                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -398,7 +393,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 5 && activeMenu == 4) || currentTab == 'Albums'
+                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums'
                           ? 'active_submenu'
                           : ''
                       }
@@ -407,16 +402,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables' ? (
-                          <img
+                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                            />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                            />
                         )
                       }
                       onClick={() => {
@@ -425,7 +420,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables'
+                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables'
                           ? 'active_submenu'
                           : ''
                       }
@@ -434,17 +429,17 @@ const SideBar = () => {
                     </MenuItem>
                   </SubMenu>
                 )}
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <MenuItem
                     icon={
-                      activeMenu == 10 || currentTab == 'Checklists' ? (
-                        <img src={Checklist} width={20}></img>
+                      activeMenu === 10 || currentTab === 'Checklists' ? (
+                        <img alt="" src={Checklist} width={20}/>
                       ) : (
-                        <img src={UnActiveChecklist} width={20}></img>
+                        <img alt="" src={UnActiveChecklist} width={20}/>
                       )
                     }
                     className={
-                      activeMenu == 10 || currentTab == 'Checklists' ? 'active active_color' : ''
+                      activeMenu === 10 || currentTab === 'Checklists' ? 'active active_color' : ''
                     }
                     onClick={() => {
                       setActiveMenu(10);
@@ -457,16 +452,16 @@ const SideBar = () => {
                 )}
                 <MenuItem
                   icon={
-                    <img
+                    <img alt=""
                       src={
-                        activeMenu !== 3 || currentTab == 'Attendence'
+                        activeMenu !== 3 || currentTab === 'Attendence'
                           ? '/images/sidebar/attendance.png'
                           : '/images/sidebar/attendanceActive.png'
                       }
                       width={20}
-                    ></img>
+                    />
                   }
-                  className={activeMenu == 3 || currentTab == 'Attendence' ? 'active active_color' : ''}
+                  className={activeMenu === 3 || currentTab === 'Attendence' ? 'active active_color' : ''}
                   onClick={() => {
                     setActiveMenu(3);
                     navigate('/MyProfile/Attendence');
@@ -476,20 +471,20 @@ const SideBar = () => {
                   Attendence
                 </MenuItem>
 
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
+                {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                   <>
                     <SubMenu
-                      className={activeMenu == 5 || currentTab == 'Tasks' ? 'active' : ''}
+                      className={activeMenu === 5 || currentTab === 'Tasks' ? 'active' : ''}
                       icon={
-                        activeMenu == 5 || currentTab == 'Tasks' ? (
-                          <img src={ActiveTask} width={20} />
+                        activeMenu === 5 || currentTab === 'Tasks' ? (
+                          <img alt="" src={ActiveTask} width={20} />
                         ) : (
-                          <img src="/images/sidebar/tasks.png"
+                          <img alt="" src="/images/sidebar/tasks.png"
                             width={20} />
                         )
                       }
                       title="Tasks"
-                      open={activeMenu == 5 || currentTab == 'Tasks' ? true : false}
+                      open={activeMenu === 5 || currentTab === 'Tasks' ? true : false}
                       onOpenChange={() => {
                         setCurrentTab(null)
                         setActiveMenu(5);
@@ -497,16 +492,16 @@ const SideBar = () => {
                     >
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks' ? (
-                            <img
+                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                            />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                            />
                           )
                         }
                         onClick={() => {
@@ -515,25 +510,25 @@ const SideBar = () => {
                           setCurrentTab(null)
                         }}
                         className={
-                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks'
+                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks'
                             ? 'active_submenu'
                             : ''
                         }
-                      >Actual Tasks
+                      >Daily Tasks
                       </MenuItem>
-                      {currentUser.rollSelect == 'Manager' ?
+                      {currentUser.rollSelect === 'Manager' ?
                         <MenuItem
                           icon={
-                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports' ? (
-                              <img
+                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports' ? (
+                              <img alt=""
                                 src="/images/sidebar/oval_active.png"
                                 width={10}
-                              ></img>
+                              />
                             ) : (
-                              <img
+                              <img alt=""
                                 src="/images/sidebar/oval.png"
                                 width={10}
-                              ></img>
+                              />
                             )
                           }
                           onClick={() => {
@@ -542,7 +537,7 @@ const SideBar = () => {
                             setCurrentTab(null)
                           }}
                           className={
-                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports'
+                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports'
                               ? 'active_submenu'
                               : ''
                           }
@@ -556,20 +551,20 @@ const SideBar = () => {
                   </>
                 )}
 
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <>
                     <MenuItem
                       icon={
-                        activeMenu == 6 || currentTab == 'Reports' ? (
-                          <img src={ActiveReport} width={20}></img>
+                        activeMenu === 6 || currentTab === 'Reports' ? (
+                          <img alt="" src={ActiveReport} width={20} />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/reports.png"
                             width={20}
-                          ></img>
+                          />
                         )
                       }
-                      className={activeMenu == 6 || currentTab == 'Reports' ? 'active active_color' : ''}
+                      className={activeMenu === 6 || currentTab === 'Reports' ? 'active active_color' : ''}
                       onClick={() => {
                         setActiveMenu(6);
                         navigate('/MyProfile/Reports');
@@ -580,16 +575,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        activeMenu == 7 || currentTab == 'Teams' ? (
-                          <img src={ActiveTeam} width={30}></img>
+                        activeMenu === 7 || currentTab === 'Teams' ? (
+                          <img alt="" src={ActiveTeam} width={30} />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/teams.png"
                             width={20}
-                          ></img>
+                          />
                         )
                       }
-                      className={activeMenu == 7 || currentTab == 'Teams' ? 'active active_color' : ''}
+                      className={activeMenu === 7 || currentTab === 'Teams' ? 'active active_color' : ''}
                       onClick={() => {
                         setActiveMenu(7);
                         navigate('/MyProfile/Team');
@@ -602,7 +597,7 @@ const SideBar = () => {
                 )}
                 <MenuItem
                   icon={
-                    <img src="/images/sidebar/logout.png" width={20}></img>
+                    <img alt="" src="/images/sidebar/logout.png" width={20} />
                   }
                   onClick={() => {
                     Cookies.remove('currentUser');
@@ -619,19 +614,19 @@ const SideBar = () => {
 
       <div className="mobile_header">
         <div className="d-flex justify-content-center align-items-center ps-3" onClick={() => setMobileSideBar(true)}>
-          <img
+          <img alt=""
             src="/images/navbar/oval.png"
             width={70}
             style={{ position : 'absolute', cursor: 'pointer', top : '-3px', left: '10px' }}
           />
-          <img
+          <img alt=""
             src="/images/navbar/verticle_lines.png"
             className="mt-2"
             style={{  cursor: 'pointer', width: '20px', zIndex : '10'}}
           />
         </div>
         <div>
-          <img
+          <img alt=""
             src="/images/Logo.png"
             width={35}
             height={35}
@@ -673,7 +668,7 @@ const SideBar = () => {
             >
               <div className="d-flex align-items-center">
                 <div className="name_div_side">
-                  <img
+                  <img alt=""
                     src="/images/navbar/oval.png"
                     width={90}
                     style={{
@@ -691,23 +686,23 @@ const SideBar = () => {
           </SidebarHeader>
           <SidebarContent>
           <Menu>
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <>
-                    <SubMenu className={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? 'active' : ''}
-                      icon={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? (
-                        <img
+                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? 'active' : ''}
+                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? (
+                        <img alt=""
                           src="/images/sidebar/clients_active.png"
                           width={30}
-                        ></img>
+                        />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/clients.png"
                           width={30}
-                        ></img>
+                        />
                       )
                       }
                       title="Clients"
-                      open={activeMenu == 1 || currentTab == 'Add Client' || currentTab == 'View Client' ? true : false}
+                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? true : false}
                       onOpenChange={() => {
                         setActiveMenu(1);
                         setCurrentTab(null)
@@ -715,16 +710,16 @@ const SideBar = () => {
                     >
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 0 && activeMenu == 1) || currentTab == 'Add Client' ? (
-                            <img
+                          (currentSubMenuIndex === 0 && activeMenu === 1) || currentTab === 'Add Client' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                            />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                            />
                           )
                         }
                         onClick={() => {
@@ -734,7 +729,7 @@ const SideBar = () => {
                           setMobileSideBar(false)
                         }}
                         className={
-                          (currentSubMenuIndex == 0 && activeMenu == 1) || currentTab == 'Add Client'
+                          (currentSubMenuIndex === 0 && activeMenu === 1) || currentTab === 'Add Client'
                             ? 'active_submenu'
                             : ''
                         }
@@ -743,16 +738,16 @@ const SideBar = () => {
                       </MenuItem>
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 1 && activeMenu == 1) || currentTab == 'View Client' ? (
-                            <img
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                            />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                            />
                           )
                         }
                         onClick={() => {
@@ -762,7 +757,7 @@ const SideBar = () => {
                           setMobileSideBar(false)
                         }}
                         className={
-                          (currentSubMenuIndex == 1 && activeMenu == 1) || currentTab == 'View Client'
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client'
                             ? 'active_submenu'
                             : ''
                         }
@@ -772,24 +767,24 @@ const SideBar = () => {
                     </SubMenu>
                   </>
                 )}
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Shooter') && (
+                {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Shooter') && (
                   <SubMenu
-                    className={activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? 'active' : ''}
+                    className={activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? 'active' : ''}
                     icon={
-                      activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? (
-                        <img
+                      activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? (
+                        <img alt=""
                           src="/images/sidebar/CalenderActive.png"
                           width={30}
-                        ></img>
+                        />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/calendar.png"
                           width={30}
-                        ></img>
+                        />
                       )
                     }
                     title="Calendar"
-                    open={activeMenu == 2 || currentTab == 'Calender View' || currentTab == 'Pre-wed Shoot' ? true : false}
+                    open={activeMenu === 2 || currentTab === 'Calender View' || currentTab === 'Pre-wed Shoot' ? true : false}
                     onOpenChange={() => {
                       setCurrentTab(null)
                       setActiveMenu(2);
@@ -797,16 +792,16 @@ const SideBar = () => {
                   >
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 0 && activeMenu == 2) || currentTab == 'Calender View' ? (
-                          <img
+                        (currentSubMenuIndex === 0 && activeMenu === 2) || currentTab === 'Calender View' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -816,7 +811,7 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 0 && activeMenu == 2) || currentTab == 'Calender View'
+                        (currentSubMenuIndex === 0 && activeMenu === 2) || currentTab === 'Calender View'
                           ? 'active_submenu'
                           : ''
                       }
@@ -825,16 +820,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 1 && activeMenu == 2) || currentTab == 'Pre-wed Shoot' ? (
-                          <img
+                        (currentSubMenuIndex === 1 && activeMenu === 2) || currentTab === 'Pre-wed Shoot' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -844,7 +839,7 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 1 && activeMenu == 2) || currentTab == 'Pre-wed Shoot'
+                        (currentSubMenuIndex === 1 && activeMenu === 2) || currentTab === 'Pre-wed Shoot'
                           ? 'active_submenu'
                           : ''
                       }
@@ -854,23 +849,23 @@ const SideBar = () => {
                   </SubMenu>
                 )}
 
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
+                {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                   <SubMenu
-                    className={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'PreWed-Deliverables' || currentTab == 'Albums' ? 'active' : ''}
+                    className={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'PreWed-Deliverables' || currentTab === 'Albums' ? 'active' : ''}
                     icon={
-                      activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? (
-                        <img
+                      activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? (
+                        <img alt=""
                           src="/images/sidebar/deliverables.png"
                           width={20}
-                        ></img>
+                        />
                       ) : (
-                        <img
+                        <img alt=""
                           src="/images/sidebar/deliverables.png"
                           width={20}
-                        ></img>
+                        />
                       )
                     }
-                    open={activeMenu == 4 || currentTab == 'Cinematography' || currentTab == 'Photos' || currentTab == 'Albums' || currentTab == 'PreWed-Deliverables' ? true : false}
+                    open={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? true : false}
                     title="Deliverables"
                     onOpenChange={() => {
                       setActiveMenu(4);
@@ -879,16 +874,16 @@ const SideBar = () => {
                   >
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 3 && activeMenu == 4) || currentTab == 'Cinematography' ? (
-                          <img
+                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -898,25 +893,25 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 3 && activeMenu === 4) || currentTab == 'Cinematography'
+                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography'
                           ? 'active_submenu'
                           : ''
                       }
                     >
-                      Cinematography
+                      Cinema
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 4 && activeMenu === 4) || currentTab == 'Photos' ? (
-                          <img
+                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -926,7 +921,7 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 4 && activeMenu == 4) || currentTab == 'Photos'
+                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos'
                           ? 'active_submenu'
                           : ''
                       }
@@ -935,16 +930,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 5 && activeMenu == 4) || currentTab == 'Albums' ? (
-                          <img
+                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -954,7 +949,7 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 5 && activeMenu == 4) || currentTab == 'Albums'
+                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums'
                           ? 'active_submenu'
                           : ''
                       }
@@ -963,16 +958,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables' ? (
-                          <img
+                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables' ? (
+                          <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
-                          ></img>
+                          />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/oval.png"
                             width={10}
-                          ></img>
+                          />
                         )
                       }
                       onClick={() => {
@@ -982,7 +977,7 @@ const SideBar = () => {
                         setMobileSideBar(false)
                       }}
                       className={
-                        (currentSubMenuIndex == 6 && activeMenu == 4) || currentTab == 'PreWed-Deliverables'
+                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables'
                           ? 'active_submenu'
                           : ''
                       }
@@ -991,17 +986,17 @@ const SideBar = () => {
                     </MenuItem>
                   </SubMenu>
                 )}
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <MenuItem
                     icon={
-                      activeMenu == 10 || currentTab == 'Checklists' ? (
-                        <img src={Checklist} width={20}></img>
+                      activeMenu === 10 || currentTab === 'Checklists' ? (
+                        <img alt="" src={Checklist} width={20} />
                       ) : (
-                        <img src={UnActiveChecklist} width={20}></img>
+                        <img alt="" src={UnActiveChecklist} width={20} />
                       )
                     }
                     className={
-                      activeMenu == 10 || currentTab == 'Checklists' ? 'active active_color' : ''
+                      activeMenu === 10 || currentTab === 'Checklists' ? 'active active_color' : ''
                     }
                     onClick={() => {
                       setActiveMenu(10);
@@ -1015,16 +1010,16 @@ const SideBar = () => {
                 )}
                 <MenuItem
                   icon={
-                    <img
+                    <img alt=""
                       src={
-                        activeMenu !== 3 || currentTab == 'Attendence'
+                        activeMenu !== 3 || currentTab === 'Attendence'
                           ? '/images/sidebar/attendance.png'
                           : '/images/sidebar/attendanceActive.png'
                       }
                       width={20}
-                    ></img>
+                    />
                   }
-                  className={activeMenu == 3 || currentTab == 'Attendence' ? 'active active_color' : ''}
+                  className={activeMenu === 3 || currentTab === 'Attendence' ? 'active active_color' : ''}
                   onClick={() => {
                     setActiveMenu(3);
                     navigate('/MyProfile/Attendence');
@@ -1035,20 +1030,20 @@ const SideBar = () => {
                   Attendence
                 </MenuItem>
 
-                {(currentUser.rollSelect == 'Manager' || currentUser.rollSelect == 'Editor') && (
+                {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                   <>
                     <SubMenu
-                      className={activeMenu == 5 || currentTab == 'Tasks' ? 'active' : ''}
+                      className={activeMenu === 5 || currentTab === 'Tasks' ? 'active' : ''}
                       icon={
-                        activeMenu == 5 || currentTab == 'Tasks' ? (
-                          <img src={ActiveTask} width={20} />
+                        activeMenu === 5 || currentTab === 'Tasks' ? (
+                          <img alt="" src={ActiveTask} width={20} />
                         ) : (
-                          <img src="/images/sidebar/tasks.png"
+                          <img alt="" src="/images/sidebar/tasks.png"
                             width={20} />
                         )
                       }
                       title="Tasks"
-                      open={activeMenu == 5 || currentTab == 'Tasks' ? true : false}
+                      open={activeMenu === 5 || currentTab === 'Tasks' ? true : false}
                       onOpenChange={() => {
                         setCurrentTab(null)
                         setActiveMenu(5);
@@ -1056,16 +1051,16 @@ const SideBar = () => {
                     >
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks' ? (
-                            <img
+                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks' ? (
+                            <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
-                            ></img>
+                            />
                           ) : (
-                            <img
+                            <img alt=""
                               src="/images/sidebar/oval.png"
                               width={10}
-                            ></img>
+                            />
                           )
                         }
                         onClick={() => {
@@ -1075,25 +1070,25 @@ const SideBar = () => {
                           setMobileSideBar(false)
                         }}
                         className={
-                          (currentSubMenuIndex == 0 && activeMenu == 5) || currentTab == 'Tasks'
+                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks'
                             ? 'active_submenu'
                             : ''
                         }
-                      >Actual Tasks
+                      >Daily Tasks
                       </MenuItem>
-                      {currentUser.rollSelect == 'Manager' ?
+                      {currentUser.rollSelect === 'Manager' ?
                         <MenuItem
                           icon={
-                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports' ? (
-                              <img
+                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports' ? (
+                              <img alt=""
                                 src="/images/sidebar/oval_active.png"
                                 width={10}
-                              ></img>
+                              />
                             ) : (
-                              <img
+                              <img alt=""
                                 src="/images/sidebar/oval.png"
                                 width={10}
-                              ></img>
+                              />
                             )
                           }
                           onClick={() => {
@@ -1103,7 +1098,7 @@ const SideBar = () => {
                             setMobileSideBar(false)
                           }}
                           className={
-                            (currentSubMenuIndex == 1 && activeMenu == 5) || currentTab == 'Tasks Reports'
+                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports'
                               ? 'active_submenu'
                               : ''
                           }
@@ -1117,20 +1112,20 @@ const SideBar = () => {
                   </>
                 )}
 
-                {currentUser.rollSelect == 'Manager' && (
+                {currentUser.rollSelect === 'Manager' && (
                   <>
                     <MenuItem
                       icon={
-                        activeMenu == 6 || currentTab == 'Reports' ? (
-                          <img src={ActiveReport} width={20}></img>
+                        activeMenu === 6 || currentTab === 'Reports' ? (
+                          <img alt="" src={ActiveReport} width={20} />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/reports.png"
                             width={20}
-                          ></img>
+                          />
                         )
                       }
-                      className={activeMenu == 6 || currentTab == 'Reports' ? 'active active_color' : ''}
+                      className={activeMenu === 6 || currentTab === 'Reports' ? 'active active_color' : ''}
                       onClick={() => {
                         setActiveMenu(6);
                         navigate('/MyProfile/Reports');
@@ -1142,16 +1137,16 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        activeMenu == 7 || currentTab == 'Teams' ? (
-                          <img src={ActiveTeam} width={30}></img>
+                        activeMenu === 7 || currentTab === 'Teams' ? (
+                          <img alt="" src={ActiveTeam} width={30} />
                         ) : (
-                          <img
+                          <img alt=""
                             src="/images/sidebar/teams.png"
                             width={20}
-                          ></img>
+                          />
                         )
                       }
-                      className={activeMenu == 7 || currentTab == 'Teams' ? 'active active_color' : ''}
+                      className={activeMenu === 7 || currentTab === 'Teams' ? 'active active_color' : ''}
                       onClick={() => {
                         setActiveMenu(7);
                         navigate('/MyProfile/Team');
@@ -1165,7 +1160,7 @@ const SideBar = () => {
                 )}
                 <MenuItem
                   icon={
-                    <img src="/images/sidebar/logout.png" width={20}></img>
+                    <img alt="" src="/images/sidebar/logout.png" width={20} />
                   }
                   onClick={() => {
                     Cookies.remove('currentUser');

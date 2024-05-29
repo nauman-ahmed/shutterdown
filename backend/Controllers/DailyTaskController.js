@@ -20,9 +20,18 @@ const getAllTasks = async (req, res) => {
   }
 };
 
+const getPendingTasks = async (req, res) => {
+  try {
+    const tasks = await taskSchema.find({ended : false}).populate("client assignBy assignTo")
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.log(error, 'taskData');
+  }
+};
+
 const getEditorTasks = async (req, res) => {
   try {
-    const tasks = await taskSchema.find({assignTo : req.params.editorId}).populate("client assignBy assignTo")
+    const tasks = await taskSchema.find({assignTo : req.params.editorId, ended : false}).populate("client assignBy assignTo")
 
     // const Editor=await userSchema.find({rollSelect:"Editor"})
     res.status(200).json(tasks);
@@ -46,5 +55,6 @@ module.exports = {
   addTask,
   getAllTasks,
   getEditorTasks,
-  updateTaskData
+  updateTaskData,
+  getPendingTasks
 };

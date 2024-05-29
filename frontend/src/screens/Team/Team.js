@@ -1,7 +1,6 @@
 import React from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
-import Heart from "../../assets/Profile/Heart.svg";
 import "../../assets/css/tableRoundHeader.css";
 
 function Team(props) {

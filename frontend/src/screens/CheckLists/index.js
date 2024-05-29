@@ -6,8 +6,6 @@ import CheckLists from "./CheckLists";
 function CheckListsPage(props) {
   return (
     <>
-      {/* <Header />
-      <SideBar /> */}
       <div className="main_content">
         <div className="CalenderViewWidth">
           <ClientHeader  title="CheckLists" />

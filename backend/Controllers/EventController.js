@@ -46,8 +46,10 @@ const AssignTeam = async (req, res) => {
 };
 const updateEvent = async (req, res) => {
     try {
-        // console.log(req.body.data);
-        const event = await EventModel.findByIdAndUpdate(req.body.data._id, req.body.data);
+        console.log(req.body.data);
+        const {_id, ...eventData } = req.body.data;
+        console.log(eventData);
+        const event = await EventModel.findByIdAndUpdate(req.body.data._id, eventData);
         
         console.log(event);
         

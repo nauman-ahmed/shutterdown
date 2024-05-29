@@ -1,18 +1,15 @@
 import React, { useState,useEffect } from "react";
-import { FormGroup, Input, Label, Button,Form } from "reactstrap";
+import { Button,Form } from "reactstrap";
 import "../../assets/css/common.css";
-import { useNavigate } from "react-router-dom";
 import Logo from "../../components/Logo";
 import { newPass } from "../../API/userApi";
 const ResetPassword = () => {
-  const navigate = useNavigate();
-  const [phone, setPhone] = useState();
   const [emailData,setEmailData]=useState('')
 
 useEffect(()=>{
   const data=JSON.parse(localStorage.getItem("email"))
   setEmailData(data)
-})
+}, [])
 const [inputData, setInputData] = useState({
   newpassword: '',
   newConfirmPassword: '',
@@ -48,9 +45,7 @@ alert("successFully Updated")
   })
   }
 }
-  const signin = () => {
-    navigate("/");
-  };
+
 
   return (
     <div className="row signup_mobile_container full_view_container">

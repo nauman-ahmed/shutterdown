@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { FormGroup, Input, Label, Button, Form } from 'reactstrap';
+import { Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
-import { useNavigate } from 'react-router-dom';
 import Logo from '../../components/Logo';
 import { verifyEmail } from '../../API/userApi';
 
 const EmailVerification = () => {
-  const navigate = useNavigate();
-  const [phone, setPhone] = useState();
   const [inputData, setInputData] = useState();
   const [error, setError] = useState();
   const handleOnChangeFuntion = (e) => {
@@ -22,9 +19,7 @@ const EmailVerification = () => {
       await verifyEmail(inputData);
     }
   };
-  const signin = () => {
-    navigate('/');
-  };
+
 
   return (
     <div className="row signup_mobile_container full_view_container">

@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../assets/css/common.css";
 import "../assets/css/Profile.css";
 import locate from "../assets/Profile/locate.svg";
 import mail from "../assets/Profile/mail.svg";
 import ID from "../assets/Profile/ID.svg";
 import phone from "../assets/Profile/phone.svg";
-import BackMobile from "../assets/Profile/BackMobile.svg";
-import Call from "../assets/Profile/Call.svg";
-import MailIcon from "../assets/Profile/MailIcon.svg";
 import { Outlet, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Last } from "react-bootstrap/esm/PageItem";
-import { useAuthContext } from "../config/context";
 import Cookies from "js-cookie";
 import BASE_URL from "../API";
 
@@ -60,13 +54,12 @@ function ProfileHeader({ attendence = false, profile = false }) {
       id: 5,
     },
   ];
-  const [timePage, setTimePage] = useState(true);
   return (
     <div style={{ width: "100%" }}>
       <div className="rowBox Profile_Web_hide">
         {user?.photo ? (
           <div className="ProfileBoxForImg w-25 Text50Semi">
-            <img className="w-100 h-100 imgRadius" src={BASE_URL + '/' + user.photo} />
+            <img alt="" className="w-100 h-100 imgRadius" src={BASE_URL + '/' + user.photo} />
           </div>
         ) : (
           <div className="ProfileBox Text50Semi">
@@ -81,19 +74,19 @@ function ProfileHeader({ attendence = false, profile = false }) {
               style={{ width: "95%" }}
             >
               <div className="d-flex align-items-center">
-                <img src={locate} className="marginrightsmall" />
+                <img alt="" src={locate} className="marginrightsmall" />
                 <p className="title_profile">{user?.currentAddress}</p>
               </div>
               <div className="d-flex align-items-center">
-                <img src={mail} className="marginrightsmall" />
+                <img alt="" src={mail} className="marginrightsmall" />
                 <p className="title_profile">{user?.email}</p>
               </div>
               <div className="d-flex align-items-center">
-                <img src={phone} className="marginrightsmall" />
+                <img alt="" src={phone} className="marginrightsmall" />
                 <p className="title_profile">{user?.phoneNo}</p>
               </div>
               <div className="d-flex align-items-center">
-                <img src={ID} className="marginrightsmall" />
+                <img alt="" src={ID} className="marginrightsmall" />
                 <p className="title_profile">ID Card</p>
               </div>
             </div>
@@ -138,15 +131,15 @@ function ProfileHeader({ attendence = false, profile = false }) {
                   <div
                     key={i.id}
                     className={
-                      i.id == selected
+                      i.id === selected
                         ? "itemsbox Text12 active_profile_tab "
                         : "itemsbox Text12 non_active_profile_tab"
                     }
                   >
                     {i.title}
                   </div>
-                  {i.id == selected ? (
-                    <img
+                  {i.id === selected ? (
+                    <img alt=""
                       src="/images/focus_arrow.png"
                       width={15}
                       className="focus_arrow"
@@ -171,7 +164,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
         </div>
         <div className="Profile_mobile_View center">
           {user?.photo ?
-            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img style={{ borderRadius: '50px' }} className="w-100" src={BASE_URL + '/' + user.photo} /></div>
+            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img alt="" style={{ borderRadius: '50px' }} className="w-100" src={BASE_URL + '/' + user.photo} /></div>
             : <div className="HeaderName Text35R mt25">{user?.firstName.charAt(0).toUpperCase()}{user?.lastName.charAt(0).toUpperCase()}</div>
           }
           <div className="Text16N mt12">{user?.firstName + ' ' + user?.lastName}</div>
@@ -230,7 +223,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
               <div
                 key={i.id}
                 className={
-                  i.id == selected
+                  i.id === selected
                     ? "itemsbox Text12 active_profile_tab_new "
                     : "itemsbox Text12 non_active_profile_tab"
                 }

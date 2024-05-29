@@ -1,6 +1,4 @@
-import React, { useState,useEffect } from "react";
-import SideBar from "../../components/Sidebar";
-import Header from "../../components/Header";
+import React from "react";
 import CalenderBar from "../../components/CalenderBar";
 import ProfileHeader from "../../components/ProfileHeader";
 

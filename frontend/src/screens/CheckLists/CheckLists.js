@@ -118,7 +118,7 @@ function CheckLists(props) {
                     style={{ cursor: 'pointer' }}
                   >
                     {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img src={CalenderImg} />
+                    <img alt="" src={CalenderImg} />
                   </div>
                   :
                   <input type='month' onChange={(e) => {
@@ -265,7 +265,7 @@ function CheckLists(props) {
                             height: '30px',
                           }}
                           onClick={() => handleSaveData(index)} >
-                          {updatingIndex == index ? (
+                          {updatingIndex === index ? (
                             <div className='w-100'>
                               <div class="smallSpinner mx-auto"></div>
                             </div>

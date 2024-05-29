@@ -83,7 +83,7 @@ function ViewClient() {
                     style={{ cursor: 'pointer' }}
                   >
                     {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img src={CalenderImg} />
+                    <img alt='' src={CalenderImg} />
                   </div>
                   :
                   <input type='month' onChange={(e) => {
@@ -148,7 +148,7 @@ function ViewClient() {
                     >
                       {client.brideName}
                       <br />
-                      <img src={Heart} />
+                      <img alt='' src={Heart} />
                       <br />
                       {client.groomName}
                     </td>

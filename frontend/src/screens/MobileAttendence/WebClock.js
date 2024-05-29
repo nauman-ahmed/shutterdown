@@ -7,10 +7,6 @@ import GreenCircle from "../../assets/Profile/GreenCircle.svg";
 import RedCircle from "../../assets/Profile/RedCircle.svg";
 import { Table } from 'reactstrap';
 import '../../assets/css/Profile.css';
-import LocateAttendee from '../../assets/Profile/LocateAttendee.svg';
-import Tick from '../../assets/Profile/Tick.svg';
-import Spinner from 'react-bootstrap/Spinner';
-import { Button } from 'reactstrap';
 
 import axios from "axios";
 function WebClock(props) {

@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Form, Table } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { Table } from 'reactstrap';
 import '../../assets/css/Profile.css';
 import Heart from '../../assets/Profile/Heart.svg';
 import '../../assets/css/tableRoundHeader.css';
 import 'react-toastify/dist/ReactToastify.css';
 import dayjs from 'dayjs';
-import { addphotosDeliverables, addPhotosDeliverables, getClients } from '../../API/Client';
 import { getEditors } from '../../API/userApi';
 import Select from 'react-select';
-import CalenderImg from '../../assets/Profile/Calender.svg';
-import Calendar from 'react-calendar';
-import { Overlay } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
 import { getPhotos, updateDeliverable } from '../../API/Deliverables';
@@ -19,35 +15,11 @@ import { getPhotos, updateDeliverable } from '../../API/Deliverables';
 function Photos() {
 
   const [editors, setEditors] = useState(null);
-  const [allClients, setAllClients] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
-  const [filterFor, setFilterFor] = useState('day')
-  const toggle = () => {
-    setShow(!show);
-  };
   const [filterBy, setFilterBy] = useState(null)
   const currentUser = JSON.parse(Cookies.get('currentUser'));
-  const [clientsForShow, setClientsForShow] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
-  const [filteringDay, setFilteringDay] = useState(null);
-  const filterByDay = (date) => {
-    setFilteringDay(date)
-    setShow(!show);
-    setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
-    }))
-  }
-  const filterByMonth = (date) => {
-    setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
-    }))
-  };
-
-
-
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -55,11 +27,11 @@ function Photos() {
       const res = await getEditors();
       setEditors(res.editors.filter(user => user.subRole === 'Photographer'));
       console.log(data);
-      if (currentUser?.rollSelect == 'Manager') {
+      if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
-      } else if (currentUser?.rollSelect == 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id == currentUser._id);
+      } else if (currentUser?.rollSelect === 'Editor') {
+        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -69,6 +41,7 @@ function Photos() {
   }
   useEffect(() => {
     fetchData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const applyFilter = (filterValue) => {
@@ -81,9 +54,9 @@ function Photos() {
       console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
-        sortedArray = [...allDeliverables]; // Create a new array
+        sortedArray = [...deliverablesForShow]; // Create a new array
       } else {
-        sortedArray = [...allDeliverables].sort((a, b) => {
+        sortedArray = [...deliverablesForShow].sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);
           return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
@@ -94,9 +67,9 @@ function Photos() {
       console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
-        sortedArray = [...allDeliverables]; // Create a new array
+        sortedArray = [...deliverablesForShow]; // Create a new array
       } else {
-        sortedArray = [...allDeliverables].sort((a, b) => {
+        sortedArray = [...deliverablesForShow].sort((a, b) => {
           const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
           const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
           return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
@@ -223,7 +196,9 @@ function Photos() {
       } else if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
-        setDeliverablesForShow(allDeliverables)
+        if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
+          setDeliverablesForShow(allDeliverables)
+        }
       }
     }
     setFilterBy(filterType);
@@ -271,25 +246,25 @@ function Photos() {
               bordered
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect == 'Manager' ? { width: '175%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect === 'Manager' ? { width: '190%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
-                {currentUser?.rollSelect == 'Editor' ?
+                {currentUser?.rollSelect === 'Editor' ?
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client:</th>
                     <th className="tableBody">Deliverable</th>
                     <th className="tableBody">Editor</th>
-                    <th className="tableBody">Company Deadline</th>
+                    <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
                   </tr>
-                  :currentUser?.rollSelect == 'Manager' ?
+                  :currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody">Client:</th>
                       <th className="tableBody">Deliverable</th>
                       <th className="tableBody">Editor</th>
                       <th className="tableBody">Wedding Date</th>
                       <th className="tableBody">Client Deadline</th>
-                      <th className="tableBody">Company Deadline</th>
+                      <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
                       <th className="tableBody">Final Delivery Date</th>
                       <th className="tableBody">Status</th>
@@ -311,8 +286,8 @@ function Photos() {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
-                      {index == 0 && <div style={{ marginTop: '15px' }} />}
-                      {currentUser?.rollSelect == 'Manager' && (
+                      {index === 0 && <div style={{ marginTop: '15px' }} />}
+                      {currentUser?.rollSelect === 'Manager' && (
                         <tr
                           style={{
                             background: '#EFF0F5',
@@ -335,7 +310,7 @@ function Photos() {
                                 marginBottom: '5px',
                               }}
                             >
-                              <img src={Heart} />
+                              <img alt='' src={Heart} />
                               <br />
                               {deliverable.client?.groomName}
                             </div>
@@ -350,9 +325,7 @@ function Photos() {
                           >
                             <div>
                               {deliverable.deliverableName}
-
                             </div>
-
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -377,7 +350,7 @@ function Photos() {
                               paddingBottom: '15px',
                               width:"10%"
                             }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MM-YYYY')}
+                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -387,7 +360,7 @@ function Photos() {
                               width:"10%"
                             }}
                           >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MM-YYYY')}
+                            {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2"
@@ -463,15 +436,7 @@ function Photos() {
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          {/* <td
-                            style={{
-                              paddingTop: '15px',
-                              paddingBottom: '15px',
-                              width: '10%',
-                            }}
-                            className="tableBody">
-                            {client.suggestion}
-                          </td> */}
+                          
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
@@ -512,7 +477,7 @@ function Photos() {
                             }} >
                             <button className="btn btn-primary "
                               onClick={(e) => updatingIndex === null && handleSaveData(index)} >
-                              {updatingIndex == index ? (
+                              {updatingIndex === index ? (
                                 <div className='w-100'>
                                   <div class="smallSpinner mx-auto"></div>
                                 </div>
@@ -523,7 +488,7 @@ function Photos() {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect == 'Editor' && (
+                      {currentUser?.rollSelect === 'Editor' && (
                         <tr
                           style={{
                             background: '#EFF0F5',
@@ -545,7 +510,7 @@ function Photos() {
                                 marginBottom: '5px',
                               }}
                             >
-                              <img src={Heart} />
+                              <img alt='' src={Heart} />
                               <br />
                               {deliverable?.client?.groomName}
                             </div>
@@ -585,31 +550,13 @@ function Photos() {
                           </td>
                         </tr>
                       )}
-
                       <div style={{ marginTop: '15px' }} />
                     </>
                   )
                 }
-
                 )}
               </tbody>
             </Table>
-            <Overlay rootClose={true}
-              onHide={() => setShow(false)}
-              target={target.current}
-              show={show}
-              placement="bottom">
-              <div>
-                <Calendar
-                  value={filteringDay}
-                  minDate={new Date(Date.now())}
-                  CalenderPress={toggle}
-                  onClickDay={(date) => {
-                    filterByDay(date);
-                  }}
-                />
-              </div>
-            </Overlay>
           </div>
         </>
       ) : (
@@ -617,7 +564,6 @@ function Photos() {
           <div class="spinner"></div>
         </div>
       )}
-
     </>
   );
 }

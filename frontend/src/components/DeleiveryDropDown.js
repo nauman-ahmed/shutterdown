@@ -9,7 +9,6 @@ import {
 import DropDownOvalActive from "../assets/Profile/DropDownOvalActive.svg";
 import DropDownOvalUnActive from "../assets/Profile/DropDownOvalUnActive.svg";
 import PropTypes from "prop-types";
-import { propTypes } from "react-bootstrap/esm/Image";
 
 function DeleiveryDropDown({
   direction,
@@ -65,7 +64,7 @@ function DeleiveryDropDown({
             style={{ background: "#666DFF" }}
           >
             {data.map((i) => {
-              const background = dropdownSelect == i.title ? true : false;
+              const background = dropdownSelect === i.title ? true : false;
               return (
                 <DropdownItem
                   key={i.id}
@@ -81,7 +80,7 @@ function DeleiveryDropDown({
                     display: "flex",
                   }}
                 >
-                  <img
+                  <img alt=""
                     src={background ? DropDownOvalActive : DropDownOvalUnActive}
                     style={{ marginRight: "5px" }}
                   />
