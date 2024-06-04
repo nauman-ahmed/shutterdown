@@ -11,7 +11,6 @@ export const getCinematography = async () => {
                 Headers: { 'Content-Type': 'application/json' },
             }
         );
-        console.log(res);
         return res.data
     } catch (error) {
         console.log(error);
@@ -29,7 +28,7 @@ export const getAlbums = async () => {
         console.log(error);
     }
 }
-export const getPhotos = async () => {
+export const getPhotos = async () => { 
     try {
         const res = await axios.get(BASE_URL + `/get-Photos`,
             {

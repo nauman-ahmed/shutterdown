@@ -161,7 +161,6 @@ export const getEditors = async () => {
         'Content-Type': 'application/json',
       },
     });
-    console.log(res);
     return res.data
   } catch (error) {
     alert(error.toString());

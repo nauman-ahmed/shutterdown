@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { getAlbums, updateDeliverable } from "../../API/Deliverables";
+import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 
 function Albums(props) {
   const [editors, setEditors] = useState(null);
@@ -19,6 +20,7 @@ function Albums(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
+  const [ascendingWeding, setAscendingWeding] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -49,49 +51,44 @@ function Albums(props) {
       id: 1,
       filters: editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 2 }
-      })]
+      }),{ title: 'Unassigned Editor', id: editors.length+3 }]
     },
-    {
-      title: 'Unassigned Editor',
-      id: 2,
-      filters: []
-    },
-    {
-      title: 'Wedding Date sorting',
-      id: 3,
-      filters: [
-        {
-          title: 'No Sorting',
-          id: 1
-        },
-        {
-          title: 'Ascending',
-          id: 2
-        },
-        {
-          title: 'Descending',
-          id: 3
-        }
-      ]
-    },
-    {
-      title: 'Deadline sorting',
-      id: 4,
-      filters: [
-        {
-          title: 'No Sorting',
-          id: 1
-        },
-        {
-          title: 'Ascending',
-          id: 2
-        },
-        {
-          title: 'Descending',
-          id: 3
-        }
-      ]
-    },
+    // {
+    //   title: 'Wedding Date sorting',
+    //   id: 3,
+    //   filters: [
+    //     {
+    //       title: 'No Sorting',
+    //       id: 1
+    //     },
+    //     {
+    //       title: 'Ascending',
+    //       id: 2
+    //     },
+    //     {
+    //       title: 'Descending',
+    //       id: 3
+    //     }
+    //   ]
+    // },
+    // {
+    //   title: 'Deadline sorting',
+    //   id: 4,
+    //   filters: [
+    //     {
+    //       title: 'No Sorting',
+    //       id: 1
+    //     },
+    //     {
+    //       title: 'Ascending',
+    //       id: 2
+    //     },
+    //     {
+    //       title: 'Descending',
+    //       id: 3
+    //     }
+    //   ]
+    // },
     {
       title: 'Current Status',
       id: 5,
@@ -139,11 +136,25 @@ function Albums(props) {
     },
   ]
 
+  const applySorting = (wedding = false)=>{
+    try {
+      if(wedding){
+        console.log("applySorting",deliverablesForShow)
+        setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
+          const dateA = new Date(a.clientDeadline);
+          const dateB = new Date(b.clientDeadline);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
+        setAscendingWeding(!ascendingWeding)
+      }
+    } catch (error) {
+      console.log("applySorting ERROR",error)
+    }
+  }
+
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
-      if (filterType === 'Assigned Editor') {
-        setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false))
-      } else if (filterType === 'Unassigned Editor') {
+      if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
         if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
@@ -156,8 +167,15 @@ function Albums(props) {
 
   const applyFilter = (filterValue) => {
     setDeliverablesForShow(null)
+    if(filterValue == null){
+      setDeliverablesForShow(allDeliverables)
+      return
+    }
     if (filterBy === 'Assigned Editor') {
-      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
+      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
+      : filterValue === 'Unassigned Editor' ?
+      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+      : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
     } else if (filterBy === 'Current Status') {
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
     } else if (filterBy === 'Deadline sorting') {
@@ -242,13 +260,13 @@ function Albums(props) {
               bordered
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect === 'Manager' ? { width: '190%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect === 'Manager' ? { width: '120%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
                 {currentUser?.rollSelect === 'Editor' ?
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
-                    <th className="tableBody">Album</th>
+                    <th className="tableBody">Albums</th>
                     <th className="tableBody">Editor</th>
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
@@ -256,9 +274,9 @@ function Albums(props) {
                   : currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody">Client</th>
-                      <th className="tableBody">Album</th>
+                      <th className="tableBody">Albums</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody">Wedding Date</th>
+                      <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -293,23 +311,16 @@ function Albums(props) {
                               paddingBottom: '15px',
                               width: "10%"
                             }}
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
                             {deliverable.client?.brideName}
-                            <div
-                              style={{
-                                fontSize: '12px',
-                                marginRight: '10px',
-                                marginBottom: '5px',
-                              }}
-                            >
-                              <img alt="" src={Heart} />
-                              <br />
-                              {deliverable?.client?.groomName}
-                            </div>
+                            <br />
+                            <img alt="" src={Heart} />
+                            <br />
+                            {deliverable?.client?.groomName}
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -321,7 +332,7 @@ function Albums(props) {
                             </div>
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -337,7 +348,7 @@ function Albums(props) {
                             })} required />
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -346,7 +357,7 @@ function Albums(props) {
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -356,7 +367,7 @@ function Albums(props) {
                             {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -375,7 +386,7 @@ function Albums(props) {
                             />
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -395,7 +406,7 @@ function Albums(props) {
                             />
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -419,7 +430,7 @@ function Albums(props) {
                               paddingBottom: '15px',
                               width: "10%"
                             }}
-                            className="tableBody Text14Semi primary2"   >
+                            className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
                               const updatedDeliverables = [...allDeliverables];
                               updatedDeliverables[index].status = selected.value;
@@ -436,7 +447,7 @@ function Albums(props) {
                               paddingBottom: '15px',
                               width: "15%"
                             }}
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
                             Reminder/Yes or No
                           </td>
@@ -444,7 +455,7 @@ function Albums(props) {
                             paddingTop: '15px',
                             paddingBottom: '15px',
                             width: '10%',
-                          }} className="tableBody">
+                          }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
                               const updatedDeliverables = [...allDeliverables];
@@ -459,7 +470,7 @@ function Albums(props) {
                           </td>
 
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -489,22 +500,15 @@ function Albums(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
                             {deliverable?.client?.brideName}
-                            <div
-                              style={{
-                                fontSize: '12px',
-                                marginRight: '10px',
-                                marginBottom: '5px',
-                              }}
-                            >
-                              <img alt="" src={Heart} />
-                              <br />
-                              {deliverable?.client?.groomName}
-                            </div>
+                            <br />
+                            <img alt="" src={Heart} />
+                            <br />
+                            {deliverable?.client?.groomName}
                           </td>
-                          <td className="tableBody Text14Semi primary2"
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -514,7 +518,7 @@ function Albums(props) {
                             </div>
                           </td>
                           <td
-                            className="tableBody Text14Semi primary2"
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
@@ -526,7 +530,7 @@ function Albums(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}
-                            className="tableBody Text14Semi primary2"   >
+                            className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             {deliverable?.companyDeadline}
                           </td>
                           <td
@@ -534,7 +538,7 @@ function Albums(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}
-                            className="tableBody Text14Semi primary2"   >
+                            className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             {deliverable?.status}
                           </td>
                         </tr>

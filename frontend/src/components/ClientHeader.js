@@ -51,7 +51,6 @@ function ClientHeader(props) {
   const fetchClientsData = async () => {
     const clients = await getClients();
     const res = await getEditors();
-    console.log(res);
     setEditors(res.editors);
     setAllClients(clients);
   }
@@ -84,7 +83,7 @@ function ClientHeader(props) {
     props.applyFilter(value)
   }
   const handleParentFilter = (value) => {
-    if (value === 'All' || value === 'Date Assigned' || value === 'Date Unassigned') {
+    if (value === 'All' || value === 'Date Assigned' || value === 'Date Unassigned' || value === null) {
       props.applyFilter(value);
       setShow(false)
     } else {
@@ -104,7 +103,7 @@ function ClientHeader(props) {
   };
   const options = props.options;
   const currentFilter = props.currentFilter
-  console.log(list);
+
   return (
     <>
       <div className="R_A_Justify mb15">
@@ -161,7 +160,7 @@ function ClientHeader(props) {
         placement="bottom"
       >
         {(props) => (
-          <Tooltip id="overlay-example" {...props}>
+          <Tooltip key={1} id="overlay-example" {...props}>
             <div
               className="nav_popover"
               style={{ width: '200px', paddingTop: '10px' }}
@@ -172,14 +171,28 @@ function ClientHeader(props) {
                   <>
                   {optionObj.title !== "clientsFromListView" && (
                     <div
+                      key={i}
                       className={`rowalign ${(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') ? " " : " d-flex flex-row justify-content-between"} `}
                       onClick={() => {
-                        if (currentFilter !== optionObj.title) {
-                          setParentFilter(optionObj.id);
-                          handleParentFilter(optionObj.title);
-                          setChildFilter(null)
-                        } else {
-                          setParentFilter(null)
+                        if(currentFilter !== undefined){
+                          if (currentFilter !== optionObj.title) {
+                            setParentFilter(optionObj.id);
+                            handleParentFilter(optionObj.title);
+                            setChildFilter(null)
+                          } else {
+                            setParentFilter(null)
+                          }
+                        }else{
+                          if(optionObj.id == parentFilter && selected){
+                            setParentFilter(null);
+                            handleParentFilter(null);
+                            setChildFilter(null)
+                          }else{
+                            setParentFilter(optionObj.id);
+                            handleParentFilter(optionObj.title);
+                            setChildFilter(null)
+                          }
+                          setShow(false)
                         }
                       }}
                       style={{
@@ -208,7 +221,6 @@ function ClientHeader(props) {
                       )}
                     </div>
                   )}
-                    
                     {(selected || optionObj.title === "clientsFromListView") && (
                       <>
                         {optionObj?.filters?.map((option, i) => {
@@ -222,7 +234,12 @@ function ClientHeader(props) {
                                 } else {
                                 handleChildFilter(option.title)
                                 }
-                                setChildFilter(option.id);
+                                if(option.id === childFilter && childSelected){
+                                  setChildFilter(null)
+                                  handleChildFilter(null)
+                                }else{
+                                  setChildFilter(option.id);
+                                }
                                 setShow(false)
                               }}
                               style={{
@@ -299,7 +316,7 @@ function ClientHeader(props) {
             </Row>
             <Row className="p-3">
               <Col xl="4" sm="6" lg="4" className="p-2">
-                <div className="label">Deadline Date</div>
+                <div className="label">Deadline</div>
                 <input
                   type="date"
                   name="deadlineDate"

@@ -48,12 +48,12 @@ function ClientInfo() {
   }, []);
   let travelByOptions = [
     {
-      value: "Car",
-      label: "Car",
+      value: "By Car",
+      label: "By Car",
     },
     {
-      value: "Bus",
-      label: "Bus",
+      value: "By Bus",
+      label: "By Bus",
     },
     {
       value: "By Air",
@@ -150,14 +150,14 @@ function ClientInfo() {
           >
             <th>Client</th>
             <th>Phone Number</th>
-            <th>Album</th>
-            <th>Pre Wedding Photos</th>
-            <th>Pre Wedding Videos</th>
-            <th>HDD</th>
-            <th>Long Film</th>
+            <th>Albums</th>
+            <th>Pre-Wedding Photos</th>
+            <th>Pre-Wedding Videos</th>
+            <th>HDDs</th>
+            <th>Long Films</th>
             <th>Reels</th>
             <th>Promo</th>
-            <th>Payment status</th>
+            <th>Payment Status</th>
           </tr>
         </thead>
         <tbody
@@ -168,31 +168,23 @@ function ClientInfo() {
           }}
         >
           <tr>
-            <td className="Text14Semi primary2">
-              <td
-                style={{
-                  paddingTop: "15px",
-                  paddingBottom: "15px",
-                }}
-                className="tableBody Text14Semi primary2 fs-6"
-              >
-                {clientData?.brideName}
-                <div
-                  style={{
-                    fontSize: "12px",
-                    marginRight: "10px",
-                    marginBottom: "5px",
-                  }}
-                >
-                  <img alt="" src={Heart} />
-                  <br />
-                  {clientData?.groomName}
-                </div>
-              </td>
+            <td
+              style={{
+                fontSize: "12px",
+                paddingTop: "15px",
+                paddingBottom: "15px",
+              }}
+              className="tableBody Text14Semi primary2 fs-6"
+            >
+              {clientData?.brideName}
+              <br />
+              <img alt="" src={Heart} />
+              <br />
+              {clientData?.groomName}
             </td>
-            <td className="textPrimary fs-6">{clientData?.phoneNumber}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.phoneNumber}</td>
            
-            <td className="textPrimary fs-6">
+            <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.albums?.map((val, i) => (
                 <div>
                   {i + 1} : {val}
@@ -200,17 +192,18 @@ function ClientInfo() {
                 </div>
               ))}
             </td>
-            <td className="textPrimary fs-6">
-              {clientData?.deliverables?.preWeddingPhotos ? "Yes" : "No"}
+            {console.log(clientData)}
+            <td className="textPrimary fs-6 tablePlaceContent">
+              {clientData?.preWeddingPhotos ? "Yes" : "No"}
             </td>
-            <td className="textPrimary fs-6">
-              {clientData?.deliverables?.preWeddingVideos ? "Yes" : "No"}
+            <td className="textPrimary fs-6 tablePlaceContent">
+              {clientData?.preWeddingVideos ? "Yes" : "No"}
             </td>
-            <td className="textPrimary fs-6">{clientData?.hardDrives}</td>
-            <td className="textPrimary fs-6">{clientData?.longFilms}</td>
-            <td className="textPrimary fs-6">{clientData?.reels}</td>
-            <td className="textPrimary fs-6">{clientData?.promos}</td>
-            <td className="textPrimary fs-6">{clientData?.paymentStatus}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.hardDrives}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.longFilms}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.reels}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.promos}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
           </tr>
         </tbody>
       </Table>
@@ -234,15 +227,15 @@ function ClientInfo() {
           >
             <th>Event Date</th>
             <th>Event Type</th>
-            <th>location</th>
+            <th>Location</th>
             <th>Travel By</th>
             <th>Photographers</th>
             <th>Cinematographers</th>
             <th>Drones</th>
             <th>Same Day Photo Editors</th>
             <th>Same Day Video Editors</th>
-            <th>Tentative</th>
-            <th>Action</th>
+            {/* <th>Tentative</th> */}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody
@@ -271,7 +264,7 @@ function ClientInfo() {
                 <td className="textPrimary fs-6">
                   {event?.sameDayVideoEditor}
                 </td>
-                <td className="textPrimary fs-6">{event?.tentative}</td>
+                {/* <td className="textPrimary fs-6">{event?.tentative}</td> */}
                 <td className=" textPrimary fs-6">
                 <div className="d-flex flex-row align-items-center gap-2">
 
@@ -307,7 +300,7 @@ function ClientInfo() {
               return;
             }
             addNewEvent();
-          }}
+          }} 
         >
           <ModalBody>
             <Row ref={target}>
@@ -377,7 +370,7 @@ function ClientInfo() {
                   onChange={(e) => updateNewEvent(e)}
                   type="name"
                   name="eventType"
-                  placeholder="Event_Type"
+                  placeholder="Enter Event Type"
                   className="ContactModel"
                   required
                 />
@@ -415,6 +408,36 @@ function ClientInfo() {
                     }}
                     styles={customStyles}
                     options={travelByOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Shoot Director
+                  </div>
+                  <Select
+                    value={newEvent?.shootDirectors ? {label : newEvent?.shootDirectors, value : newEvent?.shootDirectors} : null}
+                    name="shootDirectors"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        shootDirectors: selected?.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={[
+                      {
+                        value: "0",
+                        label: "0",
+                      },
+                      {
+                        value: "1",
+                        label: "1",
+                      },
+                    ]}
                     required
                   />
                 </div>
@@ -500,7 +523,7 @@ function ClientInfo() {
               <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Photo editor
+                    Same Day Photo Editors
                   </div>
                   <Select
                     value={
@@ -528,7 +551,7 @@ function ClientInfo() {
               <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Video editor
+                    Same Day Video Editors
                   </div>
                   <Select
                     value={
@@ -553,7 +576,7 @@ function ClientInfo() {
                   />
                 </div>
               </Col>
-              <Col xl="6" sm="6" className="p-2">
+              {/* <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Tentative
@@ -577,7 +600,7 @@ function ClientInfo() {
                     required
                   />
                 </div>
-              </Col>
+              </Col> */}
             </Row>
           </ModalBody>
           <ModalFooter>
@@ -724,6 +747,36 @@ function ClientInfo() {
               <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Shoot Director
+                  </div>
+                  <Select
+                    value={eventToEdit?.shootDirectors ? {label : eventToEdit?.shootDirectors, value : eventToEdit?.shootDirectors} : null}
+                    name="shootDirectors"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setEventToEdit({
+                        ...eventToEdit,
+                        shootDirectors: selected?.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={[
+                      {
+                        value: "0",
+                        label: "0",
+                      },
+                      {
+                        value: "1",
+                        label: "1",
+                      },
+                    ]}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Photographers
                   </div>
                   <Select
@@ -861,7 +914,7 @@ function ClientInfo() {
                   />
                 </div>
               </Col>
-              <Col xl="6" sm="6" className="p-2">
+              {/* <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Tentative
@@ -888,7 +941,7 @@ function ClientInfo() {
                     required
                   />
                 </div>
-              </Col>
+              </Col> */}
             </Row>
           </ModalBody>
           <ModalFooter>

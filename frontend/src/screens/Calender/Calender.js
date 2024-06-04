@@ -149,7 +149,7 @@ function Calender() {
                 content: `
               <div class="popover-custom-content">
                 <div class="rowalign px-auto mb-2 weds">
-                  <div className="col-12">${info.event?.extendedProps.client?.groomName} weds  ${info.event?.extendedProps.client?.brideName}</div>
+                  <div className="col-12">${info.event?.extendedProps.client?.brideName} weds  ${info.event?.extendedProps.client?.groomName}</div>
                 </div>
                 <div class="rowalign">
                   <div >Photographers : </div>

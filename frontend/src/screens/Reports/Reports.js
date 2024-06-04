@@ -21,6 +21,7 @@ function Reports(props) {
     try {
       const tasks = await getAllTasks();
       setAllTasks(tasks);
+      setTasksToShow(tasks)
     } catch (error) {
       console.log(error);
     }
@@ -76,6 +77,10 @@ function Reports(props) {
 
   const applyFilter = (filterValue) => {
     // setTaksToShow(null);
+    if(filterValue == null){
+      setTasksToShow(allTasks)
+      return
+    }
     if (filterBy === "Assign By") {
       setTasksToShow(
         allTasks.filter((task) => task.assignBy._id === filterValue.userId)
@@ -110,7 +115,7 @@ function Reports(props) {
           <thead>
             <tr className="logsHeader Text16N1">
               <th className="tableBody">Client</th>
-              <th className="tableBody">Task Assigned</th>
+              <th className="tableBody">Task</th>
               <th className="tableBody">Task Assigned Date</th>
               <th className="tableBody">Assigned By</th>
               <th className="tableBody">Assigned To</th>
@@ -118,7 +123,7 @@ function Reports(props) {
               <th className="tableBody">Deadline</th>
               <th className="tableBody">Completion Date</th>
               <th className="tableBody">Task Ended</th>
-              <th className="tableBody">Delay</th>
+              <th className="tableBody">Delays</th>
             </tr>
           </thead>
           <tbody
@@ -139,7 +144,7 @@ function Reports(props) {
                   }}
                 >
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -153,7 +158,7 @@ function Reports(props) {
                   </td>
 
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -162,7 +167,7 @@ function Reports(props) {
                     {task.taskName}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -171,7 +176,7 @@ function Reports(props) {
                     {dayjs(task.assignDate).format("DD-MMM-YYYY")}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -180,7 +185,7 @@ function Reports(props) {
                     {task.assignBy.firstName} {task.assignBy.lastName}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -189,7 +194,7 @@ function Reports(props) {
                     {task.assignTo.firstName} {task.assignTo.lastName}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -208,7 +213,7 @@ function Reports(props) {
                       : "Closed"}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -217,7 +222,7 @@ function Reports(props) {
                     {dayjs(task.deadlineDate).format("DD-MMM-YYYY")}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -225,10 +230,10 @@ function Reports(props) {
                   >
                     {task.completionDate
                       ? dayjs(task.completionDate).format("DD-MMM-YYYY")
-                      : "Not yet Completed"}
+                      : "Not Yet Completed"}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",
@@ -237,7 +242,7 @@ function Reports(props) {
                     {task.ended ? "Yes" : "No"}
                   </td>
                   <td
-                    className="tableBody Text14Semi primary2"
+                    className="tableBody Text14Semi primary2 tablePlaceContent"
                     style={{
                       paddingTop: "15px",
                       paddingBottom: "15px",

@@ -46,7 +46,7 @@ function Job() {
           <Col xs="12" sm="6" style={{ paddingRight: '25px' }}>
             <div className="profileCard mt40">
               <div className="R_A_Justify p10">
-                <div className="Text14Semi">Jobs Details</div>
+                <div className="Text14Semi">Job Details</div>
                 <div className="Text10N gray" style={{ cursor: "pointer" }} onClick={toggle}>Edit</div>
               </div>
               <div className="line" />

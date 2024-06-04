@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
@@ -10,6 +11,7 @@ import Assistant from "../../assets/Profile/Assistant.svg";
 import Car from "../../assets/Profile/Car.svg";
 import Plane from "../../assets/Profile/Plane.svg";
 import ShootDropDown from "../../components/ShootDropDown";
+import { addEvent, deleteEvent, updateEventData } from "../../API/Event";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import { assignEventTeam, getEvents } from "../../API/Event";
@@ -22,9 +24,22 @@ import { Overlay } from "react-bootstrap";
 import { IoIosArrowRoundUp, IoIosWarning } from "react-icons/io";
 import ClientHeader from "../../components/ClientHeader";
 import { IoIosArrowRoundDown } from "react-icons/io";
-
+import { useDispatch } from "react-redux";
+import { updateAllEvents } from "../../redux/eventsSlice";
+import { getClientById } from "../../API/Client";
+import {
+  Button,
+  Col,
+  Form,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+} from "reactstrap";
+import { getClients } from '../../API/Client';
 function ListView(props) {
-  console.log(props.filter);
+  const [clientData, setClientData] = useState(null);
   const [allEvents, setAllEvents] = useState([]);
   const [eventsForShow, setEventsForShow] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
@@ -32,6 +47,10 @@ function ListView(props) {
   const [filterFor, setFilterFor] = useState("day");
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascending, setAscending] = useState(true);
+  const [newEventModel, setNewEventModel] = useState(false);
+  const [newEvent, setNewEvent] = useState({  });
+  const [showCalender, setShowCalender] = useState(false);
+  const dispatch = useDispatch();
   const toggle = () => {
     setShow(!show);
   };
@@ -138,14 +157,18 @@ function ListView(props) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    setEventsForShow(allEvents.sort((a, b) => {
-      const dateA = new Date(a.eventDate);
-      const dateB = new Date(b.eventDate);
-      return ascending ? dateA - dateB : dateB - dateA;
-    }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allEvents]);
+  // useEffect(() => {
+  //   try {
+  //     setEventsForShow(allEvents.sort((a, b) => {
+  //       const dateA = new Date(a.eventDate);
+  //       const dateB = new Date(b.eventDate);
+  //       return ascending ? dateA - dateB : dateB - dateA;
+  //     }));
+  //   } catch (error) {
+  //     console.log("ERROR useEffect",error)      
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [allEvents]);
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -161,11 +184,6 @@ function ListView(props) {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
-  
-  useEffect(() => {
-    getEventsData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onSubmitHandler = async (event, index) => {
     try {
@@ -245,17 +263,94 @@ function ListView(props) {
   ];
 
   const applyFilter = (filterObj) => {
-    console.log(filterObj);
-    setEventsForShow(allEvents.filter((event) => event.client?._id === filterObj?.clientId));
+    if(filterObj){
+      setEventsForShow(allEvents.filter((event) => event.client?._id === filterObj?.clientId));
+      return
+    }
+    applySorting()
+    getEventsData()
   };
   const applySorting = ()=>{
-    setEventsForShow(allEvents.sort((a, b) => {
-      const dateA = new Date(a.eventDate);
-      const dateB = new Date(b.eventDate);
-      return ascending ? dateB - dateA : dateA - dateB;
-    }));
-    setAscending(!ascending)
+    try {
+      setEventsForShow(eventsForShow.sort((a, b) => {
+        const dateA = new Date(a.eventDate);
+        const dateB = new Date(b.eventDate);
+        return ascending ? dateB - dateA : dateA - dateB;
+      }));
+      setAscending(!ascending)
+    } catch (error) {
+      console.log("applySorting ERROR",error)
+    }
   }
+  
+  useEffect(() => {
+    applySorting()
+  }, [allEvents]);
+
+  useEffect(() => {
+    getEventsData();
+    getStoredEvents();
+    fetchClientsData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const getStoredEvents = async () => {
+    const storedEvents = await getEvents();
+    setAllEvents(storedEvents.data);
+    dispatch(updateAllEvents(storedEvents.data));
+  };
+  const addNewEvent = async () => {
+    try {
+      await addEvent(newEvent);
+      setNewEvent({  });
+      setNewEventModel(false);
+      window.notify("Event added successfully!", "success");
+      getEventsData();
+      getStoredEvents();
+      fetchClientsData()
+    } catch (error) {
+      console.log(error);
+    }
+  };
+ 
+  const updateNewEvent = (e) => {
+    setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
+  };
+  const fetchClientsData = async () => {
+    const clients = await getClients();
+    setClientData(clients);
+  }
+  let travelByOptions = [
+    {
+      value: "By Car",
+      label: "By Car",
+    },
+    {
+      value: "By Bus",
+      label: "By Bus",
+    },
+    {
+      value: "By Air",
+      label: "By Air",
+    },
+    {
+      value: "N/A",
+      label: "N/A",
+    },
+  ];
+  let numberOptions = [
+    {
+      value: "1",
+      label: "1",
+    },
+    {
+      value: "2",
+      label: "2",
+    },
+    {
+      value: "3",
+      label: "3",
+    },
+  ];
   return (
     <>
       <ToastContainer />
@@ -274,7 +369,7 @@ function ListView(props) {
             ref={target}
           >
             <div className="w-100 d-flex flex-row align-items-center">
-              <div className="w-50">
+              <div className="" style={{ width: "40%" }}>
                 {filterFor === "day" ? (
                   <div
                     className={`forminput R_A_Justify1`}
@@ -296,10 +391,9 @@ function ListView(props) {
                   />
                 )}
               </div>
-              <div className="w-50 px-2 ">
+              <div className="mx-2 " style={{ width: "30%" }} >
                 <Select
                   value={{ value: filterFor, label: filterFor }}
-                  className="w-75"
                   onChange={(selected) => {
                     if (selected.value !== filterFor) {
                       setEventsForShow(allEvents);
@@ -315,6 +409,15 @@ function ListView(props) {
                   ]}
                 />
               </div>
+              <div className=" px-2 " style={{ width: "30%" }}>
+              <button
+                  onClick={() => setNewEventModel(true)}
+                  className="btn btn-primary"
+                  style={{ backgroundColor : '#666DFF'}}
+                >
+                  Add Event
+                </button>
+              </div>
             </div>
           </div>
           <div style={{ overflowX: "hidden", width: "100%" }}>
@@ -327,20 +430,20 @@ function ListView(props) {
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple Location</th>
-                    <th className="tableBody">Travel {ascending ? <IoIosArrowRoundDown style={{color : '#666DFF'}} onClick={applySorting} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" onClick={applySorting} /> }</th>
+                    <th className="tableBody">Date {ascending ? <IoIosArrowRoundDown style={{color : '#666DFF'}} onClick={applySorting} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" onClick={applySorting} /> }</th>
                     <th className="tableBody">Event Type</th>
                     {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Director</th>
                     <th className="tableBody">
-                      Photographer
+                      Photographers
                       <img alt="" src={Camera} />
                     </th>
                     <th className="tableBody">
-                      Cinematographer
+                      Cinematographers
                       <img alt="" src={Video} />
                     </th>
                     <th className="tableBody">
-                      DroneFlyer
+                      Drone Flyers
                       <img alt="" src={Drone} />
                     </th>
                     <th className="tableBody">
@@ -348,11 +451,11 @@ function ListView(props) {
                       <img alt="" src={Manager} />
                     </th>
                     <th className="tableBody">
-                      Assistant
+                      Assistants
                       <img alt="" src={Assistant} />
                     </th>
-                    <th className="tableBody">SameDay Photos</th>
-                    <th className="tableBody">SameDay Videos</th>
+                    <th className="tableBody">Same Day Photos</th>
+                    <th className="tableBody">Same Day Videos</th>
                     <th className="tableBody">Team Assign</th>
                   </tr>
                 )}
@@ -440,7 +543,7 @@ function ListView(props) {
                                 background: index % 2 === 0 ? "" : "#F6F6F6",
                               }}
                             >
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <div className="d-flex flex-row">
                                   {errorText.length > 0 && (
                                     <ButtonWithHoverBox
@@ -453,11 +556,11 @@ function ListView(props) {
                                       errorText.length === 0 && "ms-4"
                                     }`}
                                   >
-                                    {event?.client?.groomName}
+                                    {event?.client?.brideName}
                                     <br />
                                     <img alt="" src={Heart} />
                                     <br />
-                                    {event?.client?.brideName}
+                                    {event?.client?.groomName}
                                     <br />
                                     <div
                                       className="mt-2"
@@ -473,7 +576,7 @@ function ListView(props) {
                                   width: "90px",
                                   marginLeft: 10,
                                 }}
-                                className="tableBody Text14Semi primary2"
+                                className="tableBody Text14Semi primary2 tablePlaceContent"
                               >
                                 <div
                                   style={{
@@ -486,8 +589,8 @@ function ListView(props) {
                                     "DD-MMM-YYYY"
                                   )}
                                 </div>
-                                {event?.travelBy === "Car" ||
-                                event?.travelBy === "Bus" ? (
+                                {event?.travelBy === "By Car" ||
+                                event?.travelBy === "By Bus" ? (
                                   <img alt="" src={Car} />
                                 ) : event?.travelBy === "By Air" ? (
                                   <img alt="" src={Plane} />
@@ -495,7 +598,7 @@ function ListView(props) {
                                   "N/A"
                                 )}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <p
                                   style={{
                                     marginBottom: 0,
@@ -507,7 +610,7 @@ function ListView(props) {
                                 </p>
                               </td>
                              
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={1}
@@ -543,7 +646,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={event?.photographers}
@@ -584,7 +687,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={event?.cinematographers}
@@ -634,7 +737,7 @@ function ListView(props) {
                                     )
                                   )}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={event?.drones}
@@ -671,7 +774,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={1}
@@ -708,7 +811,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
                                   allowedPersons={1}
@@ -745,7 +848,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <p
                                   style={{
                                     marginBottom: 0,
@@ -797,7 +900,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <p
                                   style={{
                                     marginBottom: 0,
@@ -849,7 +952,7 @@ function ListView(props) {
                                     </p>
                                   ))}
                               </td>
-                              <td>
+                              <td className="tablePlaceContent">
                                 <button
                                   style={{
                                     backgroundColor: "#FFDADA",
@@ -896,11 +999,11 @@ function ListView(props) {
                                 </div>
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                {event?.client?.groomName}
+                                {event?.client?.brideName}
                                 <br />
                                 <img alt="" src={Heart} />
                                 <br />
-                                {event?.client?.brideName}
+                                {event?.client?.groomName}
                                 <br />
                               </td>
                               <td className="tableBody Text14Semi primary2">
@@ -973,6 +1076,317 @@ function ListView(props) {
           <div class="spinner"></div>
         </div>
       )}
+      <Modal isOpen={newEventModel} centered={true} size="lg" fullscreen="md">
+        <ModalHeader>Event Details</ModalHeader>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (newEvent.eventDate === "" || !newEvent.eventDate) {
+              window.notify("Please set event Date!", "error");
+              return;
+            }
+            addNewEvent();
+          }} 
+        >
+          <ModalBody>
+            <Row ref={target}>
+              <Col xl="6" sm="6" lg="6" className="p-2">
+                  <div className="label">Client</div>
+                  <Select className="w-75" onChange={(selected) => {
+                  setNewEvent({ ...newEvent, client: selected.value._id });
+                }} styles={customStyles} options={clientData?.map(client => {
+                    return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
+                  })} required />
+                </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label">Event Date</div>
+                <div
+                  className={`ContactModel d-flex justify-content-between textPrimary`}
+                  onClick={() => setShowCalender(!showCalender)}
+                  style={{ cursor: "pointer" }}
+                >
+                  {newEvent?.eventDate
+                    ? dayjs(newEvent?.eventDate).format("DD-MMM-YYYY")
+                    : "Date"}
+                  <img alt="" src={CalenderImg} />
+                </div>
+                {showCalender && (
+                  <div
+                    style={{
+                      zIndex: "5",
+                    }}
+                    className="position-absolute"
+                  >
+                    <Calendar
+                      minDate={new Date(Date.now())}
+                      CalenderPress={() => setShowCalender(false)}
+                      onClickDay={(date) => {
+                        setShowCalender(!showCalender);
+                        setNewEvent({ ...newEvent, eventDate: date });
+                      }}
+                      tileClassName={({ date }) => {
+                        let count = 0;
+                        for (
+                          let index = 0;
+                          index < allEvents?.length;
+                          index++
+                        ) {
+                          const initialDate = new Date(
+                            allEvents[index].eventDate
+                          );
+                          const targetDate = new Date(date);
+                          const initialDatePart = initialDate
+                            .toISOString()
+                            .split("T")[0];
+                          const targetDatePart = targetDate
+                            .toISOString()
+                            .split("T")[0];
+                          if (initialDatePart === targetDatePart) {
+                            count += 1;
+                          }
+                        }
+                        if (count === 1) {
+                          return "highlight5";
+                        } else if (count === 2) {
+                          return "highlight3";
+                        } else if (count >= 3) {
+                          return "highlight1";
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label mt25">Event Type</div>
+                <input
+                  value={newEvent?.eventType}
+                  onChange={(e) => updateNewEvent(e)}
+                  type="name"
+                  name="eventType"
+                  placeholder="Event_Type"
+                  className="ContactModel"
+                  required
+                />
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label mt25">Location</div>
+                <input
+                  value={newEvent?.location}
+                  type="text"
+                  onChange={(e) => updateNewEvent(e)}
+                  name="location"
+                  className="ContactModel Text16N"
+                  placeholder="Location"
+                  required
+                />
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Travel By
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.travelBy
+                        ? {
+                            value: newEvent?.travelBy,
+                            label: newEvent?.travelBy,
+                          }
+                        : null
+                    }
+                    name="travelBy"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({ ...newEvent, travelBy: selected.value });
+                    }}
+                    styles={customStyles}
+                    options={travelByOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Shoot Director
+                  </div>
+                  <Select
+                    value={newEvent?.shootDirectors ? {label : newEvent?.shootDirectors, value : newEvent?.shootDirectors} : null}
+                    name="shootDirectors"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        shootDirectors: selected?.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={[
+                      {
+                        value: "0",
+                        label: "0",
+                      },
+                      {
+                        value: "1",
+                        label: "1",
+                      },
+                    ]}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Photographers
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.photographers
+                        ? {
+                            value: newEvent?.photographers,
+                            label: newEvent?.photographers,
+                          }
+                        : null
+                    }
+                    name="phtotgraphers"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        photographers: selected.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={numberOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Cinematographers
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.cinematographers
+                        ? {
+                            value: newEvent?.cinematographers,
+                            label: newEvent?.cinematographers,
+                          }
+                        : null
+                    }
+                    name="cinematographers"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        cinematographers: selected.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={numberOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Drones
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.drones
+                        ? { value: newEvent?.drones, label: newEvent?.drones }
+                        : null
+                    }
+                    name="drones"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({ ...newEvent, drones: selected.value });
+                    }}
+                    styles={customStyles}
+                    options={numberOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Same day Photo editor
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.sameDayPhotoEditor
+                        ? {
+                            value: newEvent?.sameDayPhotoEditor,
+                            label: newEvent?.sameDayPhotoEditor,
+                          }
+                        : null
+                    }
+                    name="sameDayPhotoEditor"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        sameDayPhotoEditor: selected.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={numberOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Same day Video editor
+                  </div>
+                  <Select
+                    value={
+                      newEvent?.sameDayVideoEditor
+                        ? {
+                            value: newEvent?.sameDayVideoEditor,
+                            label: newEvent?.sameDayVideoEditor,
+                          }
+                        : null
+                    }
+                    name="sameDayVideoEditor"
+                    className="w-75"
+                    onChange={(selected) => {
+                      setNewEvent({
+                        ...newEvent,
+                        sameDayVideoEditor: selected.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={numberOptions}
+                    required
+                  />
+                </div>
+              </Col>
+            </Row>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="submit" className="Update_btn">
+              ADD
+            </Button>
+            <Button
+              color="danger"
+              onClick={() => {
+                setNewEventModel(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Form>
+      </Modal>
     </>
   );
 }
@@ -991,7 +1405,7 @@ const ButtonWithHoverBox = ({ hoverText }) => {
   };
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }}>
+    <div style={{ position: "relative", display: "flex", alignItems:"center" }}>
       <IoIosWarning
         className="fs-3 text-danger"
         onMouseEnter={handleMouseEnter}

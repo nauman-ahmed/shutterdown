@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 
 function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
-  const [filterFor, setFilterFor] = useState('day');
+  const [filterFor, setFilterFor] = useState('Day');
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const toggle = () => {
     setShow(!show);
@@ -111,7 +111,7 @@ function CheckLists(props) {
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-50'>
-                {filterFor === 'day' ?
+                {filterFor === 'Day' ?
                   <div
                     className={`forminput R_A_Justify1`}
                     onClick={toggle}
@@ -136,8 +136,8 @@ function CheckLists(props) {
                   setShow(false)
                 }} styles={customStyles}
                   options={[
-                    { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                    { value: 'Day', label: 'Day' },
+                    { value: 'Month', label: 'Month' }]} />
               </div>
             </div>
 

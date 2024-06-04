@@ -197,7 +197,7 @@ function ShootDetails(props) {
                   </blockquote>
                 </div>
 
-              </div>
+              </div> 
             )}
             {teamToShow?.assistants.length > 0 && teamToShow?.assistants?.map((user, ind) =>
               <div className="shootCardBox mt-5">
@@ -289,15 +289,15 @@ function ShootDetails(props) {
                 <th>Location</th>
                 <th style={{ whiteSpace: 'nowrap' }}>Team Leader</th>
                 <th style={{ whiteSpace: 'nowrap' }}>
-                  Photographer
+                  Photographers
                 </th>
                 <th style={{ whiteSpace: 'nowrap' }}>
-                  Cinematpgrapher
+                  Cinematographers
                 </th>
                 <th style={{ whiteSpace: 'nowrap' }}>
-                  Drone Flyer
+                  Drone Flyers
                 </th>
-                <th>Team Detail</th>
+                <th>Team Details</th>
               </tr>
             </thead>
             <tbody
@@ -310,18 +310,18 @@ function ShootDetails(props) {
             >
               {clientData?.events?.map((event, index) =>
                 <tr>
-                  <td className="Text14Semi primary2">
+                  <td className="Text14Semi textPrimary">
                     {clientData.brideName}
                     <br />
                     <img alt="" src={Heart} />
                     <br />
                     {clientData.groomName}
                   </td>
-                  <td>{event.eventType}</td>
-                  <td>{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
-                  <td>{event.location}</td>
-                  <td>{clientData.userID && clientData.userID?.firstName + " " + clientData.userID?.lastName}</td>
-                  <td>
+                  <td className="tablePlaceContent  textPrimary fs-6">{event.eventType}</td>
+                  <td className="tablePlaceContent  textPrimary fs-6">{dayjs(event.eventDate).format('DD-MMM-YYYY')}</td>
+                  <td className="tablePlaceContent  textPrimary fs-6">{event.location}</td>
+                  <td className="tablePlaceContent  textPrimary fs-6">{clientData.userID && clientData.userID?.firstName + " " + clientData.userID?.lastName}</td>
+                  <td className="tablePlaceContent  textPrimary fs-6">
                     {event.choosenPhotographers?.length > 0 &&
                       <div>
                         {event.choosenPhotographers?.map((photographer, i) => {
@@ -335,7 +335,7 @@ function ShootDetails(props) {
                       </div>
                     }
                   </td>
-                  <td>
+                  <td className="tablePlaceContent  textPrimary fs-6">
                     {event.choosenCinematographers?.length > 0 &&
                       <div>
                         {event.choosenCinematographers?.map((cinematographer, i) => {
@@ -348,7 +348,7 @@ function ShootDetails(props) {
                       </div>
                     }
                   </td>
-                  <td>
+                  <td className="tablePlaceContent  textPrimary fs-6">
                     {event.droneFlyers?.length > 0 &&
                       <div>
                         {event.droneFlyers.map((droneFlyer, i) => {

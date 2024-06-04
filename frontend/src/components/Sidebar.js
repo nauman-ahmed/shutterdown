@@ -35,7 +35,7 @@ const SideBar = () => {
       setCurrentTab('Add Client');
     }
     if (location.pathname.startsWith('/MyProfile/Client')) {
-      setCurrentTab('View Client');
+      setCurrentTab('View Clients');
     }
     if (location.pathname.startsWith('/MyProfile/Calender')) {
       setCurrentTab('Calender View');
@@ -77,7 +77,7 @@ const SideBar = () => {
       setCurrentTab('Add Client');
     }
     if (location.pathname.startsWith('/MyProfile/Client')) {
-      setCurrentTab('View Client');
+      setCurrentTab('View Clients');
     }
     if (location.pathname.startsWith('/MyProfile/Calender')) {
       setCurrentTab('Calender View');
@@ -139,8 +139,8 @@ const SideBar = () => {
               <Menu>
                 {currentUser.rollSelect === 'Manager' && (
                   <>
-                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? 'active' : ''}
-                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? (
+                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}
+                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? (
                         <img alt=""
                           src="/images/sidebar/clients_active.png"
                           width={30}
@@ -153,7 +153,7 @@ const SideBar = () => {
                       )
                       }
                       title="Clients"
-                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? true : false}
+                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? true : false}
                       onOpenChange={() => {
                         setActiveMenu(1);
                         setCurrentTab(null)
@@ -188,7 +188,7 @@ const SideBar = () => {
                       </MenuItem>
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client' ? (
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Clients' ? (
                             <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
@@ -206,12 +206,12 @@ const SideBar = () => {
                           setCurrentTab(null)
                         }}
                         className={
-                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client'
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Clients'
                             ? 'active_submenu'
                             : ''
                         }
                       >
-                        View Client
+                        View Clients
                       </MenuItem>
                     </SubMenu>
                   </>
@@ -688,8 +688,8 @@ const SideBar = () => {
           <Menu>
                 {currentUser.rollSelect === 'Manager' && (
                   <>
-                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? 'active' : ''}
-                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? (
+                    <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}
+                      icon={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? (
                         <img alt=""
                           src="/images/sidebar/clients_active.png"
                           width={30}
@@ -702,7 +702,7 @@ const SideBar = () => {
                       )
                       }
                       title="Clients"
-                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Client' ? true : false}
+                      open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? true : false}
                       onOpenChange={() => {
                         setActiveMenu(1);
                         setCurrentTab(null)
@@ -757,12 +757,12 @@ const SideBar = () => {
                           setMobileSideBar(false)
                         }}
                         className={
-                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Client'
+                          (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Clients'
                             ? 'active_submenu'
                             : ''
                         }
                       >
-                        View Client
+                        View Clients
                       </MenuItem>
                     </SubMenu>
                   </>

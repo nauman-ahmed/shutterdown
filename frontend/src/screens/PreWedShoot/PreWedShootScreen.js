@@ -101,7 +101,10 @@ function PreWedShootScreen() {
   }
 
   const applyFilter = (filterTitle) => {
-    console.log(preWedClients);
+    if(filterTitle == null){
+      setClientsForShow(preWedClients)
+      return
+    }
     if (filterTitle === 'Date Assigned') {
       setClientsForShow(preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate))
     } else if (filterTitle === 'Date Unassigned') {
@@ -159,14 +162,14 @@ function PreWedShootScreen() {
   };
   return (
     <>
-      <ClientHeader applyFilter={applyFilter} options={filterOptions} filter title="Pre-Weds" />
+      <ClientHeader applyFilter={applyFilter} options={filterOptions} filter title="Pre-Wedding" />
       {clientsForShow ? (
         <>
           <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
           }} ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50'>
+              <div className='w-50 '>
                 {filterFor === 'day' ?
                   <div
                     className={`forminput R_A_Justify1`}
@@ -245,14 +248,14 @@ function PreWedShootScreen() {
                             background: index % 2 === 0 ? '' : '#F6F6F6',
                           }}
                         >
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             {client.brideName}
                             <br />
                             <img alt="" src={Heart} />
                             <br />
                             {client.groomName}
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <>
                               {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD-MMM-YYYY')}<br />
                             </>
@@ -260,7 +263,7 @@ function PreWedShootScreen() {
                           {/* <td className="tableBody Text14Semi primary2">
                             {client.userID?.firstName}{' '}{client.userID?.lastName}
                           </td> */}
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client.preWedPhotographers}
@@ -287,7 +290,7 @@ function PreWedShootScreen() {
                             })
                             }
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedCinematographers}
@@ -317,7 +320,7 @@ function PreWedShootScreen() {
                               )
                             }
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedAssistants}
@@ -347,7 +350,7 @@ function PreWedShootScreen() {
                             }
                           </td>
 
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedDroneFlyers}
@@ -376,7 +379,7 @@ function PreWedShootScreen() {
                               )
                             }
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <div className="d-flex flex-column">
                               <input
                                 type="date"
@@ -407,9 +410,9 @@ function PreWedShootScreen() {
                               />
                             </div>
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             {currentUser.rollSelect === 'Manager' ? (
-                              <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : null} name='preWeddingDetailsStatus' onChange={(selected) => {
+                              <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : { value: 'Yet to Start', label: 'Yet to Start' }} name='preWeddingDetailsStatus' onChange={(selected) => {
                                 const updatedClients = [...preWedClients];
                                 updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
                                 updatedClients[index].preWeddingDetails.status = selected.value;
@@ -446,7 +449,7 @@ function PreWedShootScreen() {
                             background: index % 2 === 0 ? '' : '#F6F6F6',
                           }}
                         >
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             {client.brideName}
                             <br />
                             <img alt="" src={Heart} />
@@ -458,18 +461,18 @@ function PreWedShootScreen() {
                               {client.userID?.firstName}{' '}{client.userID?.lastName}
                             </>
                           </td> */}
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <>
                               {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"} to {client.preWeddingDetails?.shootStartDate ? new Date(client.preWeddingDetails.shootStartDate).toISOString().split('T')[0] : "Not Available"}
                             </>
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <>
 
                               {client.userRole}
                             </>
                           </td>
-                          <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <>
                               {client.preWeddingDetails?.status || 'Not Filled'}
                             </>

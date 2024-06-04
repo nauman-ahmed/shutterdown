@@ -9,7 +9,7 @@ const Client = () => {
     <>
       <div className="main_content">
         <div style={{ width: "100%", paddingRight: "20px" }}>
-          <ClientHeader  title="View Client"  />
+          <ClientHeader  title="View Clients"  />
           <div>
             <Outlet />
           </div>

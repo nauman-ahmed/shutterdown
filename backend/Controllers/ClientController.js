@@ -6,8 +6,11 @@ const EventModel = require('../models/EventModel');
 
 const AddClientFunction = async (req, res) => {
   try {
-    console.log(req.body);
-    const client = new ClientModel(req.body.data);
+    let clientBody = req.body.data
+    clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos
+    clientBody.preWeddingVideos = req.body.data?.deliverables?.preWeddingVideos
+
+    const client = new ClientModel(clientBody);
     let deliverables = [];
     let clientDeadline = null;
     const eventIds = await Promise.all(req.body?.data?.events.map(async (eventData) => {

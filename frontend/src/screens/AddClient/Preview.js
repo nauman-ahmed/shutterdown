@@ -35,7 +35,6 @@ function Preview() {
   }, []);
   const [eventIndex, setEventIndex] = useState(0);
   const submitClient = async () => {
-    console.log(requesting);
     if (requesting === false ) {
       setRequesting(true);
       const saveResult = await SaveClientForm(clientData);
@@ -259,7 +258,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" className="me-3">
+          {/* <Col xs="6" sm="3" className="me-3">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Tentative
@@ -278,14 +277,14 @@ function Preview() {
                 placeholder={"Location"}
               />
             </div>
-          </Col>
+          </Col> */}
         </Row>
         <Row>
           <Col xs="6" sm="3" className="pr5 mt-3 text16N">
             <input
               type="checkbox"
               name="isWedding"
-              style={{ marginLeft: "20px" }}
+              // style={{ marginLeft: "20px" }}
               checked={
                 clientData?.events && clientData?.events[eventIndex]?.isWedding
               }
@@ -316,8 +315,8 @@ function Preview() {
             <tbody className="Text14Semi alignCenter">
               {clientData?.events?.map((event, i) => (
                 <tr>
-                  <td className="primary2">
-                    <div class="form-check">
+                  <td className="primary2 alignCenter">
+                    <div class="form-check" style={{display:"contents", justifyContent: "center"}}>
                       <input
                         style={{ marginLeft: "20px" }}
                         class="form-check-input"
@@ -330,7 +329,7 @@ function Preview() {
                     </div>
                   </td>
                   <td>
-                    {i + 1} : {event.eventType}
+                    {event.eventType}
                   </td>
                   <td className="primary2">
                     {dayjs(event.eventDate).format("DD-MMM-YYYY")}
@@ -367,8 +366,9 @@ function Preview() {
             Pre Wedding Videos
           </div>
         </div>
+        {console.log("PREVIEW",clientData)}
         {(clientData?.deliverables?.preWeddingVideos ||
-          clientData?.preWeddingPhotos) && (
+          clientData?.deliverables?.preWeddingPhotos) && (
           <>
             <p className="mt-5 text16N mb-0 fw-bold">For Pre-Wedding :</p>
             <Row>
@@ -417,15 +417,30 @@ function Preview() {
                   />
                 </div>
               </Col>
+              <Col xs="6" sm="3" className="me-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Drone Flyers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedDroneFlyerss"
+                    disabled={true}
+                    className="forminput"
+                    value={clientData?.preWedDroneFlyers}
+                    required={true}
+                  />
+                </div>
+              </Col>
             </Row>
           </>
         )}
         <Row>
           {clientData?.albums?.map((albumValue, i) => {
             return (
-              <Col className="mx-2" xs="4" sm="3" lg="4" key={i}>
+              <Col className= {i > 0 ? "mx-2" : " "} xs="4" sm="3" lg="4" key={i}>
                 <div className="Drop">
-                  <h4 className="LabelDrop">Album_ {i + 1}</h4>
+                  <h4 className="LabelDrop">Album {i + 1}</h4>
                   <Input
                     type="text"
                     name="album"
@@ -460,7 +475,7 @@ function Preview() {
           <Col xs="6" sm="2" className="me-3">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Long Film
+                Long Films
               </div>
               <Input
                 type="text"
@@ -476,7 +491,7 @@ function Preview() {
           <Col xs="4" sm="2" className="me-3">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Promo
+                Reels
               </div>
               <Input
                 type="text"
@@ -508,7 +523,7 @@ function Preview() {
         </Row>
         <div className="mt25">
           <div className="Text16N" style={{ marginBottom: "6px" }}>
-            Client Suggestion
+            Client Suggestions If Any
           </div>
           <Input
             type="text"
@@ -518,7 +533,7 @@ function Preview() {
             value={clientData?.suggestion || ""}
             required={false}
             // onChange={(e) => dispatch(updateClintData({ ...clientData, [e.target.name]: e.target.value }))}
-            placeholder={"Client_Suggestion"}
+            placeholder={"Write notes here..."}
           />
         </div>
         <Row className="centerAlign">

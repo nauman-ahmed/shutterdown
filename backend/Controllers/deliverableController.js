@@ -1,5 +1,6 @@
 const DeliverableModel = require('../models/DeliverableModel');
-
+const ClientModel = require('../models/ClientModel');
+const eventModel = require('../models/EventModel');
 
 const getCinematography = async (req, res) => {
     try {
@@ -11,7 +12,6 @@ const getCinematography = async (req, res) => {
 }
 const getAlbums = async (req, res) => {
     try {
-        
         const albumsDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['CMYK', 'RGB'] } }).populate('client editor');
         res.status(200).json(albumsDeliverables);
     } catch (error) {
@@ -36,7 +36,6 @@ const getPreWeds = async (req, res) => {
 }
 const updateDeliverable = async (req, res) => {
     try {
-        console.log(req.body);
         await DeliverableModel.findByIdAndUpdate(req.body.deliverable._id, { ...req.body.deliverable, client: req.body.deliverable.client._id, editor: req.body.deliverable.editor?._id }).then(() => {
             res.status(200).json('Deliverable Updated Successfully!')
         })

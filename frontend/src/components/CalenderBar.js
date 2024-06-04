@@ -124,10 +124,10 @@ function CalenderBar(props) {
                 >
                   <thead>
                     <tr className="Text10S gray3 alignTop">
-                      <th>Date</th>
-                      <th>Couple </th>
-                      <th>Location</th>
-                      <th>Photographer: Cinematographer</th>
+                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Date</th>
+                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Couple </th>
+                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Location</th>
+                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Photographer: Cinematographer</th>
                     </tr>
                   </thead>
                   <tbody className="Text10S alignCenter">
@@ -148,6 +148,7 @@ function CalenderBar(props) {
                               {event?.client?.brideName}
                               <br />
                               <img alt="" src={Heart} />
+                              <br />
                               {event?.client?.groomName}
                             </td>
                             <td

@@ -36,6 +36,14 @@ const ClientSchema = mongoose.Schema({
   preWedding: {
     type: Boolean,
   },
+  preWeddingPhotos: {
+    type: Boolean,
+    default: false,
+  },
+  preWeddingVideos: {
+    type: Boolean,
+    default: false,
+  },
   preWedPhotographers: {
     type: Number,
   },

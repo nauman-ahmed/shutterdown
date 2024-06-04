@@ -48,6 +48,10 @@
      width: 70% !important;
 }
 
+.CalenderViewWidthfull{
+     width: 100% !important;
+}
+
 
 @media only screen and (max-width: 990px) {
      .CalenderViewWidth{

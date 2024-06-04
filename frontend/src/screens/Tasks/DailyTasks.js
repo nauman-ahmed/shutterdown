@@ -57,8 +57,8 @@ function DailyTasks(props) {
         id: i,
         userId: taskObj?.[propertyName]?._id,
       })).filter(taskObj => {
-        if (taskObj.userId && !seenUsers.has(taskObj.userId)) {
-          seenUsers.add(taskObj.userId);
+        if (taskObj?.userId && !seenUsers.has(taskObj?.userId)) {
+          seenUsers.add(taskObj?.userId);
           return true;
         }
         return false;
@@ -85,7 +85,11 @@ function DailyTasks(props) {
   };
 
   const applyFilter = (filterValue) => {
-    // setTaksToShow(null);
+    console.log("applyFilter",filterValue)
+    if(filterValue == null){
+      setTasksToShow(allTasks)
+      return
+    }
     if (filterBy === "Assign By") {
       setTasksToShow(allTasks.filter(task => task.assignBy._id === filterValue.userId))
     } else if (filterBy === "Assign To") {
@@ -115,7 +119,7 @@ function DailyTasks(props) {
                   <th className="tableBody">Assign By</th>
                   <th className="tableBody">Deadline</th>
                   <th className="tableBody">Completion Date</th>
-                  <th className="tableBody">End Tasks</th>
+                  <th className="tableBody">End Task</th>
                   <th className="tableBody">Save</th>
                 </tr>
               )}
@@ -155,20 +159,20 @@ function DailyTasks(props) {
                       }}
                     >
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
                         }}
                       >
-                        {task.client.brideName}
+                        {task.client?.brideName}
                         <br />
                         <img src={Heart} alt="" />
                         <br />
-                        {task.client.groomName}
+                        {task.client?.groomName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -177,7 +181,7 @@ function DailyTasks(props) {
                         {task.taskName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -186,7 +190,7 @@ function DailyTasks(props) {
                         {task.assignTo.firstName} {task.assignTo.lastName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -195,7 +199,7 @@ function DailyTasks(props) {
                         {task.assignBy.firstName} {task.assignBy.lastName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -220,7 +224,7 @@ function DailyTasks(props) {
                         />
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -243,7 +247,7 @@ function DailyTasks(props) {
                         />
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -252,7 +256,7 @@ function DailyTasks(props) {
                         <input
                           type="checkbox"
                           name="endTask"
-                          className="JobInput mt-3"
+                          className="JobInput"
                           onChange={(e) => {
                             let temp = [...tasksToShow];
                             temp[index]["ended"] = e.target.checked;
@@ -261,9 +265,8 @@ function DailyTasks(props) {
                           checked={task.ended}
                         />
                       </td>
-                      <td>
+                      <td className="tablePlaceContent">
                         <button
-                          className="mt-3"
                           style={{
                             backgroundColor: "#FFDADA",
                             borderRadius: "5px",
@@ -293,20 +296,20 @@ function DailyTasks(props) {
                       }}
                     >
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
                         }}
                       >
-                        {task.client.brideName}
+                        {task.client?.brideName}
                         <br />
                         <img src={Heart} alt="" />
                         <br />
-                        {task.client.groomName}
+                        {task.client?.groomName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -316,7 +319,7 @@ function DailyTasks(props) {
                       </td>
 
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -325,7 +328,7 @@ function DailyTasks(props) {
                         {task.assignBy.firstName} {task.assignBy.lastName}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",
@@ -334,7 +337,7 @@ function DailyTasks(props) {
                         {dayjs(task.deadlineDate).format("DD-MMM-YYYY")}
                       </td>
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody Text14Semi primary2 tablePlaceContent"
                         style={{
                           paddingTop: "15px",
                           paddingBottom: "15px",

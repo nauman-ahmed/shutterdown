@@ -127,9 +127,9 @@ function Logs(props) {
             <thead>
               <tr className="logsHeader Text16N1 gray2">
                 <th className="tableBody">Date</th>
-                <th className="tableBody">Checked In Time</th>
-                <th className="tableBody">Checked Out Time</th>
-                <th className="tableBody">Checked In From Home</th>
+                <th className="tableBody">Check In Time</th>
+                <th className="tableBody">Check Out Time</th>
+                <th className="tableBody">Check In From Home</th>
               </tr>
             </thead>
             <tbody

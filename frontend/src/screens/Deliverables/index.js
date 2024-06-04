@@ -7,10 +7,9 @@ function Deliverables(props) {
   return (
     <>
       <div className="main_content">
-        <div className="CalenderViewWidth">
+        <div className="CalenderViewWidthfull">
           <Outlet />
         </div>
-        <CalenderBar />
       </div>
     </>
   );

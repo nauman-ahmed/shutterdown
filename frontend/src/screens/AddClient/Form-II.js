@@ -72,8 +72,9 @@ function FormII() {
     };
     updatedDeliverables = {
       ...updatedDeliverables,
-      [e.target.name]: e.target.checked,
+      [e.target.name]: e.target.checked, 
     };
+    console.log(clientData,updatedDeliverables)
     dispatch(
       updateClintData({ ...clientData, deliverables: updatedDeliverables })
     );
@@ -96,12 +97,12 @@ function FormII() {
   };
   let travelByOptions = [
     {
-      value: "Car",
-      label: "Car",
+      value: "By Car",
+      label: "By Car",
     },
     {
-      value: "Bus",
-      label: "Bus",
+      value: "By Bus",
+      label: "By Bus",
     },
     {
       value: "By Air",
@@ -205,7 +206,7 @@ function FormII() {
             <Col xs="6" sm="3">
               <div style={{ marginLeft: "10px" }}>
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Is This Wedding Event
+                  Is This a Wedding Event
                 </div>
                 <input
                   onChange={(e) => {
@@ -344,7 +345,7 @@ function FormII() {
             <Col xs="6" sm="3">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Drone
+                  Drones
                 </div>
                 <Select
                   // ref={dronesSelect}
@@ -365,7 +366,7 @@ function FormII() {
             <Col xs="6" sm="3">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Same day Photo editor
+                  Same Day Photo Editors
                 </div>
                 <Select
                   // ref={sameDayPhotoEditorsSelect}
@@ -387,7 +388,7 @@ function FormII() {
             <Col xs="6" sm="3">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Same day Video editor
+                  Same Day Video Editors
                 </div>
                 <Select
                   // ref={sameDayVideoEditorsSelect}
@@ -406,7 +407,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            {/* <Col xs="6" sm="3">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Tentative
@@ -427,7 +428,7 @@ function FormII() {
                   required
                 />
               </div>
-            </Col>
+            </Col> */}
           </Row>
           {/* <Row className='mt-2'>
             <Col xs="6" sm="3">
@@ -466,7 +467,7 @@ function FormII() {
                 <th>Date</th>
                 <th>Location</th>
                 <th>Travel By</th>
-                <th>Wedding Event</th>
+                <th>Wedding Event Date</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -553,10 +554,11 @@ function FormII() {
                */}
             </div>
           </div>
+          {console.log("FORM 2",clientData)}
           {(clientData?.deliverables?.preWeddingVideos ||
             clientData?.deliverables?.preWeddingPhotos) && (
             <>
-              <p className="mt-5 text16N mb-0 fw-bold">For Pre-Wedding :</p>
+              <p className="mt-5 text16N mb-0 fw-bold">For Pre-Wedding:</p>
               <Row>
                 <Col xs="6" sm="3">
                   <div className="mt25">
@@ -689,7 +691,7 @@ function FormII() {
                   return (
                     <Col xs="4" sm="3" key={i}>
                       <div className="Drop">
-                        <h4 className="LabelDrop">Album_ {i + 1}</h4>
+                        <h4 className="LabelDrop">Album {i + 1}</h4>
                         <Select
                           value={
                             albumValue?.length > 0
@@ -798,7 +800,7 @@ function FormII() {
             <Col xs="6" sm="2">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Long Film
+                  Long Films
                 </div>
                 <Select
                   value={
@@ -852,7 +854,7 @@ function FormII() {
             <Col xs="3" sm="2">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Hard Drive
+                  Hard Drives
                 </div>
                 <Select
                   value={
@@ -882,7 +884,7 @@ function FormII() {
           </Row>
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
-              Client Suggestion If Any
+              Client Suggestions If Any
             </div>
             <Input
               type="text"
@@ -899,7 +901,7 @@ function FormII() {
                   })
                 )
               }
-              placeholder={"Client_Suggestion"}
+              placeholder={"Write notes here..."}
             />
           </div>
           <div className="centerAlign mt40 mb15 ">

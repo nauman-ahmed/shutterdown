@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Login from "./screens/login/Login";
 import Signup from "./screens/signup/Signup";
@@ -51,6 +51,9 @@ import PreWedDeliverables from "./screens/Deliverables/PreWeds";
 function App() {
   const location = useLocation();
   const currentUser =  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
   return (
     <AuthContextProvider>
       <>

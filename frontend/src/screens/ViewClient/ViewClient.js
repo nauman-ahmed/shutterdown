@@ -18,7 +18,7 @@ function ViewClient() {
     navigate('/MyProfile/Client/ParticularClient/ClientInfo/' + clientId);
   };
   const [allClients, setAllClients] = useState()
-  const [filterFor, setFilterFor] = useState('day')
+  const [filterFor, setFilterFor] = useState('Day')
   const toggle = () => {
     setShow(!show);
   };
@@ -76,7 +76,7 @@ function ViewClient() {
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-50'>
-                {filterFor === 'day' ?
+                {filterFor === 'Day' ?
                   <div
                     className={`forminput R_A_Justify1`}
                     onClick={toggle}
@@ -86,7 +86,7 @@ function ViewClient() {
                     <img alt='' src={CalenderImg} />
                   </div>
                   :
-                  <input type='month' onChange={(e) => {
+                  <input type='Month' onChange={(e) => {
                     filterByMonth(new Date(e.target.value))
                   }} className='forminput R_A_Justify mt-1' />
                 }
@@ -101,8 +101,8 @@ function ViewClient() {
                   setShow(false)
                 }} styles={customStyles}
                   options={[
-                    { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                    { value: 'Day', label: 'Day' },
+                    { value: 'Month', label: 'Month' }]} />
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ function ViewClient() {
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Client</th>
                 <th className="tableBody" style={{ width: '33%' }}>
-                  Wedding Dates
+                  Wedding Date
                 </th>
               </tr>
             </thead>
@@ -153,7 +153,7 @@ function ViewClient() {
                       {client.groomName}
                     </td>
                     <td
-                      className="tableBody Text14Semi primary2 textPrimary"
+                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
                       style={{
                         paddingTop: '15px',
                         paddingBottom: '15px',
@@ -183,7 +183,7 @@ function ViewClient() {
             show={show}
             placement="bottom"
           >
-            <div>
+            <div style={{ width: "300px" }}>
               <Calendar
                 value={filteringDay}
                 minDate={new Date(Date.now())}
