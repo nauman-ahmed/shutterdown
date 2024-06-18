@@ -33,7 +33,6 @@ function Whatsapp() {
     const res = await getAllWhatsappText()
     const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)
     const newEditorStatecinematography = loadEditorContent(res.data[0].cinematographyTextGetImmutable)
-    console.log("getAllWhatsappTextHandler",newEditorStateAlbum, newEditorStatecinematography)
 
     setEditorState({
       _id: res.data[0]._id,
@@ -71,8 +70,6 @@ function Whatsapp() {
   const updateHandler = async () => {
     const stringifiedContentAlbum = saveEditorContent(editorState.albumTextGetImmutable)
     const stringifiedContentCinematography = saveEditorContent(editorState.cinematographyTextGetImmutable)
-    console.log("updateHandler",typeof stringifiedContentAlbum)
-    console.log("updateHandler",stringifiedContentCinematography)
     const res = await postWhatsappText({
       _id: editorState._id,
       albumTextGetImmutable:stringifiedContentAlbum,

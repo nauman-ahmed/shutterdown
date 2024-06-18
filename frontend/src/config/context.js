@@ -17,7 +17,6 @@ export default function AuthContextProvider({ children }) {
     const GetDataProfile = async () => {
         try {
             let user = JSON.parse(Cookies.get('currentUser'));
-            // console.log(ID);
             const res = await axios.get(
                 `${BASE_URL}/MyProfile/Profile/${user._id}`,
                 {

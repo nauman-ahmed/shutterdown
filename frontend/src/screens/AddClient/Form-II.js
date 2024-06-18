@@ -83,7 +83,6 @@ function FormII() {
       ...updatedDeliverables,
       [e.target.name]: e.target.checked, 
     };
-    console.log(clientData,updatedDeliverables)
     dispatch(
       updateClintData({ ...clientData, deliverables: updatedDeliverables })
     );
@@ -178,7 +177,6 @@ function FormII() {
   const [show, setShow] = useState(false);
   return (
     <>
-    {console.log("eventOptionsKeyValues",eventOptionsKeyValues)}
       <div className="mt18">
         <Form
           onSubmit={(e) => {
@@ -533,7 +531,6 @@ function FormII() {
               Pre Wedding Videos
             </div>
           </div>
-          {console.log("FORM 2",clientData)}
           {(clientData?.deliverables?.preWeddingVideos ||
             clientData?.deliverables?.preWeddingPhotos) && (
               <Row>

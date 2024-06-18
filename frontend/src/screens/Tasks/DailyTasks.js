@@ -85,7 +85,6 @@ function DailyTasks(props) {
   };
 
   const applyFilter = (filterValue) => {
-    console.log("applyFilter",filterValue)
     if(filterValue == null){
       setTasksToShow(allTasks)
       return

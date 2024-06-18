@@ -3,7 +3,6 @@ const WhatsappSchema = require('../models/Whatsapp')
 
 const addWhatsappText = async (req, res) => {
     try {
-        console.log("AlbumText", req.body)
         await WhatsappSchema.findByIdAndUpdate(req.body.data._id,req.body.data)
         res.status(200).json({ message: 'Data has been saved' })
     } catch (error) {

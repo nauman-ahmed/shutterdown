@@ -33,7 +33,6 @@ const Signup = (props) => {
     confirmPassword: '',
     phoneNo: phone,
   });
-  // console.log(`This is Roll ${inputData.rollSelect}`)
   let Roll = [
     {
       check: 'roll',

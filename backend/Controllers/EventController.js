@@ -5,6 +5,7 @@ const eventModel = require('../models/EventModel');
 
 const AddEvent = async (req, res) => {
     try {
+        console.log(req.body.data)
         const newEvent = new EventModel(req.body.data);
         const client = await ClientModel.findById(req.body.data.client)
         client.events.push(newEvent._id);
@@ -19,7 +20,6 @@ const AddEvent = async (req, res) => {
 
 const AssignTeam = async (req, res) => {
     try {
-        // console.log(req.body.data);
         const event = await EventModel.findById(req.body.data._id);
         const photographersIds = req.body.data.choosenPhotographers?.map(user => user._id);
         const cinematographersIds = req.body.data.choosenCinematographers?.map(user => user._id);
@@ -47,12 +47,8 @@ const AssignTeam = async (req, res) => {
 };
 const updateEvent = async (req, res) => {
     try {
-        console.log(req.body.data);
         const {_id, ...eventData } = req.body.data;
-        console.log(eventData);
         const event = await EventModel.findByIdAndUpdate(req.body.data._id, eventData);
-        
-        console.log(event);
         
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {
@@ -63,7 +59,6 @@ const updateEvent = async (req, res) => {
 const getEvents = async (req, res) => {
     try {
         const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
-        console.log("EVENTS",events)
         events.sort((a, b) => {
             const dateA = new Date(a.eventDate);
             const dateB = new Date(b.eventDate);
@@ -76,10 +71,8 @@ const getEvents = async (req, res) => {
 };
 const DeleteEvent = async (req, res) => {
     try {
-        console.log(req.params.eventId);
         const eventToDelete = await EventModel.findById(req.params.eventId);
         const client = await ClientModel.findById(eventToDelete.client)
-        console.log(client);
         client.events = client.events.filter(eventId => !eventId.equals(eventToDelete._id));
         await client.save();
         await eventModel.findByIdAndDelete(eventToDelete._id)

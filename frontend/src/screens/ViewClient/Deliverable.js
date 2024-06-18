@@ -14,7 +14,6 @@ function Deliverable(props) {
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId)
-      console.log(res);
       const preWedDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName === 'Pre-Wedding Photos' || deliverable.deliverableName === 'Pre-Wedding Videos');
       setPreWedDeliverables(preWedDeliverable);
       const otherDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName !== 'Pre-Wedding Photos' && deliverable.deliverableName !== 'Pre-Wedding Videos')

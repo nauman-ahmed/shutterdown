@@ -601,7 +601,6 @@ function ListView(props) {
                                   {event?.eventType}
                                 </p>
                               </td>
-                             {console.log(event)}
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
@@ -653,7 +652,6 @@ function ListView(props) {
                                             userObj,
                                           ]
                                         : [userObj];
-                                    console.log(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
@@ -1077,13 +1075,13 @@ function ListView(props) {
           <ModalBody>
             <Row ref={target}>
               <Col xl="6" sm="6" lg="6" className="p-2">
-                  <div className="label">Client</div>
-                  <Select className="w-75" onChange={(selected) => {
-                  setNewEvent({ ...newEvent, client: selected.value._id });
-                }} styles={customStyles} options={clientData?.map(client => {
-                    return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
-                  })} required />
-                </Col>
+                <div className="label">Client</div>
+                <Select className="w-75" onChange={(selected) => {
+                setNewEvent({ ...newEvent, client: selected.value._id });
+              }} styles={customStyles} options={clientData?.map(client => {
+                  return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
+                })} required />
+              </Col>
               <Col xl="6" sm="6" className="p-2">
                 <div className="label">Event Date</div>
                 <div
@@ -1150,12 +1148,12 @@ function ListView(props) {
                   onChange={(e) => updateNewEvent(e)}
                   type="name"
                   name="eventType"
-                  placeholder="Event_Type"
+                  placeholder="Enter Event Type"
                   className="ContactModel"
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2">
+              <Col xl="6" sm="6" className="p-2"> 
                 <div className="label mt25">Location</div>
                 <input
                   value={newEvent?.location}
@@ -1167,195 +1165,33 @@ function ListView(props) {
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Travel By
+              {eventOptionObjectKeys.map((Objkey) => 
+                <Col xl="6" sm="6" className="p-2">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Select
+                      value={
+                        newEvent?.[Objkey]
+                          ? {
+                              value: newEvent?.[Objkey],
+                              label: newEvent?.[Objkey],
+                            }
+                          : null
+                      }
+                      name={Objkey}
+                      className="w-75"
+                      onChange={(selected) => {
+                        setNewEvent({ ...newEvent, [Objkey]: selected.value });
+                      }}
+                      styles={customStyles}
+                      options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                      required
+                    />
                   </div>
-                  <Select
-                    value={
-                      newEvent?.travelBy
-                        ? {
-                            value: newEvent?.travelBy,
-                            label: newEvent?.travelBy,
-                          }
-                        : null
-                    }
-                    name="travelBy"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({ ...newEvent, travelBy: selected.value });
-                    }}
-                    styles={customStyles}
-                    options={travelByOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Shoot Director
-                  </div>
-                  <Select
-                    value={newEvent?.shootDirector ? {label : newEvent?.shootDirector, value : newEvent?.shootDirector} : null}
-                    name="shootDirector"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        shootDirector: selected?.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={[
-                      {
-                        value: "0",
-                        label: "0",
-                      },
-                      {
-                        value: "1",
-                        label: "1",
-                      },
-                    ]}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Photographers
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.photographers
-                        ? {
-                            value: newEvent?.photographers,
-                            label: newEvent?.photographers,
-                          }
-                        : null
-                    }
-                    name="phtotgraphers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        photographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Cinematographers
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.cinematographers
-                        ? {
-                            value: newEvent?.cinematographers,
-                            label: newEvent?.cinematographers,
-                          }
-                        : null
-                    }
-                    name="cinematographers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        cinematographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Drones
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.drones
-                        ? { value: newEvent?.drones, label: newEvent?.drones }
-                        : null
-                    }
-                    name="drones"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({ ...newEvent, drones: selected.value });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Photo editor
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.sameDayPhotoEditors
-                        ? {
-                            value: newEvent?.sameDayPhotoEditors,
-                            label: newEvent?.sameDayPhotoEditors,
-                          }
-                        : null
-                    }
-                    name="sameDayPhotoEditors"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        sameDayPhotoEditors: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Video editor
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.sameDayVideoEditors
-                        ? {
-                            value: newEvent?.sameDayVideoEditors,
-                            label: newEvent?.sameDayVideoEditors,
-                          }
-                        : null
-                    }
-                    name="sameDayVideoEditors"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        sameDayVideoEditors: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
+                </Col>
+              )}
             </Row>
           </ModalBody>
           <ModalFooter>
@@ -1380,9 +1216,6 @@ const ButtonWithHoverBox = ({ hoverText }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = (e) => {
-    console.log("entered");
-    
-
     setIsHovered(true);
   };
 

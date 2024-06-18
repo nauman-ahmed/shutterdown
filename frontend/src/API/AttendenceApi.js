@@ -26,11 +26,9 @@ export const checkInUser = async (data=null) => {
             },
             data
         }).then(res=>{
-            console.log(res);
             toast.success(res.data.message)
         })
     } catch (error) {
-        console.log(error);
         if(error.response?.status == 303){
             toast.error(error.response.data.message)
         }
@@ -47,7 +45,6 @@ export const checkOutUser = async (data) => {
             toast.success(res.data.message)
         })
     } catch (error) {
-        console.log(error);
         if(error.response.status == 303){
             toast.error(error.response.data.message)
         }

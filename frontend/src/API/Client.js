@@ -6,9 +6,8 @@ const currentUser =
 
 export const SaveClientForm = async (data) => {
   try {
-    console.log(data);
     const dataToSend = { ...data, userID: currentUser._id };
-   const result = await axios
+    const result = await axios
       .post(BASE_URL + "/AddClient", {
         data: dataToSend,
       })

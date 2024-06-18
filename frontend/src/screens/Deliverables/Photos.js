@@ -52,7 +52,6 @@ function Photos() {
       return
     }
     if (filterBy === 'Assigned Editor') {
-      console.log("applyFilter",filterValue,filterBy,allDeliverables)
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
       : filterValue === 'Unassigned Editor' ?
       setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
@@ -60,7 +59,6 @@ function Photos() {
     } else if (filterBy === 'Current Status') {
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
     } else if (filterBy === 'Deadline sorting') {
-      console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
         sortedArray = [...deliverablesForShow]; // Create a new array
@@ -105,7 +103,6 @@ function Photos() {
   const applySorting = (wedding = false)=>{
     try {
       if(wedding){
-        console.log("applySorting",deliverablesForShow)
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);

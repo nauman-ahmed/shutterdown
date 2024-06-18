@@ -93,8 +93,6 @@ export const GetsignUPData = async (data, phoneNo) => {
 };
 export const GetSignInWithGoogleData = async (data, phoneNo) => {
 
-  // console.log(`this is roll base ${rollSelect}`);
-
   const { firstName, lastName, email, rollSelect } =
     data;
 
@@ -138,7 +136,6 @@ export const GetSignInApi = async (data) => {
     Cookies.set('currentUser', JSON.stringify(res.data.User));
     toast.success('Logged in successfully!')
   }).catch(err => {
-    console.log(err);
     if (err.response?.status === 404) {
       window.notify(err.response.data.message, 'error')
     }
@@ -194,7 +191,6 @@ export const newPass = async (data) => {
 };
 export const updateUserData = async (userData) => {
   try {
-    console.log(userData);
     await axios.post(BASE_URL + '/update-userInfo', userData).then(async (res) => {
       console.log(res);
       await GetUserData();
@@ -203,7 +199,6 @@ export const updateUserData = async (userData) => {
       console.log(err);
     })
   } catch (error) {
-    console.log(error);
     toast.error('Error in updating Details')
   }
 }

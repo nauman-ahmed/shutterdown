@@ -15,7 +15,6 @@ cron.schedule('55 23 * * *', async () => { // Runs at 12:00 AM daily
         for (const unchecked of uncheckedUsers) {
             unchecked.checkOutTime = new Date();
             await unchecked.save();
-            console.log(`Automatically checked out  at 12:00 AM.`);
         }
     } catch (error) {
         console.error('Error during automatic checkout:', error);
@@ -29,7 +28,6 @@ const checkInUser = async (req, res) => {
         const currentDate = new Date()
         const dateOnly = currentDate.toLocaleDateString();
         const alreadyCheckedIn = await AttendaceModel.findOne({ userID: userId, currentDate: dateOnly });
-        console.log(alreadyCheckedIn);
         if (alreadyCheckedIn) {
             res.status(303).json({ message: 'user already checked In!' })
         } else {

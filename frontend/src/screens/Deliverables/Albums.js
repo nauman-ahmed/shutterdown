@@ -45,7 +45,6 @@ function Albums(props) {
     const res = await getAllWhatsappText()
     const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)
     const newEditorStatecinematography = loadEditorContent(res.data[0].cinematographyTextGetImmutable)
-    console.log("getAllWhatsappTextHandler",newEditorStateAlbum, newEditorStatecinematography)
 
     setEditorState({
       _id: res.data[0]._id,
@@ -172,7 +171,6 @@ function Albums(props) {
   const applySorting = (wedding = false)=>{
     try {
       if(wedding){
-        console.log("applySorting",deliverablesForShow)
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);
@@ -212,7 +210,6 @@ function Albums(props) {
     } else if (filterBy === 'Current Status') {
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
     } else if (filterBy === 'Deadline sorting') {
-      console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
         sortedArray = [...deliverablesForShow]; // Create a new array
@@ -271,7 +268,6 @@ function Albums(props) {
 
     // const chatUrl = `whatsapp://send?abid=${contactParam}&text=Hello%2C%20World!`;
     // window.open(chatUrl, '_blank');
-    console.log("openWhatsAppChat",message,contact)
     const baseUrl = 'https://web.whatsapp.com/';
     const contactParam = encodeURIComponent(contact);
     const messageParam = encodeURIComponent(message);
@@ -279,7 +275,6 @@ function Albums(props) {
     window.open(chatUrl, '_blank');
 
   }
-  console.log(deliverablesForShow)
 
   return (
     <>

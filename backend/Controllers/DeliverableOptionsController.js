@@ -31,7 +31,6 @@ const addDeliverableFields = async (req, res) => {
   try {
     const field = "promos" // Change field name to add/update new record
     const data = req.body.data;
-    console.log("addDeliverableFields",field, data)
     const updatedDocument = await DeliverableOptionsSchema.findByIdAndUpdate(
       id,
       { $set: { [field]: data } }, // Assuming you want to set the 'photographers' field to the new data

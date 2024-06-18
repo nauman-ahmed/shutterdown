@@ -194,7 +194,6 @@ function FormOptions() {
   },[editableOptions])
 
   const updateAllEventOptionsHandler = async () => {
-    console.log("RESPONSE",eventOptionsKeyValues)
     const res = await updateAllEventOptions(eventOptionsKeyValues);
     if(res && res.status && res.status === 200){
       window.notify("Options successfully updated", "success");
@@ -208,7 +207,6 @@ function FormOptions() {
 
   const updateAllDeliverableOptionsHandler = async () => {
     const res = await updateAllDeliverableOptions(deliverableOptionsKeyValues);
-    console.log("RESPONSE",res)
     if(res && res.status && res.status === 200){
       window.notify("Options successfully updated", "success");
       return

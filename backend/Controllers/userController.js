@@ -5,7 +5,6 @@ const mimeTypes = require('mime-types');
 
 const updateUserData = async (req, res) => {
   try {
-    console.log(req.body);
     const updatedUser = await userSchema.findByIdAndUpdate(req.body._id, req.body, { new: true });
     res.status(200).json({ message: 'Information Updated Successfully!' })
   } catch (error) {
@@ -15,17 +14,14 @@ const updateUserData = async (req, res) => {
 const downloadFile = async (req, res) => {
   try {
     const filePath = path.join(__dirname, '../uploads/', req.params.filePath);
-    console.log(filePath);
     res.download(filePath);
   } catch (error) {
-    // console.log(error);
     return res.status(404).json({ error: 'File not found on the server' });
   }
 }
 
 const getUserAccountbanned = async (req, res) => {
   try {
-    console.log(req.body.data);
     const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : true}, { new: true });
     res.status(200).json({ message: 'Account has been banned' })
   } catch (error) {
@@ -35,7 +31,6 @@ const getUserAccountbanned = async (req, res) => {
 
 const getUserAccountUnbanned = async (req, res) => {
   try {
-    console.log(req.body.data);
     const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : false}, { new: true });
     res.status(200).json({ message: 'Account has been unbanned' })
   } catch (error) {
@@ -45,7 +40,6 @@ const getUserAccountUnbanned = async (req, res) => {
 
 const getUserAccountApproved = async (req, res) => {
   try {
-    console.log(req.body.data);
     const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {accountRequest : false}, { new: true });
     res.status(200).json({ message: 'Account Approved' })
   } catch (error) {
@@ -98,7 +92,6 @@ const getAllAccountRequestCount = async (req, res) => {
 const previewFile = async (req, res) => {
   try {
     const filePath = path.join(__dirname, '../uploads/', req.params.filePath);
-    console.log(filePath);
     res.set({
       'Content-Type': mimeTypes.contentType(filePath)
     });
@@ -112,8 +105,6 @@ const previewFile = async (req, res) => {
 
 const uploadFiles = async (req, res) => {
   try {
-    console.log(req.files);
-    console.log(req.params.userId);
     const dirPath = path.join(__dirname, '../');
     const userData = await userSchema.findById(req.params.userId);
     if (req.files['adharCard']) {
@@ -186,7 +177,6 @@ const uploadFiles = async (req, res) => {
       })
       userData.signature = req.files['signature'][0].path;
     }
-    console.log(userData);
     await userData.save();
     res.status(200).json({ message: 'Files saved!' })
   } catch (error) {
@@ -259,7 +249,6 @@ const SignInPostRequest = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
-    console.log(loginUser);
     if (loginUser) {
       if(loginUser.accountRequest){
         res.status(404).json({ message: 'Your account is not approved' });
@@ -329,7 +318,6 @@ const getEditors = async (req, res) => {
   try {
     const editors = await userSchema.find({ rollSelect: 'Editor' });
     res.json({ editors })
-    console.log('gone');
   } catch (error) {
     console.log("error")
   }
@@ -338,7 +326,6 @@ const getShooters = async (req, res) => {
   try {
     const shooters = await userSchema.find({ rollSelect: 'Shooter' });
     res.json({ shooters })
-    console.log('gone');
   } catch (error) {
     console.log("error")
   }

@@ -20,14 +20,12 @@ function Preview() {
   const [requesting, setRequesting] = useState(false);
   const clientData = useSelector((state) => state.clientData);
   useEffect(() => {
-    console.log(clientData);
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientData]);
   useEffect(() => {
-    console.log(clientData);
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
@@ -42,7 +40,6 @@ function Preview() {
       const storedEvents = await getEvents();
       dispatch(updateAllEvents(storedEvents.data));
       dispatch(updateClintData({ albums: [""] }));
-      console.log(saveResult);
       if (saveResult) {
         navigate("/MyProfile/AddClient/Form-I");
       }

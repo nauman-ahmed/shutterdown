@@ -44,7 +44,6 @@ function Cinematography(props) {
     const res = await getAllWhatsappText()
     const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)
     const newEditorStatecinematography = loadEditorContent(res.data[0].cinematographyTextGetImmutable)
-    console.log("getAllWhatsappTextHandler",newEditorStateAlbum, newEditorStatecinematography)
 
     setEditorState({
       _id: res.data[0]._id,
@@ -214,7 +213,6 @@ function Cinematography(props) {
   const applySorting = (wedding = false)=>{
     try {
       if(wedding){
-        console.log("applySorting",deliverablesForShow)
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);
@@ -245,7 +243,6 @@ function Cinematography(props) {
     } else if (filterBy === 'Current Status') {
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
     } else if (filterBy === 'Deadline sorting') {
-      console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
         sortedArray = [...deliverablesForShow]; // Create a new array
@@ -258,7 +255,6 @@ function Cinematography(props) {
       }
       setDeliverablesForShow([...sortedArray]);
     } else if (filterBy === 'Wedding Date sorting') {
-      console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
         sortedArray = [...deliverablesForShow]; // Create a new array
@@ -274,7 +270,6 @@ function Cinematography(props) {
   }
 
   const changeFilter = (filterType) => {
-    console.log("changeFilter",filterType)
     if (filterType !== filterBy) {
       if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))

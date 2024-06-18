@@ -14,7 +14,6 @@ const AddClientFunction = async (req, res) => {
     let clientDeadline = null;
     const eventIds = await Promise.all(req.body?.data?.events.map(async (eventData) => {
       const event = new EventModel({ ...eventData, client: client._id });
-      console.log("clientBody ONE",eventData)
       if (event.isWedding) {
         const newDate = new Date(event.eventDate.getTime());
         newDate.setDate(newDate.getDate() + 45)
@@ -28,7 +27,6 @@ const AddClientFunction = async (req, res) => {
       await event.save();
       return event._id
     }))
-    console.log("clientBody TWO")
     const photosDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Photos', quantity: 1, clientDeadline, })
     await photosDeliverable.save().then(() => {
       deliverables.push(photosDeliverable._id)
@@ -78,18 +76,15 @@ const AddClientFunction = async (req, res) => {
 
 const AddPreWedDetails = async (req, res) => {
   try {
-    console.log(req.body);
     const client = await ClientModel.findById(req.body.client._id);
     const photographersIds = req.body.client.preWeddingDetails?.photographers?.map(user => user._id);
     const cinematographersIds = req.body.client.preWeddingDetails?.cinematographers?.map(user => user._id);
     const droneFlyersIds = req.body.client.preWeddingDetails?.droneFlyers?.map(user => user._id);
     const assistantsIds = req.body.client?.preWeddingDetails?.assistants?.map(user => user._id);
     client.preWeddingDetails = { ...req.body.client.preWeddingDetails, photographers: photographersIds, cinematographers: cinematographersIds, droneFlyers: droneFlyersIds, assistants: assistantsIds };
-    console.log(client);
     await client.save();
     res.status(200).json('Pre-Wedding Added SucccessFully');
   } catch (error) {
-    console.log(error);
     console.log(error, 'error');
   }
 };

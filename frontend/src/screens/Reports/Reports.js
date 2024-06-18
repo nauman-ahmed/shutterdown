@@ -28,7 +28,6 @@ function Reports(props) {
   };
 
   useEffect(() => {
-    console.log(currentUser);
     if (
       currentUser.rollSelect === "Editor" ||
       currentUser.rollSelect === "Shooter"

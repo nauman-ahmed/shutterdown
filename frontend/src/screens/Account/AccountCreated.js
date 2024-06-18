@@ -15,7 +15,6 @@ function AccountCreated() {
   const getUsertAccountRequestCountHandler = async () => {
     const count = await getAllUserAccountRequestCount()
     setRequestCount(count)
-    console.log("count",count)
   }
 
   useEffect(() => {

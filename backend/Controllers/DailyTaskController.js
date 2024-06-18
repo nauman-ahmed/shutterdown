@@ -42,7 +42,6 @@ const getEditorTasks = async (req, res) => {
 
 const updateTaskData = async (req, res) => {
   try {
-    console.log(req.body);
     const data = req.body.data;
 
     const updatedTask = await taskSchema.findByIdAndUpdate({ _id: data._id }, {...data, client : data.client._id, assignBy : data.assignBy._id, assignTo : data.assignTo._id})

@@ -22,7 +22,6 @@ function Profile() {
   }
   const handleUpdateUserData = async (e) => {
     try {
-      console.log(userData.firstName.length);
       if (userData.firstName.length === 0 || userData.lastName.length === 0 || userData.email.length === 0 || userData?.phoneNo.length === 0) {
         toast.error('First Name, Last Name, Email and phone is required!');
       } else {

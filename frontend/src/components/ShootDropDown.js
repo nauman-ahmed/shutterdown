@@ -68,11 +68,9 @@ function ShootDropDown(props) {
                         window.notify(`Maximum Limit is ${allowedPersons}, uncheck previous!`, 'error');
                         return
                       } else {
-                        console.log("Checked")
                         userChecked(user);
                       }
                     } else {
-                      console.log("Un Checked")
                       userUnChecked(user)
                     }
                   }}

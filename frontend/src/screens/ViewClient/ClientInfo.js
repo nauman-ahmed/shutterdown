@@ -151,7 +151,6 @@ function ClientInfo() {
       console.log(error);
     }
   };
-  console.log(clientData);
   return (
     <div>
       <Table bordered hover responsive>
@@ -204,7 +203,6 @@ function ClientInfo() {
                 </div>
               ))}
             </td>
-            {console.log(clientData)}
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.preWeddingPhotos ? "Yes" : "No"}
             </td>
@@ -387,7 +385,7 @@ function ClientInfo() {
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2">
+              <Col xl="6" sm="6" className="p-2"> 
                 <div className="label mt25">Location</div>
                 <input
                   value={newEvent?.location}

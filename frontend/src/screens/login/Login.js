@@ -39,7 +39,6 @@ const Login = () => {
         await GetSignInApi(inputData);
         setLoginIn(false)
         const user = Cookies.get('currentUser');
-        console.log(user);
         if (user) {
           setSuccess(true);
          
@@ -57,7 +56,6 @@ const Login = () => {
           }
         }
       } catch (error) {
-        console.log(error);
         toast.error('Invalid Credentials');
       }
     }
@@ -218,7 +216,6 @@ const login =  useGoogleLogin({
             {/* <GoogleLogin
               onSuccess={(credentialResponse) => {
                const decode=jwt_decode(credentialResponse.credential);
-               console.log(decode,"decode")
               }}
               onError={() => {
                 console.log('Login Failed');

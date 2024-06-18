@@ -116,7 +116,6 @@ function PreWedDeliverables() {
   const applySorting = (wedding = false)=>{
     try {
       if(wedding){
-        console.log("applySorting",deliverablesForShow)
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.clientDeadline);
           const dateB = new Date(b.clientDeadline);
@@ -150,7 +149,6 @@ function PreWedDeliverables() {
       const data = await getPreWeds();
       const res = await getEditors();
       setEditors(res.editors);
-      console.log(data);
       if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
@@ -182,7 +180,6 @@ function PreWedDeliverables() {
     } else if (filterBy === 'Current Status') {
       filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
     } else if (filterBy === 'Deadline sorting') {
-      console.log(filterValue);
       let sortedArray;
       if (filterValue === 'No Sorting') {
         sortedArray = [...deliverablesForShow]; // Create a new array

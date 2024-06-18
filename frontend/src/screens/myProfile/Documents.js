@@ -47,7 +47,6 @@ function Documents() {
   const [drivingLicense, setDrivingLicense] = useState();
   const drivingLicenseCard = useRef(null);
   const handleUploadDrivingLicense = () => {
-    console.log(drivingLicenseCard.current);
     drivingLicenseCard.current?.click();
   };
   const handleChangeDrivingLicense = e => {
