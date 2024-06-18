@@ -4,6 +4,9 @@ const userRouter = require('./Routes/userRoutes');
 const clientRouter = require('./Routes/AddClientRoutes');
 const viewClientRouter = require('./Routes/ViewClientRoutes');
 const DailyTaskRouter = require('./Routes/DailyTaskRoutes');
+const EventOptionsRouter = require('./Routes/EventOptionsRoutes');
+const WhatsappRouter = require('./Routes/Whatsapp');
+const DeliverableOptionsRouter = require('./Routes/DeliverableOptionsRoutes');
 const AttendenceRouter = require('./Routes/AttendenceRoutes');
 const Database = require('./DataBase/db');
 const cors = require('cors');
@@ -46,16 +49,20 @@ app.use(deliverableRouter);
 app.use('/', AttendenceRouter);
 app.use('/', viewClientRouter);
 app.use('/', DailyTaskRouter);
-app.use(express.static(path.join(__dirname, "frontend/build")));
-app.get("*", function (_, res) {
-  res.setHeader("Content-Type", "text/html");
-  res.sendFile(
-    path.join(__dirname, "frontend/build/index.html"),
-    function (err) {
-      res.status(500).send(err);
-    },
-  );
-});
+app.use('/eventOptions', EventOptionsRouter);
+app.use('/deliverableOptions', DeliverableOptionsRouter);
+app.use('/Whatsapp', WhatsappRouter);
+
+// app.use(express.static(path.join(__dirname, "frontend/build")));
+// app.get("*", function (_, res) {
+//   res.setHeader("Content-Type", "text/html");
+//   res.sendFile(
+//     path.join(__dirname, "frontend/build/index.html"),
+//     function (err) {
+//       res.status(500).send(err);
+//     },
+//   );
+// });
 
 app.listen(PORT, () => {
   try {

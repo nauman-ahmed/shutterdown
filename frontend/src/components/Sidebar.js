@@ -115,6 +115,9 @@ const SideBar = () => {
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
     }
+    if (location.pathname.startsWith('/MyProfile/FormOptions')) {
+      setCurrentTab('FormOptions');
+    }
   }, [location])
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   return (
@@ -137,6 +140,76 @@ const SideBar = () => {
           <SidebarContent>
             <>
               <Menu>
+                {currentUser.rollSelect === 'Admin' && (
+                  <>
+                    < MenuItem
+                      icon={
+                        <img alt=""
+                          src={
+                            "/images/sidebar/clients.png"
+                          }
+                          width={20}
+                        />
+                      }
+                      onClick={() => {
+                        setActiveMenu(101);
+                        navigate('/MyProfile/Accounts/Count');
+                        setCurrentTab(null);
+                      }}
+                      className={
+                        activeMenu === 101 || currentTab === 'Accounts'
+                          ? 'active active_color'
+                          : ''
+                      }
+                    >
+                      Accounts
+                    </MenuItem>
+                    <MenuItem
+                      icon={
+                        <img alt=""
+                          src={
+                            "/images/sidebar/clients.png"
+                          }
+                          width={20}
+                        />
+                      }
+                      onClick={() => {
+                        setActiveMenu(100);
+                        navigate('/MyProfile/FormOptions');
+                        setCurrentTab(null);
+                      }}
+                      className={
+                        activeMenu === 100 || currentTab === 'FormOptions'
+                          ? 'active active_color'
+                          : ''
+                      }
+                    >
+                      Form Options
+                    </MenuItem>
+                    <MenuItem
+                      icon={
+                        <img alt=""
+                          src={
+                            "/images/sidebar/clients.png"
+                          }
+                          width={20}
+                        />
+                      }
+                      onClick={() => {
+                        setActiveMenu(102);
+                        navigate('/MyProfile/Whatsapp');
+                        setCurrentTab(null);
+                      }}
+                      className={
+                        activeMenu === 102 || currentTab === 'Whatsapp'
+                          ? 'active active_color'
+                          : ''
+                      }
+                    >
+                      Whatsapp
+                    </MenuItem>
+                  </>
+                )}
                 {currentUser.rollSelect === 'Manager' && (
                   <>
                     <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}
@@ -450,27 +523,28 @@ const SideBar = () => {
                     Checklists
                   </MenuItem>
                 )}
-                <MenuItem
-                  icon={
-                    <img alt=""
-                      src={
-                        activeMenu !== 3 || currentTab === 'Attendence'
-                          ? '/images/sidebar/attendance.png'
-                          : '/images/sidebar/attendanceActive.png'
-                      }
-                      width={20}
-                    />
-                  }
-                  className={activeMenu === 3 || currentTab === 'Attendence' ? 'active active_color' : ''}
-                  onClick={() => {
-                    setActiveMenu(3);
-                    navigate('/MyProfile/Attendence');
-                    setCurrentTab(null)
-                  }}
-                >
-                  Attendence
-                </MenuItem>
-
+                {currentUser.rollSelect !== 'Admin' && (
+                  <MenuItem
+                    icon={
+                      <img alt=""
+                        src={
+                          activeMenu !== 3 || currentTab === 'Attendence'
+                            ? '/images/sidebar/attendance.png'
+                            : '/images/sidebar/attendanceActive.png'
+                        }
+                        width={20}
+                      />
+                    }
+                    className={activeMenu === 3 || currentTab === 'Attendence' ? 'active active_color' : ''}
+                    onClick={() => {
+                      setActiveMenu(3);
+                      navigate('/MyProfile/Attendence');
+                      setCurrentTab(null)
+                    }}
+                  >
+                    Attendence
+                  </MenuItem>
+                )}
                 {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                   <>
                     <SubMenu

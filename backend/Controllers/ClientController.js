@@ -9,12 +9,12 @@ const AddClientFunction = async (req, res) => {
     let clientBody = req.body.data
     clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos
     clientBody.preWeddingVideos = req.body.data?.deliverables?.preWeddingVideos
-
     const client = new ClientModel(clientBody);
     let deliverables = [];
     let clientDeadline = null;
     const eventIds = await Promise.all(req.body?.data?.events.map(async (eventData) => {
       const event = new EventModel({ ...eventData, client: client._id });
+      console.log("clientBody ONE",eventData)
       if (event.isWedding) {
         const newDate = new Date(event.eventDate.getTime());
         newDate.setDate(newDate.getDate() + 45)
@@ -28,6 +28,7 @@ const AddClientFunction = async (req, res) => {
       await event.save();
       return event._id
     }))
+    console.log("clientBody TWO")
     const photosDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Photos', quantity: 1, clientDeadline, })
     await photosDeliverable.save().then(() => {
       deliverables.push(photosDeliverable._id)
@@ -68,11 +69,10 @@ const AddClientFunction = async (req, res) => {
 
     client.events = eventIds;
     client.deliverables = [...deliverables, ...albumsDeliverables]
-    console.log(client);
     await client.save()
     res.status(200).json('Client Added SucccessFully');
   } catch (error) {
-    console.log(error, 'error');
+    console.log("Client Form Error",error);
   }
 };
 
@@ -119,7 +119,7 @@ const getAllClients = async (req, res) => {
         { path: 'assistants', model: 'user' },
         { path: 'sameDayPhotoMakers', model: 'user' },
         { path: 'sameDayVideoMakers', model: 'user' },
-        { path: 'shootDirector', model: 'user' },
+        { path: 'shootDirectors', model: 'user' },
       ],
     }).populate({
       path: 'deliverables',
@@ -163,6 +163,7 @@ const getPreWedClients = async (req, res) => {
   }
 
 };
+
 const getClientById = async (req, res) => {
   try {
     const client = await ClientModel.findById(req.params.clientId).populate("userID").populate({
@@ -176,7 +177,7 @@ const getClientById = async (req, res) => {
         { path: 'assistants', model: 'user' },
         { path: 'sameDayPhotoMakers', model: 'user' },
         { path: 'sameDayVideoMakers', model: 'user' },
-        { path: 'shootDirector', model: 'user' },
+        { path: 'shootDirectors', model: 'user' },
       ],
     }).populate({
       path: 'deliverables',

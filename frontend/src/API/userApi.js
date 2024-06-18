@@ -3,6 +3,74 @@ import BASE_URL from '.';
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify';
 
+export const getAllUserAccountDetails = async () => {
+  try {
+    const res = await axios.get(BASE_URL + '/getAllUserAccountDetails', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return res.data
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
+export const getUserAccountApproved = async (data) => {
+  try {
+    const res = await axios.post(BASE_URL + '/getUserAccountApproved', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+      data
+    });
+    return res
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
+export const getUserAccountbanned = async (data) => {
+  try {
+    const res = await axios.post(BASE_URL + '/getUserAccountbanned', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+      data
+    });
+    return res
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
+export const getUserAccountUnbanned = async (data) => {
+  try {
+    const res = await axios.post(BASE_URL + '/getUserAccountUnbanned', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+      data
+    });
+    return res
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
+export const getAllUserAccountRequestCount = async () => {
+  try {
+    const res = await axios.get(BASE_URL + '/getAllUserAccountRequestCount', {
+      Headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return res.data
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
 export const GetsignUPData = async (data, phoneNo) => {
 
   const { firstName, lastName, email, password, confirmPassword, rollSelect } = data;

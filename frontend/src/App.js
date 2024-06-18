@@ -10,6 +10,13 @@ import Job from "./screens/myProfile/Job";
 import Documents from "./screens/myProfile/Documents";
 import Assets from "./screens/myProfile/Assets";
 import AddClient from "./screens/AddClient";
+import FormOptions from "./screens/FormOptions";
+import Whatsapp from "./screens/Whatsapp";
+
+import Account from "./screens/Account";
+import AccountCreated from "./screens/Account/AccountCreated";
+import UserTable from "./screens/Account/UserDetails";
+
 import FormI from "./screens/AddClient/Form-I";
 import FormII from "./screens/AddClient/Form-II";
 import Preview from "./screens/AddClient/Preview";
@@ -123,7 +130,37 @@ function App() {
               element={currentUser ? <Assets /> : <Navigate to="/" replace />}
             />
           </Route>
-
+          <Route
+            path="/Myprofile/FormOptions"
+            element={
+              currentUser ? <FormOptions /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/Myprofile/Whatsapp"
+            element={
+              currentUser ? <Whatsapp /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/Myprofile/Accounts"
+            element={
+              currentUser ? <Account /> : <Navigate to="/" replace />
+            }
+          >
+            <Route
+              path="Count"
+              element={
+                currentUser ? <AccountCreated /> : <Navigate to="/" replace />
+              }
+            />
+            <Route
+              path="Users"
+              element={
+                currentUser ? <UserTable /> : <Navigate to="/" replace />
+              }
+            />
+          </Route>
           <Route
             path="/Myprofile/Attendence"
             element={

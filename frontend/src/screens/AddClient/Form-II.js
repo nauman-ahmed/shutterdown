@@ -20,11 +20,20 @@ import { LuPlus } from "react-icons/lu";
 import { getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
+import { getAllEventOptions, updateAllEventOptions } from "../../API/FormEventOptionsAPI";
+import { getAllDeliverableOptions, updateAllDeliverableOptions } from "../../API/FormDeliverableOptionsAPI";
 
 function FormII() {
  
   const [allEvents, setAllEvents] = useState([]);
   const [weddingAssigned, setWeddingAssigned] = useState(false);
+  const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
+
+  const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
+  const deliverablePreWeddingOptionObjectKeys = ["photographers", "cinematographers", "assistants", "drones"]
+  const deliverableAlbumOptionObjectKeys = ["albums"]
+  const deliverableOptionObjectKeys = ["promos", "longFilms", "reels", "hardDrives"]
 
   const dispatch = useDispatch();
   const clientData = useSelector((state) => state.clientData);
@@ -84,11 +93,21 @@ function FormII() {
     updatedAlbums.push("");
     dispatch(updateClintData({ ...clientData, albums: updatedAlbums }));
   };
+
+  const getAllFormOptionsHandler = async () => {
+    const eventOptions = await getAllEventOptions();
+    const deliverableOptions = await getAllDeliverableOptions();
+
+    setEventOptionsKeyValues(eventOptions)
+    setDeliverableOptionsKeyValues(deliverableOptions)
+  }
+
   useEffect(() => {
     if (!clientData.form1Submitted) {
       navigate("/MyProfile/AddClient/Form-I");
     }
     getStoredEvents();
+    getAllFormOptionsHandler()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const handleAddDate = (date) => {
@@ -159,6 +178,7 @@ function FormII() {
   const [show, setShow] = useState(false);
   return (
     <>
+    {console.log("eventOptionsKeyValues",eventOptionsKeyValues)}
       <div className="mt18">
         <Form
           onSubmit={(e) => {
@@ -168,7 +188,7 @@ function FormII() {
           }}
         >
           <Row>
-            <Col xs="6" sm="3" className="pr5">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div ref={target}>
                 <div>
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
@@ -186,7 +206,7 @@ function FormII() {
                 </div>
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div>
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Type
@@ -203,31 +223,28 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
-              <div style={{ marginLeft: "10px" }}>
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
+            <Col xs="6" sm="3" md="4" lg="4" >
+              <div >
+                <div className="Text16N" style={{ marginBottom: "25px" }}>
                   Is This a Wedding Event
                 </div>
                 <input
+                  
                   onChange={(e) => {
                     setEventValues({
                       ...eventValues,
                       isWedding: e.target.checked,
                     });
                   }}
-                  className="mx-2"
                   type="checkbox"
                   name="isWedding"
-                  style={{ marginTop: "20px" }}
                   checked={eventValues?.isWedding}
                   disabled={weddingAssigned}
                 />
               </div>
             </Col>
-          </Row>
-          <Row>
-            <Col xs="4" sm="3" className="pr5">
-              <div className="mt25">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+              <div  className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Location
                 </div>
@@ -243,7 +260,31 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            {eventOptionObjectKeys.map((Objkey) => 
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                  </div>
+                  <Select
+                    // ref={travelSelect}
+                    value={eventValues?.[Objkey] ? {label : eventValues?.[Objkey], value : eventValues?.[Objkey]} : null}
+                    name={Objkey}
+                    className="w-100"
+                    onChange={(selected) => {
+                      setEventValues({
+                        ...eventValues,
+                        [Objkey]: selected?.value,
+                      });
+                    }}
+                    styles={customStyles}
+                    options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                    required={true}
+                  />
+                </div>
+              </Col>
+            )}
+            {/* <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Travel By
@@ -252,7 +293,7 @@ function FormII() {
                   // ref={travelSelect}
                   value={eventValues?.travelBy ? {label : eventValues?.travelBy, value : eventValues?.travelBy} : null}
                   name="travelBy"
-                  className="w-75"
+                  className="w-100"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -265,7 +306,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Shoot Directors
@@ -274,7 +315,7 @@ function FormII() {
                   // ref={shootDirectorsSelect}
                   value={eventValues?.shootDirectors ? {label : eventValues?.shootDirectors, value : eventValues?.shootDirectors} : null}
                   name="shootDirectors"
-                  className="w-50"
+                  className="w-100"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -296,9 +337,7 @@ function FormII() {
                 />
               </div>
             </Col>
-          </Row>
-          <Row>
-            <Col xs="4" sm="3" className="pr5">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Photographers
@@ -307,7 +346,7 @@ function FormII() {
                   // ref={photographersSelect}
                   value={eventValues?.photographers ? {label : eventValues?.photographers, value : eventValues?.photographers} : null}
                   name="photographers"
-                  className="w-50"
+                  className="w-100"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -320,7 +359,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Cinematographers
@@ -329,7 +368,6 @@ function FormII() {
                   // ref={cinematographersSelect}
                   value={eventValues?.cinematographers ? {label : eventValues?.cinematographers, value : eventValues?.cinematographers} : null}
                   name="cinematographers"
-                  className="w-50"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -342,7 +380,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Drones
@@ -351,7 +389,6 @@ function FormII() {
                   // ref={dronesSelect}
                   value={eventValues?.drones ? {label : eventValues?.drones, value : eventValues?.drones} : null}
                   name="drones"
-                  className="w-50"
                   onChange={(selected) => {
                     setEventValues({ ...eventValues, drones: selected?.value });
                   }}
@@ -361,9 +398,7 @@ function FormII() {
                 />
               </div>
             </Col>
-          </Row>
-          <Row className="mt-2">
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Same Day Photo Editors
@@ -372,7 +407,6 @@ function FormII() {
                   // ref={sameDayPhotoEditorsSelect}
                   value={eventValues?.sameDayPhotoEditor ? {label : eventValues?.sameDayPhotoEditor, value : eventValues?.sameDayPhotoEditor} : null}
                   name="sameDayPhotoEditor"
-                  className="w-50"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -385,7 +419,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3">
+            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Same Day Video Editors
@@ -394,7 +428,6 @@ function FormII() {
                   // ref={sameDayVideoEditorsSelect}
                   value={eventValues?.sameDayVideoEditor ? {label : eventValues?.sameDayVideoEditor, value : eventValues?.sameDayVideoEditor} : null}
                   name="sameDayVideoEditor"
-                  className="w-50"
                   onChange={(selected) => {
                     setEventValues({
                       ...eventValues,
@@ -406,49 +439,8 @@ function FormII() {
                   required
                 />
               </div>
-            </Col>
-            {/* <Col xs="6" sm="3">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Tentative
-                </div>
-                <Select
-                  // ref={tentativeSelect}
-                  value={eventValues?.tentative ? {label : eventValues?.tentative, value : eventValues?.tentative} : null}
-                  name="tentative"
-                  className="w-50"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      tentative: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={yesNoOptions}
-                  required
-                />
-              </div>
             </Col> */}
           </Row>
-          {/* <Row className='mt-2'>
-            <Col xs="6" sm="3">
-              <div className='mt25'>
-                <div className="Text16N mt-5" style={{ marginBottom: '6px' }}>
-                  <input
-                    onChange={(e) => {
-                      setEventValues({ ...eventValues, isWedding: e.target.checked })
-                    }}
-                    className='mx-2'
-                    type="checkbox"
-                    name="isWedding"
-                    style={{ marginLeft: "20px" }}
-                    checked={eventValues?.isWedding}
-                    disabled={false}
-                  />Wedding
-                </div>
-              </div>
-            </Col>
-          </Row> */}
           <Button type="submit" className="add_album album mt-4">
             Add Event
           </Button>
@@ -539,28 +531,44 @@ function FormII() {
               />
               {"   "}
               Pre Wedding Videos
-              {/* <input
-                onChange={(e) => {
-                  updateDeliverables(e)
-                }}
-                type="checkbox"
-                name="photos"
-                style={{ marginLeft: "20px" }}
-                checked={clientData?.deliverables?.photos}
-                disabled={false}
-              />
-              {"   "}
-              Photos
-               */}
             </div>
           </div>
           {console.log("FORM 2",clientData)}
           {(clientData?.deliverables?.preWeddingVideos ||
             clientData?.deliverables?.preWeddingPhotos) && (
-            <>
-              <p className="mt-5 text16N mb-0 fw-bold">For Pre-Wedding:</p>
               <Row>
-                <Col xs="6" sm="3">
+                {deliverablePreWeddingOptionObjectKeys.map((Objkey) => 
+                  <Col xs="6" sm="3" className="pr5">
+                    <div className="mt25">
+                      <div className="Text16N" style={{ marginBottom: "6px" }}>
+                        {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
+                      </div>
+                      <Select
+                        value={
+                          clientData?.["preWed"+Objkey]
+                            ? {
+                                value: clientData?.["preWed"+Objkey],
+                                label: clientData?.["preWed"+Objkey],
+                              }
+                            : null
+                        }
+                        name={"preWed"+Objkey}
+                        onChange={(selected) => {
+                          dispatch(
+                            updateClintData({
+                              ...clientData,
+                              ["preWed"+Objkey]: selected?.value,
+                            })
+                          );
+                        }}
+                        styles={customStyles}
+                        options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
+                        required
+                      />
+                    </div>
+                  </Col>
+                )}
+                {/* <Col xs="6" sm="3" className="pr5">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
                       Photographers
@@ -575,7 +583,6 @@ function FormII() {
                           : null
                       }
                       name="preWedPhotographers"
-                      className="w-50"
                       onChange={(selected) => {
                         dispatch(
                           updateClintData({
@@ -590,7 +597,7 @@ function FormII() {
                     />
                   </div>
                 </Col>
-                <Col xs="6" sm="3">
+                <Col xs="6" sm="3"  className="pr5">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
                       Cinematograpers
@@ -605,7 +612,6 @@ function FormII() {
                           : null
                       }
                       name="preWedCinematographers"
-                      className="w-50"
                       onChange={(selected) => {
                         dispatch(
                           updateClintData({
@@ -620,7 +626,7 @@ function FormII() {
                     />
                   </div>
                 </Col>
-                <Col xs="6" sm="3">
+                <Col xs="6" sm="3" className="pr5">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
                       Assistants
@@ -635,7 +641,6 @@ function FormII() {
                           : null
                       }
                       name="preWedAssistants"
-                      className="w-50"
                       onChange={(selected) => {
                         dispatch(
                           updateClintData({
@@ -665,7 +670,6 @@ function FormII() {
                           : null
                       }
                       name="preWedDroneFlyerss"
-                      className="w-50"
                       onChange={(selected) => {
                         dispatch(
                           updateClintData({
@@ -679,16 +683,15 @@ function FormII() {
                       required
                     />
                   </div>
-                </Col>
+                </Col> */}
               </Row>
-            </>
           )}
 
           <Row>
             <Col xl="10" sm="8">
               <Row>
-                {clientData?.albums?.map((albumValue, i) => {
-                  return (
+                {clientData?.albums?.map((albumValue, i) => 
+                  deliverableAlbumOptionObjectKeys.map((Objkey) => 
                     <Col xs="4" sm="3" key={i}>
                       <div className="Drop">
                         <h4 className="LabelDrop">Album {i + 1}</h4>
@@ -701,30 +704,26 @@ function FormII() {
                           name={`album${i + 1}`}
                           className="w-75"
                           onChange={(selected) => {
-                            const updatedAlbums = [...clientData?.albums];
+                            const updatedAlbums = [...clientData?.[Objkey]];
                             updatedAlbums[i] = selected?.value;
                             dispatch(
                               updateClintData({
                                 ...clientData,
-                                albums: updatedAlbums,
+                                [Objkey]: updatedAlbums,
                               })
                             );
                             setEventValues({
                               ...eventValues,
-                              albums: selected?.value,
+                              [Objkey]: selected?.value,
                             });
                           }}
                           styles={customStyles}
-                          options={[
-                            { value: "RGB", label: "RGB" },
-                            { value: "CMYK", label: "CMYK" },
-                          ]}
+                          options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
                           required={true}
                         />
                       </div>
                     </Col>
-                  );
-                })}
+                ))}
               </Row>
             </Col>
             <Col xl="2" sm="4" className="mt-3">
@@ -770,7 +769,35 @@ function FormII() {
             </Col>
           </Row>
           <Row>
-            <Col xs="4" sm="2">
+            {deliverableOptionObjectKeys.map((Objkey) => 
+              <Col xs="6" sm="3" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
+                  </div>
+                  <Select
+                    value={
+                      clientData?.[Objkey]
+                        ? { value: clientData?.[Objkey], label: clientData?.[Objkey] }
+                        : null
+                    }
+                    name={Objkey}
+                    onChange={(selected) => {
+                      dispatch(
+                        updateClintData({
+                          ...clientData,
+                          [Objkey]: selected?.value,
+                        })
+                      );
+                    }}
+                    styles={customStyles}
+                    options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
+                    required
+                  />
+                </div>
+              </Col>
+            )}
+            {/* <Col xs="6" sm="3" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Promo
@@ -782,7 +809,6 @@ function FormII() {
                       : null
                   }
                   name="promos"
-                  className="w-75"
                   onChange={(selected) => {
                     dispatch(
                       updateClintData({
@@ -797,7 +823,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="2">
+            <Col xs="6" sm="3" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Long Films
@@ -812,7 +838,6 @@ function FormII() {
                       : null
                   }
                   name="longFilms"
-                  className="w-75"
                   onChange={(selected) => {
                     dispatch(
                       updateClintData({
@@ -827,7 +852,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="4" sm="2">
+            <Col xs="6" sm="3" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Reels
@@ -839,7 +864,6 @@ function FormII() {
                       : null
                   }
                   name="reels"
-                  className="w-75"
                   onChange={(selected) => {
                     dispatch(
                       updateClintData({ ...clientData, reels: selected?.value })
@@ -851,7 +875,7 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="3" sm="2">
+            <Col xs="6" sm="3" >
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Hard Drives
@@ -866,7 +890,6 @@ function FormII() {
                       : null
                   }
                   name="hardDrives"
-                  className="w-75"
                   onChange={(selected) => {
                     dispatch(
                       updateClintData({
@@ -880,7 +903,7 @@ function FormII() {
                   required
                 />
               </div>
-            </Col>
+            </Col> */}
           </Row>
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>

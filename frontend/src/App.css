@@ -91,6 +91,13 @@ abbr[title] {
   background-color: #f8f8fa;
 }
 
+.wrapperClassName{
+  padding: 10px;
+  height: 300px;
+  border: lightgray solid ;
+  border-radius: 10px;
+}
+
 .react-calendar__tile--range {
   background: #f8f8fa;
   color: #6f48eb;

@@ -44,7 +44,7 @@ const ClientSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  preWedPhotographers: {
+  preWedphotographers: {
     type: Number,
   },
   promos: {
@@ -57,13 +57,13 @@ const ClientSchema = mongoose.Schema({
   reels: {
     type: Number
   },
-  preWedCinematographers: {
+  preWedcinematographers: {
     type: Number,
   },
-  preWedAssistants: {
+  preWedassistants: {
     type: Number,
   },
-  preWedDroneFlyers: {
+  preWeddrones: {
     type: Number,
   },
   preWeddingDetails: {

@@ -49,6 +49,9 @@ const Login = () => {
          else if (user.rollSelect==='Editor') {
             navigate('/Deliverables/Cinematography')
           }
+          else if (user.rollSelect==='Admin') {
+            navigate('/Deliverables/Cinematography')
+          }
           else {
             navigate('/MyProfile');
           }
@@ -110,8 +113,11 @@ const login =  useGoogleLogin({
     else if (shooter.data.User.rollSelect === 'Editor') {
        navigate('/MyProfile/Deliverables/Cinematography');
      }
-  else  if(shooter.data.User.rollSelect === "Manager"){
+    else  if(shooter.data.User.rollSelect === "Manager"){
       navigate('/MyProfile');
+    }
+    else  if(shooter.data.User.rollSelect === "Admin"){
+      navigate('/MyProfile/FormOptions');
     }
     
   }

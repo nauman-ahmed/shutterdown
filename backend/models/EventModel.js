@@ -28,16 +28,16 @@ const eventSchema = mongoose.Schema({
         default : false
     },
     photographers: {
-        type: Number,
+        type: String,
     },
     cinematographers: {
-        type: Number,
+        type: String,
     },
-    shootDirectors : {
-        type : Number
+    shootDirector : {
+        type : String
     },
     drones: {
-        type: Number
+        type: String
     },
     choosenPhotographers: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -55,7 +55,7 @@ const eventSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
-    shootDirector: [{
+    shootDirectors: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
@@ -71,11 +71,11 @@ const eventSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
-    sameDayPhotoEditor: {
-        type: Number
+    sameDayPhotoEditors: {
+        type: String
     },
-    sameDayVideoEditor: {
-        type: Number
+    sameDayVideoEditors: {
+        type: String
     },
     tentative: {
         type: String

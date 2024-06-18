@@ -204,6 +204,14 @@ Label {
     --bs-btn-border-width: 0px !important;
 }
 
+.dangerBtn {
+    --bs-btn-bg: red !important;
+    color: #C1C1C1 !important;
+    border: white;
+    --bs-btn-border-width: 0px !important;
+}
+
+
 .submit {
     width: 10vw;
 }

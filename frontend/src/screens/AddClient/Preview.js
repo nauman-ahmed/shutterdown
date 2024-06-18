@@ -54,7 +54,7 @@ function Preview() {
     <>
       <div className="mt18">
         <Row>
-          <Col xs="6" sm="3" className="pr5">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div ref={target}>
               <div>
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
@@ -74,7 +74,7 @@ function Preview() {
               </div>
             </div>
           </Col>
-          <Col xs="6" sm="3">
+          <Col xs="6" sm="3"  md="4" lg="4" className="pr5">
             <div>
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Event Type
@@ -94,9 +94,21 @@ function Preview() {
               />
             </div>
           </Col>
-        </Row>
-        <Row>
-          <Col xs="4" sm="3" className="pr5 mb-2">
+          <Col xs="6" sm="3" md="4" lg="4">
+            <div className="Text16N" style={{ marginBottom: "25px" }}>
+              Is This a Wedding Event
+            </div>
+            <input
+              type="checkbox"
+              name="isWedding"
+              // style={{ marginLeft: "20px" }}
+              checked={
+                clientData?.events && clientData?.events[eventIndex]?.isWedding
+              }
+              disabled={true}
+            />
+          </Col>
+          <Col xs="4" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Location
@@ -117,7 +129,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" className="me-3">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Travel By
@@ -136,7 +148,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Shoot Directors
@@ -147,7 +159,7 @@ function Preview() {
                 className="forminput"
                 value={
                   clientData?.events &&
-                  clientData?.events[eventIndex]?.shootDirectors
+                  clientData?.events[eventIndex]?.shootDirector
                 }
                 required={true}
                 // onChange={(e) => updateEventValues(e)}
@@ -157,7 +169,7 @@ function Preview() {
           </Col>
         </Row>
         <Row>
-          <Col xs="4" sm="3" className="pr5">
+          <Col xs="4" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Photographers
@@ -177,7 +189,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" className="me-3">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Cinematographers
@@ -197,7 +209,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3">
+          <Col xs="6" sm="3"  md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Drones
@@ -216,9 +228,7 @@ function Preview() {
               />
             </div>
           </Col>
-        </Row>
-        <Row>
-          <Col xs="6" sm="3" className="pr5">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Same Day Photo Editor
@@ -230,7 +240,7 @@ function Preview() {
                 className="forminput"
                 value={
                   clientData?.events &&
-                  clientData?.events[eventIndex]?.sameDayPhotoEditor
+                  clientData?.events[eventIndex]?.sameDayPhotoEditors
                 }
                 required={true}
                 // onChange={(e) => updateEventValues(e)}
@@ -238,7 +248,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" className="me-3">
+          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Same Day Video Editor
@@ -250,48 +260,13 @@ function Preview() {
                 className="forminput"
                 value={
                   clientData?.events &&
-                  clientData?.events[eventIndex]?.sameDayVideoEditor
+                  clientData?.events[eventIndex]?.sameDayVideoEditors
                 }
                 required={true}
                 // onChange={(e) => updateEventValues(e)}
                 placeholder={"Location"}
               />
             </div>
-          </Col>
-          {/* <Col xs="6" sm="3" className="me-3">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Tentative
-              </div>
-              <Input
-                type="text"
-                name="tentative"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.tentative
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col> */}
-        </Row>
-        <Row>
-          <Col xs="6" sm="3" className="pr5 mt-3 text16N">
-            <input
-              type="checkbox"
-              name="isWedding"
-              // style={{ marginLeft: "20px" }}
-              checked={
-                clientData?.events && clientData?.events[eventIndex]?.isWedding
-              }
-              disabled={true}
-            />
-            {"   "}
-            Wedding
           </Col>
         </Row>
         <div className="mt-5">
@@ -366,13 +341,10 @@ function Preview() {
             Pre Wedding Videos
           </div>
         </div>
-        {console.log("PREVIEW",clientData)}
         {(clientData?.deliverables?.preWeddingVideos ||
           clientData?.deliverables?.preWeddingPhotos) && (
-          <>
-            <p className="mt-5 text16N mb-0 fw-bold">For Pre-Wedding :</p>
             <Row>
-              <Col xs="6" sm="3" className="me-2">
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Photographers
@@ -382,12 +354,12 @@ function Preview() {
                     name="preWedAssistants"
                     disabled={true}
                     className="forminput"
-                    value={clientData?.preWedPhotographers}
+                    value={clientData?.preWedphotographers}
                     required={true}
                   />
                 </div>
               </Col>
-              <Col xs="6" sm="3" className="me-2">
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Cinematograpers
@@ -397,12 +369,12 @@ function Preview() {
                     name="preWedCinematographers"
                     disabled={true}
                     className="forminput"
-                    value={clientData?.preWedCinematographers}
+                    value={clientData?.preWedcinematographers}
                     required={true}
                   />
                 </div>
               </Col>
-              <Col xs="6" sm="3" className="me-2">
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Assistants
@@ -412,12 +384,12 @@ function Preview() {
                     name="preWedAssistants"
                     disabled={true}
                     className="forminput"
-                    value={clientData?.preWedAssistants}
+                    value={clientData?.preWedassistants}
                     required={true}
                   />
                 </div>
               </Col>
-              <Col xs="6" sm="3" className="me-2">
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Drone Flyers
@@ -427,18 +399,17 @@ function Preview() {
                     name="preWedDroneFlyerss"
                     disabled={true}
                     className="forminput"
-                    value={clientData?.preWedDroneFlyers}
+                    value={clientData?.preWeddrones}
                     required={true}
                   />
                 </div>
               </Col>
             </Row>
-          </>
         )}
         <Row>
           {clientData?.albums?.map((albumValue, i) => {
             return (
-              <Col className= {i > 0 ? "mx-2" : " "} xs="4" sm="3" lg="4" key={i}>
+              <Col xs="6" sm="3" md="3" lg="3" className="pr5" key={i}>
                 <div className="Drop">
                   <h4 className="LabelDrop">Album {i + 1}</h4>
                   <Input
@@ -456,7 +427,7 @@ function Preview() {
           })}
         </Row>
         <Row>
-          <Col xs="4" sm="2" className="me-3">
+          <Col xs="6" sm="3" md="3" lg="3"  className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Promo
@@ -472,7 +443,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="2" className="me-3">
+          <Col xs="6" sm="3" md="3" lg="3"  className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Long Films
@@ -488,7 +459,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="4" sm="2" className="me-3">
+          <Col xs="6" sm="3" md="3" lg="3" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Reels
@@ -504,7 +475,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="3" sm="2" className="me-3">
+          <Col xs="6" sm="3" md="3" lg="3" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Hard Drives

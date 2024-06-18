@@ -11,7 +11,10 @@ import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { getAlbums, updateDeliverable } from "../../API/Deliverables";
+import { getAllWhatsappText } from "../../API/Whatsapp";
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
+import { Editor } from "react-draft-wysiwyg";
 
 function Albums(props) {
   const [editors, setEditors] = useState(null);
@@ -21,12 +24,42 @@ function Albums(props) {
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(true);
+  const [editorState, setEditorState] = useState({
+    albumTextGetImmutable:EditorState.createEmpty(),
+    cinematographyTextGetImmutable:EditorState.createEmpty(),
+    _id: null
+  });
+
+  const extractText = () => {
+    const contentState = editorState.albumTextGetImmutable.getCurrentContent();
+    return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
+  };
+
+  const loadEditorContent = (rawContent) => {
+    const contentState = convertFromRaw(JSON.parse(rawContent));
+   return EditorState.createWithContent(contentState);
+    // Use `newEditorState` in your editor component
+  };
+
+  const getAllWhatsappTextHandler = async () => {
+    const res = await getAllWhatsappText()
+    const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)
+    const newEditorStatecinematography = loadEditorContent(res.data[0].cinematographyTextGetImmutable)
+    console.log("getAllWhatsappTextHandler",newEditorStateAlbum, newEditorStatecinematography)
+
+    setEditorState({
+      _id: res.data[0]._id,
+      albumTextGetImmutable: newEditorStateAlbum,
+      cinematographyTextGetImmutable: newEditorStatecinematography,
+    })
+  }
 
   const fetchData = async () => {
     try {
       const data = await getAlbums();
       const res = await getEditors();
       setEditors(res.editors)
+      await getAllWhatsappTextHandler()
       if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
@@ -238,7 +271,7 @@ function Albums(props) {
 
     // const chatUrl = `whatsapp://send?abid=${contactParam}&text=Hello%2C%20World!`;
     // window.open(chatUrl, '_blank');
-
+    console.log("openWhatsAppChat",message,contact)
     const baseUrl = 'https://web.whatsapp.com/';
     const contactParam = encodeURIComponent(contact);
     const messageParam = encodeURIComponent(message);
@@ -441,7 +474,7 @@ function Albums(props) {
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
                           <td
-                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber, "HI This is shutter down ")}
+                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber, extractText())}
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',

@@ -266,7 +266,7 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
-                              allowedPersons={client.preWedPhotographers}
+                              allowedPersons={client.preWedphotographers}
                               usersToShow={shooters}
                               existedUsers={client?.preWeddingDetails?.photographers}
                               userChecked={(userObj) => {
@@ -293,7 +293,7 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
-                              allowedPersons={client?.preWedCinematographers}
+                              allowedPersons={client?.preWedcinematographers}
                               usersToShow={shooters}
                               existedUsers={client?.preWeddingDetails?.cinematographers}
                               userChecked={(userObj) => {
@@ -323,7 +323,7 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
-                              allowedPersons={client?.preWedAssistants}
+                              allowedPersons={client?.preWedassistants}
                               usersToShow={shooters}
                               existedUsers={client?.preWeddingDetails?.assistants}
                               userChecked={(userObj) => {
@@ -353,7 +353,7 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
-                              allowedPersons={client?.preWedDroneFlyers}
+                              allowedPersons={client?.preWeddrones}
                               usersToShow={shooters}
                               existedUsers={client?.preWeddingDetails?.droneFlyers}
                               userChecked={(userObj) => {

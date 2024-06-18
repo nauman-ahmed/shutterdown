@@ -74,7 +74,7 @@ function ClientHeader(props) {
   const route = window.location.href.split('/MyProfile');
 
   useEffect(() => {
-    if (route[1].startsWith('/Tasks/DailyTasks') && currentUser.rollSelect === 'Manager') {
+    if (route[1] && route[1].startsWith('/Tasks/DailyTasks') && currentUser.rollSelect === 'Manager') {
       fetchClientsData()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

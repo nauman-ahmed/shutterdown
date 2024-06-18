@@ -37,7 +37,9 @@ import {
   ModalHeader,
   Row,
 } from "reactstrap";
+import { getAllEventOptions, updateAllEventOptions } from "../../API/FormEventOptionsAPI";
 import { getClients } from '../../API/Client';
+
 function ListView(props) {
   const [clientData, setClientData] = useState(null);
   const [allEvents, setAllEvents] = useState([]);
@@ -50,6 +52,9 @@ function ListView(props) {
   const [newEventModel, setNewEventModel] = useState(false);
   const [newEvent, setNewEvent] = useState({  });
   const [showCalender, setShowCalender] = useState(false);
+  const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
+  
   const dispatch = useDispatch();
   const toggle = () => {
     setShow(!show);
@@ -82,16 +87,8 @@ function ListView(props) {
       setAllUsers(usersData.users);
       const res = await getEvents();
       if (currentUser.rollSelect === "Manager") {
-        setAllEvents(res.data.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
-          return ascending ? dateA - dateB : dateB - dateA;
-        }));
-        setEventsForShow(res.data.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
-          return ascending ? dateA - dateB : dateB - dateA;
-        }));
+        setAllEvents(res.data);
+        setEventsForShow(res.data);
       } else if (currentUser.rollSelect === "Shooter") {
         const eventsToShow = res.data.map((event) => {
           if (
@@ -99,7 +96,7 @@ function ListView(props) {
               (director) => director._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Shoot Director" };
+            return { ...event, userRole: "Shoot Directors" };
           } else if (
             event?.choosenPhotographers.some(
               (photographer) => photographer._id === currentUser._id
@@ -142,16 +139,8 @@ function ListView(props) {
             return null;
           }
         });
-        setAllEvents(eventsToShow.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
-          return ascending ? dateA - dateB : dateB - dateA;
-        }));
-        setEventsForShow(eventsToShow.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
-          return ascending ? dateA - dateB : dateB - dateA;
-        }));
+        setAllEvents(eventsToShow);
+        setEventsForShow(eventsToShow);
       }
     } catch (error) {
       console.log(error);
@@ -283,14 +272,17 @@ function ListView(props) {
     }
   }
   
-  useEffect(() => {
-    applySorting()
-  }, [allEvents]);
+  const getAllFormOptionsHandler = async () => {
+    const eventOptions = await getAllEventOptions();
+
+    setEventOptionsKeyValues(eventOptions)
+  }
 
   useEffect(() => {
     getEventsData();
     getStoredEvents();
-    fetchClientsData()
+    fetchClientsData();
+    getAllFormOptionsHandler();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const getStoredEvents = async () => {
@@ -609,18 +601,18 @@ function ListView(props) {
                                   {event?.eventType}
                                 </p>
                               </td>
-                             
+                             {console.log(event)}
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
-                                  allowedPersons={1}
+                                  allowedPersons={event?.shootDirector}
                                   usersToShow={allUsers}
-                                  existedUsers={event?.shootDirector}
+                                  existedUsers={event?.shootDirectors}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
-                                    updatedEvents[index].shootDirector =
-                                      Array.isArray(event?.shootDirector)
-                                        ? [...event?.shootDirector, userObj]
+                                    updatedEvents[index].shootDirectors =
+                                      Array.isArray(event?.shootDirectors)
+                                        ? [...event?.shootDirectors, userObj]
                                         : [userObj];
                                     setAllEvents(updatedEvents);
                                   }}
@@ -633,8 +625,8 @@ function ListView(props) {
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
-                                {Array.isArray(event?.shootDirector) &&
-                                  event?.shootDirector?.map((director) => (
+                                {Array.isArray(event?.shootDirectors) &&
+                                  event?.shootDirectors?.map((director) => (
                                     <p
                                       style={{
                                         marginBottom: 0,
@@ -858,35 +850,32 @@ function ListView(props) {
                                 >
                                   {event?.sameDayPhotoEditor}
                                 </p>
-                                {event?.sameDayPhotoEditor === "Yes" && (
-                                  <ShootDropDown
-                                    teble={true}
-                                    allowedPersons={2}
-                                    usersToShow={allUsers}
-                                    existedUsers={event?.sameDayPhotoMakers}
-                                    userChecked={(userObj) => {
-                                      const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayPhotoMakers =
-                                        Array.isArray(event?.sameDayPhotoMakers)
-                                          ? [
-                                              ...event?.sameDayPhotoMakers,
-                                              userObj,
-                                            ]
-                                          : [userObj];
-                                      setAllEvents(updatedEvents);
-                                    }}
-                                    userUnChecked={(userObj) => {
-                                      const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayPhotoMakers =
-                                        event?.sameDayPhotoMakers.filter(
-                                          (existingUser) =>
-                                            existingUser !== userObj
-                                        );
-                                      setAllEvents(updatedEvents);
-                                    }}
-                                  />
-                                )}
-
+                                <ShootDropDown
+                                  teble={true}
+                                  allowedPersons={event?.sameDayPhotoEditors}
+                                  usersToShow={allUsers}
+                                  existedUsers={event?.sameDayPhotoMakers}
+                                  userChecked={(userObj) => {
+                                    const updatedEvents = [...allEvents];
+                                    updatedEvents[index].sameDayPhotoMakers =
+                                      Array.isArray(event?.sameDayPhotoMakers)
+                                        ? [
+                                            ...event?.sameDayPhotoMakers,
+                                            userObj,
+                                          ]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
+                                  }}
+                                  userUnChecked={(userObj) => {
+                                    const updatedEvents = [...allEvents];
+                                    updatedEvents[index].sameDayPhotoMakers =
+                                      event?.sameDayPhotoMakers.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
+                                    setAllEvents(updatedEvents);
+                                  }}
+                                />
                                 {Array.isArray(event?.sameDayPhotoMakers) &&
                                   event?.sameDayPhotoMakers?.map((user) => (
                                     <p
@@ -910,35 +899,32 @@ function ListView(props) {
                                 >
                                   {event?.sameDayVideoEditor}
                                 </p>
-                                {event?.sameDayVideoEditor === "Yes" && (
-                                  <ShootDropDown
-                                    teble={true}
-                                    allowedPersons={1}
-                                    usersToShow={allUsers}
-                                    existedUsers={event?.sameDayVideoMakers}
-                                    userChecked={(userObj) => {
-                                      const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayVideoMakers =
-                                        Array.isArray(event?.sameDayVideoMakers)
-                                          ? [
-                                              ...event?.sameDayVideoMakers,
-                                              userObj,
-                                            ]
-                                          : [userObj];
-                                      setAllEvents(updatedEvents);
-                                    }}
-                                    userUnChecked={(userObj) => {
-                                      const updatedEvents = [...allEvents];
-                                      updatedEvents[index].sameDayVideoMakers =
-                                        event?.sameDayVideoMakers.filter(
-                                          (existingUser) =>
-                                            existingUser !== userObj
-                                        );
-                                      setAllEvents(updatedEvents);
-                                    }}
-                                  />
-                                )}
-
+                                <ShootDropDown
+                                  teble={true}
+                                  allowedPersons={event?.sameDayVideoEditors}
+                                  usersToShow={allUsers}
+                                  existedUsers={event?.sameDayVideoMakers}
+                                  userChecked={(userObj) => {
+                                    const updatedEvents = [...allEvents];
+                                    updatedEvents[index].sameDayVideoMakers =
+                                      Array.isArray(event?.sameDayVideoMakers)
+                                        ? [
+                                            ...event?.sameDayVideoMakers,
+                                            userObj,
+                                          ]
+                                        : [userObj];
+                                    setAllEvents(updatedEvents);
+                                  }}
+                                  userUnChecked={(userObj) => {
+                                    const updatedEvents = [...allEvents];
+                                    updatedEvents[index].sameDayVideoMakers =
+                                      event?.sameDayVideoMakers.filter(
+                                        (existingUser) =>
+                                          existingUser !== userObj
+                                      );
+                                    setAllEvents(updatedEvents);
+                                  }}
+                                />
                                 {Array.isArray(event?.sameDayVideoMakers) &&
                                   event?.sameDayVideoMakers?.map((user) => (
                                     <p
@@ -1212,13 +1198,13 @@ function ListView(props) {
                     Shoot Director
                   </div>
                   <Select
-                    value={newEvent?.shootDirectors ? {label : newEvent?.shootDirectors, value : newEvent?.shootDirectors} : null}
-                    name="shootDirectors"
+                    value={newEvent?.shootDirector ? {label : newEvent?.shootDirector, value : newEvent?.shootDirector} : null}
+                    name="shootDirector"
                     className="w-75"
                     onChange={(selected) => {
                       setNewEvent({
                         ...newEvent,
-                        shootDirectors: selected?.value,
+                        shootDirector: selected?.value,
                       });
                     }}
                     styles={customStyles}
@@ -1321,19 +1307,19 @@ function ListView(props) {
                   </div>
                   <Select
                     value={
-                      newEvent?.sameDayPhotoEditor
+                      newEvent?.sameDayPhotoEditors
                         ? {
-                            value: newEvent?.sameDayPhotoEditor,
-                            label: newEvent?.sameDayPhotoEditor,
+                            value: newEvent?.sameDayPhotoEditors,
+                            label: newEvent?.sameDayPhotoEditors,
                           }
                         : null
                     }
-                    name="sameDayPhotoEditor"
+                    name="sameDayPhotoEditors"
                     className="w-75"
                     onChange={(selected) => {
                       setNewEvent({
                         ...newEvent,
-                        sameDayPhotoEditor: selected.value,
+                        sameDayPhotoEditors: selected.value,
                       });
                     }}
                     styles={customStyles}
@@ -1349,19 +1335,19 @@ function ListView(props) {
                   </div>
                   <Select
                     value={
-                      newEvent?.sameDayVideoEditor
+                      newEvent?.sameDayVideoEditors
                         ? {
-                            value: newEvent?.sameDayVideoEditor,
-                            label: newEvent?.sameDayVideoEditor,
+                            value: newEvent?.sameDayVideoEditors,
+                            label: newEvent?.sameDayVideoEditors,
                           }
                         : null
                     }
-                    name="sameDayVideoEditor"
+                    name="sameDayVideoEditors"
                     className="w-75"
                     onChange={(selected) => {
                       setNewEvent({
                         ...newEvent,
-                        sameDayVideoEditor: selected.value,
+                        sameDayVideoEditors: selected.value,
                       });
                     }}
                     styles={customStyles}

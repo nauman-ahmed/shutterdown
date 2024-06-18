@@ -23,6 +23,7 @@ import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
+import { getAllEventOptions, updateAllEventOptions } from "../../API/FormEventOptionsAPI";
 
 function ClientInfo() {
   const [clientData, setClientData] = useState(null);
@@ -33,6 +34,9 @@ function ClientInfo() {
   const [newEvent, setNewEvent] = useState({ client: clientId });
   const [showCalender, setShowCalender] = useState(false);
   const [allEvents, setAllEvents] = useState(null);
+  const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
+  
   const dispatch = useDispatch();
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
@@ -41,9 +45,17 @@ function ClientInfo() {
   };
 
   const target = useRef(null);
+
+  const getAllFormOptionsHandler = async () => {
+    const eventOptions = await getAllEventOptions();
+
+    setEventOptionsKeyValues(eventOptions)
+  }
+
   useEffect(() => {
     getIdData();
     getStoredEvents();
+    getAllFormOptionsHandler()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   let travelByOptions = [
@@ -213,7 +225,7 @@ function ClientInfo() {
           <button
             onClick={() => setNewEventModel(true)}
             className="btn btn-primary"
-            style={{ backgroundColor : '#666DFF'}}
+            style={{ backgroundColor : '#666DFF'}} 
           >
             Add Event
           </button>
@@ -259,10 +271,10 @@ function ClientInfo() {
                 <td className="textPrimary fs-6">{event?.cinematographers}</td>
                 <td className="textPrimary fs-6">{event?.drones}</td>
                 <td className="textPrimary fs-6">
-                  {event?.sameDayPhotoEditor}
+                  {event?.sameDayPhotoEditors}
                 </td>
                 <td className="textPrimary fs-6">
-                  {event?.sameDayVideoEditor}
+                  {event?.sameDayVideoEditors}
                 </td>
                 {/* <td className="textPrimary fs-6">{event?.tentative}</td> */}
                 <td className=" textPrimary fs-6">
@@ -387,220 +399,33 @@ function ClientInfo() {
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Travel By
+              {eventOptionObjectKeys.map((Objkey) => 
+                <Col xl="6" sm="6" className="p-2">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Select
+                      value={
+                        newEvent?.[Objkey]
+                          ? {
+                              value: newEvent?.[Objkey],
+                              label: newEvent?.[Objkey],
+                            }
+                          : null
+                      }
+                      name={Objkey}
+                      className="w-75"
+                      onChange={(selected) => {
+                        setNewEvent({ ...newEvent, [Objkey]: selected.value });
+                      }}
+                      styles={customStyles}
+                      options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                      required
+                    />
                   </div>
-                  <Select
-                    value={
-                      newEvent?.travelBy
-                        ? {
-                            value: newEvent?.travelBy,
-                            label: newEvent?.travelBy,
-                          }
-                        : null
-                    }
-                    name="travelBy"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({ ...newEvent, travelBy: selected.value });
-                    }}
-                    styles={customStyles}
-                    options={travelByOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Shoot Director
-                  </div>
-                  <Select
-                    value={newEvent?.shootDirectors ? {label : newEvent?.shootDirectors, value : newEvent?.shootDirectors} : null}
-                    name="shootDirectors"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        shootDirectors: selected?.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={[
-                      {
-                        value: "0",
-                        label: "0",
-                      },
-                      {
-                        value: "1",
-                        label: "1",
-                      },
-                    ]}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Photographers
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.photographers
-                        ? {
-                            value: newEvent?.photographers,
-                            label: newEvent?.photographers,
-                          }
-                        : null
-                    }
-                    name="phtotgraphers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        photographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Cinematographers
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.cinematographers
-                        ? {
-                            value: newEvent?.cinematographers,
-                            label: newEvent?.cinematographers,
-                          }
-                        : null
-                    }
-                    name="cinematographers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        cinematographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Drones
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.drones
-                        ? { value: newEvent?.drones, label: newEvent?.drones }
-                        : null
-                    }
-                    name="drones"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({ ...newEvent, drones: selected.value });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same Day Photo Editors
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.sameDayPhotoEditor
-                        ? {
-                            value: newEvent?.sameDayPhotoEditor,
-                            label: newEvent?.sameDayPhotoEditor,
-                          }
-                        : null
-                    }
-                    name="sameDayPhotoEditor"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        sameDayPhotoEditor: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same Day Video Editors
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.sameDayVideoEditor
-                        ? {
-                            value: newEvent?.sameDayVideoEditor,
-                            label: newEvent?.sameDayVideoEditor,
-                          }
-                        : null
-                    }
-                    name="sameDayVideoEditor"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({
-                        ...newEvent,
-                        sameDayVideoEditor: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              {/* <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Tentative
-                  </div>
-                  <Select
-                    value={
-                      newEvent?.tentative
-                        ? {
-                            value: newEvent?.tentative,
-                            label: newEvent?.tentative,
-                          }
-                        : null
-                    }
-                    name="tentative"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setNewEvent({ ...newEvent, tentative: selected.value });
-                    }}
-                    styles={customStyles}
-                    options={yesNoOptions}
-                    required
-                  />
-                </div>
-              </Col> */}
+                </Col>
+              )}
             </Row>
           </ModalBody>
           <ModalFooter>
@@ -716,232 +541,36 @@ function ClientInfo() {
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Travel By
+              {eventOptionObjectKeys.map((Objkey) => 
+                <Col xl="6" sm="6" className="p-2">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Select
+                      value={
+                        eventToEdit?.[Objkey]
+                          ? {
+                              value: eventToEdit?.[Objkey],
+                              label: eventToEdit?.[Objkey],
+                            }
+                          : null
+                      }
+                      name={Objkey}
+                      className="w-75"
+                      onChange={(selected) => {
+                        setEventToEdit({
+                          ...eventToEdit,
+                          [Objkey]: selected.value,
+                        });
+                      }}
+                      styles={customStyles}
+                      options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                      required
+                    />
                   </div>
-                  <Select
-                    value={
-                      eventToEdit?.travelBy
-                        ? {
-                            value: eventToEdit?.travelBy,
-                            label: eventToEdit?.travelBy,
-                          }
-                        : null
-                    }
-                    name="travelBy"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        travelBy: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={travelByOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Shoot Director
-                  </div>
-                  <Select
-                    value={eventToEdit?.shootDirectors ? {label : eventToEdit?.shootDirectors, value : eventToEdit?.shootDirectors} : null}
-                    name="shootDirectors"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        shootDirectors: selected?.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={[
-                      {
-                        value: "0",
-                        label: "0",
-                      },
-                      {
-                        value: "1",
-                        label: "1",
-                      },
-                    ]}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Photographers
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.photographers
-                        ? {
-                            value: eventToEdit?.photographers,
-                            label: eventToEdit?.photographers,
-                          }
-                        : null
-                    }
-                    name="phtotgraphers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        photographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Cinematographers
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.cinematographers
-                        ? {
-                            value: eventToEdit?.cinematographers,
-                            label: eventToEdit?.cinematographers,
-                          }
-                        : null
-                    }
-                    name="cinematographers"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        cinematographers: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Drones
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.drones
-                        ? {
-                            value: eventToEdit?.drones,
-                            label: eventToEdit?.drones,
-                          }
-                        : null
-                    }
-                    name="drones"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        drones: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Photo editor
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.sameDayPhotoEditor
-                        ? {
-                            value: eventToEdit?.sameDayPhotoEditor,
-                            label: eventToEdit?.sameDayPhotoEditor,
-                          }
-                        : null
-                    }
-                    name="sameDayPhotoEditor"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        sameDayPhotoEditor: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Same day Video editor
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.sameDayVideoEditor
-                        ? {
-                            value: eventToEdit?.sameDayVideoEditor,
-                            label: eventToEdit?.sameDayVideoEditor,
-                          }
-                        : null
-                    }
-                    name="sameDayVideoEditor"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        sameDayVideoEditor: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={numberOptions}
-                    required
-                  />
-                </div>
-              </Col>
-              {/* <Col xl="6" sm="6" className="p-2">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Tentative
-                  </div>
-                  <Select
-                    value={
-                      eventToEdit?.tentative
-                        ? {
-                            value: eventToEdit?.tentative,
-                            label: eventToEdit?.tentative,
-                          }
-                        : null
-                    }
-                    name="tentative"
-                    className="w-75"
-                    onChange={(selected) => {
-                      setEventToEdit({
-                        ...eventToEdit,
-                        tentative: selected.value,
-                      });
-                    }}
-                    styles={customStyles}
-                    options={yesNoOptions}
-                    required
-                  />
-                </div>
-              </Col> */}
+                </Col>
+              )}
             </Row>
           </ModalBody>
           <ModalFooter>

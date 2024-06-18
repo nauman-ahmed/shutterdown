@@ -28,7 +28,8 @@ const AssignTeam = async (req, res) => {
         const sameDayVideoMakersIds = req.body.data.sameDayVideoMakers?.map(user => user._id);
         const assistantsIds = req.body.data.assistants?.map(user => user._id);
         const managerIds = req.body.data.manager?.map(user => user._id);
-        const directorIds = req.body.data.shootDirector?.map(user => user._id);
+        const directorIds = req.body.data.shootDirectors?.map(user => user._id);
+        
         event.choosenCinematographers = cinematographersIds;
         event.choosenPhotographers = photographersIds;
         event.droneFlyers = droneFlyersIds;
@@ -36,9 +37,9 @@ const AssignTeam = async (req, res) => {
         event.sameDayVideoMakers = sameDayVideoMakersIds;
         event.assistants = assistantsIds;
         event.manager = managerIds;
-        event.shootDirector = directorIds;
-        console.log(event);
+        event.shootDirectors = directorIds;
         await event.save();
+
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {
         console.log(error, 'error');
@@ -61,7 +62,13 @@ const updateEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
     try {
-        const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirector sameDayPhotoMakers sameDayVideoMakers');
+        const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        console.log("EVENTS",events)
+        events.sort((a, b) => {
+            const dateA = new Date(a.eventDate);
+            const dateB = new Date(b.eventDate);
+            return dateA - dateB 
+          })
         res.status(200).json(events);
     } catch (error) {
         console.log(error, 'error');

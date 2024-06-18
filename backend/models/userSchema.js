@@ -12,6 +12,14 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  accountRequest: {
+    type: Boolean,
+    default: true
+  },
+  banAccount: {
+    type: Boolean,
+    default: false
+  },
   phoneNo: {
     type: String,
   },

@@ -22,6 +22,79 @@ const downloadFile = async (req, res) => {
     return res.status(404).json({ error: 'File not found on the server' });
   }
 }
+
+const getUserAccountbanned = async (req, res) => {
+  try {
+    console.log(req.body.data);
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : true}, { new: true });
+    res.status(200).json({ message: 'Account has been banned' })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getUserAccountUnbanned = async (req, res) => {
+  try {
+    console.log(req.body.data);
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : false}, { new: true });
+    res.status(200).json({ message: 'Account has been unbanned' })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getUserAccountApproved = async (req, res) => {
+  try {
+    console.log(req.body.data);
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {accountRequest : false}, { new: true });
+    res.status(200).json({ message: 'Account Approved' })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getAllAccountDetails = async (req, res) => {
+  try {
+    let userAccountDetails = await userSchema.find({  });
+    
+    // Assuming 'userAccountDetails' is your original array of Mongoose documents
+    userAccountDetails = userAccountDetails.map(doc => {
+      // Convert the Mongoose document to a plain JavaScript object
+      const obj = doc.toObject();
+
+      // Add the fullname field by merging firstName and lastName
+      return {
+          ...obj,
+        fullname: `${obj.firstName} ${obj.lastName}`
+      };
+    });
+
+    // Sorting the array so that objects with accountRequest = true come first,
+    // and if accountRequest is the same, then sort by banRequest = true next
+    userAccountDetails.sort((a, b) => {
+      if (a.accountRequest === b.accountRequest) {
+        // If accountRequest is the same, sort by banRequest
+        return (a.banRequest === b.banRequest) ? 0 : a.banRequest ? -1 : 1;
+      }
+      return a.accountRequest ? -1 : 1;
+    });
+
+    res.status(200).json(userAccountDetails);
+  } catch (error) {
+    console.log("USERS ERROR",error)
+    res.status(404).json('Your Email is not exists');
+  }
+};
+
+const getAllAccountRequestCount = async (req, res) => {
+  try {
+    const userAccountRequests = await userSchema.find({ accountRequest: true  });
+    res.status(200).json(userAccountRequests.length);
+  } catch (error) {
+    res.status(404).json('Your Email is not exists');
+  }
+};
+
 const previewFile = async (req, res) => {
   try {
     const filePath = path.join(__dirname, '../uploads/', req.params.filePath);
@@ -188,6 +261,14 @@ const SignInPostRequest = async (req, res) => {
     });
     console.log(loginUser);
     if (loginUser) {
+      if(loginUser.accountRequest){
+        res.status(404).json({ message: 'Your account is not approved' });
+        return
+      }
+      if(loginUser.banAccount){
+        res.status(404).json({ message: 'Your account access is limited' });
+        return
+      }
       res
         .status(200)
         .json({ message: 'Login Successfully', User: loginUser });
@@ -265,6 +346,11 @@ const getShooters = async (req, res) => {
 
 
 module.exports = {
+  getUserAccountUnbanned,
+  getUserAccountbanned,
+  getUserAccountApproved,
+  getAllAccountDetails,
+  getAllAccountRequestCount,
   RegisterPostRequest,
   getShooters,
   SignInPostRequest,
