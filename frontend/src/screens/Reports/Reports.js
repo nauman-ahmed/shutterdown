@@ -42,7 +42,7 @@ function Reports(props) {
     const seenUsers = new Set();
     return allTasks
       ?.map((taskObj, i) => ({
-        title: `${taskObj?.[propertyName]?.firstName} ${taskObj?.[propertyName]?.lastName}`,
+        title: `${taskObj?.[propertyName]?.firstName}`,
         id: i,
         userId: taskObj?.[propertyName]?._id,
       }))
@@ -67,12 +67,40 @@ function Reports(props) {
     },
   ];
 
+  // Define priority for parentTitle
+  const priority = {
+    "Assign By": 1,
+    "Assign To": 2,
+  };
+
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       setTasksToShow(allTasks);
     }
     setFilterBy(filterType);
   };
+
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Assign By"){
+          console.log("obj",allTasks,obj)
+          const newData = allTasks.filter(task => task.assignBy.firstName === obj.title)
+          fullData = [...fullData,...newData]
+          notVisited = false
+        }else if(obj.parentTitle == "Assign To"){
+          const newData = allTasks.filter(task => task.assignTo.firstName === obj.title)
+          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+          fullData = notVisited ? [...fullData,...newData] : [...common]
+        }
+      })
+      setTasksToShow(fullData)
+    }else{
+      setTasksToShow(allTasks)
+    }
+  }
 
   const applyFilter = (filterValue) => {
     // setTaksToShow(null);
@@ -96,7 +124,7 @@ function Reports(props) {
       <ClientHeader
         selectFilter={changeFilter}
         currentFilter={filterBy}
-        applyFilter={applyFilter}
+        priority={priority} applyFilter={applyFilterNew}
         options={filterOptions}
         title="Reports"
         filter
@@ -129,7 +157,7 @@ function Reports(props) {
             className="Text12"
             style={{
               textAlign: "center",
-              borderWidth: "0px 1px 0px 1px",
+              borderWidth: '1px 1px 1px 1px',
               // background: "#EFF0F5",
             }}
           >

@@ -30,7 +30,7 @@ function Cinematography(props) {
   });
 
   const extractText = () => {
-    const contentState = editorState.albumTextGetImmutable.getCurrentContent();
+    const contentState = editorState.cinematographyTextGetImmutable.getCurrentContent();
     return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
   };
 
@@ -58,10 +58,6 @@ function Cinematography(props) {
       id: 1,
       filters: [
         {
-          title: 'All',
-          id: 1,
-        },
-        {
           title: 'Promo',
           id: 2,
         },
@@ -78,54 +74,15 @@ function Cinematography(props) {
     {
       title: 'Assigned Editor',
       id: 2,
-      filters: editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
+      filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 3 }
       }),{ title: 'Unassigned Editor', id: editors.length+3 }]
     },
-    // {
-    //   title: 'Wedding Date sorting',
-    //   id: 4,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
-    // {
-    //   title: 'Deadline sorting',
-    //   id: 5,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
+    
     {
       title: 'Current Status',
       id: 6,
       filters: [
-        {
-          title: 'Any',
-          id: 1
-        },
         {
           title: 'Yet to Start',
           id: 2
@@ -145,10 +102,6 @@ function Cinematography(props) {
     id: 1,
     filters: [
       {
-        title: 'All',
-        id: 1,
-      },
-      {
         title: 'Promo',
         id: 2,
       },
@@ -167,10 +120,6 @@ function Cinematography(props) {
     id: 6,
     filters: [
       {
-        title: 'Any',
-        id: 1
-      },
-      {
         title: 'Yet to Start',
         id: 2
       },
@@ -185,6 +134,13 @@ function Cinematography(props) {
     ]
   },
 ]
+
+// Define priority for parentTitle
+const priority = {
+  "Deliverable": 1,
+  "Assigned Editor": 2,
+  'Current Status': 3
+};
 
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
@@ -222,6 +178,38 @@ function Cinematography(props) {
       }
     } catch (error) {
       console.log("applySorting ERROR",error)
+    }
+  }
+
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Deliverable"){
+            const newData = allDeliverables.filter(deliverable => deliverable.deliverableName === obj.title)
+            fullData = [...fullData,...newData]
+            notVisited = false
+        }else if(obj.parentTitle == "Assigned Editor"){
+          if(obj.title === 'Unassigned Editor'){
+            const newData = allDeliverables.filter(deliverable => deliverable.editor ? false : true)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }else{
+            const newData = allDeliverables.filter(deliverable => deliverable.editor?.firstName === obj.title)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }
+          notVisited = false
+        }else if(obj.parentTitle == "Current Status"){
+          const newData = allDeliverables.filter(deliverable => deliverable.status === obj.title)
+          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+          fullData = notVisited ? [...fullData,...newData] : [...common]
+        }
+      })
+      setDeliverablesForShow(fullData)
+    }else{
+      setDeliverablesForShow(allDeliverables)
     }
   }
 
@@ -311,9 +299,21 @@ function Cinematography(props) {
     }
   };
 
+  const openWhatsAppChat = (contact, message) => {
+
+    // const chatUrl = `whatsapp://send?abid=${contactParam}&text=Hello%2C%20World!`;
+    // window.open(chatUrl, '_blank');
+    const baseUrl = 'https://web.whatsapp.com/';
+    const contactParam = encodeURIComponent(contact);
+    const messageParam = encodeURIComponent(message);
+    const chatUrl = `${baseUrl}send?phone=${contactParam}&text=${messageParam}`;
+    window.open(chatUrl, '_blank');
+
+  }
+
   return (
     <>
-      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} applyFilter={applyFilter} options={filterOptions} filter title="Cinematography" />
+      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Cinematography" />
       {deliverablesForShow ? (
         <>
           <div >
@@ -336,7 +336,7 @@ function Cinematography(props) {
                   :
                   currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
-                      <th className="tableBody">Client</th>
+                      <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
                       <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
@@ -345,7 +345,7 @@ function Cinematography(props) {
                       <th className="tableBody">First Delivery Date</th>
                       <th className="tableBody">Final Delivery Date</th>
                       <th className="tableBody">Status</th>
-                      {/* <th className="tableBody">Suggestions</th> */}
+                      <th className="tableBody">Action</th>
                       <th className="tableBody">Client Revisions</th>
                       <th className="tableBody">Client Ratings</th>
                       <th className="tableBody">Save</th>
@@ -379,7 +379,7 @@ function Cinematography(props) {
                               paddingBottom: '15px',
                               width: "10%"
                             }}
-                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                            className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
                           >
                             {deliverable?.client?.brideName}
                             <br />
@@ -449,7 +449,7 @@ function Cinematography(props) {
                                 updatedDeliverables[index].companyDeadline = e.target.value;
                                 setAllDeliverables(updatedDeliverables);
                               }}
-                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                              min={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -509,7 +509,17 @@ function Cinematography(props) {
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-
+                          <td
+                            onClick={() => openWhatsAppChat(deliverable.client.phoneNumber, extractText())}
+                            style={{
+                              paddingTop: '15px',
+                              paddingBottom: '15px',
+                              width: "15%"
+                            }}
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                          >
+                            Send Reminder
+                          </td>
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
@@ -523,7 +533,11 @@ function Cinematography(props) {
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
-                              { value: 3, label: 3 }]} required />
+                              { value: 3, label: 3 },
+                              { value: 4, label: 4 },
+                              { value: 5, label: 5 },
+                              { value: 6, label: 6 },
+                              ]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',

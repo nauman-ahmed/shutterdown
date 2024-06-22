@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 const currentUser =
   Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
-export const SaveClientForm = async (data) => {
+export const SaveClientForm = async (data) => { 
   try {
     const dataToSend = { ...data, userID: currentUser._id };
     const result = await axios

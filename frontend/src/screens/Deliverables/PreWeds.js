@@ -26,54 +26,15 @@ function PreWedDeliverables() {
     {
       title: 'Assigned Editor',
       id: 1,
-      filters: editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
+      filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 2 }
       }),{ title: 'Unassigned Editor', id: editors.length+3 }]
     },
-    // {
-    //   title: 'Wedding Date sorting',
-    //   id: 3,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
-    // {
-    //   title: 'Deadline sorting',
-    //   id: 4,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
     {
       title: 'Current Status',
       id: 5,
       filters: [
-        {
-          title: 'Any',
-          id: 1
-        },
+        
         {
           title: 'Yet to Start',
           id: 2
@@ -94,10 +55,6 @@ function PreWedDeliverables() {
       id: 5,
       filters: [
         {
-          title: 'Any',
-          id: 1
-        },
-        {
           title: 'Yet to Start',
           id: 2
         },
@@ -112,6 +69,12 @@ function PreWedDeliverables() {
       ]
     },
   ]
+
+    // Define priority for parentTitle
+    const priority = {
+      "Assigned Editor": 1,
+      'Current Status': 2
+    };
 
   const applySorting = (wedding = false)=>{
     try {
@@ -165,6 +128,38 @@ function PreWedDeliverables() {
     fetchData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Deliverable"){
+            const newData = allDeliverables.filter(deliverable => deliverable.deliverableName === obj.title)
+            fullData = [...fullData,...newData]
+            notVisited = false
+        }else if(obj.parentTitle == "Assigned Editor"){
+          if(obj.title === 'Unassigned Editor'){
+            const newData = allDeliverables.filter(deliverable => deliverable.editor ? false : true)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }else{
+            const newData = allDeliverables.filter(deliverable => deliverable.editor?.firstName === obj.title)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }
+          notVisited = false
+        }else if(obj.parentTitle == "Current Status"){
+          const newData = allDeliverables.filter(deliverable => deliverable.status === obj.title)
+          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+          fullData = notVisited ? [...fullData,...newData] : [...common]
+        }
+      })
+      setDeliverablesForShow(fullData)
+    }else{
+      setDeliverablesForShow(allDeliverables)
+    }
+  }
 
   const applyFilter = (filterValue) => {
     setDeliverablesForShow(null)
@@ -226,25 +221,6 @@ function PreWedDeliverables() {
   const handleSaveData = async (index) => {
     try {
       const deliverable = allDeliverables[index];
-      // if (!client.photosDeliverables) {
-      //   window.notify('Please Select the values!', 'error');
-      //   return
-      // } else if (!client.photosDeliverables.editor) {
-      //   window.notify('Please Select Editor!', 'error');
-      //   return
-      // } else if (!client.photosDeliverables.weddingDate) {
-      //   window.notify('Please Select Wedding Date!', 'error');
-      //   return
-      // } else if (!client.photosDeliverables.companyDeadline) {
-      //   window.notify('Please Provide Company Deadline!', 'error');
-      //   return
-      // } else if (!client.photosDeliverables.status) {
-      //   window.notify('Please Select any Status!', 'error');
-      //   return
-      // } else if (!client.photosDeliverables.clientRevision) {
-      //   window.notify('Please Select Client Revisions!', 'error');
-      //   return
-      // }
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
       setUpdatingIndex(null);
@@ -255,7 +231,7 @@ function PreWedDeliverables() {
 
   return (
     <>
-      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} applyFilter={applyFilter} options={filterOptions} filter title="Pre-Wedding" />
+      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Pre-Wedding" />
       {deliverablesForShow ? (
         <>
         
@@ -278,7 +254,7 @@ function PreWedDeliverables() {
                   </tr>
                   :currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
-                      <th className="tableBody">Client</th>
+                      <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
                       <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
@@ -318,7 +294,7 @@ function PreWedDeliverables() {
                               paddingBottom: '15px',
                               width:"10%"
                             }}
-                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                            className="tableBody Text14Semi sticky-column primary2 tablePlaceContent"
                           >
                             {deliverable?.client?.brideName}
                             <br />
@@ -390,6 +366,7 @@ function PreWedDeliverables() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                              min={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -461,7 +438,11 @@ function PreWedDeliverables() {
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
-                              { value: 3, label: 3 }]} required />
+                              { value: 3, label: 3 },
+                              { value: 4, label: 4 },
+                              { value: 5, label: 5 },
+                              { value: 6, label: 6 },
+                              ]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',

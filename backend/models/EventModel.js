@@ -36,6 +36,10 @@ const eventSchema = mongoose.Schema({
     shootDirector : {
         type : String
     },
+    allDataCompleted : {
+        type : Boolean,
+        default: false
+    },
     drones: {
         type: String
     },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, } from "react";
 import {
   ButtonDropdown,
   DropdownItem,
@@ -9,16 +9,47 @@ import {
 import ShootStar from '../assets/Profile/ShootStar.svg';
 import { ToastContainer} from 'react-toastify';
 import Edit from '../assets/Profile/Edit.svg';
+import { all } from 'axios';
 
 function ShootDropDown(props) {
-  const { existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons } = props;
+  const { existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons, allEvents, currentEvent } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const target = useRef(null);
 
 
   const toggle = async () => {
     setDropdownOpen((prevState) => !prevState);
   };
 
+  const shooterDatesHandler = (user) => {
+    let pushShooter = true
+    if(allEvents && currentEvent){
+      let dummy = {}
+
+      allEvents.map((event) => {
+        if(event.eventDate === currentEvent.eventDate){
+          dummy[event.eventDate] = Array.isArray(dummy[event.eventDate]) ?
+          [...dummy[event.eventDate],...event.shootDirectors ] : [...event.shootDirectors,user ]
+        }else{
+          dummy[event.eventDate] = event.shootDirectors
+        }
+      })
+      for (const date in dummy) {
+        const events = dummy[date];
+        const seen = new Set();  // To store JSON stringified versions of objects
+
+        for (const event of events) {
+            const eventString = JSON.stringify(event);
+            if (seen.has(eventString)) {
+                return false; // Duplicate found
+            }
+            seen.add(eventString);
+        }
+      }
+      return true; // No duplicates found
+    }
+    return pushShooter
+  }
 
   return (
     <div className="d-flex">
@@ -60,6 +91,7 @@ function ShootDropDown(props) {
               >
                 {user.firstName} {user.lastName}
                 <input
+                  ref={target}
                   className='ml-2 mx-2'
                   type="checkbox"
                   onChange={(e) => {
@@ -68,7 +100,11 @@ function ShootDropDown(props) {
                         window.notify(`Maximum Limit is ${allowedPersons}, uncheck previous!`, 'error');
                         return
                       } else {
-                        userChecked(user);
+                        if(shooterDatesHandler(user)){
+                          userChecked(user);
+                        }else{
+                          window.notify("This shooter has already been assigned on the same date", 'error')
+                        }
                       }
                     } else {
                       userUnChecked(user)

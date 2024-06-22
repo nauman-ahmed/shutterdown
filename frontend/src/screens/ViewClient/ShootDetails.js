@@ -130,7 +130,7 @@ function ShootDetails(props) {
                     </div>
                   }
                 </div>
-
+ 
                 <div style={{ padding: '20px' }}>
                   <text className="Text14Semi">
                     Cinematographer: <text style={{ color: '#666DFF' }}>{user.firstName + " " + user.lastName}</text>
@@ -304,7 +304,7 @@ function ShootDetails(props) {
               className="Text12 primary2"
               style={{
                 textAlign: 'center',
-                borderWidth: '0px 1px 0px 1px',
+                borderWidth: '1px 1px 1px 1px',
                 // background: "#EFF0F5",
               }}
             >

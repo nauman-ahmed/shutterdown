@@ -35,7 +35,7 @@ function Preview() {
   const submitClient = async () => {
     if (requesting === false ) {
       setRequesting(true);
-      const saveResult = await SaveClientForm(clientData);
+      const saveResult = await SaveClientForm(clientData); 
       setRequesting(false);
       const storedEvents = await getEvents();
       dispatch(updateAllEvents(storedEvents.data));

@@ -29,11 +29,15 @@ function FormII() {
   const [weddingAssigned, setWeddingAssigned] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
+  const [minDate, setMinDate] = useState(new Date(Date.now()));
 
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
   const deliverablePreWeddingOptionObjectKeys = ["photographers", "cinematographers", "assistants", "drones"]
   const deliverableAlbumOptionObjectKeys = ["albums"]
   const deliverableOptionObjectKeys = ["promos", "longFilms", "reels", "hardDrives"]
+  
+  const target = useRef(null);
+  const [show, setShow] = useState(false);
 
   const dispatch = useDispatch();
   const clientData = useSelector((state) => state.clientData);
@@ -42,6 +46,7 @@ function FormII() {
     setEventValues({ ...eventValues, [e.target.name]: e.target.value });
   };
   const navigate = useNavigate();
+
   const handleAddEvent = (e) => {
     if (!eventValues?.eventDate) {
       return window.notify("Please Select the Date", "error");
@@ -59,11 +64,25 @@ function FormII() {
     updatedStoredEvents.push(eventValues);
     setAllEvents(updatedStoredEvents);
   };
+
+  useEffect(() => {
+    if(clientData.events && clientData.events.length){
+      let earliest = clientData.events.reduce((prev, curr) => {
+        return new Date(prev.eventDate) < new Date(curr.eventDate) ? prev : curr;
+      }, clientData.events[0]);
+      setMinDate(earliest.eventDate)
+      console.log("USE EFFECT", clientData,earliest)
+      return
+    }
+    setMinDate(new Date(Date.now()))
+  }, [clientData]);
+
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
     setAllEvents(storedEvents.data);
     dispatch(updateAllEvents(storedEvents.data));
   };
+
   const handleDeleteEvent = (event, index) => {
     let updatedEvents = [...clientData?.events];
     updatedEvents.splice(index, 1);
@@ -75,6 +94,7 @@ function FormII() {
     }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
   };
+
   const updateDeliverables = (e) => {
     var updatedDeliverables = { ...clientData?.deliverables } || {
       photos: true,
@@ -87,6 +107,7 @@ function FormII() {
       updateClintData({ ...clientData, deliverables: updatedDeliverables })
     );
   };
+
   const addAlbum = () => {
     let updatedAlbums = [...clientData?.albums];
     updatedAlbums.push("");
@@ -107,54 +128,14 @@ function FormII() {
     }
     getStoredEvents();
     getAllFormOptionsHandler()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const handleAddDate = (date) => {
     setEventValues({ ...eventValues, eventDate: date });
     setShow(!show);
   };
-  let travelByOptions = [
-    {
-      value: "By Car",
-      label: "By Car",
-    },
-    {
-      value: "By Bus",
-      label: "By Bus",
-    },
-    {
-      value: "By Air",
-      label: "By Air",
-    },
-    {
-      value: "N/A",
-      label: "N/A",
-    },
-  ];
-  let numberOptions = [
-    {
-      value: "1",
-      label: "1",
-    },
-    {
-      value: "2",
-      label: "2",
-    },
-    {
-      value: "3",
-      label: "3",
-    },
-  ];
-  let yesNoOptions = [
-    {
-      value: "Yes",
-      label: "Yes",
-    },
-    {
-      value: "No",
-      label: "NO",
-    },
-  ];
+  
+
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -173,8 +154,7 @@ function FormII() {
   const toggle = () => {
     setShow(!show);
   };
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
+
   return (
     <>
       <div className="mt18">
@@ -282,162 +262,6 @@ function FormII() {
                 </div>
               </Col>
             )}
-            {/* <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Travel By
-                </div>
-                <Select
-                  // ref={travelSelect}
-                  value={eventValues?.travelBy ? {label : eventValues?.travelBy, value : eventValues?.travelBy} : null}
-                  name="travelBy"
-                  className="w-100"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      travelBy: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={travelByOptions}
-                  required={true}
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Shoot Directors
-                </div>
-                <Select
-                  // ref={shootDirectorsSelect}
-                  value={eventValues?.shootDirectors ? {label : eventValues?.shootDirectors, value : eventValues?.shootDirectors} : null}
-                  name="shootDirectors"
-                  className="w-100"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      shootDirectors: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={[
-                    {
-                      value: "0",
-                      label: "0",
-                    },
-                    {
-                      value: "1",
-                      label: "1",
-                    },
-                  ]}
-                  required={true}
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Photographers
-                </div>
-                <Select
-                  // ref={photographersSelect}
-                  value={eventValues?.photographers ? {label : eventValues?.photographers, value : eventValues?.photographers} : null}
-                  name="photographers"
-                  className="w-100"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      photographers: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Cinematographers
-                </div>
-                <Select
-                  // ref={cinematographersSelect}
-                  value={eventValues?.cinematographers ? {label : eventValues?.cinematographers, value : eventValues?.cinematographers} : null}
-                  name="cinematographers"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      cinematographers: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Drones
-                </div>
-                <Select
-                  // ref={dronesSelect}
-                  value={eventValues?.drones ? {label : eventValues?.drones, value : eventValues?.drones} : null}
-                  name="drones"
-                  onChange={(selected) => {
-                    setEventValues({ ...eventValues, drones: selected?.value });
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Same Day Photo Editors
-                </div>
-                <Select
-                  // ref={sameDayPhotoEditorsSelect}
-                  value={eventValues?.sameDayPhotoEditor ? {label : eventValues?.sameDayPhotoEditor, value : eventValues?.sameDayPhotoEditor} : null}
-                  name="sameDayPhotoEditor"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      sameDayPhotoEditor: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Same Day Video Editors
-                </div>
-                <Select
-                  // ref={sameDayVideoEditorsSelect}
-                  value={eventValues?.sameDayVideoEditor ? {label : eventValues?.sameDayVideoEditor, value : eventValues?.sameDayVideoEditor} : null}
-                  name="sameDayVideoEditor"
-                  onChange={(selected) => {
-                    setEventValues({
-                      ...eventValues,
-                      sameDayVideoEditor: selected?.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col> */}
           </Row>
           <Button type="submit" className="add_album album mt-4">
             Add Event
@@ -565,122 +389,6 @@ function FormII() {
                     </div>
                   </Col>
                 )}
-                {/* <Col xs="6" sm="3" className="pr5">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      Photographers
-                    </div>
-                    <Select
-                      value={
-                        clientData?.preWedPhotographers
-                          ? {
-                              value: clientData?.preWedPhotographers,
-                              label: clientData?.preWedPhotographers,
-                            }
-                          : null
-                      }
-                      name="preWedPhotographers"
-                      onChange={(selected) => {
-                        dispatch(
-                          updateClintData({
-                            ...clientData,
-                            preWedPhotographers: selected?.value,
-                          })
-                        );
-                      }}
-                      styles={customStyles}
-                      options={numberOptions}
-                      required
-                    />
-                  </div>
-                </Col>
-                <Col xs="6" sm="3"  className="pr5">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      Cinematograpers
-                    </div>
-                    <Select
-                      value={
-                        clientData?.preWedCinematographers
-                          ? {
-                              value: clientData?.preWedCinematographers,
-                              label: clientData?.preWedCinematographers,
-                            }
-                          : null
-                      }
-                      name="preWedCinematographers"
-                      onChange={(selected) => {
-                        dispatch(
-                          updateClintData({
-                            ...clientData,
-                            preWedCinematographers: selected?.value,
-                          })
-                        );
-                      }}
-                      styles={customStyles}
-                      options={numberOptions}
-                      required
-                    />
-                  </div>
-                </Col>
-                <Col xs="6" sm="3" className="pr5">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      Assistants
-                    </div>
-                    <Select
-                      value={
-                        clientData?.preWedAssistants
-                          ? {
-                              value: clientData?.preWedAssistants,
-                              label: clientData?.preWedAssistants,
-                            }
-                          : null
-                      }
-                      name="preWedAssistants"
-                      onChange={(selected) => {
-                        dispatch(
-                          updateClintData({
-                            ...clientData,
-                            preWedAssistants: selected?.value,
-                          })
-                        );
-                      }}
-                      styles={customStyles}
-                      options={numberOptions}
-                      required
-                    />
-                  </div>
-                </Col>
-                <Col xs="6" sm="3">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      Drone Flyers
-                    </div>
-                    <Select
-                      value={
-                        clientData?.preWedDroneFlyers
-                          ? {
-                              value: clientData?.preWedDroneFlyers,
-                              label: clientData?.preWedDroneFlyers,
-                            }
-                          : null
-                      }
-                      name="preWedDroneFlyerss"
-                      onChange={(selected) => {
-                        dispatch(
-                          updateClintData({
-                            ...clientData,
-                            preWedDroneFlyers: selected?.value,
-                          })
-                        );
-                      }}
-                      styles={customStyles}
-                      options={numberOptions}
-                      required
-                    />
-                  </div>
-                </Col> */}
               </Row>
           )}
 
@@ -794,113 +502,6 @@ function FormII() {
                 </div>
               </Col>
             )}
-            {/* <Col xs="6" sm="3" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Promo
-                </div>
-                <Select
-                  value={
-                    clientData?.promos
-                      ? { value: clientData?.promos, label: clientData?.promos }
-                      : null
-                  }
-                  name="promos"
-                  onChange={(selected) => {
-                    dispatch(
-                      updateClintData({
-                        ...clientData,
-                        promos: selected?.value,
-                      })
-                    );
-                  }}
-                  styles={customStyles}
-                  options={yesNoOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Long Films
-                </div>
-                <Select
-                  value={
-                    clientData?.longFilms
-                      ? {
-                          value: clientData?.longFilms,
-                          label: clientData?.longFilms,
-                        }
-                      : null
-                  }
-                  name="longFilms"
-                  onChange={(selected) => {
-                    dispatch(
-                      updateClintData({
-                        ...clientData,
-                        longFilms: selected?.value,
-                      })
-                    );
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Reels
-                </div>
-                <Select
-                  value={
-                    clientData?.reels
-                      ? { value: clientData?.reels, label: clientData?.reels }
-                      : null
-                  }
-                  name="reels"
-                  onChange={(selected) => {
-                    dispatch(
-                      updateClintData({ ...clientData, reels: selected?.value })
-                    );
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col>
-            <Col xs="6" sm="3" >
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Hard Drives
-                </div>
-                <Select
-                  value={
-                    clientData?.hardDrives
-                      ? {
-                          value: clientData?.hardDrives,
-                          label: clientData?.hardDrives,
-                        }
-                      : null
-                  }
-                  name="hardDrives"
-                  onChange={(selected) => {
-                    dispatch(
-                      updateClintData({
-                        ...clientData,
-                        hardDrives: selected?.value,
-                      })
-                    );
-                  }}
-                  styles={customStyles}
-                  options={numberOptions}
-                  required
-                />
-              </div>
-            </Col> */}
           </Row>
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
@@ -951,6 +552,7 @@ function FormII() {
           <Tooltip id="overlay-example" bsPrefix="tooltipBg" {...props}>
             <div style={{ width: "300px" }} className="tooltipBg">
               <Calendar
+                value={minDate}
                 minDate={new Date(Date.now())}
                 CalenderPress={toggle}
                 onClickDay={(date) => {
@@ -979,25 +581,6 @@ function FormII() {
                     return "highlight1";
                   }
                 }}
-                // tileDisabled={({ date }) => {
-                //   let count = 0;
-                //   for (let index = 0; index < allEvents?.length; index++) {
-                //     const initialDate = new Date(allEvents[index].eventDate)
-                //     const targetDate = new Date(date);
-                //     const initialDatePart = initialDate.toISOString().split("T")[0];
-                //     const targetDatePart = targetDate.toISOString().split("T")[0];
-                //     if (initialDatePart === targetDatePart) {
-                //       count += 1
-                //     }
-                //   }
-                //   if (count == 1) {
-                //     return "highlight5"
-                //   } else if (count == 2) {
-                //     return "highlight3"
-                //   } else if (count >= 3) {
-                //     return "highlight1"
-                //   }
-                // }}
               />
             </div>
           </Tooltip>

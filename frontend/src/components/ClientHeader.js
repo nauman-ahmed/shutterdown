@@ -8,7 +8,7 @@ import ActiveFilter from '../assets/Profile/ActiveFilter.svg';
 import Filter from '../assets/Profile/Filter.svg';
 import UnactiveFilter from '../assets/Profile/UnactiveFilter.svg';
 import { useNavigate } from 'react-router-dom';
-import { Overlay, Tooltip } from 'react-bootstrap';
+import { Overlay, Tooltip, Navbar, Nav,NavDropdown } from 'react-bootstrap';
 import {
   Modal,
   ModalHeader,
@@ -27,7 +27,7 @@ import Heart from '../assets/Profile/Heart.svg';
 import Select from 'react-select';
 import { getEditors } from '../API/userApi';
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-
+import { DropdownSubmenu, NavDropdownMenu} from "react-bootstrap-submenu";
 
 function ClientHeader(props) {
   const [list, setList] = useState(window.location.pathname === "/MyProfile/Calender/View" ? false : true);
@@ -39,9 +39,9 @@ function ClientHeader(props) {
   const [parentFilter, setParentFilter] = useState(null)
   const [childFilter, setChildFilter] = useState(null)
   const [show, setShow] = useState(false);
-  // const [filterType, setFilterType] = useState(1);
+  const [parentFilterNauman, setParentFilterNauman] = useState(null)
+  const [childFilterNauman, setChildFilterNauman] = useState([])
 
-  // This is Model section function and state Start...
   const currentUser = JSON.parse(Cookies.get('currentUser'))
 
   const [modal, setModal] = useState(false);
@@ -79,9 +79,46 @@ function ClientHeader(props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const handleChildFilter = (value) => {
-    props.applyFilter(value)
+
+  useEffect(() => {
+    props.applyFilter && props.applyFilter(childFilterNauman);
+  }, [childFilterNauman])
+
+  const handleChildFilter = (value,optionObj) => {
+    console.log("handleChildFilter",value,optionObj)
+    const obj = {title: value.title, parentTitle: optionObj.title}
+    if(childFilterNauman.length){
+      const exists = childFilterNauman.some(
+        el => el.title === obj.title && el.parentTitle === obj.parentTitle
+      );
+      if (exists) {
+        setChildFilterNauman(prevState => prevState.filter(
+          el => el.title !== obj.title || el.parentTitle !== obj.parentTitle
+        ));
+      } else {
+        const beforeSorted = [...childFilterNauman, obj]
+        // Custom sort function
+        beforeSorted.sort((a, b) => {
+          // First, compare by parentTitle using the priority map
+          if (props.priority[a.parentTitle] < props.priority[b.parentTitle]) {
+              return -1;
+          }
+          if (props.priority[a.parentTitle] > props.priority[b.parentTitle]) {
+              return 1;
+          }
+
+          // If parentTitle is the same, then sort by title
+          return a.title.localeCompare(b.title);
+        });
+        setChildFilterNauman(beforeSorted);
+      }
+    }else{
+      setChildFilterNauman(prevState => (
+        [...prevState,obj]
+      ))
+    }
   }
+
   const handleParentFilter = (value) => {
     if (value === 'All' || value === 'Date Assigned' || value === 'Date Unassigned' || value === null) {
       props.applyFilter(value);
@@ -151,7 +188,7 @@ function ClientHeader(props) {
           )}
         </div>
       </div>
-
+      
       <Overlay
         rootClose={true}
         onHide={() => setShow(false)}
@@ -169,11 +206,113 @@ function ClientHeader(props) {
                 const selected = optionObj.id === parentFilter ? true : false;
                 return (
                   <>
+                  {(
+                    <div
+                      key={i}
+                      className={`rowalign d-flex flex-row justify-content-between`}
+                      onClick={() => {
+                        if(parentFilter == optionObj.id){
+                          setParentFilter(null)
+                        }else{
+                          setParentFilter(optionObj.id);
+                        }
+                      }}
+                      style={{
+                        width: '200px',
+                        height: '40px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        background: selected  ? '#666DFF' : '',
+                        paddingLeft: '4px',
+                      }}
+                    >
+                      <img alt='' src={selected ? ActiveFilter : UnactiveFilter} />
+                      <div
+                        className="Text16N "
+                        style={{
+                          color: selected ? 'white' : 'black',
+                          marginLeft: '15px',
+                        }}
+                      >
+                        {optionObj.title}
+                      </div>
+                      {selected ? <IoIosArrowUp className='text-black' /> : <IoIosArrowDown className='text-black' />}
+                    </div>
+                  )}
+                    {selected && (
+                      <>
+                        {optionObj?.filters?.map((option, i) => {
+                          const childSelected = childFilterNauman.some(
+                            el => el.title === option.title 
+                          );
+                          return (
+                            <div
+                              className="rowalign d-flex align-item-center justify-content-end "
+                              onClick={() => {
+                                handleChildFilter(option,optionObj);
+                              }}
+                              style={{
+                                width: '200px',
+                                height: '45px',
+                                padding: '8px',
+                                cursor: 'pointer',
+                                background: childSelected ? '#666DFF' : '',
+                                lineHeight : '15px',
+                              }}
+                            >
+                              <img style={{
+                                width:"20%",
+                                height : '23px'
+                              }} alt='' src={childSelected ? ActiveFilter : UnactiveFilter} />
+                              <div
+                                className="Text16N"
+                                style={{
+                                  width:"50%",
+                                  color: childSelected ? 'white' : '',
+                                  marginLeft: '15px',
+                                }}
+                              >
+                                {option.title}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                  </>
+                )
+              })}
+
+
+            </div>
+          </Tooltip>
+        )}
+      </Overlay>
+
+      <Overlay
+        rootClose={true}
+        onHide={() => setShow(false)}
+        target={target.current}
+        show={false}
+        placement="bottom"
+      >
+        {(props) => (
+          <Tooltip key={1} id="overlay-example" {...props}>
+            <div
+              className="nav_popover"
+              style={{ width: '200px', paddingTop: '10px' }}
+            >
+              {options.map((optionObj, i) => {
+                const selected = optionObj.id === parentFilter ? true : false;
+                return (
+                  <>
                   {optionObj.title !== "clientsFromListView" && (
                     <div
                       key={i}
                       className={`rowalign ${(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') ? " " : " d-flex flex-row justify-content-between"} `}
                       onClick={() => {
+                        console.log("FILTER",optionObj)
                         if(currentFilter !== undefined){
                           if (currentFilter !== optionObj.title) {
                             setParentFilter(optionObj.id);
@@ -229,6 +368,7 @@ function ClientHeader(props) {
                             <div
                               className="rowalign d-flex align-item-center"
                               onClick={() => {
+                                console.log("FILTER",optionObj,option)
                                 if(optionObj.title === 'clientsFromListView' || optionObj.title === 'Assign By' || optionObj.title === 'Assign To'){
                                   handleChildFilter(option)
                                 } else {

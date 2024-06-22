@@ -6,7 +6,7 @@ const EventController = require('../Controllers/EventController')
 router.post('/AddEvent', EventController.AddEvent);
 router.patch('/assignEventTeam', EventController.AssignTeam);
 router.patch('/updateEvent', EventController.updateEvent);
-router.get('/getAllEvents', EventController.getEvents);
+router.post('/getAllEvents', EventController.getEvents);
 router.delete('/deleteEvent/:eventId', EventController.DeleteEvent);
 
 

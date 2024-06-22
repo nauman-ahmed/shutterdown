@@ -25,7 +25,7 @@ function Team(props) {
         className="Text12"
         style={{
           textAlign: "center",
-          borderWidth: "0px 1px 0px 1px",
+          borderWidth: '1px 1px 1px 1px',
           // background: "#EFF0F5",
         }}
       >

@@ -134,7 +134,9 @@ function Logs(props) {
             </thead>
             <tbody
               className="Text12"
-              style={{ textAlign: 'center', borderWidth: '0px 1px 0px 1px' }}
+              style={{ textAlign: 'center', 
+              borderWidth: '1px 1px 1px 1px',
+            }}
             >
               {attendaces?.map((attendace, index) => (
                 <tr>

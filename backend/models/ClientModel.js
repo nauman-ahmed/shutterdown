@@ -49,7 +49,6 @@ const ClientSchema = mongoose.Schema({
   },
   promos: {
     type: String,
-    enum : ["Yes", "No"]
   },
   longFilms: {
     type: Number
@@ -57,7 +56,7 @@ const ClientSchema = mongoose.Schema({
   reels: {
     type: Number
   },
-  preWedcinematographers: {
+  preWedcinematographers: { 
     type: Number,
   },
   preWedassistants: {

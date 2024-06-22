@@ -53,7 +53,7 @@ function DailyTasks(props) {
   const getUsersForFilters = (propertyName) => {
     const seenUsers = new Set();
     return allTasks?.map((taskObj, i) => ({
-        title: `${taskObj?.[propertyName]?.firstName} ${taskObj?.[propertyName]?.lastName}`,
+        title: `${taskObj?.[propertyName]?.firstName}`,
         id: i,
         userId: taskObj?.[propertyName]?._id,
       })).filter(taskObj => {
@@ -76,6 +76,13 @@ function DailyTasks(props) {
       filters: getUsersForFilters('assignTo')
     },
   ];
+  
+
+  // Define priority for parentTitle
+  const priority = {
+    "Assign By": 1,
+    "Assign To": 2,
+  };
 
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
@@ -83,6 +90,28 @@ function DailyTasks(props) {
     }
     setFilterBy(filterType);
   };
+
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Assign By"){
+          console.log("obj",allTasks,obj)
+          const newData = allTasks.filter(task => task.assignBy.firstName === obj.title)
+          fullData = [...fullData,...newData]
+          notVisited = false
+        }else if(obj.parentTitle == "Assign To"){
+          const newData = allTasks.filter(task => task.assignTo.firstName === obj.title)
+          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+          fullData = notVisited ? [...fullData,...newData] : [...common]
+        }
+      })
+      setTasksToShow(fullData)
+    }else{
+      setTasksToShow(allTasks)
+    }
+  }
 
   const applyFilter = (filterValue) => {
     if(filterValue == null){
@@ -99,7 +128,7 @@ function DailyTasks(props) {
   return (
     <>
       <ToastContainer />
-      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} applyFilter={applyFilter} options={filterOptions} title={"Daily Tasks"} updateData={getTaskData} filter />
+      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} title={"Daily Tasks"} updateData={getTaskData} filter />
       {tasksToShow ? (
         <Table
           hover
@@ -139,7 +168,7 @@ function DailyTasks(props) {
             className="Text12"
             style={{
               textAlign: "center",
-              borderWidth: "0px 1px 0px 1px",
+              borderWidth: '1px 1px 1px 1px',
             }}
           >
             <>

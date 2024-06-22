@@ -14,6 +14,8 @@ import { Overlay } from 'react-bootstrap';
 import { getShooters } from "../../API/userApi";
 import ShootDropDown from "../../components/ShootDropDown";
 import ClientHeader from "../../components/ClientHeader";
+import CalenderMulti from "../../components/Calendar";
+import { GrPowerReset } from "react-icons/gr";
 
 function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
@@ -21,27 +23,30 @@ function PreWedShootScreen() {
   const [clientsForShow, setClientsForShow] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [filterFor, setFilterFor] = useState('day')
+  const target = useRef(null);
+  const [show, setShow] = useState(false);
+  const [shooters, setShooters] = useState([]);
+
   const toggle = () => {
     setShow(!show);
   };
   const [filteringDay, setFilteringDay] = useState(null);
-  const filterByDay = (date) => {
-    setFilteringDay(date)
-    setShow(!show);
+
+  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
+    if(reset){
+      setShow(false)
+      setClientsForShow(preWedClients)
+      setFilteringDay(null)
+      return
+    }
+    else if(view !== "month" && view !== "year"){
+      setShow(false)
+    }
+    setFilteringDay(startDate)
     setClientsForShow(preWedClients.filter(clientData => {
       const weddingEvent = clientData.events.find(eventData => eventData.isWedding === true);
       if (weddingEvent) {
-        return new Date(weddingEvent.eventDate).getTime() === (new Date(date)).getTime()
-      } else {
-        return false
-      }
-    }))
-  }
-  const filterByMonth = (date) => {
-    setClientsForShow(preWedClients.filter(clientData => {
-      const weddingEvent = clientData.events.find(eventData => eventData.isWedding === true);
-      if (weddingEvent) {
-        return new Date(weddingEvent.eventDate).getFullYear() === date.getFullYear() && new Date(weddingEvent.eventDate).getMonth() === date.getMonth()
+        return new Date(weddingEvent.eventDate).getTime() >= (new Date(startDate)).getTime() && new Date(weddingEvent.eventDate).getTime() <= (new Date(endDate)).getTime()
       } else {
         return false
       }
@@ -50,18 +55,27 @@ function PreWedShootScreen() {
 
   const filterOptions = [
     {
-      title: 'All',
+      title: 'Date Filter',
       id: 1,
+      filters: [
+        {
+          title: 'Date Assigned',
+          id: 2,
+        },
+        {
+          title: 'Date Unassigned',
+          id: 3,
+        },
+      ]
     },
-    {
-      title: 'Date Assigned',
-      id: 2,
-    },
-    {
-      title: 'Date Unassigned',
-      id: 3,
-    },
+    
   ];
+
+  // Define priority for parentTitle
+  const priority = {
+    "Date Filter": 1
+  };
+
   const getClients = async () => {
     try {
       const allPreWedClients = await getPreWedClients();
@@ -100,6 +114,32 @@ function PreWedShootScreen() {
     }
   }
 
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Date Filter"){
+          console.log(obj)
+          if (obj.title === 'Date Assigned') {
+            const newData = preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...newData] : [...preWedClients]
+            notVisited = false
+          } else if (obj.title === 'Date Unassigned') {
+            const newData = preWedClients.filter(client => !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDate)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...newData] : [...preWedClients]
+            notVisited = false
+          }
+        }
+      })
+      setClientsForShow(fullData)
+    }else{
+      setClientsForShow(preWedClients)
+    }
+  }
+
   const applyFilter = (filterTitle) => {
     if(filterTitle == null){
       setClientsForShow(preWedClients)
@@ -113,15 +153,10 @@ function PreWedShootScreen() {
       getClients()
     }
   }
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
-  const [shooters, setShooters] = useState([]);
-  // useEffect(() => {
-  //   setClientsForShow(preWedClients)
-  // }, [preWedClients])
+  
+  
   useEffect(() => {
     getClients();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const customStyles = {
@@ -143,16 +178,6 @@ function PreWedShootScreen() {
   const handleSaveData = async (index) => {
     try {
       const client = preWedClients[index];
-      // if (!client.preWeddingDetails) {
-      //   window.notify('Please Select the values!', 'error');
-      //   return
-      // } else if (!client.preWeddingDetails.shootDate) {
-      //   window.notify('Please choose shoot Date!', 'error');
-      //   return
-      // } else if (!client.preWeddingDetails.status) {
-      //   window.notify('Please Select some status!', 'error');
-      //   return
-      // }
       setUpdatingIndex(index);
       await addPreWedData(client);
       setUpdatingIndex(null);
@@ -162,7 +187,7 @@ function PreWedShootScreen() {
   };
   return (
     <>
-      <ClientHeader applyFilter={applyFilter} options={filterOptions} filter title="Pre-Wedding" />
+      <ClientHeader priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Pre-Wedding" />
       {clientsForShow ? (
         <>
           <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
@@ -170,33 +195,16 @@ function PreWedShootScreen() {
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-50 '>
-                {filterFor === 'day' ?
-                  <div
-                    className={`forminput R_A_Justify1`}
-                    onClick={toggle}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img alt="" src={CalenderImg} />
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                  <div className="d-flex align-items-center">
+                    <img alt="" src={CalenderImg} onClick={toggle}/>
+                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
                   </div>
-                  :
-                  <input type='month' onChange={(e) => {
-                    filterByMonth(new Date(e.target.value))
-                  }} className='forminput R_A_Justify mt-1' />
-                }
-              </div>
-              <div className='w-50 px-2 '>
-                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterFor) {
-                    setClientsForShow(preWedClients)
-                    setFilteringDay('');
-                  }
-                  setFilterFor(selected.value);
-                  setShow(false)
-                }} styles={customStyles}
-                  options={[
-                    { value: 'day', label: 'Day' },
-                    { value: 'month', label: 'Month' }]} />
+                </div>
               </div>
             </div>
 
@@ -212,8 +220,8 @@ function PreWedShootScreen() {
               <thead>
                 {currentUser.rollSelect === 'Manager' && (
                   <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Couple</th>
-                    <th className="tableBody">Wedding Date</th>
+                    <th className="tableBody sticky-column-prewed">Couple</th>
+                    <th className="tableBody sticky-column-prewed">Wedding Date</th>
                     {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Photographers</th>
                     <th className="tableBody">Cinematographers</th>
@@ -237,7 +245,7 @@ function PreWedShootScreen() {
               <tbody className="Text12"
                 style={{
                   textAlign: 'center',
-                  borderWidth: '0px 1px 0px 1px',
+                  borderWidth: '1px 1px 1px 1px',
                 }}  >
                 {clientsForShow?.map((client, index) => {
                   return (
@@ -248,14 +256,14 @@ function PreWedShootScreen() {
                             background: index % 2 === 0 ? '' : '#F6F6F6',
                           }}
                         >
-                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                          <td className="tableBody Text14Semi sticky-column-prewed primary2 tablePlaceContent">
                             {client.brideName}
                             <br />
                             <img alt="" src={Heart} />
                             <br />
                             {client.groomName}
                           </td>
-                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                          <td className="tableBody Text14Semi sticky-column-prewed primary2 tablePlaceContent">
                             <>
                               {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD-MMM-YYYY')}<br />
                             </>
@@ -412,22 +420,24 @@ function PreWedShootScreen() {
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             {currentUser.rollSelect === 'Manager' ? (
-                              <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : { value: 'Yet to Start', label: 'Yet to Start' }} name='preWeddingDetailsStatus' onChange={(selected) => {
+                              <Select value={client.preWeddingDetails?.status ? { value: client?.preWeddingDetails?.status, label: client?.preWeddingDetails?.status } : { value: 'Unassigned', label: 'Unassigned' }} name='preWeddingDetailsStatus' onChange={(selected) => {
                                 const updatedClients = [...preWedClients];
                                 updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
                                 updatedClients[index].preWeddingDetails.status = selected.value;
                                 setPreWedClients(updatedClients)
                               }} styles={customStyles} options={[
-                                { value: 'Yet to Start', label: 'Yet to Start' },
-                                { value: 'In Progress', label: 'In Progress' },
-                                { value: 'Completed', label: 'Completed' }]} required />
+                                { value: 'Unassigned', label: 'Unassigned' },
+                                { value: 'Assigned', label: 'Assigned' },
+                                { value: 'Shot', label: 'Shot' },
+                                { value: 'Delivered', label: 'Delivered' },
+                              ]} required />
                             ) : (
                               <>
                                 {client.preWeddingDetails?.status || 'Not Filled'}
                               </>
                             )}
                           </td>
-                          <td>
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <button
                               style={{ backgroundColor: '#FFDADA', borderRadius: '5px', border: 'none', height: '30px' }}
                               onClick={() => updatingIndex == null && handleSaveData(index)}
@@ -493,14 +503,7 @@ function PreWedShootScreen() {
               placement="bottom"
             >
               <div>
-                <Calendar
-                  value={filteringDay}
-                  minDate={new Date(Date.now())}
-                  CalenderPress={toggle}
-                  onClickDay={(date) => {
-                    filterByDay(date);
-                  }}
-                />
+                <CalenderMulti filterByDates={filterByDates}/>
               </div>
             </Overlay>
           </div>

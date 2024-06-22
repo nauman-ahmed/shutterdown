@@ -10,6 +10,8 @@ import { Overlay } from 'react-bootstrap';
 import Calendar from 'react-calendar';
 import Select from 'react-select'
 import CalenderImg from '../../assets/Profile/Calender.svg';
+import CalenderMulti from "../../components/Calendar";
+import { GrPowerReset } from "react-icons/gr";
 
 function ViewClient() {
   const navigate = useNavigate();
@@ -23,13 +25,25 @@ function ViewClient() {
     setShow(!show);
   };
   const [filteringDay, setFilteringDay] = useState(null);
-  const filterByDay = (date) => {
-    setFilteringDay(date)
-    setShow(!show)
+  const target = useRef(null);
+  const [show, setShow] = useState(false);
+
+  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
+    if(reset){
+      setShow(false)
+      setClients(allClients)
+      setFilteringDay(null)
+      return
+    }
+    else if(view !== "month" && view !== "year"){
+      setShow(false)
+    }
+    setFilteringDay(startDate)
     setClients(allClients.filter(clientData => {
-      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
+      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() >= (new Date(startDate)).getTime() && (new Date(eventData.eventDate)).getTime() <= (new Date(endDate)).getTime())
     }))
   }
+
   const fetchData = async () => {
     try {
       const data = await getClients()
@@ -39,13 +53,7 @@ function ViewClient() {
       console.log(error)
     }
   }
-  const filterByMonth = (date) => {
-    setClients(allClients.filter(clientData => {
-      return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
-    }))
-  }
-  const target = useRef(null);
-  const [show, setShow] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -66,6 +74,17 @@ function ViewClient() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
+  const filterByNameHanler = (brideName) => {
+    if(brideName == "Reset"){
+      setClients(allClients)
+      return
+    }
+    const seperator = "<"
+    brideName = brideName.split(seperator)[0]
+    setClients(allClients.filter(clientData => {
+      return clientData.brideName == brideName
+    }))
+  } 
 
   return (
     <>
@@ -76,43 +95,33 @@ function ViewClient() {
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-50'>
-                {filterFor === 'Day' ?
-                  <div
-                    className={`forminput R_A_Justify1`}
-                    onClick={toggle}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img alt='' src={CalenderImg} />
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                  <div className="d-flex align-items-center">
+                    <img alt="" src={CalenderImg} onClick={toggle}/>
+                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
                   </div>
-                  :
-                  <input type='Month' onChange={(e) => {
-                    filterByMonth(new Date(e.target.value))
-                  }} className='forminput R_A_Justify mt-1' />
-                }
-              </div>
-              <div className='w-50 px-2 '>
-                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterFor) {
-                    setClients(allClients);
-                    setFilteringDay('');
-                  }
-                  setFilterFor(selected.value);
-                  setShow(false)
-                }} styles={customStyles}
-                  options={[
-                    { value: 'Day', label: 'Day' },
-                    { value: 'Month', label: 'Month' }]} />
-              </div>
+                </div>
+              </div> 
+              <Select className='w-50 mx-3' isSearchable={true} onChange={(e) => filterByNameHanler(e.value)} styles={customStyles} 
+              options={[
+                { value: 'Reset', label: <div className='d-flex justify-content-around'><strong>Reset</strong></div> },
+                ...allClients?.map(client => {
+                      return { value: client.brideName + "<" + client.groomName, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
+                    })
+                ]} 
+                required 
+              />
             </div>
           </div>
           <Table
             bordered
             hover
-            borderless
             responsive
             style={{ marginTop: '15px' }}
-            className="ViewClientWidth tableViewClient"
           >
             <thead>
               <tr className="logsHeader Text16N1">
@@ -123,10 +132,11 @@ function ViewClient() {
               </tr>
             </thead>
             <tbody
-              className="Text12"
+              className="Text12 primary2"
               style={{
                 textAlign: 'center',
-                borderWidth: '0px 1px 0px 1px',
+                borderWidth: '1px 1px 1px 1px',
+                // background: "#EFF0F5",
               }}
             >
               {clients?.map((client, i) => (
@@ -184,14 +194,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <Calendar
-                value={filteringDay}
-                minDate={new Date(Date.now())}
-                CalenderPress={toggle}
-                onClickDay={(date) => {
-                  filterByDay(date);
-                }}
-              />
+              <CalenderMulti filterByDates={filterByDates}/>
             </div>
           </Overlay>
         </>

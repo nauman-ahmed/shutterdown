@@ -20,6 +20,7 @@ const AddEvent = async (req, res) => {
 
 const AssignTeam = async (req, res) => {
     try {
+
         const event = await EventModel.findById(req.body.data._id);
         const photographersIds = req.body.data.choosenPhotographers?.map(user => user._id);
         const cinematographersIds = req.body.data.choosenCinematographers?.map(user => user._id);
@@ -38,6 +39,15 @@ const AssignTeam = async (req, res) => {
         event.assistants = assistantsIds;
         event.manager = managerIds;
         event.shootDirectors = directorIds;
+
+        if(event.shootDirectors.length && event.choosenPhotographers.length && event.choosenCinematographers.length
+            && event.droneFlyers.length && event.manager.length && event.assistants.length && event.sameDayPhotoMakers.length
+            && event.sameDayVideoMakers.length
+        ){
+            event.allDataCompleted = true
+        }
+
+
         await event.save();
 
         res.status(200).json('Event Added SucccessFully');
@@ -58,13 +68,35 @@ const updateEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
     try {
-        const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        let obj = {};
+        if(req.body.clientId){
+            obj = {client: req.body.clientId}
+        }
+        const events = await EventModel.find(obj).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        
+        // Step 1: Sort by eventDate
         events.sort((a, b) => {
             const dateA = new Date(a.eventDate);
             const dateB = new Date(b.eventDate);
             return dateA - dateB 
-          })
-        res.status(200).json(events);
+        })
+        
+        // Step 2: Group by brideName, but store the result as an array of objects
+        const groupedByBrideName = events.reduce((acc, event) => {
+            const brideName = event.client.brideName;
+            const found = acc.find(item => item.client.brideName === brideName);
+            const index = acc.findIndex(item => item.client.brideName === brideName);
+            if (!found) {
+                // If no existing group for this brideName, create a new group
+                acc.push(event);
+            } else {
+                // Add to the existing group's events array
+                acc.splice(index+1, 0, event);
+            }
+            return acc;
+        }, []);
+        
+        res.status(200).json(groupedByBrideName);
     } catch (error) {
         console.log(error, 'error');
     }

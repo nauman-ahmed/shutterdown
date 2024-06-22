@@ -31,12 +31,10 @@ const AddClientFunction = async (req, res) => {
     await photosDeliverable.save().then(() => {
       deliverables.push(photosDeliverable._id)
     })
-    if (req.body.data.promos === 'Yes') {
-      const promoDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Promo', quantity: 1, clientDeadline })
-      await promoDeliverable.save().then(() => {
-        deliverables.push(promoDeliverable._id)
-      })
-    }
+    const promoDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Promo', quantity: req.body.data.promos, clientDeadline })
+    await promoDeliverable.save().then(() => {
+      deliverables.push(promoDeliverable._id)
+    })
     const longFilmDeliverable = new deliverableModel({ client: client._id, deliverableName: 'Long Film', quantity: req.body.data.longFilms, clientDeadline })
     await longFilmDeliverable.save().then(() => {
       deliverables.push(longFilmDeliverable._id)

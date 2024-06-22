@@ -61,14 +61,14 @@ function Deliverable(props) {
               className="Text12 primary2"
               style={{
                 textAlign: "center",
-                borderWidth: "0px 1px 0px 1px",
+                borderWidth: '1px 1px 1px 1px',
                 // background: "#EFF0F5",
               }}
             >
               {preWedDeliverables.map((deliverable, i) => {
                 return (
                   <tr>
-                    <td className="textPrimary Text14Semi tablePlaceContent" style={{ paddingBottom: "30px" }}>{deliverable.deliverableName}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent">{deliverable.deliverableName}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(deliverable.clientDeadline).format('DD-MMM-YYYY')}</td>

@@ -8,6 +8,8 @@ import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
 import dayjs from "dayjs";
+import CalenderMulti from "../../components/Calendar";
+import { GrPowerReset } from "react-icons/gr";
 
 function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
@@ -18,13 +20,23 @@ function CheckLists(props) {
   };
   const [clientsForShow, setClientsForShow] = useState(null);
   const [filteringDay, setFilteringDay] = useState(null);
-  const filterByDay = (date) => {
-    setFilteringDay(date)
-    setShow(!show);
+
+  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
+    if(reset){
+      setShow(false)
+      setClientsForShow(allClients)
+      setFilteringDay(null)
+      return
+    }
+    else if(view !== "month" && view !== "year"){
+      setShow(false)
+    }
+    setFilteringDay(startDate)
     setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() === (new Date(date)).getTime())
+      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() >= (new Date(startDate)).getTime() && (new Date(eventData.eventDate)).getTime() <= (new Date(endDate)).getTime())
     }))
   }
+  
   const filterByMonth = (date) => {
     setClientsForShow(allClients.filter(clientData => {
       return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
@@ -111,33 +123,16 @@ function CheckLists(props) {
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-50'>
-                {filterFor === 'Day' ?
-                  <div
-                    className={`forminput R_A_Justify1`}
-                    onClick={toggle}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
-                    <img alt="" src={CalenderImg} />
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                  <div className="d-flex align-items-center">
+                    <img alt="" src={CalenderImg} onClick={toggle}/>
+                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
                   </div>
-                  :
-                  <input type='month' onChange={(e) => {
-                    filterByMonth(new Date(e.target.value))
-                  }} className='forminput R_A_Justify mt-1' />
-                }
-              </div>
-              <div className='w-50 px-2 '>
-                <Select value={{ value: filterFor, label: filterFor }} className='w-75' onChange={(selected) => {
-                  if (selected.value !== filterFor) {
-                    setClientsForShow(allClients)
-                    setFilteringDay('');
-                  }
-                  setFilterFor(selected.value);
-                  setShow(false)
-                }} styles={customStyles}
-                  options={[
-                    { value: 'Day', label: 'Day' },
-                    { value: 'Month', label: 'Month' }]} />
+                </div>
               </div>
             </div>
 
@@ -163,7 +158,7 @@ function CheckLists(props) {
               className="Text12"
               style={{
                 textAlign: 'center',
-                borderWidth: '0px 1px 0px 1px',
+                borderWidth: '1px 1px 1px 1px',
                 // background: "#EFF0F5",
               }}
             >
@@ -286,14 +281,7 @@ function CheckLists(props) {
             show={show}
             placement="bottom">
             <div>
-              <Calendar
-                value={filteringDay}
-                minDate={new Date(Date.now())}
-                CalenderPress={toggle}
-                onClickDay={(date) => {
-                  filterByDay(date);
-                }}
-              />
+              <CalenderMulti filterByDates={filterByDates}/>
             </div>
           </Overlay>
         </>

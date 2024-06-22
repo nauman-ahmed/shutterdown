@@ -20,9 +20,36 @@
   src: url("./assets/fonts/Roboto-Bold.ttf");
 }
 
+.sticky-column-prewed {
+  position: sticky;
+  left: 0;
+  z-index: 100;
+  background-color: white;
+}
+
+.fc-h-event{
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.sticky-column-prewed + .sticky-column-prewed {
+  left: 80px; /* This needs to be adjusted based on the actual width of the first column */
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 100;
+  background-color: white;
+}
+
+.sticky-column + .sticky-column {
+  left: 100px; /* This needs to be adjusted based on the actual width of the first column */
+}
+
 .widthForFilters{
   width:  50%;
-  margin-top: -70px;
+  margin-top: -60px;
   margin-bottom: 30px;
 }
 @media only screen and (max-width: 500px){

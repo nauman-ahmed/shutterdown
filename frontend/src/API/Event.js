@@ -54,15 +54,16 @@ export const updateEventData = async (data) => {
     }
 }
 
-export const getEvents = async () => {
+export const getEvents = async (clientId) => { 
     try {
-        const res = await axios.get(BASE_URL +
+        const res = await axios.post(BASE_URL +
             '/getAllEvents',
             {
                 Headers: {
                     'Content-Type': 'application/json',
-                }
-            }
+                },
+                clientId
+            },
         );
         return res;
     } catch (error) {

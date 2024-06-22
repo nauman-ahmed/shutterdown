@@ -237,6 +237,10 @@ function App() {
               path="ListView"
               element={currentUser ? <ListView /> : <Navigate to="/" replace />}
             />
+            <Route
+              path="ListView/:clientId"
+              element={currentUser ? <ListView /> : <Navigate to="/" replace />}
+            />
           </Route>
           <Route
             exact

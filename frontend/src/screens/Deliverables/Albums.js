@@ -81,54 +81,14 @@ function Albums(props) {
     {
       title: 'Assigned Editor',
       id: 1,
-      filters: editors && [{ title: 'Any', id: 1 }, ...editors?.map((editor, i) => {
+      filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 2 }
       }),{ title: 'Unassigned Editor', id: editors.length+3 }]
     },
-    // {
-    //   title: 'Wedding Date sorting',
-    //   id: 3,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
-    // {
-    //   title: 'Deadline sorting',
-    //   id: 4,
-    //   filters: [
-    //     {
-    //       title: 'No Sorting',
-    //       id: 1
-    //     },
-    //     {
-    //       title: 'Ascending',
-    //       id: 2
-    //     },
-    //     {
-    //       title: 'Descending',
-    //       id: 3
-    //     }
-    //   ]
-    // },
     {
       title: 'Current Status',
       id: 5,
       filters: [
-        {
-          title: 'Any',
-          id: 1
-        },
         {
           title: 'Yet to Start',
           id: 2
@@ -149,10 +109,6 @@ function Albums(props) {
       id: 5,
       filters: [
         {
-          title: 'Any',
-          id: 1
-        },
-        {
           title: 'Yet to Start',
           id: 2
         },
@@ -168,6 +124,13 @@ function Albums(props) {
     },
   ]
 
+  // Define priority for parentTitle
+  const priority = {
+    "Assigned Editor": 1,
+    'Current Status': 2
+  };
+
+  
   const applySorting = (wedding = false)=>{
     try {
       if(wedding){
@@ -194,6 +157,38 @@ function Albums(props) {
       }
     }
     setFilterBy(filterType);
+  }
+
+  const applyFilterNew = (filterValue) => {
+    if(filterValue.length){
+      let notVisited = true
+      let fullData = []
+      filterValue.map((obj) => {
+        if(obj.parentTitle == "Deliverable"){
+            const newData = allDeliverables.filter(deliverable => deliverable.deliverableName === obj.title)
+            fullData = [...fullData,...newData]
+            notVisited = false
+        }else if(obj.parentTitle == "Assigned Editor"){
+          if(obj.title === 'Unassigned Editor'){
+            const newData = allDeliverables.filter(deliverable => deliverable.editor ? false : true)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }else{
+            const newData = allDeliverables.filter(deliverable => deliverable.editor?.firstName === obj.title)
+            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+            fullData = notVisited ? [...fullData,...newData] : [...common]
+          }
+          notVisited = false
+        }else if(obj.parentTitle == "Current Status"){
+          const newData = allDeliverables.filter(deliverable => deliverable.status === obj.title)
+          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
+          fullData = notVisited ? [...fullData,...newData] : [...common]
+        }
+      })
+      setDeliverablesForShow(fullData)
+    }else{
+      setDeliverablesForShow(allDeliverables)
+    }
   }
 
   const applyFilter = (filterValue) => {
@@ -278,7 +273,7 @@ function Albums(props) {
 
   return (
     <>
-      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} applyFilter={applyFilter} options={filterOptions} filter title="Albums" />
+      <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Albums" />
       {deliverablesForShow ? (
         <>
          
@@ -301,8 +296,8 @@ function Albums(props) {
                   </tr>
                   : currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
-                      <th className="tableBody">Client</th>
-                      <th className="tableBody">Albums</th>
+                      <th className="tableBody sticky-column">Client</th>
+                      <th className="tableBody ">Albums</th>
                       <th className="tableBody">Editor</th>
                       <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
                       <th className="tableBody">Client Deadline</th>
@@ -339,7 +334,7 @@ function Albums(props) {
                               paddingBottom: '15px',
                               width: "10%"
                             }}
-                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                            className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
                           >
                             {deliverable.client?.brideName}
                             <br />
@@ -411,6 +406,7 @@ function Albums(props) {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                              min={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -477,7 +473,7 @@ function Albums(props) {
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
-                            Reminder/Yes or No
+                            Send Reminder
                           </td>
                           <td style={{
                             paddingTop: '15px',

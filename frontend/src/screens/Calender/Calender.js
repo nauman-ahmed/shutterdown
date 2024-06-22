@@ -10,11 +10,16 @@ import * as bootstrap from "bootstrap";
 import { getEvents } from "../../API/Event";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
+import { FaDirections } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 function Calender() {
   const poperReferencd = useRef(null);
   const [allEvents, setAllEvents] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
+  
+  const navigate = useNavigate();
+
   const getEventsData = async () => {
     try {
       const res = await getEvents();
@@ -96,7 +101,6 @@ function Calender() {
 
   useEffect(() => {
     getEventsData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -114,9 +118,15 @@ function Calender() {
             defaultView="basicWeek"
             eventContent={(eventInfo) => {
               return (
-                <div className="calenderEventBox d-block">
-                  <div className="rowalign2 p4" style={{ width: "100%" }}>
-                    <div className="Text10N white">
+                <div className="d-block" style={{ cursor: "pointer" }}>
+                  <div className="rowalign2 p4 " >
+                    <div className="Text10N white ">
+                      <FaDirections color="black"/>
+                    </div>
+                    <div 
+                      className={eventInfo.event?.extendedProps.allDataCompleted ? "Text10N p-1 calenderEventBox" : "Text10N p-1 calenderEventBoxYellow" }
+                      style={{ marginLeft: "5px", width: "100%",  }}
+                    >
                       {" "}
                       • {eventInfo.event?.extendedProps.eventType}
                     </div>
@@ -139,7 +149,17 @@ function Calender() {
             events={allEvents}
             displayEventTime={false}
             eventDisplay="block"
+            eventClick= {(info) => {
+              if(poperReferencd.current){
+                poperReferencd.current.hide();
+              }
+              console.log("ON CLICK",info.event?.extendedProps.client);
+              navigate('/MyProfile/Calender/ListView/'+info.event?.extendedProps.client._id);
+            }}
             eventMouseEnter={(info) => {
+              if(poperReferencd.current){
+                poperReferencd.current.disable();
+              }
               const pop = new bootstrap.Popover(info.el, {
                 title: info.event?._def.extendedProps.eventType,
                 placement: "auto",

@@ -43,6 +43,7 @@ function FormI() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+  
   let bookingOptions = [
     {
       value: 'Yes',
