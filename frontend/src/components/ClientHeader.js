@@ -85,7 +85,6 @@ function ClientHeader(props) {
   }, [childFilterNauman])
 
   const handleChildFilter = (value,optionObj) => {
-    console.log("handleChildFilter",value,optionObj)
     const obj = {title: value.title, parentTitle: optionObj.title}
     if(childFilterNauman.length){
       const exists = childFilterNauman.some(

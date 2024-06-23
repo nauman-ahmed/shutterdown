@@ -116,25 +116,29 @@ function PreWedShootScreen() {
 
   const applyFilterNew = (filterValue) => {
     if(filterValue.length){
-      let notVisited = true
-      let fullData = []
+      let conditionAssigned = null
+      let conditionUnassigned = null
       filterValue.map((obj) => {
         if(obj.parentTitle == "Date Filter"){
-          console.log(obj)
           if (obj.title === 'Date Assigned') {
-            const newData = preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate)
-            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-            fullData = notVisited ? [...newData] : [...preWedClients]
-            notVisited = false
+            conditionAssigned = conditionAssigned ? conditionAssigned + " || client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate" : "client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate"
           } else if (obj.title === 'Date Unassigned') {
-            const newData = preWedClients.filter(client => !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDate)
-            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-            fullData = notVisited ? [...newData] : [...preWedClients]
-            notVisited = false
+            conditionUnassigned = conditionUnassigned ? conditionUnassigned + " || !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDat" : " !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDat"
           }
         }
       })
-      setClientsForShow(fullData)
+      let finalCond = null
+      if(conditionAssigned){
+        if(conditionUnassigned){
+          finalCond = "(" + conditionAssigned +")" + " || " + "(" + conditionUnassigned + ")"
+        }else{
+          finalCond = "(" + conditionAssigned +")" 
+        }
+      }else{
+        finalCond = "(" + conditionUnassigned +")" 
+      }
+      const newData = preWedClients.filter(client => eval(finalCond))
+      setClientsForShow(newData)
     }else{
       setClientsForShow(preWedClients)
     }

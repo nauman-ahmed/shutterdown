@@ -159,33 +159,47 @@ function Albums(props) {
     setFilterBy(filterType);
   }
 
-  const applyFilterNew = (filterValue) => {
+  const applyFilterNew = (filterValue) => { 
     if(filterValue.length){
-      let notVisited = true
-      let fullData = []
+      let conditionDeliverable = null
+      let conditionEditor = null
+      let conditionStatus = null
       filterValue.map((obj) => {
         if(obj.parentTitle == "Deliverable"){
-            const newData = allDeliverables.filter(deliverable => deliverable.deliverableName === obj.title)
-            fullData = [...fullData,...newData]
-            notVisited = false
+          conditionDeliverable = conditionDeliverable ? conditionDeliverable + " || deliverable.deliverableName === '" + obj.title + "'" : "deliverable.deliverableName === '" + obj.title + "'"
         }else if(obj.parentTitle == "Assigned Editor"){
           if(obj.title === 'Unassigned Editor'){
-            const newData = allDeliverables.filter(deliverable => deliverable.editor ? false : true)
-            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-            fullData = notVisited ? [...fullData,...newData] : [...common]
+            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
           }else{
-            const newData = allDeliverables.filter(deliverable => deliverable.editor?.firstName === obj.title)
-            const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-            fullData = notVisited ? [...fullData,...newData] : [...common]
+            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.firstName === '" + obj.title + "'" : " deliverable.firstName === '" + obj.title + "'"
           }
-          notVisited = false
         }else if(obj.parentTitle == "Current Status"){
-          const newData = allDeliverables.filter(deliverable => deliverable.status === obj.title)
-          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-          fullData = notVisited ? [...fullData,...newData] : [...common]
+          conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
         }
       })
-      setDeliverablesForShow(fullData)
+      let finalCond = null
+      if(conditionDeliverable){
+        if(conditionEditor){
+          if(conditionStatus){
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
+          }else{
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
+          }
+        }else{
+          finalCond = "(" + conditionDeliverable + ")" 
+        }
+      }else if(conditionEditor){
+        if(conditionStatus){
+          finalCond = "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
+        }else{
+          finalCond = "(" + conditionEditor +")" 
+        }
+      }else{
+        finalCond = "(" + conditionStatus +")" 
+      }
+      console.log(finalCond);
+      const newData = allDeliverables.filter(deliverable => eval(finalCond))
+      setDeliverablesForShow(newData)
     }else{
       setDeliverablesForShow(allDeliverables)
     }

@@ -93,26 +93,32 @@ function DailyTasks(props) {
 
   const applyFilterNew = (filterValue) => {
     if(filterValue.length){
-      let notVisited = true
-      let fullData = []
+      let conditionBy = null
+      let conditionTo= null
       filterValue.map((obj) => {
         if(obj.parentTitle == "Assign By"){
-          console.log("obj",allTasks,obj)
-          const newData = allTasks.filter(task => task.assignBy.firstName === obj.title)
-          fullData = [...fullData,...newData]
-          notVisited = false
+          conditionBy = conditionBy ? conditionBy + " || task.assignBy.firstName === '" + obj.title + "'" : "task.assignBy.firstName === '" + obj.title + "'"
         }else if(obj.parentTitle == "Assign To"){
-          const newData = allTasks.filter(task => task.assignTo.firstName === obj.title)
-          const common = fullData.filter(o1 => newData.some(o2 => o1._id === o2._id));
-          fullData = notVisited ? [...fullData,...newData] : [...common]
+          conditionTo = conditionTo ? conditionTo + " || task.assignTo.firstName === '" + obj.title + "'" : "task.assignTo.firstName === '" + obj.title + "'"
         }
       })
-      setTasksToShow(fullData)
+      let finalCond = null
+      if(conditionBy){
+        if(conditionTo){
+          finalCond = "(" + conditionBy +")" + " && " + "(" + conditionTo + ")"
+        }else{
+          finalCond = "(" + conditionBy +")" 
+        }
+      }else{
+        finalCond = "(" + conditionTo +")" 
+      }
+      console.log(finalCond);
+      const newData = allTasks.filter(task => eval(finalCond))
+      setTasksToShow(newData)
     }else{
       setTasksToShow(allTasks)
     }
   }
-
   const applyFilter = (filterValue) => {
     if(filterValue == null){
       setTasksToShow(allTasks)
