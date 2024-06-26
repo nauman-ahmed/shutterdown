@@ -14,6 +14,7 @@ import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { getAllWhatsappText } from "../../API/Whatsapp";
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 import { Editor } from "react-draft-wysiwyg";
+import { useDispatch } from 'react-redux';
 
 function Cinematography(props) {
   const [editors, setEditors] = useState(null);
@@ -28,7 +29,7 @@ function Cinematography(props) {
     cinematographyTextGetImmutable:EditorState.createEmpty(),
     _id: null
   });
-
+  const dispatch = useDispatch()
   const extractText = () => {
     const contentState = editorState.cinematographyTextGetImmutable.getCurrentContent();
     return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
@@ -306,6 +307,22 @@ const priority = {
       const deliverable = allDeliverables[index];
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
+     
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Cinema Deliverable",
+              data: deliverable,
+              forManager: false,
+              forUser: deliverable?.editor._id,
+              read: false,
+              dataId: deliverable._id,
+            },
+          },
+        });
+   
       setUpdatingIndex(null)
     } catch (error) {
       console.log(error);

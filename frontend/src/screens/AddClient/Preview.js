@@ -13,6 +13,8 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import { updateClintData } from "../../redux/clientBookingForm";
 import { getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
+import Cookies from "js-cookie";
+
 
 function Preview() {
   const navigate = useNavigate();
@@ -31,16 +33,18 @@ function Preview() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [eventIndex, setEventIndex] = useState(0);
   const submitClient = async () => {
     if (requesting === false ) {
       setRequesting(true);
       const saveResult = await SaveClientForm(clientData); 
+      dispatch({ type: 'SOCKET_EMIT_EVENT', payload: { event: 'add-notification', data : { notificationOf : 'client', data : saveResult.data, forManager : true, read : false, readBy : [currentUser._id], } } })
       setRequesting(false);
       const storedEvents = await getEvents();
       dispatch(updateAllEvents(storedEvents.data));
       dispatch(updateClintData({ albums: [""] }));
-      if (saveResult) {
+      if (saveResult.result) {
         navigate("/MyProfile/AddClient/Form-I");
       }
     }

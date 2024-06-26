@@ -30,90 +30,131 @@ const SideBar = () => {
     setMobileSideBar(false);
   };
   const [currentTab, setCurrentTab] = useState(null);
+  // useEffect(() => {
+  //   if (location.pathname.startsWith('/MyProfile/AddClient')) {
+  //     setCurrentTab('Add Client');
+  //     setActiveMenu(1)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Client')) {
+  //     setCurrentTab('View Clients');
+  //     setActiveMenu(1)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Calender')) {
+  //     setCurrentTab('Calender View');
+  //     setActiveMenu(2)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
+  //     setCurrentTab('Pre-wed Shoot');
+  //     setActiveMenu(2)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
+  //     setCurrentTab('Cinematography');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
+  //     setCurrentTab('Photos');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
+  //     setCurrentTab('Albums');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(2)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/CheckLists')) {
+  //     setCurrentTab('Checklists');
+  //     setActiveMenu(4)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Attendence')) {
+  //     setCurrentTab('Attendence');
+  //     setActiveMenu(5)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
+  //     setCurrentTab('Tasks');
+  //     setActiveMenu(6)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
+  //     setCurrentTab('Tasks Reports');
+  //     setActiveMenu(6)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Reports')) {
+  //     setCurrentTab('Reports');
+  //     setActiveMenu(7)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Team')) {
+  //     setCurrentTab('Teams');
+  //     setActiveMenu(8)
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
       setCurrentTab('Add Client');
+      setActiveMenu(1)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Client')) {
       setCurrentTab('View Clients');
+      setActiveMenu(1)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Calender')) {
       setCurrentTab('Calender View');
+      setActiveMenu(2)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
       setCurrentTab('Pre-wed Shoot');
+      setActiveMenu(2)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
       setCurrentTab('Cinematography');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
       setCurrentTab('Photos');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
       setCurrentTab('Albums');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(2)
     }
     if (location.pathname.startsWith('/MyProfile/CheckLists')) {
       setCurrentTab('Checklists');
+      setActiveMenu(4)
     }
     if (location.pathname.startsWith('/MyProfile/Attendence')) {
       setCurrentTab('Attendence');
+      setActiveMenu(5)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
       setCurrentTab('Tasks');
+      setActiveMenu(6)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
       setCurrentTab('Tasks Reports');
+      setActiveMenu(6)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Reports')) {
       setCurrentTab('Reports');
+      setActiveMenu(7)
     }
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  useEffect(() => {
-    if (location.pathname.startsWith('/MyProfile/AddClient')) {
-      setCurrentTab('Add Client');
-    }
-    if (location.pathname.startsWith('/MyProfile/Client')) {
-      setCurrentTab('View Clients');
-    }
-    if (location.pathname.startsWith('/MyProfile/Calender')) {
-      setCurrentTab('Calender View');
-    }
-    if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
-      setCurrentTab('Pre-wed Shoot');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
-      setCurrentTab('Cinematography');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
-      setCurrentTab('Photos');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
-      setCurrentTab('Albums');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/PreWed-Deliverables')) {
-      setCurrentTab('PreWed-Deliverables');
-    }
-    if (location.pathname.startsWith('/MyProfile/CheckLists')) {
-      setCurrentTab('Checklists');
-    }
-    if (location.pathname.startsWith('/MyProfile/Attendence')) {
-      setCurrentTab('Attendence');
-    }
-    if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
-      setCurrentTab('Tasks');
-    }
-    if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
-      setCurrentTab('Tasks Reports');
-    }
-    if (location.pathname.startsWith('/MyProfile/Reports')) {
-      setCurrentTab('Reports');
-    }
-    if (location.pathname.startsWith('/MyProfile/Team')) {
-      setCurrentTab('Teams');
+      setActiveMenu(8)
     }
     if (location.pathname.startsWith('/MyProfile/FormOptions')) {
       setCurrentTab('FormOptions');

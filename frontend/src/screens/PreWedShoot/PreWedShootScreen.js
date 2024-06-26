@@ -16,6 +16,7 @@ import ShootDropDown from "../../components/ShootDropDown";
 import ClientHeader from "../../components/ClientHeader";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
+import { useDispatch } from "react-redux";
 
 function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
@@ -26,7 +27,7 @@ function PreWedShootScreen() {
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [shooters, setShooters] = useState([]);
-
+  const dispatch = useDispatch()
   const toggle = () => {
     setShow(!show);
   };
@@ -184,6 +185,70 @@ function PreWedShootScreen() {
       const client = preWedClients[index];
       setUpdatingIndex(index);
       await addPreWedData(client);
+      client.preWeddingDetails?.photographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.cinematographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.assistants?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.droneFlyers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
@@ -226,7 +291,6 @@ function PreWedShootScreen() {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column-prewed">Couple</th>
                     <th className="tableBody sticky-column-prewed">Wedding Date</th>
-                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Photographers</th>
                     <th className="tableBody">Cinematographers</th>
                     <th className="tableBody">Assistants</th>
@@ -239,7 +303,6 @@ function PreWedShootScreen() {
                 {currentUser.rollSelect === 'Shooter' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple</th>
-                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Shoot Date</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Status</th>

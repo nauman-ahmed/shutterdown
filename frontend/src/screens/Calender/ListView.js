@@ -37,7 +37,7 @@ import {
   Row,
 } from "reactstrap";
 import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
-import { getClients } from '../../API/Client';
+import { getClients } from "../../API/Client";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 
@@ -51,58 +51,71 @@ function ListView(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascending, setAscending] = useState(true);
   const [newEventModel, setNewEventModel] = useState(false);
-  const [newEvent, setNewEvent] = useState({  });
+  const [newEvent, setNewEvent] = useState({});
   const [showCalender, setShowCalender] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
-  const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
+  const eventOptionObjectKeys = [
+    "travelBy",
+    "shootDirector",
+    "photographers",
+    "cinematographers",
+    "drones",
+    "sameDayPhotoEditors",
+    "sameDayVideoEditors",
+  ];
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [filteringDay, setFilteringDay] = useState(null);
 
   const dispatch = useDispatch();
-  const { clientId } = useParams()
+  const { clientId } = useParams();
 
   const toggle = () => {
     setShow(!show);
   };
 
-  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
-    if(reset){
-      setShow(false)
+  const filterByDates = (
+    startDate = null,
+    endDate = null,
+    view = null,
+    reset = false
+  ) => {
+    if (reset) {
+      setShow(false);
       setEventsForShow(groupByBrideName(allEvents));
-      setFilteringDay(null)
-      return
+      setFilteringDay(null);
+      return;
+    } else if (view !== "month" && view !== "year") {
+      setShow(false);
     }
-    else if(view !== "month" && view !== "year"){
-      setShow(false)
-    }
-    setFilteringDay(startDate)
-    let filteredData = allEvents.filter(
+    setFilteringDay(startDate);
+    let filteredData = allEvents?.filter(
       (event) =>
-      new Date(event.eventDate).getTime() >= (new Date(startDate)).getTime() && new Date(event.eventDate).getTime() <= (new Date(endDate)).getTime()
-    )
+        new Date(event.eventDate).getTime() >= new Date(startDate).getTime() &&
+        new Date(event.eventDate).getTime() <= new Date(endDate).getTime()
+    );
     setEventsForShow(groupByBrideName(filteredData));
-  }
-  
+  };
+
   const groupByBrideName = (events) => {
     // Step 2: Group by brideName, but store the result as an array of objects
-    const groupedByBrideName = events.reduce((acc, event) => {
+    const groupedByBrideName = events?.reduce((acc, event) => {
       const brideName = event.client.brideName;
-      const found = acc.find(item => item.client.brideName === brideName);
-      const index = acc.findIndex(item => item.client.brideName === brideName);
+      const found = acc?.find((item) => item.client.brideName === brideName);
+      const index = acc?.findIndex(
+        (item) => item.client.brideName === brideName
+      );
       if (!found) {
-          // If no existing group for this brideName, create a new group
-          acc.push(event);
+        // If no existing group for this brideName, create a new group
+        acc.push(event);
       } else {
-          // Add to the existing group's events array
-          acc.splice(index+1, 0, event);
+        // Add to the existing group's events array
+        acc.splice(index + 1, 0, event);
       }
       return acc;
     }, []);
-    return groupedByBrideName
-  }
-  
-  
+    return groupedByBrideName;
+  };
 
   const getEventsData = async (clientId) => {
     try {
@@ -113,47 +126,47 @@ function ListView(props) {
         setAllEvents(res.data);
         setEventsForShow(groupByBrideName(res.data));
       } else if (currentUser.rollSelect === "Shooter") {
-        const eventsToShow = res.data.map((event) => {
+        const eventsToShow = res?.data?.map((event) => {
           if (
-            event?.shootDirector.some(
+            event?.shootDirector?.some(
               (director) => director._id === currentUser._id
             )
           ) {
             return { ...event, userRole: "Shoot Directors" };
           } else if (
-            event?.choosenPhotographers.some(
+            event?.choosenPhotographers?.some(
               (photographer) => photographer._id === currentUser._id
             )
           ) {
             return { ...event, userRole: "Photographer" };
           } else if (
-            event?.choosenCinematographers.some(
+            event?.choosenCinematographers?.some(
               (cinematographer) => cinematographer._id === currentUser._id
             )
           ) {
             return { ...event, userRole: "Cinematographer" };
           } else if (
-            event?.droneFlyers.some((flyer) => flyer._id === currentUser._id)
+            event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
           ) {
             return { ...event, userRole: "Drone Flyer" };
           } else if (
-            event.manager.some((manager) => manager._id === currentUser._id)
+            event.manager?.some((manager) => manager._id === currentUser._id)
           ) {
             return { ...event, userRole: "Manager" };
           } else if (
-            event?.sameDayPhotoMakers.some(
+            event?.sameDayPhotoMakers?.some(
               (photoMaker) => photoMaker._id === currentUser._id
             )
           ) {
             return { ...event, userRole: "Same Day Photos Maker" };
           } else if (
-            event?.sameDayVideoMakers.some(
+            event?.sameDayVideoMakers?.some(
               (videoMaker) => videoMaker._id === currentUser._id
             )
           ) {
             return { ...event, userRole: "Same Day Video Maker" };
           } else if (
-            event?.assistants.some(
+            event?.assistants?.some(
               (assistant) => assistant._id === currentUser._id
             )
           ) {
@@ -169,7 +182,7 @@ function ListView(props) {
       console.log(error);
     }
   };
-  
+
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -191,26 +204,155 @@ function ListView(props) {
       setUpdatingIndex(index);
       await assignEventTeam(event);
       setUpdatingIndex(null);
+      event.shootDirectors?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.choosenPhotographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.choosenCinematographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.droneFlyers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.manager?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.assistants?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.sameDayPhotoMakers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
+      event.sameDayVideoMakers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "event",
+              data: event,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: event._id,
+            },
+          },
+        });
+      });
     } catch (error) {
+      console.log(error);
       toast.error("It seems like nothing to update");
       return;
     }
   };
-  
+
   const getClientsForFilters = () => {
     const seenClients = new Set();
     return allEvents?.map((eventObj, i) => ({
         title: `${eventObj?.client?.brideName} Weds ${eventObj?.client?.groomName}`,
         id: i,
         clientId: eventObj.client?._id,
-      })).filter(eventObj => {
-        if (eventObj.clientId && !seenClients.has(eventObj.clientId)) {
-          seenClients.add(eventObj.clientId);
+      }))?.filter((eventObj) => {
+        if (eventObj.clientId && !seenClients?.has(eventObj.clientId)) {
+          seenClients?.add(eventObj.clientId);
           return true;
         }
         return false;
       });
-  }
+  };
 
   const filterOptions = [
     {
@@ -221,31 +363,41 @@ function ListView(props) {
   ];
 
   const applyFilter = (filterObj) => {
-    if(filterObj){
-      setEventsForShow(groupByBrideName(allEvents.filter((event) => event.client?._id === filterObj?.clientId)));
-      return
+    if (filterObj) {
+      setEventsForShow(
+        groupByBrideName(
+          allEvents?.filter(
+            (event) => event.client?._id === filterObj?.clientId
+          )
+        )
+      );
+      return;
     }
-    applySorting()
-    getEventsData(clientId)
+    applySorting();
+    getEventsData(clientId);
   };
 
-  const applySorting = ()=>{
+  const applySorting = () => {
     try {
-      setEventsForShow(groupByBrideName(eventsForShow.sort((a, b) => {
-        const dateA = new Date(a.eventDate);
-        const dateB = new Date(b.eventDate);
-        return ascending ? dateB - dateA : dateA - dateB;
-      })));
-      setAscending(!ascending)
+      setEventsForShow(
+        groupByBrideName(
+          eventsForShow?.sort((a, b) => {
+            const dateA = new Date(a.eventDate);
+            const dateB = new Date(b.eventDate);
+            return ascending ? dateB - dateA : dateA - dateB;
+          })
+        )
+      );
+      setAscending(!ascending);
     } catch (error) {
-      console.log("applySorting ERROR",error)
+      console.log("applySorting ERROR", error);
     }
-  }
-  
+  };
+
   const getAllFormOptionsHandler = async () => {
     const eventOptions = await getAllEventOptions();
-    setEventOptionsKeyValues(eventOptions)
-  }
+    setEventOptionsKeyValues(eventOptions);
+  };
 
   useEffect(() => {
     getEventsData(clientId);
@@ -263,17 +415,17 @@ function ListView(props) {
   const addNewEvent = async () => {
     try {
       await addEvent(newEvent);
-      setNewEvent({  });
+      setNewEvent({});
       setNewEventModel(false);
       window.notify("Event added successfully!", "success");
       getEventsData(clientId);
       getStoredEvents();
-      fetchClientsData()
+      fetchClientsData();
     } catch (error) {
       console.log(error);
     }
   };
- 
+
   const updateNewEvent = (e) => {
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
@@ -281,85 +433,110 @@ function ListView(props) {
   const fetchClientsData = async () => {
     const clients = await getClients();
     setClientData(clients);
-  }
-  
+  };
+
   const filterByNameHanler = (brideName) => {
-    if(brideName == "Reset"){
-      setEventsForShow(groupByBrideName(allEvents))
-      return
+    if (brideName == "Reset") {
+      setEventsForShow(groupByBrideName(allEvents));
+      return;
     }
-    const seperator = "<"
-    brideName = brideName.split(seperator)[0]
-    setEventsForShow(groupByBrideName(allEvents.filter(event => {
-      return event.client.brideName == brideName
-    })))
-  }
-  
-  const returnOneRow = (event,prevEvent) => {
-    if(prevEvent && !clientId){
-      if(event.client._id !== prevEvent.client._id){
+    const seperator = "<";
+    brideName = brideName?.split(seperator)[0];
+    setEventsForShow(
+      groupByBrideName(
+        allEvents?.filter((event) => {
+          return event.client.brideName == brideName;
+        })
+      )
+    );
+  };
+
+  const returnOneRow = (event, prevEvent) => {
+    if (prevEvent && !clientId) {
+      if (event.client._id !== prevEvent.client._id) {
         return (
-          <tr style={{backgroundColor: "rgb(102, 109, 255)",}}>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
-            <td style={{backgroundColor: "rgb(102, 109, 255)",}}></td>
+          <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
           </tr>
-        )
+        );
       }
     }
-  }
+  };
 
   return (
     <>
       <ToastContainer />
       {eventsForShow !== null ? (
         <>
-          <ClientHeader
-            title="List View"
-            options={filterOptions}
-            calender
-          />
+          <ClientHeader title="List View" options={filterOptions} calender />
           <div
             className=" d-flex mx-auto align-items-center justify-content-between"
-            style={{width: "100%"}}
+            style={{ width: "100%" }}
             ref={target}
           >
             <div className="">
               <button
-                  onClick={() => setNewEventModel(true)}
-                  className="btn btn-primary"
-                  style={{ backgroundColor : '#666DFF', marginLeft:"5px"}}
-                >
-                  Add Event
-                </button>
+                onClick={() => setNewEventModel(true)}
+                className="btn btn-primary"
+                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+              >
+                Add Event
+              </button>
             </div>
-            <Select className='w-25 mx-3' isSearchable={true} onChange={(e) => filterByNameHanler(e.value)} styles={{...customStyles, zIndex: -1000}} 
+            <Select
+              className="w-25 mx-3"
+              isSearchable={true}
+              onChange={(e) => filterByNameHanler(e.value)}
+              styles={{ ...customStyles, zIndex: -1000 }}
               options={[
-                { value: 'Reset', label: <div className='d-flex justify-content-around'><strong>Reset</strong></div> },
-                ...clientData?.map(client => {
-                    return { value: client.brideName + "<" + client.groomName, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
-                  })
-              ]} 
-              required 
+                {
+                  value: "Reset",
+                  label: (
+                    <div className="d-flex justify-content-around">
+                      <strong>Reset</strong>
+                    </div>
+                  ),
+                },
+                ...clientData?.map((client) => {
+                  return {
+                    value: client.brideName + "<" + client.groomName,
+                    label: (
+                      <div className="d-flex justify-content-around">
+                        <span>{client.brideName}</span>{" "}
+                        <img alt="" src={Heart} />{" "}
+                        <span>{client.groomName}</span>
+                      </div>
+                    ),
+                  };
+                }),
+              ]}
+              required
             />
             <div className="w-25">
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
               >
-                {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                {filteringDay
+                  ? dayjs(filteringDay).format("DD-MMM-YYYY")
+                  : "Date"}
                 <div className="d-flex align-items-center">
-                  <img alt="" src={CalenderImg} onClick={toggle}/>
-                  <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
+                  <img alt="" src={CalenderImg} onClick={toggle} />
+                  <GrPowerReset
+                    className="mx-1"
+                    onClick={() => filterByDates(null, null, null, true)}
+                  />
                 </div>
               </div>
             </div>
@@ -374,7 +551,22 @@ function ListView(props) {
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column">Couple Location</th>
-                    <th className="tableBody sticky-column">Date {ascending ? <IoIosArrowRoundDown style={{color : '#666DFF'}} onClick={applySorting} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" onClick={applySorting} /> }</th>
+                    <th className="tableBody sticky-column">
+                      Date{" "}
+                      {ascending ? (
+                        <IoIosArrowRoundDown
+                          style={{ color: "#666DFF" }}
+                          onClick={applySorting}
+                          className="fs-4 cursor-pointer"
+                        />
+                      ) : (
+                        <IoIosArrowRoundUp
+                          style={{ color: "#666DFF" }}
+                          className="fs-4 cursor-pointer"
+                          onClick={applySorting}
+                        />
+                      )}
+                    </th>
                     <th className="tableBody">Event Type</th>
                     {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Director</th>
@@ -479,7 +671,10 @@ function ListView(props) {
                   }
                   return (
                     <>
-                      {returnOneRow(event,index >= 0 ? eventsForShow[index-1]: null)}
+                      {returnOneRow(
+                        event,
+                        index >= 0 ? eventsForShow[index - 1] : null
+                      )}
                       {event && (
                         <>
                           {currentUser.rollSelect === "Manager" && (
@@ -564,16 +759,16 @@ function ListView(props) {
                                       Array.isArray(event?.shootDirectors)
                                         ? [...event?.shootDirectors, userObj]
                                         : [userObj];
-                                      setEventsForShow(updatedEvents)
-                                      setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].shootDirectors =
-                                      event?.shootDirectors.filter(
+                                      event?.shootDirectors?.filter(
                                         (director) => director !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -605,17 +800,17 @@ function ListView(props) {
                                             userObj,
                                           ]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].choosenPhotographers =
-                                      event?.choosenPhotographers.filter(
+                                      event?.choosenPhotographers?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -650,7 +845,7 @@ function ListView(props) {
                                           userObj,
                                         ]
                                       : [userObj];
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
@@ -658,11 +853,11 @@ function ListView(props) {
                                     updatedEvents[
                                       index
                                     ].choosenCinematographers =
-                                      event?.choosenCinematographers.filter(
+                                      event?.choosenCinematographers?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -696,17 +891,17 @@ function ListView(props) {
                                       Array.isArray(event?.droneFlyers)
                                         ? [...event?.droneFlyers, userObj]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].droneFlyers =
-                                      event?.droneFlyers.filter(
+                                      event?.droneFlyers?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -735,17 +930,17 @@ function ListView(props) {
                                       Array.isArray(event?.manager)
                                         ? [...event?.manager, userObj]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].manager =
-                                      event?.manager.filter(
+                                      event?.manager?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -774,17 +969,17 @@ function ListView(props) {
                                       Array.isArray(event?.assistants)
                                         ? [...event?.assistants, userObj]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].assistants =
-                                      event?.assistants.filter(
+                                      event?.assistants?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -825,17 +1020,17 @@ function ListView(props) {
                                             userObj,
                                           ]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].sameDayPhotoMakers =
-                                      event?.sameDayPhotoMakers.filter(
+                                      event?.sameDayPhotoMakers?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -876,17 +1071,17 @@ function ListView(props) {
                                             userObj,
                                           ]
                                         : [userObj];
-                                        setEventsForShow(updatedEvents)
-                                        setAllEvents(updatedEvents);
+                                    setEventsForShow(updatedEvents);
+                                    setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...allEvents];
                                     updatedEvents[index].sameDayVideoMakers =
-                                      event?.sameDayVideoMakers.filter(
+                                      event?.sameDayVideoMakers?.filter(
                                         (existingUser) =>
                                           existingUser !== userObj
                                       );
-                                      setEventsForShow(updatedEvents)
+                                    setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
                                 />
@@ -968,7 +1163,6 @@ function ListView(props) {
                                 className="tableBody Text14Semi primary2"
                               >
                                 {event?.eventStatus}
-                               
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
@@ -989,7 +1183,6 @@ function ListView(props) {
                                   {event?.location}
                                 </div>
                               </td>
-                              
                             </tr>
                           )}
                         </>
@@ -1007,7 +1200,7 @@ function ListView(props) {
               placement="bottom"
             >
               <div>
-                <CalenderMulti filterByDates={filterByDates}/>
+                <CalenderMulti filterByDates={filterByDates} />
               </div>
             </Overlay>
           </div>
@@ -1030,17 +1223,32 @@ function ListView(props) {
               return;
             }
             addNewEvent();
-          }} 
+          }}
         >
           <ModalBody>
             <Row ref={target}>
               <Col xl="6" sm="6" lg="6" className="p-2">
                 <div className="label">Client</div>
-                <Select className="w-75" onChange={(selected) => {
-                setNewEvent({ ...newEvent, client: selected.value._id });
-              }} styles={customStyles} options={clientData?.map(client => {
-                  return { value: client, label: <div className='d-flex justify-content-around'><span>{client.brideName}</span>  <img alt='' src={Heart} /> <span>{client.groomName}</span></div> }
-                })} required />
+                <Select
+                  className="w-75"
+                  onChange={(selected) => {
+                    setNewEvent({ ...newEvent, client: selected.value._id });
+                  }}
+                  styles={customStyles}
+                  options={clientData?.map((client) => {
+                    return {
+                      value: client,
+                      label: (
+                        <div className="d-flex justify-content-around">
+                          <span>{client.brideName}</span>{" "}
+                          <img alt="" src={Heart} />{" "}
+                          <span>{client.groomName}</span>
+                        </div>
+                      ),
+                    };
+                  })}
+                  required
+                />
               </Col>
               <Col xl="6" sm="6" className="p-2">
                 <div className="label">Event Date</div>
@@ -1113,7 +1321,7 @@ function ListView(props) {
                   required
                 />
               </Col>
-              <Col xl="6" sm="6" className="p-2"> 
+              <Col xl="6" sm="6" className="p-2">
                 <div className="label mt25">Location</div>
                 <input
                   value={newEvent?.location}
@@ -1125,11 +1333,12 @@ function ListView(props) {
                   required
                 />
               </Col>
-              {eventOptionObjectKeys.map((Objkey) => 
+              {eventOptionObjectKeys?.map((Objkey) => (
                 <Col xl="6" sm="6" className="p-2">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                      {eventOptionsKeyValues &&
+                        eventOptionsKeyValues[Objkey].label}
                     </div>
                     <Select
                       value={
@@ -1146,12 +1355,15 @@ function ListView(props) {
                         setNewEvent({ ...newEvent, [Objkey]: selected.value });
                       }}
                       styles={customStyles}
-                      options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                      options={
+                        eventOptionsKeyValues &&
+                        eventOptionsKeyValues[Objkey].values
+                      }
                       required
                     />
                   </div>
                 </Col>
-              )}
+              ))}
             </Row>
           </ModalBody>
           <ModalFooter>
@@ -1184,13 +1396,15 @@ const ButtonWithHoverBox = ({ hoverText }) => {
   };
 
   return (
-    <div style={{ position: "relative", display: "flex", alignItems:"center" }}>
+    <div
+      style={{ position: "relative", display: "flex", alignItems: "center" }}
+    >
       <IoIosWarning
         className="fs-3 text-danger"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />
-      
+
       {isHovered && (
         <div
           style={{

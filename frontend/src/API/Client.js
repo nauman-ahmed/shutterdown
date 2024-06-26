@@ -1,8 +1,7 @@
 import axios from "axios";
 import BASE_URL from "./index";
 import Cookies from "js-cookie";
-const currentUser =
-  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
 export const SaveClientForm = async (data) => { 
   try {
@@ -11,12 +10,13 @@ export const SaveClientForm = async (data) => {
       .post(BASE_URL + "/AddClient", {
         data: dataToSend,
       })
-      .then(() => {
-        window.notify("Client has been Added", "success");
-        return true;
+      .then((res) => {
+
+        return {result :true, data : res.data};
       })
       .catch((err) => console.log(err));
       return result
+
   } catch (error) {
     console.log(error, "error");
     return false;
@@ -40,7 +40,7 @@ export const addCinematography = async (client) => {
 };
 export const updateClient = async (client) => {
   try {
-    const res = await axios
+    await axios
       .post(BASE_URL + "/updateClientData", {
         Headers: {
           "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export const updateClient = async (client) => {
 
 export const addPhotosDeliverables = async (client) => {
   try {
-    const res = await axios
+   await axios
       .post(BASE_URL + "/AddPhotosDeliverables", {
         Headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export const addPhotosDeliverables = async (client) => {
 
 export const addAlbumsDeliverables = async (client) => {
   try {
-    const res = await axios
+    await axios
       .post(BASE_URL + "/AddAlbumsDeliverables", {
         Headers: {
           "Content-Type": "application/json",

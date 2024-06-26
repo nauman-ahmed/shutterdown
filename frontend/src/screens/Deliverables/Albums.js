@@ -15,6 +15,7 @@ import { getAllWhatsappText } from "../../API/Whatsapp";
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 import { Editor } from "react-draft-wysiwyg";
+import { useDispatch } from "react-redux";
 
 function Albums(props) {
   const [editors, setEditors] = useState(null);
@@ -260,7 +261,7 @@ function Albums(props) {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-
+  const dispatch = useDispatch()
 
   const handleSaveData = async (index) => {
     try {
@@ -268,6 +269,20 @@ function Albums(props) {
       setUpdatingIndex(index);
       await updateDeliverable(deliverable);
       setUpdatingIndex(null);
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "add-notification",
+          data: {
+            notificationOf: "Albums Deliverable",
+            data: deliverable,
+            forManager: false,
+            forUser: deliverable?.editor._id,
+            read: false,
+            dataId: deliverable._id,
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
     }

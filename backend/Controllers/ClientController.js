@@ -66,7 +66,7 @@ const AddClientFunction = async (req, res) => {
     client.events = eventIds;
     client.deliverables = [...deliverables, ...albumsDeliverables]
     await client.save()
-    res.status(200).json('Client Added SucccessFully');
+    res.status(200).json(client);
   } catch (error) {
     console.log("Client Form Error",error);
   }

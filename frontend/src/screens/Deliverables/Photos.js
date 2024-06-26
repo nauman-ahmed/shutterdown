@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
 import { getPhotos, updateDeliverable } from '../../API/Deliverables';
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
+import { useDispatch } from 'react-redux';
 
 
 function Photos() {
@@ -226,7 +227,7 @@ function Photos() {
     }
     setFilterBy(filterType);
   }
-
+  const dispatch = useDispatch()
 
   const handleSaveData = async (index) => {
     try {
@@ -234,6 +235,20 @@ function Photos() {
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
       setUpdatingIndex(null);
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "add-notification",
+          data: {
+            notificationOf: "Photos Deliverable",
+            data: deliverable,
+            forManager: false,
+            forUser: deliverable?.editor._id,
+            read: false,
+            dataId: deliverable._id,
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
     }

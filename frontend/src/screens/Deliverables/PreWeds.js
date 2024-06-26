@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
 import { getPreWeds, updateDeliverable } from '../../API/Deliverables';
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
+import { useDispatch } from 'react-redux';
 
 
 function PreWedDeliverables() {
@@ -230,7 +231,7 @@ function PreWedDeliverables() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-
+  const dispatch = useDispatch()
 
   const handleSaveData = async (index) => {
     try {
@@ -238,6 +239,20 @@ function PreWedDeliverables() {
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
       setUpdatingIndex(null);
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "add-notification",
+          data: {
+            notificationOf: "Pre-Wed Deliverable",
+            data: deliverable,
+            forManager: false,
+            forUser: deliverable?.editor._id,
+            read: false,
+            dataId: deliverable._id,
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
     }
