@@ -47,7 +47,6 @@ function ListView(props) {
   const [eventsForShow, setEventsForShow] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
-  const [filterFor, setFilterFor] = useState("day");
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascending, setAscending] = useState(true);
   const [newEventModel, setNewEventModel] = useState(false);
@@ -67,6 +66,11 @@ function ListView(props) {
   const [show, setShow] = useState(false);
   const [filteringDay, setFilteringDay] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [filterStartDate, setFilterStartDate] = useState(null);
+  const [filterEndDate, setFilterEndDate] = useState(null);
   const dispatch = useDispatch();
   const { clientId } = useParams();
 
@@ -84,11 +88,15 @@ function ListView(props) {
       setShow(false);
       setEventsForShow(groupByBrideName(allEvents));
       setFilteringDay(null);
+      setFilterStartDate(null);
+      setFilterEndDate(null);
       return;
     } else if (view !== "month" && view !== "year") {
       setShow(false);
     }
     setFilteringDay(startDate);
+    setFilterStartDate(startDate);
+    setFilterEndDate(endDate);
     let filteredData = allEvents?.filter(
       (event) =>
         new Date(event.eventDate).getTime() >= new Date(startDate).getTime() &&
@@ -120,8 +128,8 @@ function ListView(props) {
   const getEventsData = async (clientId) => {
     try {
       const usersData = await getAllUsers();
-      setAllUsers(usersData.users);
-      const res = await getEvents(clientId);
+      setAllUsers(usersData?.users);
+      const res = await getEvents(clientId, page);
       if (currentUser.rollSelect === "Manager") {
         setAllEvents(res.data);
         setEventsForShow(groupByBrideName(res.data));
@@ -150,7 +158,7 @@ function ListView(props) {
           ) {
             return { ...event, userRole: "Drone Flyer" };
           } else if (
-            event.manager?.some((manager) => manager._id === currentUser._id)
+            event?.manager?.some((manager) => manager._id === currentUser._id)
           ) {
             return { ...event, userRole: "Manager" };
           } else if (
@@ -341,13 +349,15 @@ function ListView(props) {
 
   const getClientsForFilters = () => {
     const seenClients = new Set();
-    return allEvents?.map((eventObj, i) => ({
+    return allEvents
+      ?.map((eventObj, i) => ({
         title: `${eventObj?.client?.brideName} Weds ${eventObj?.client?.groomName}`,
         id: i,
-        clientId: eventObj.client?._id,
-      }))?.filter((eventObj) => {
-        if (eventObj.clientId && !seenClients?.has(eventObj.clientId)) {
-          seenClients?.add(eventObj.clientId);
+        clientId: eventObj?.client?._id,
+      }))
+      ?.filter((eventObj) => {
+        if (eventObj?.clientId && !seenClients?.has(eventObj.clientId)) {
+          seenClients?.add(eventObj?.clientId);
           return true;
         }
         return false;
@@ -362,20 +372,7 @@ function ListView(props) {
     },
   ];
 
-  const applyFilter = (filterObj) => {
-    if (filterObj) {
-      setEventsForShow(
-        groupByBrideName(
-          allEvents?.filter(
-            (event) => event.client?._id === filterObj?.clientId
-          )
-        )
-      );
-      return;
-    }
-    applySorting();
-    getEventsData(clientId);
-  };
+
 
   const applySorting = () => {
     try {
@@ -406,6 +403,135 @@ function ListView(props) {
     getAllFormOptionsHandler();
   }, []);
 
+  const fetchEvents = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const res = await getEvents(clientId ,page === 1 ? page + 1 : page);
+        if (res.data.length > 0) {
+          if (currentUser.rollSelect === "Manager") {
+            setAllEvents([...allEvents, ...res.data]);
+            if (filterStartDate && filterEndDate) {
+              let filteredData = res.data?.filter(
+                (event) =>
+                  new Date(event.eventDate).getTime() >=
+                    new Date(filterStartDate).getTime() &&
+                  new Date(event.eventDate).getTime() <=
+                    new Date(filterEndDate).getTime()
+              );
+              setEventsForShow([
+                ...eventsForShow,
+                ...groupByBrideName(filteredData),
+              ]);
+            } else {
+              setEventsForShow([
+                ...eventsForShow,
+                ...groupByBrideName(res.data),
+              ]);
+            }
+          } else if (currentUser.rollSelect === "Shooter") {
+            const eventsToShow = res?.data?.map((event) => {
+              if (
+                event?.shootDirector?.some(
+                  (director) => director._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Shoot Directors" };
+              } else if (
+                event?.choosenPhotographers?.some(
+                  (photographer) => photographer._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Photographer" };
+              } else if (
+                event?.choosenCinematographers?.some(
+                  (cinematographer) => cinematographer._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Cinematographer" };
+              } else if (
+                event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
+              ) {
+                return { ...event, userRole: "Drone Flyer" };
+              } else if (
+                event.manager?.some((manager) => manager._id === currentUser._id)
+              ) {
+                return { ...event, userRole: "Manager" };
+              } else if (
+                event?.sameDayPhotoMakers?.some(
+                  (photoMaker) => photoMaker._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Same Day Photos Maker" };
+              } else if (
+                event?.sameDayVideoMakers?.some(
+                  (videoMaker) => videoMaker._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Same Day Video Maker" };
+              } else if (
+                event?.assistants?.some(
+                  (assistant) => assistant._id === currentUser._id
+                )
+              ) {
+                return { ...event, userRole: "Assistant" };
+              } else {
+                return null;
+              }
+            });
+            setAllEvents([...allEvents, eventsToShow]);
+            if (filterStartDate && filterEndDate) {
+              let filteredData = eventsToShow?.filter(
+                (event) =>
+                  new Date(event.eventDate).getTime() >=
+                    new Date(filterStartDate).getTime() &&
+                  new Date(event.eventDate).getTime() <=
+                    new Date(filterEndDate).getTime()
+              );
+              setEventsForShow([
+                ...eventsForShow,
+                ...groupByBrideName(filteredData),
+              ]);
+            } else {
+              setEventsForShow([
+                ...eventsForShow,
+                ...groupByBrideName(eventsToShow),
+              ]);
+            }
+            setEventsForShow(groupByBrideName(eventsToShow));
+          }
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (eventsForShow?.length < 10 && hasMore && !loading) {
+      fetchEvents();
+    }
+  }, [eventsForShow]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchEvents();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
     setAllEvents(storedEvents.data);
@@ -1192,6 +1318,16 @@ function ListView(props) {
                 })}
               </tbody>
             </Table>
+            {loading && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div class="spinner"></div>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div>No more data to load.</div>
+              </div>
+            )}
             <Overlay
               rootClose={true}
               onHide={() => setShow(false)}

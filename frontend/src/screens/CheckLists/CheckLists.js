@@ -15,6 +15,11 @@ function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
   const [filterFor, setFilterFor] = useState('Day');
   const [updatingIndex, setUpdatingIndex] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [filterStartDate, setFilterStartDate] = useState(null);
+  const [filterEndDate, setFilterEndDate] = useState(null);
   const toggle = () => {
     setShow(!show);
   };
@@ -26,12 +31,16 @@ function CheckLists(props) {
       setShow(false)
       setClientsForShow(allClients)
       setFilteringDay(null)
+      setFilterStartDate(null);
+      setFilterEndDate(null);
       return
     }
     else if(view !== "month" && view !== "year"){
       setShow(false)
     }
     setFilteringDay(startDate)
+    setFilterStartDate(startDate);
+    setFilterEndDate(endDate);
     setClientsForShow(allClients.filter(clientData => {
       return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() >= (new Date(startDate)).getTime() && (new Date(eventData.eventDate)).getTime() <= (new Date(endDate)).getTime())
     }))
@@ -50,7 +59,7 @@ function CheckLists(props) {
 
   const fetchClients = async () => {
     try {
-      const clients = await getClients();
+      const clients = await getClients(page);
       setClientsForShow(clients);
       setAllClients(clients);
     } catch (error) {
@@ -62,6 +71,60 @@ function CheckLists(props) {
     fetchClients()
   }, [])
 
+  const fetchClientsAgain = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const data = await getClients(page === 1 ? page + 1 : page);
+        if (data.length > 0) {
+          setAllClients([...allClients, ...data]);
+          if (filterStartDate && filterEndDate) {
+            const clientsToAdd = data.filter((clientData) => {
+              return clientData.events.some(
+                (eventData) =>
+                  new Date(eventData.eventDate).getTime() >=
+                    new Date(filterStartDate).getTime() &&
+                  new Date(eventData.eventDate).getTime() <=
+                    new Date(filterEndDate).getTime()
+              );
+            });
+            setClientsForShow([...clientsForShow, ...clientsToAdd]);
+          } else {
+            setClientsForShow([...clientsForShow, ...data]);
+          }
+
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (clientsForShow?.length < 10 && hasMore && !loading) {
+      fetchClientsAgain();
+    }
+  }, [clientsForShow]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchClientsAgain();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
   const yesNoOptions = [{
     label: 'Yes',
     value: 'Yes'
@@ -275,6 +338,16 @@ function CheckLists(props) {
               })}
             </tbody>
           </Table>
+          {loading && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <div class="spinner"></div>
+            </div>
+          )}
+          {!hasMore && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <div>No more data to load.</div>
+            </div>
+          )}
           <Overlay rootClose={true}
             onHide={() => setShow(false)}
             target={target.current}

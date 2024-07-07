@@ -22,7 +22,7 @@ function Cinematography(props) {
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [filterBy, setFilterBy] = useState(null)
   const [ascendingWeding, setAscendingWeding] = useState(true);
-  const [ascendingDeadline, setAscendingDeadline] = useState(true);
+  const [filterCondition, setFilterCondition] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [editorState, setEditorState] = useState({
     albumTextGetImmutable:EditorState.createEmpty(),
@@ -34,6 +34,9 @@ function Cinematography(props) {
     const contentState = editorState.cinematographyTextGetImmutable.getCurrentContent();
     return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
   };
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const loadEditorContent = (rawContent) => {
     const contentState = convertFromRaw(JSON.parse(rawContent));
@@ -146,7 +149,7 @@ const priority = {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
-      const data = await getCinematography();
+      const data = await getCinematography(page);
       const res = await getEditors();
       await getAllWhatsappTextHandler()
       if (currentUser.rollSelect === 'Manager') {
@@ -166,6 +169,68 @@ const priority = {
     fetchData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const fetchCinemas = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const data = await getCinematography(page === 1 ? page + 1 : page);
+        if (data.length > 0) {
+          let dataToAdd;
+          if (currentUser?.rollSelect === "Manager") {
+            setAllDeliverables([...allDeliverables, ...data])
+            if(filterCondition){
+              dataToAdd = data.filter(deliverable => eval(filterCondition))
+            } else {
+              dataToAdd = data
+            }
+            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
+          } else if (currentUser.rollSelect === "Editor") {
+            const deliverablesToShow = data.filter(
+              (deliverable) => deliverable?.editor?._id === currentUser._id
+            );
+            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
+            if(filterCondition){
+              dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
+            } else {
+              dataToAdd = deliverablesToShow
+            }
+            setDeliverablesForShow([
+              ...deliverablesForShow,
+              ...dataToAdd,
+            ]);
+          }
+
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+  useEffect(()=>{
+    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+      fetchCinemas()
+    }
+  }, [deliverablesForShow])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchCinemas();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   const applySorting = (wedding = false)=>{
     try {
@@ -183,6 +248,7 @@ const priority = {
   }
 
   const applyFilterNew = (filterValue) => { 
+    console.log(filterValue);
     if(filterValue.length){
       let conditionDeliverable = null
       let conditionEditor = null
@@ -220,6 +286,7 @@ const priority = {
       }else{
         finalCond = "(" + conditionStatus +")" 
       }
+      setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
       setDeliverablesForShow(newData)
     }else{
@@ -227,49 +294,6 @@ const priority = {
     }
   }
 
-  const applyFilter = (filterValue) => {
-    setDeliverablesForShow(null)
-    if(filterValue == null){
-      setDeliverablesForShow(allDeliverables)
-      return
-    }
-    if (filterBy === 'Assigned Editor') {
-      filterValue === 'Any' ? 
-      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
-      : filterValue === 'Unassigned Editor' ?
-      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-      :
-      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
-    } else if (filterBy === 'Deliverable') {
-      filterValue === 'All' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.deliverableName === filterValue))
-    } else if (filterBy === 'Current Status') {
-      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
-    } else if (filterBy === 'Deadline sorting') {
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline);
-          const dateB = new Date(b.clientDeadline);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    } else if (filterBy === 'Wedding Date sorting') {
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
-          const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    }
-  }
 
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
@@ -338,7 +362,6 @@ const priority = {
     const messageParam = encodeURIComponent(message);
     const chatUrl = `${baseUrl}send?phone=${contactParam}&text=${messageParam}`;
     window.open(chatUrl, '_blank');
-
   }
 
   return (
@@ -670,6 +693,16 @@ const priority = {
                 )}
               </tbody>
             </Table>
+            {loading && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div class="spinner"></div>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div>No more data to load.</div>
+              </div>
+            )}
           </div>
         </>
       ) : (

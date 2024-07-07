@@ -23,10 +23,13 @@ function Photos() {
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(true);
-
+  const [filterCondition, setFilterCondition] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const fetchData = async () => {
     try {
-      const data = await getPhotos();
+      const data = await getPhotos(page);
       const res = await getEditors();
       setEditors(res.editors.filter(user => user.subRole === 'Photographer'));
       if (currentUser?.rollSelect === 'Manager') {
@@ -45,6 +48,69 @@ function Photos() {
     fetchData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const fetchPhotos = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const data = await getPhotos(page === 1 ? page + 1 : page);
+        if (data.length > 0) {
+          let dataToAdd;
+          if (currentUser?.rollSelect === "Manager") {
+            setAllDeliverables([...allDeliverables, ...data])
+            if(filterCondition){
+              dataToAdd = data.filter(deliverable => eval(filterCondition))
+            } else {
+              dataToAdd = data
+            }
+            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
+          } else if (currentUser.rollSelect === "Editor") {
+            const deliverablesToShow = data.filter(
+              (deliverable) => deliverable?.editor?._id === currentUser._id
+            );
+            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
+            if(filterCondition){
+              dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
+            } else {
+              dataToAdd = deliverablesToShow
+            }
+            setDeliverablesForShow([
+              ...deliverablesForShow,
+              ...dataToAdd,
+            ]);
+          }
+
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+    useEffect(()=>{
+    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+      fetchPhotos()
+    }
+  }, [deliverablesForShow])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchPhotos();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   const applyFilterNew = (filterValue) => { 
     if(filterValue.length){
@@ -84,7 +150,7 @@ function Photos() {
       }else{
         finalCond = "(" + conditionStatus +")" 
       }
-      console.log(finalCond);
+      setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
       setDeliverablesForShow(newData)
     }else{
@@ -567,6 +633,16 @@ function Photos() {
                 )}
               </tbody>
             </Table>
+            {loading && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div class="spinner"></div>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div>No more data to load.</div>
+              </div>
+            )}
           </div>
         </>
       ) : (

@@ -68,11 +68,14 @@ const updateEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
         let obj = {};
         if(req.body.clientId){
             obj = {client: req.body.clientId}
         }
-        const events = await EventModel.find(obj).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        const events = await EventModel.find(obj).skip(skip).limit(10).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
         
         // Step 1: Sort by eventDate
         events.sort((a, b) => {

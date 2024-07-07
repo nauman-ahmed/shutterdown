@@ -101,7 +101,10 @@ const updateClient = async (req, res) => {
 const getAllClients = async (req, res) => {
 
   try {
-    const clients = await ClientModel.find().populate({
+    const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+    const clients = await ClientModel.find().skip(skip).limit(10).populate({
       path: 'events',
       model: 'Event',
       populate: [
@@ -133,7 +136,10 @@ const getAllClients = async (req, res) => {
 const getPreWedClients = async (req, res) => {
 
   try {
-    const clients = await ClientModel.find({ preWedding: true }).populate({
+    const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+    const clients = await ClientModel.find({ preWedding: true }).skip(skip).limit(10).populate({
       path: 'deliverables',
       model: 'Deliverable',
       populate: {

@@ -62,15 +62,25 @@ const Header = (args) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const removeId = (obj) => {
+    const { _id, ...rest } = obj;
+    return rest;
+  };
   const getUserData = async () => {
     const currentUser = JSON.parse(Cookies.get("currentUser"));
     setUserData(currentUser);
     const data = await getUserNotifications();
-    const todayNotifications = data?.filter(
+    const uniqueData = data?.filter((item, index, self) =>
+      index === self.findIndex((t) => JSON.stringify(removeId(t)) === JSON.stringify(removeId(item)))
+    );
+    
+    const todayNotifications = uniqueData?.filter(
       (noti) =>
         dayjs(noti.date).format("YYYY-MM-DD") === dayjs().format("YYYY-MM-DD")
     );
-    const previousNotifications = data?.filter(
+    
+    const previousNotifications = uniqueData?.filter(
       (noti) =>
         dayjs(noti.date).format("YYYY-MM-DD") !== dayjs().format("YYYY-MM-DD")
     );
@@ -83,8 +93,7 @@ const Header = (args) => {
   };
   const notifications = useSelector((state) => state.notifications);
   const [confirmPassword, setConfirmPassword] = useState(null);
-  const currentUser =
-    Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+  const currentUser =Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
   function CheckPassword(submittedPassword) {
     if (submittedPassword?.length < 8) {
@@ -354,10 +363,11 @@ const Header = (args) => {
           target={targetNoti.current}
           show={showNoti}
           placement="bottom"
+          
         >
           {(props) => (
             <Tooltip id="overlay-example" {...props}>
-              <div style={{ width: "420px" }}>
+              <div style={{ width: "420px"  }}>
                 <div className="nav_Noti_popover Text18S white">
                   <div>Notifications</div>
                 </div>

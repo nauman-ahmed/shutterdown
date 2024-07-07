@@ -13,7 +13,10 @@ const addTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await taskSchema.find().populate("client assignBy assignTo")
+    const page = parseInt(req.query.page) || 1;
+    console.log(page);
+    const skip = (page - 1) * 10;
+    const tasks = await taskSchema.find().skip(skip).limit(10).populate("client assignBy assignTo")
     res.status(200).json(tasks);
   } catch (error) {
     console.log(error, 'taskData');
@@ -22,7 +25,10 @@ const getAllTasks = async (req, res) => {
 
 const getPendingTasks = async (req, res) => {
   try {
-    const tasks = await taskSchema.find({ended : false}).populate("client assignBy assignTo")
+    const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+    const tasks = await taskSchema.find({ended : false}).skip(skip).limit(10).populate("client assignBy assignTo")
     res.status(200).json(tasks);
   } catch (error) {
     console.log(error, 'taskData');
@@ -31,7 +37,10 @@ const getPendingTasks = async (req, res) => {
 
 const getEditorTasks = async (req, res) => {
   try {
-    const tasks = await taskSchema.find({assignTo : req.params.editorId, ended : false}).populate("client assignBy assignTo")
+    const page = parseInt(req.query.page) || 1;
+    console.log(page);
+    const skip = (page - 1) * 10;
+    const tasks = await taskSchema.find({assignTo : req.params.editorId, ended : false}).skip(skip).limit(10).populate("client assignBy assignTo")
 
     // const Editor=await userSchema.find({rollSelect:"Editor"})
     res.status(200).json(tasks);

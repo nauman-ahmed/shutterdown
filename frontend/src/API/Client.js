@@ -90,9 +90,9 @@ export const addAlbumsDeliverables = async (client) => {
   }
 };
 
-export const getClients = async () => {
+export const getClients = async (page) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getAllClients`, {
+    const res = await axios.get(BASE_URL + `/Client/getAllClients?page=${page}`, {
       Headers: { "Content-Type": "application/json" },
     });
     return res.data;
@@ -100,9 +100,9 @@ export const getClients = async () => {
     console.log(error);
   }
 };
-export const getPreWedClients = async () => {
+export const getPreWedClients = async (page) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getPreWedClients`, {
+    const res = await axios.get(BASE_URL + `/Client/getPreWedClients?page=${page}`, {
       Headers: { "Content-Type": "application/json" },
     });
     return res.data;

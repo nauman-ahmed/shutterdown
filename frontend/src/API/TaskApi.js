@@ -28,12 +28,15 @@ export const updateTaskData = async (data) => {
     }
 }
 
-export const getAllTasks = async () => {
+export const getAllTasks = async (page) => {
     try {
         const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getAllTasks`, {
             Headers: {
                 "Content-Type": "application/json"
             },
+            params : {
+                page : page
+            }
         })
         return res.data
     } catch (error) {
@@ -41,9 +44,9 @@ export const getAllTasks = async () => {
     }
 }
 
-export const getPendingTasks = async () => {
+export const getPendingTasks = async (page) => {
     try {
-        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getPendingTasks`, {
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getPendingTasks?page=${page}`, {
             Headers: {
                 "Content-Type": "application/json"
             },
@@ -54,10 +57,10 @@ export const getPendingTasks = async () => {
     }
 }
 
-export const getEditorTasks = async () => {
+export const getEditorTasks = async (page) => {
     try {
         const currentUser = JSON.parse(Cookies.get('currentUser'));
-        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getEditorTasks/${currentUser._id}`, {
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getEditorTasks/${currentUser._id}?page=${page}`, {
             Headers: {
                 "Content-Type": "application/json"
             },

@@ -17,14 +17,19 @@ function DailyTasks(props) {
   const [filterBy, setFilterBy] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
 
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [filterCondition, setFilterCondition] = useState(null);
+
   const getTaskData = async () => {
     try {
       if (currentUser.rollSelect === "Manager") {
-        const allData = await getPendingTasks();
+        const allData = await getPendingTasks(page);
         setAllTasks(allData);
         setTasksToShow(allData);
       } else if (currentUser.rollSelect === "Editor") {
-        const editorTasks = await getEditorTasks();
+        const editorTasks = await getEditorTasks(page);
         setAllTasks(editorTasks);
         setTasksToShow(editorTasks);
       }
@@ -37,7 +42,62 @@ function DailyTasks(props) {
     getTaskData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const fetchTasks = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        let data;
+        if (currentUser.rollSelect === "Manager") {
+          data = await getPendingTasks(page === 1 ? page + 1 : page);
+         
+        } else if (currentUser.rollSelect === "Editor") {
+          data = await getEditorTasks(page === 1 ? page + 1 : page);
+        }
+       
+        if (data.length > 0) {
+          let dataToAdd;
+         
+            setAllTasks([...allTasks, ...data])
+            if(filterCondition){
+              dataToAdd = data.filter(task => eval(filterCondition))
+            } else {
+              dataToAdd = data
+            }
+            setTasksToShow([...tasksToShow, ...dataToAdd]);
+          
 
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(tasksToShow?.length < 10 && hasMore && !loading){
+      fetchTasks()
+    }
+  }, [tasksToShow])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchTasks();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
   const updateTask = async (index) => {
     const taskDataToUpdate = tasksToShow[index];
     if (!taskDataToUpdate.deadlineDate) {
@@ -112,7 +172,7 @@ function DailyTasks(props) {
       }else{
         finalCond = "(" + conditionTo +")" 
       }
-      console.log(finalCond);
+      setFilterCondition(finalCond)
       const newData = allTasks.filter(task => eval(finalCond))
       setTasksToShow(newData)
     }else{
@@ -136,6 +196,7 @@ function DailyTasks(props) {
       <ToastContainer />
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} title={"Daily Tasks"} updateData={getTaskData} filter />
       {tasksToShow ? (
+         <>
         <Table
           hover
           bordered
@@ -422,6 +483,18 @@ function DailyTasks(props) {
             </>
           </tbody>
         </Table>
+       
+         {loading && (
+           <div className="d-flex my-3 justify-content-center align-items-center">
+            <div class="spinner"></div>
+          </div>
+        )}
+        {!hasMore && (
+          <div className="d-flex my-3 justify-content-center align-items-center">
+            <div>No more data to load.</div>
+          </div>
+        )}
+        </>
       ) : (
         <div
           style={{ height: "400px" }}

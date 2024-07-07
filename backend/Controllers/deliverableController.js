@@ -4,7 +4,10 @@ const eventModel = require('../models/EventModel');
 
 const getCinematography = async (req, res) => {
     try {
-        const cinematographyDeliverables = await DeliverableModel.find({ deliverableName: { $in: ['Long Film', 'Reel', 'Promo'] } }).populate('client editor');
+        const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+        const cinematographyDeliverables = await DeliverableModel.find({ deliverableName: { $in: ['Long Film', 'Reel', 'Promo'] } }).skip(skip).limit(10).populate('client editor');
         res.status(200).json(cinematographyDeliverables);
     } catch (error) {
         console.log(error);
@@ -12,7 +15,10 @@ const getCinematography = async (req, res) => {
 }
 const getAlbums = async (req, res) => {
     try {
-        const albumsDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['CMYK', 'RGB'] } }).populate('client editor');
+        const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+        const albumsDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['CMYK', 'RGB'] } }).skip(skip).limit(10).populate('client editor');
         res.status(200).json(albumsDeliverables);
     } catch (error) {
         console.log(error);
@@ -20,7 +26,10 @@ const getAlbums = async (req, res) => {
 }
 const getPhotos = async (req, res) => {
     try {
-        const photosDeliverables = await DeliverableModel.find({ deliverableName: 'Photos' }).populate('client editor');
+        const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+        const photosDeliverables = await DeliverableModel.find({ deliverableName: 'Photos' }).skip(skip).limit(10).populate('client editor');
         res.status(200).json(photosDeliverables);
     } catch (error) {
         console.log(error);
@@ -28,7 +37,10 @@ const getPhotos = async (req, res) => {
 }
 const getPreWeds = async (req, res) => {
     try {
-        const preWedDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['Pre-Wedding Photos', 'Pre-Wedding Videos'] } }).populate('client editor');
+        const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+        const preWedDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['Pre-Wedding Photos', 'Pre-Wedding Videos'] } }).skip(skip).limit(10).populate('client editor');
         res.status(200).json(preWedDeliverables);
     } catch (error) {
         console.log(error);

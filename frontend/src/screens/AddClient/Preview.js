@@ -39,8 +39,8 @@ function Preview() {
     if (requesting === false ) {
       setRequesting(true);
       const saveResult = await SaveClientForm(clientData); 
-      dispatch({ type: 'SOCKET_EMIT_EVENT', payload: { event: 'add-notification', data : { notificationOf : 'client', data : saveResult.data, forManager : true, read : false, readBy : [currentUser._id], } } })
       setRequesting(false);
+      dispatch({ type: 'SOCKET_EMIT_EVENT', payload: { event: 'add-notification', data : { notificationOf : 'client', data : saveResult.data, forManager : true, read : false, readBy : [currentUser._id], } } })
       const storedEvents = await getEvents();
       dispatch(updateAllEvents(storedEvents.data));
       dispatch(updateClintData({ albums: [""] }));
