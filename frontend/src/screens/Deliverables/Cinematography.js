@@ -157,7 +157,7 @@ const priority = {
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
-      setEditors(res.editors.filter(user => user.subRole.includes('Videographer')))
+      setEditors(res.editors.filter(user => user.subRole.includes("Cinematographer")))
     } catch (error) {
       console.log(error)
     }
