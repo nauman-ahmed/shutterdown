@@ -70,6 +70,25 @@ export const getEvents = async (clientId) => {
         console.log(error);
     }
 }
+
+export const getEventsByMonths = async (currentMonth) => { 
+    try {
+        console.log("CURRENT",currentMonth)
+        const res = await axios.post(BASE_URL +
+            '/getAllEvents/byMonths',
+            {
+                Headers: {
+                    'Content-Type': 'application/json',
+                },
+                currentMonth
+            },
+        );
+        return res;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const deleteEvent = async (eventId) => {
     try {
         const res = await axios.delete(BASE_URL +

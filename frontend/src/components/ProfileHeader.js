@@ -101,8 +101,15 @@ function ProfileHeader({ attendence = false, profile = false }) {
                 <div className="Text12Semi">
                   Sub Role
                 </div>
-                <div className=" mtsmall">
-                  {user.subRole || 'Not Selected'}
+                <div className=" mtsmall d-flex">
+                  {user.subRole.length > 0 ? 
+                    user.subRole.map((role,index) => (
+                      <div className="mx-1">
+                        {role}{index < user.subRole.length - 1 ? "," : null}
+                      </div>
+                    ))
+                  : "Not Selected"
+                  }
                 </div>
               </div>
               <div>

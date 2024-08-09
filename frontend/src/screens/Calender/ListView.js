@@ -45,7 +45,6 @@ function ListView(props) {
   const [clientData, setClientData] = useState(null);
   const [allEvents, setAllEvents] = useState([]);
   const [eventsForShow, setEventsForShow] = useState(null);
-  const [allUsers, setAllUsers] = useState([]);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [filterFor, setFilterFor] = useState("day");
   const [updatingIndex, setUpdatingIndex] = useState(null);
@@ -58,6 +57,15 @@ function ListView(props) {
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [filteringDay, setFilteringDay] = useState(null);
+
+  const [directors, setDirectors] = useState([]);
+  const [assistant, setAssistant] = useState([]);
+  const [photographer, setPhotographer] = useState([]);
+  const [cinematographer, setCinematographer] = useState([]);
+  const [flyer, setFlyer] = useState([]);
+  const [manager, setManager] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+
 
   const dispatch = useDispatch();
   const { clientId } = useParams()
@@ -102,12 +110,29 @@ function ListView(props) {
     return groupedByBrideName
   }
   
-  
+  const getFilterdUsers = (users) => {
+    const DirectorDummy = users.filter(user => user.subRole.includes("Shoot Director"))
+    const AssitantsDummy = users.filter(user => user.subRole.includes("Assistant"))
+    const PhotographerDummy = users.filter(user => user.subRole.includes("Photographer"))
+    const CinematographerDummy = users.filter(user => user.subRole.includes("Cinematographer"))
+    const FlyerDummy = users.filter(user => user.subRole.includes("Drone Flyer"))
+    const ManagerDummy = users.filter(user => user.subRole.includes("Manager"))
+
+    setDirectors(DirectorDummy)
+    setAssistant(AssitantsDummy)
+    setPhotographer(PhotographerDummy)
+    setCinematographer(CinematographerDummy)
+    setFlyer(FlyerDummy)
+    setManager(ManagerDummy)
+  }   
 
   const getEventsData = async (clientId) => {
     try {
       const usersData = await getAllUsers();
-      setAllUsers(usersData.users);
+      setAllUsers(usersData.users)
+
+      getFilterdUsers(usersData.users) // FUNCTION TO FILTER USERS
+
       const res = await getEvents(clientId);
       if (currentUser.rollSelect === "Manager") {
         setAllEvents(res.data);
@@ -378,23 +403,23 @@ function ListView(props) {
                     <th className="tableBody">Event Type</th>
                     {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Director</th>
-                    <th className="tableBody">
+                    <th className="tableBody mx-1">
                       Photographers
                       <img alt="" src={Camera} />
                     </th>
-                    <th className="tableBody">
+                    <th className="tableBody mx-1">
                       Cinematographers
                       <img alt="" src={Video} />
                     </th>
-                    <th className="tableBody">
+                    <th className="tableBody mx-1">
                       Drone Flyers
                       <img alt="" src={Drone} />
                     </th>
-                    <th className="tableBody">
+                    <th className="tableBody mx-1">
                       Manager
                       <img alt="" src={Manager} />
                     </th>
-                    <th className="tableBody">
+                    <th className="tableBody mx-1">
                       Assistants
                       <img alt="" src={Assistant} />
                     </th>
@@ -552,14 +577,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"shootDirectors"}
+                                  message={"Shoot Directors"}
                                   teble={true}
                                   allowedPersons={event?.shootDirector}
-                                  usersToShow={allUsers}
+                                  usersToShow={directors}
                                   currentEvent={event}
                                   allEvents={allEvents}
                                   existedUsers={event?.shootDirectors}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].shootDirectors =
                                       Array.isArray(event?.shootDirectors)
                                         ? [...event?.shootDirectors, userObj]
@@ -568,13 +595,13 @@ function ListView(props) {
                                       setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].shootDirectors =
                                       event?.shootDirectors.filter(
                                         (director) => director !== userObj
                                       );
                                       setEventsForShow(updatedEvents)
-                                    setAllEvents(updatedEvents);
+                                      setAllEvents(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.shootDirectors) &&
@@ -592,12 +619,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"choosenPhotographers"}
+                                  message={"Photographers"}
                                   teble={true}
                                   allowedPersons={event?.photographers}
-                                  usersToShow={allUsers}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
+                                  usersToShow={photographer}
                                   existedUsers={event?.choosenPhotographers}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].choosenPhotographers =
                                       Array.isArray(event?.choosenPhotographers)
                                         ? [
@@ -609,7 +640,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].choosenPhotographers =
                                       event?.choosenPhotographers.filter(
                                         (existingUser) =>
@@ -634,12 +665,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"choosenCinematographers"}
+                                  message={"Cinematographers"}
                                   teble={true}
+                                  currentEvent={event}
+                                  allEvents={cinematographer}
                                   allowedPersons={event?.cinematographers}
                                   usersToShow={allUsers}
                                   existedUsers={event?.choosenCinematographers}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[
                                       index
                                     ].choosenCinematographers = Array.isArray(
@@ -654,7 +689,7 @@ function ListView(props) {
                                     setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[
                                       index
                                     ].choosenCinematographers =
@@ -686,12 +721,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"droneFlyers"}
+                                  message={"Drone Flyers"}
                                   teble={true}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
                                   allowedPersons={event?.drones}
-                                  usersToShow={allUsers}
+                                  usersToShow={flyer}
                                   existedUsers={event?.droneFlyers}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].droneFlyers =
                                       Array.isArray(event?.droneFlyers)
                                         ? [...event?.droneFlyers, userObj]
@@ -700,7 +739,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].droneFlyers =
                                       event?.droneFlyers.filter(
                                         (existingUser) =>
@@ -725,12 +764,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"manager"}
+                                  message={"Manager"}
                                   teble={true}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
                                   allowedPersons={1}
-                                  usersToShow={allUsers}
+                                  usersToShow={manager}
                                   existedUsers={event?.manager}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].manager =
                                       Array.isArray(event?.manager)
                                         ? [...event?.manager, userObj]
@@ -739,7 +782,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].manager =
                                       event?.manager.filter(
                                         (existingUser) =>
@@ -764,12 +807,16 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
+                                  role={"assistants"}
+                                  message={"Assistants"}
                                   teble={true}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
                                   allowedPersons={1}
-                                  usersToShow={allUsers}
+                                  usersToShow={assistant}
                                   existedUsers={event?.assistants}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].assistants =
                                       Array.isArray(event?.assistants)
                                         ? [...event?.assistants, userObj]
@@ -778,7 +825,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].assistants =
                                       event?.assistants.filter(
                                         (existingUser) =>
@@ -812,12 +859,16 @@ function ListView(props) {
                                   {event?.sameDayPhotoEditor}
                                 </p>
                                 <ShootDropDown
+                                  role={"sameDayPhotoMakers"}
+                                  message={"Same Day Photo Makers"}
                                   teble={true}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
                                   allowedPersons={event?.sameDayPhotoEditors}
-                                  usersToShow={allUsers}
+                                  usersToShow={photographer}
                                   existedUsers={event?.sameDayPhotoMakers}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].sameDayPhotoMakers =
                                       Array.isArray(event?.sameDayPhotoMakers)
                                         ? [
@@ -829,7 +880,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].sameDayPhotoMakers =
                                       event?.sameDayPhotoMakers.filter(
                                         (existingUser) =>
@@ -863,12 +914,16 @@ function ListView(props) {
                                   {event?.sameDayVideoEditor}
                                 </p>
                                 <ShootDropDown
+                                  role={"sameDayVideoEditors"}
+                                  message={"Same Day Video Makers"}
                                   teble={true}
                                   allowedPersons={event?.sameDayVideoEditors}
-                                  usersToShow={allUsers}
+                                  currentEvent={event}
+                                  allEvents={allEvents}
+                                  usersToShow={cinematographer}
                                   existedUsers={event?.sameDayVideoMakers}
                                   userChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].sameDayVideoMakers =
                                       Array.isArray(event?.sameDayVideoMakers)
                                         ? [
@@ -880,7 +935,7 @@ function ListView(props) {
                                         setAllEvents(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
-                                    const updatedEvents = [...allEvents];
+                                    const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].sameDayVideoMakers =
                                       event?.sameDayVideoMakers.filter(
                                         (existingUser) =>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import "../assets/css/common.css";
 import "../assets/css/Profile.css";
@@ -8,18 +8,22 @@ import "../App.css";
 import { Button, Table } from "reactstrap";
 import Chat from "../assets/Profile/Chat.svg";
 import Heart from "../assets/Profile/Heart.svg";
-import { getEvents } from "../API/Event";
+import { getEvents, getEventsByMonths } from "../API/Event";
 import dayjs from 'dayjs';
 import Cookies from "js-cookie";
 import { updateAllEvents } from "../redux/eventsSlice";
+import moment from 'moment';
 
 function CalenderBar(props) {
+  const [currentMonth, setCurrentMonth] = useState(moment().format('MMMM'));
   const EventsList = useSelector(state => state.allEvents);
   const dispatch = useDispatch()
   const currentUser = JSON.parse(Cookies.get('currentUser'));
+  
   const getEventsData = async () => {
     try {
-      const res = await getEvents();
+      // const res = await getEvents();
+      const res = await getEventsByMonths(currentMonth);
       if (currentUser.rollSelect === 'Manager') {
         dispatch(updateAllEvents(res?.data));
       } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
@@ -53,8 +57,7 @@ function CalenderBar(props) {
 
   useEffect(() => {
     getEventsData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [currentMonth])
 
   function getCurrentMonthAndYear() {
     const months = [
@@ -113,7 +116,21 @@ function CalenderBar(props) {
                   >
                     Summary
                   </Button>
-                  <img alt="" src={Chat} style={{ marginRight: '15px' }} />
+                  <div>
+                    <Button
+                      className="mx-1 mt-1"
+                      onClick={() => setCurrentMonth(moment().month(currentMonth).add(-1,"months").format('MMMM'))}
+                    >
+                      {"<"}
+                    </Button>
+                    <Button
+                      className="mx-1 mt-1"
+                      onClick={() => setCurrentMonth(moment().month(currentMonth).add(1,"months").format('MMMM'))}
+                    >
+                      {">"}
+                    </Button>
+                  </div>
+                  {/* <img alt="" src={Chat} style={{ marginRight: '15px' }} /> */}
                 </div>
                 <Table
                   // bordered

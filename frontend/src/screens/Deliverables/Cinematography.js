@@ -14,6 +14,7 @@ import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { getAllWhatsappText } from "../../API/Whatsapp";
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 import { Editor } from "react-draft-wysiwyg";
+import { getAllUsers } from "../../API/userApi";
 
 function Cinematography(props) {
   const [editors, setEditors] = useState(null);
@@ -156,7 +157,7 @@ const priority = {
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
-      setEditors(res.editors.filter(user => user.subRole === 'Videographer'))
+      setEditors(res.editors.filter(user => user.subRole.includes('Videographer')))
     } catch (error) {
       console.log(error)
     }
@@ -193,7 +194,7 @@ const priority = {
           if(obj.title === 'Unassigned Editor'){
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
           }else{
-            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.firstName === '" + obj.title + "'" : " deliverable.firstName === '" + obj.title + "'"
+            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor?.firstName === '" + obj.title + "'" : " deliverable.editor?.firstName === '" + obj.title + "'"
           }
         }else if(obj.parentTitle == "Current Status"){
           conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
@@ -207,6 +208,8 @@ const priority = {
           }else{
             finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
           }
+        }else if(conditionStatus){
+          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus +")" 
         }else{
           finalCond = "(" + conditionDeliverable + ")" 
         }
@@ -226,49 +229,49 @@ const priority = {
     }
   }
 
-  const applyFilter = (filterValue) => {
-    setDeliverablesForShow(null)
-    if(filterValue == null){
-      setDeliverablesForShow(allDeliverables)
-      return
-    }
-    if (filterBy === 'Assigned Editor') {
-      filterValue === 'Any' ? 
-      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
-      : filterValue === 'Unassigned Editor' ?
-      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-      :
-      setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
-    } else if (filterBy === 'Deliverable') {
-      filterValue === 'All' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.deliverableName === filterValue))
-    } else if (filterBy === 'Current Status') {
-      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
-    } else if (filterBy === 'Deadline sorting') {
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline);
-          const dateB = new Date(b.clientDeadline);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    } else if (filterBy === 'Wedding Date sorting') {
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
-          const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    }
-  }
+  // const applyFilter = (filterValue) => {
+  //   setDeliverablesForShow(null)
+  //   if(filterValue == null){
+  //     setDeliverablesForShow(allDeliverables)
+  //     return
+  //   }
+  //   if (filterBy === 'Assigned Editor') {
+  //     filterValue === 'Any' ? 
+  //     setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
+  //     : filterValue === 'Unassigned Editor' ?
+  //     setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+  //     :
+  //     setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
+  //   } else if (filterBy === 'Deliverable') {
+  //     filterValue === 'All' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.deliverableName === filterValue))
+  //   } else if (filterBy === 'Current Status') {
+  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
+  //   } else if (filterBy === 'Deadline sorting') {
+  //     let sortedArray;
+  //     if (filterValue === 'No Sorting') {
+  //       sortedArray = [...deliverablesForShow]; // Create a new array
+  //     } else {
+  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
+  //         const dateA = new Date(a.clientDeadline);
+  //         const dateB = new Date(b.clientDeadline);
+  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+  //       });
+  //     }
+  //     setDeliverablesForShow([...sortedArray]);
+  //   } else if (filterBy === 'Wedding Date sorting') {
+  //     let sortedArray;
+  //     if (filterValue === 'No Sorting') {
+  //       sortedArray = [...deliverablesForShow]; // Create a new array
+  //     } else {
+  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
+  //         const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
+  //         const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
+  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+  //       });
+  //     }
+  //     setDeliverablesForShow([...sortedArray]);
+  //   }
+  // }
 
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
@@ -335,7 +338,7 @@ const priority = {
               bordered
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect === 'Manager' ? { width: '120%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect === 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
                 {currentUser?.rollSelect === 'Editor' ?
@@ -390,7 +393,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}
                             className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
                           >
@@ -404,7 +406,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }} >
                             <div>
                               {deliverable?.deliverableName} : {deliverable?.quantity}
@@ -415,7 +416,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -431,7 +431,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}  >
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
                           </td>
@@ -440,7 +439,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
@@ -450,7 +448,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}
                           >
                             <input
@@ -462,7 +459,7 @@ const priority = {
                                 updatedDeliverables[index].companyDeadline = e.target.value;
                                 setAllDeliverables(updatedDeliverables);
                               }}
-                              min={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
+                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -470,7 +467,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}
                           >
 
@@ -484,6 +480,7 @@ const priority = {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -491,7 +488,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }}>
 
                             <input
@@ -504,13 +500,13 @@ const priority = {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "15%"
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -527,7 +523,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "15%"
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
@@ -536,7 +531,6 @@ const priority = {
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
-                            width: '10%',
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
@@ -555,7 +549,6 @@ const priority = {
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
-                            width: '15%',
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
@@ -573,7 +566,6 @@ const priority = {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width: "10%"
                             }} >
                             <button className="btn btn-primary "
                               onClick={(e) => updatingIndex === null && handleSaveData(index)} >

@@ -106,9 +106,9 @@ const userSchema = mongoose.Schema({
   passport : {
     type : String
   },
-  subRole : {
+  subRole : [{
     type : String
-  },
+  }],
   photo : {
     type : String
   },

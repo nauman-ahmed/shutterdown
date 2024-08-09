@@ -88,10 +88,7 @@ tr:first-child {
      border-width: 0px !important;
 }
 
-.table-striped>tbody>tr:nth-child(2n+1)>td,
-.table-striped>tbody>tr:nth-child(2n+1)>th {
-     color: 'red' !important;
-}
+
 
 /* th:first-child{
      border-bottom-left-radius: 20px !important;
@@ -360,6 +357,15 @@ blockquote h3:after {
 
 /* This is Job Section Styling */
 
+.userInput {
+     outline: none;
+     border: 0.5px solid;
+     border-radius: 7px;
+     /* background-color: #eff0f5; */
+     padding: 12px;
+     width: 75%;
+}
+
 .JobInput {
      outline: none;
      border: none;
@@ -379,17 +385,20 @@ blockquote h3:after {
 }
 
 .JobInputDrop {
-     outline: none;
-     border: none;
      font-size: 16px;
      border-radius: 7px;
-     background-color: #eff0f5;
-     padding: 6px 12px 6px 12px;
      font-family: "Roboto Regular";
+
+     display: inline-block;
+     width: 100%;
+     padding: 10px; /* Padding for the text */
+     padding-right: 30px; /* Extra padding for the arrow */
+     -webkit-appearance: none;
+     -moz-appearance: none;
+     appearance: none;
+     background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE2IDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMWw2IDZsNi02IiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgLz48L3N2Zz4=') no-repeat right 10px center;
+     background-size: 10px 10px; /* Adjust size of the arrow */
 }
-
-
-
 
 @media only screen and (max-width: 800px) {
      .ViewClientWidth {

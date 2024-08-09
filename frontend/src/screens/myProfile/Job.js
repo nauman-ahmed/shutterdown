@@ -71,7 +71,16 @@ function Job() {
                     </Col>
                     <Col xs="6" sm="6">
                       <div className="Text10N gray mt12">Sub Role</div>
-                      <div className="Text10N black mt12">{userData?.subRole}</div>
+                      <div className="Text10N black mt12">
+                      {userData.subRole.length > 0 ? 
+                        userData.subRole.map(role => (
+                          <div>
+                            {role}
+                          </div>
+                        ))
+                      : "Not Selected"
+                      }
+                      </div>
                     </Col>
                     <Col xs="6" sm="6">
                       <div className="Text10N gray mt12">Shift Timing</div>
@@ -118,7 +127,7 @@ function Job() {
                 <option value="Part Time">Part Time</option>
               </select>
             </Col>
-            <Col xl="6" sm="6" className="p-2">
+            {/* <Col xl="6" sm="6" className="p-2">
               <div className="label">Sub Role</div>
               <select name="subRole" className="JobInputDrop" placeholder="Job_Type" defaultValue={userData?.subRole} onChange={handleChange}>
                 <option value="">Select</option>
@@ -136,7 +145,7 @@ function Job() {
                   </>
                 )}
               </select>
-            </Col>
+            </Col> */}
             <Col xl="12" sm="12" className="p-2">
               <div className="label">Shift Timing</div>
               <input type="text" name="shiftTiming" placeholder="Shift_Timing" className="JobInput" defaultValue={userData?.shiftTiming} onChange={handleChange} />

@@ -119,6 +119,7 @@ function Calender() {
             eventContent={(eventInfo) => {
               return (
                 <div className="d-block" style={{ cursor: "pointer" }}>
+
                   <div className="rowalign2 p4 " >
                     <div className="Text10N white ">
                       <FaDirections color="black"/>
@@ -128,7 +129,7 @@ function Calender() {
                       style={{ marginLeft: "5px", width: "100%",  }}
                     >
                       {" "}
-                      • {eventInfo.event?.extendedProps.eventType}
+                      • {eventInfo.event?.extendedProps.client?.brideName} X  {eventInfo.event?.extendedProps.client?.groomName}
                     </div>
                   </div>
                 </div>
@@ -153,7 +154,6 @@ function Calender() {
               if(poperReferencd.current){
                 poperReferencd.current.hide();
               }
-              console.log("ON CLICK",info.event?.extendedProps.client);
               navigate('/MyProfile/Calender/ListView/'+info.event?.extendedProps.client._id);
             }}
             eventMouseEnter={(info) => {
@@ -169,7 +169,7 @@ function Calender() {
                 content: `
               <div class="popover-custom-content">
                 <div class="rowalign px-auto mb-2 weds">
-                  <div className="col-12">${info.event?.extendedProps.client?.brideName} weds  ${info.event?.extendedProps.client?.groomName}</div>
+                  <div className="col-12">${info.event?.extendedProps.client?.brideName} X  ${info.event?.extendedProps.client?.groomName}</div>
                 </div>
                 <div class="rowalign">
                   <div >Photographers : </div>

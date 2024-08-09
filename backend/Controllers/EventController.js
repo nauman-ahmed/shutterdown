@@ -1,6 +1,7 @@
 const EventModel = require('../models/EventModel');
 const ClientModel = require('../models/ClientModel');
 const eventModel = require('../models/EventModel');
+const moment = require('moment');
 
 
 const AddEvent = async (req, res) => {
@@ -66,6 +67,49 @@ const updateEvent = async (req, res) => {
     }
 };
 
+const getEventsByMonth = async (req, res) => {
+    try {
+
+        let currentMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').toDate()
+        let endOfMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate()
+        
+        const query = {
+            eventDate: {
+              $gte: currentMonth,
+              $lte: endOfMonth
+            }
+          };
+        
+        const events = await EventModel.find(query).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        
+        // Step 1: Sort by eventDate
+        events.sort((a, b) => {
+            const dateA = new Date(a.eventDate);
+            const dateB = new Date(b.eventDate);
+            return dateA - dateB 
+        })
+        
+        // Step 2: Group by brideName, but store the result as an array of objects
+        const groupedByBrideName = events.reduce((acc, event) => {
+            const brideName = event.client.brideName;
+            const found = acc.find(item => item.client.brideName === brideName);
+            const index = acc.findIndex(item => item.client.brideName === brideName);
+            if (!found) {
+                // If no existing group for this brideName, create a new group
+                acc.push(event);
+            } else {
+                // Add to the existing group's events array
+                acc.splice(index+1, 0, event);
+            }
+            return acc;
+        }, []);
+        
+        res.status(200).json(groupedByBrideName);
+    } catch (error) {
+        console.log(error, 'error');
+    }
+};
+
 const getEvents = async (req, res) => {
     try {
         let obj = {};
@@ -115,4 +159,4 @@ const DeleteEvent = async (req, res) => {
 };
 
 
-module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam }
+module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth }

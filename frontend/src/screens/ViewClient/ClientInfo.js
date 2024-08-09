@@ -153,6 +153,7 @@ function ClientInfo() {
   };
   return (
     <div>
+      {console.log("clientData",clientData)}
       <Table bordered hover responsive>
         <thead>
           <tr
@@ -169,6 +170,7 @@ function ClientInfo() {
             <th>Reels</th>
             <th>Promo</th>
             <th>Payment Status</th>
+            <th>Client Suggestion</th>
           </tr>
         </thead>
         <tbody
@@ -214,6 +216,7 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.reels}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.promos}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.suggestion}</td>
           </tr>
         </tbody>
       </Table>

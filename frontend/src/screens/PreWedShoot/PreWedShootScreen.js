@@ -27,6 +27,11 @@ function PreWedShootScreen() {
   const [show, setShow] = useState(false);
   const [shooters, setShooters] = useState([]);
 
+  const [assistant, setAssistant] = useState([]);
+  const [photographer, setPhotographer] = useState([]);
+  const [cinematographer, setCinematographer] = useState([]);
+  const [flyer, setFlyer] = useState([]);
+
   const toggle = () => {
     setShow(!show);
   };
@@ -76,11 +81,26 @@ function PreWedShootScreen() {
     "Date Filter": 1
   };
 
+  const getFilterdUsers = (users) => {
+    const AssitantsDummy = users.filter(user => user.subRole.includes("Assistant"))
+    const PhotographerDummy = users.filter(user => user.subRole.includes("Photographer"))
+    const CinematographerDummy = users.filter(user => user.subRole.includes("Cinematographer"))
+    const FlyerDummy = users.filter(user => user.subRole.includes("Drone Flyer"))
+
+    setAssistant(AssitantsDummy)
+    setPhotographer(PhotographerDummy)
+    setCinematographer(CinematographerDummy)
+    setFlyer(FlyerDummy)
+  }   
+
   const getClients = async () => {
     try {
       const allPreWedClients = await getPreWedClients();
       const res = await getShooters();
+
       setShooters(res.shooters)
+      getFilterdUsers(res.shooters)
+
       if (currentUser.rollSelect === 'Manager') {
         setPreWedClients(allPreWedClients);
         setClientsForShow(allPreWedClients);
@@ -279,7 +299,7 @@ function PreWedShootScreen() {
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client.preWedphotographers}
-                              usersToShow={shooters}
+                              usersToShow={photographer}
                               existedUsers={client?.preWeddingDetails?.photographers}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
@@ -306,7 +326,7 @@ function PreWedShootScreen() {
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedcinematographers}
-                              usersToShow={shooters}
+                              usersToShow={cinematographer}
                               existedUsers={client?.preWeddingDetails?.cinematographers}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
@@ -336,7 +356,7 @@ function PreWedShootScreen() {
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedassistants}
-                              usersToShow={shooters}
+                              usersToShow={assistant}
                               existedUsers={client?.preWeddingDetails?.assistants}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
@@ -366,7 +386,7 @@ function PreWedShootScreen() {
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWeddrones}
-                              usersToShow={shooters}
+                              usersToShow={flyer}
                               existedUsers={client?.preWeddingDetails?.droneFlyers}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];

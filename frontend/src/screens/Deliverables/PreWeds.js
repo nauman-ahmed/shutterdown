@@ -141,7 +141,7 @@ function PreWedDeliverables() {
           if(obj.title === 'Unassigned Editor'){
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
           }else{
-            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.firstName === '" + obj.title + "'" : " deliverable.firstName === '" + obj.title + "'"
+            conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor?.firstName === '" + obj.title + "'" : " deliverable.editor?.firstName === '" + obj.title + "'"
           }
         }else if(obj.parentTitle == "Current Status"){
           conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
@@ -155,6 +155,8 @@ function PreWedDeliverables() {
           }else{
             finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
           }
+        }else if(conditionStatus){
+          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus +")" 
         }else{
           finalCond = "(" + conditionDeliverable + ")" 
         }
@@ -175,46 +177,46 @@ function PreWedDeliverables() {
     }
   }
 
-  const applyFilter = (filterValue) => {
-    setDeliverablesForShow(null)
-    if(filterValue == null){
-      setDeliverablesForShow(allDeliverables)
-      return
-    }
-    if (filterBy === 'Assigned Editor') {
-      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
-      : filterValue === 'Unassigned Editor' ?
-      setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-      : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
-    } else if (filterBy === 'Current Status') {
-      filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
-    } else if (filterBy === 'Deadline sorting') {
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline);
-          const dateB = new Date(b.clientDeadline);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    } else if (filterBy === 'Wedding Date sorting') {
-      console.log(filterValue);
-      let sortedArray;
-      if (filterValue === 'No Sorting') {
-        sortedArray = [...deliverablesForShow]; // Create a new array
-      } else {
-        sortedArray = [...deliverablesForShow].sort((a, b) => {
-          const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
-          const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
-          return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-        });
-      }
-      setDeliverablesForShow([...sortedArray]);
-    }
-  }
+  // const applyFilter = (filterValue) => {
+  //   setDeliverablesForShow(null)
+  //   if(filterValue == null){
+  //     setDeliverablesForShow(allDeliverables)
+  //     return
+  //   }
+  //   if (filterBy === 'Assigned Editor') {
+  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
+  //     : filterValue === 'Unassigned Editor' ?
+  //     setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+  //     : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
+  //   } else if (filterBy === 'Current Status') {
+  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
+  //   } else if (filterBy === 'Deadline sorting') {
+  //     let sortedArray;
+  //     if (filterValue === 'No Sorting') {
+  //       sortedArray = [...deliverablesForShow]; // Create a new array
+  //     } else {
+  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
+  //         const dateA = new Date(a.clientDeadline);
+  //         const dateB = new Date(b.clientDeadline);
+  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+  //       });
+  //     }
+  //     setDeliverablesForShow([...sortedArray]);
+  //   } else if (filterBy === 'Wedding Date sorting') {
+  //     console.log(filterValue);
+  //     let sortedArray;
+  //     if (filterValue === 'No Sorting') {
+  //       sortedArray = [...deliverablesForShow]; // Create a new array
+  //     } else {
+  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
+  //         const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
+  //         const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
+  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
+  //       });
+  //     }
+  //     setDeliverablesForShow([...sortedArray]);
+  //   }
+  // }
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -255,7 +257,7 @@ function PreWedDeliverables() {
               bordered
               responsive
               className="tableViewClient"
-              style={currentUser.rollSelect === 'Manager' ? { width: '120%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
+              style={currentUser.rollSelect === 'Manager' ? { width: '150%', marginTop: '15px' } : { width: '100%', marginTop: '15px' }}
             >
               <thead>
                 {currentUser?.rollSelect === 'Editor' ?
@@ -306,7 +308,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }}
                             className="tableBody Text14Semi sticky-column primary2 tablePlaceContent"
                           >
@@ -332,7 +333,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
@@ -348,7 +348,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }}  >
                             {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
                           </td>
@@ -357,7 +356,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }}
                           >
                             {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
@@ -367,7 +365,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }}
                           >
                             <input
@@ -426,7 +423,6 @@ function PreWedDeliverables() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"10%"
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
@@ -442,8 +438,7 @@ function PreWedDeliverables() {
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
-                            width: '10%',
-                          }} className="tableBody">
+                          }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
                               const updatedDeliverables = [...allDeliverables];
@@ -461,7 +456,6 @@ function PreWedDeliverables() {
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
-                            width: '10%',
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {

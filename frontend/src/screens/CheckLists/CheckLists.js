@@ -90,22 +90,22 @@ function CheckLists(props) {
   const handleSaveData = async (index) => {
     try {
       const client = allClients[index];
-      if (!client.checklistDetails) {
-        window.notify('Please Select the values!', 'error');
-        return
-      } else if (!client.checklistDetails.whatsAppGroup) {
-        window.notify('Please select whatsApp Group status!', 'error');
-        return
-      } else if (!client.checklistDetails.sopSentDate) {
-        window.notify("Please Select SOP's sent date!", 'error');
-        return
-      } else if (!client.checklistDetails.questionsSentDate) {
-        window.notify("Please Select questions sent date!", 'error');
-        return
-      } else if (!client.checklistDetails.iternaryCollection) {
-        window.notify("Please Select iternary Collection!", 'error');
-        return
-      }
+      // if (!client.checklistDetails) {
+      //   window.notify('Please Select the values!', 'error');
+      //   return
+      // } else if (!client.checklistDetails.whatsAppGroup) {
+      //   window.notify('Please select whatsApp Group status!', 'error');
+      //   return
+      // } else if (!client.checklistDetails.sopSentDate) {
+      //   window.notify("Please Select SOP's sent date!", 'error');
+      //   return
+      // } else if (!client.checklistDetails.questionsSentDate) {
+      //   window.notify("Please Select questions sent date!", 'error');
+      //   return
+      // } else if (!client.checklistDetails.iternaryCollection) {
+      //   window.notify("Please Select iternary Collection!", 'error');
+      //   return
+      // }
       setUpdatingIndex(index);
       await updateClient(client)
       setUpdatingIndex(null);
@@ -142,11 +142,11 @@ function CheckLists(props) {
             hover
             // borderless
             responsive
-            style={{ width: '100%', marginTop: '15px' }}
+            style={{ width: '150%', marginTop: '15px' }}
           >
             <thead>
               <tr className="logsHeader Text16N1">
-                <th className="tableBody">Client</th>
+                <th className="tableBody sticky-column">Client</th>
                 <th className="tableBody">WhatsApp Group</th>
                 <th className="tableBody">SOP Date</th>
                 <th className="tableBody">Questionnaire Date</th>
@@ -171,7 +171,7 @@ function CheckLists(props) {
                       }}
                     >
                       <td
-                        className="tableBody Text14Semi primary2"
+                        className="tableBody sticky-column Text14Semi primary2"
                         style={{
                           paddingTop: '15px',
                           paddingBottom: '15px',

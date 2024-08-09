@@ -12,7 +12,7 @@ import Edit from '../assets/Profile/Edit.svg';
 import { all } from 'axios';
 
 function ShootDropDown(props) {
-  const { existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons, allEvents, currentEvent } = props;
+  const { existedUsers, userChecked, userUnChecked, usersToShow, allowedPersons, allEvents, currentEvent, message } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const target = useRef(null);
 
@@ -21,7 +21,7 @@ function ShootDropDown(props) {
     setDropdownOpen((prevState) => !prevState);
   };
 
-  const shooterDatesHandler = (user) => {
+  const shooterDatesHandler = (user,role=undefined) => {
     let pushShooter = true
     if(allEvents && currentEvent){
       let dummy = {}
@@ -29,9 +29,9 @@ function ShootDropDown(props) {
       allEvents.map((event) => {
         if(event.eventDate === currentEvent.eventDate){
           dummy[event.eventDate] = Array.isArray(dummy[event.eventDate]) ?
-          [...dummy[event.eventDate],...event.shootDirectors ] : [...event.shootDirectors,user ]
+          [...dummy[event.eventDate],...event[role] ] : [...event[role],user ]
         }else{
-          dummy[event.eventDate] = event.shootDirectors
+          dummy[event.eventDate] = event[role]
         }
       })
       for (const date in dummy) {
@@ -88,6 +88,7 @@ function ShootDropDown(props) {
                   display: 'flex',
                   justifyContent: 'space-between',
                 }}
+                // onClick={() => target.current.click()}
               >
                 {user.firstName} {user.lastName}
                 <input
@@ -100,10 +101,10 @@ function ShootDropDown(props) {
                         window.notify(`Maximum Limit is ${allowedPersons}, uncheck previous!`, 'error');
                         return
                       } else {
-                        if(shooterDatesHandler(user)){
+                        if(shooterDatesHandler(user,props.role)){
                           userChecked(user);
                         }else{
-                          window.notify("This shooter has already been assigned on the same date", 'error')
+                          window.notify(`This ${message} has already been assigned on the same date`, 'error')
                         }
                       }
                     } else {
