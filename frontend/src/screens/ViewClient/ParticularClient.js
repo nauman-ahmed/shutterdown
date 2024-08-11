@@ -32,7 +32,7 @@ function ParticularClient(props) {
         style={{ marginBottom: "20px" }}
       >
         <div className="d-flex justify-content-between ViewClientParticularContent">
-          {Data3.map((i, value) => (
+          {Data3?.map((i, value) => (
             <div
               style={{
                 height: 20,

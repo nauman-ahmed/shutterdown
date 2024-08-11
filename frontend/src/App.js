@@ -54,6 +54,7 @@ import LoginWithGoogle from "./screens/login/LoginWithGoogle";
 import UserAttendence from "./screens/Attendence/Attendence";
 import Cookies from "js-cookie";
 import PreWedDeliverables from "./screens/Deliverables/PreWeds";
+import DeliverablesDeadline from "./screens/Deadlines";
 
 function App() {
   const location = useLocation();
@@ -134,6 +135,12 @@ function App() {
             path="/Myprofile/FormOptions"
             element={
               currentUser ? <FormOptions /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/Myprofile/Deadlines"
+            element={
+              currentUser ? <DeliverablesDeadline /> : <Navigate to="/" replace />
             }
           />
           <Route

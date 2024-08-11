@@ -3,8 +3,9 @@ import BASE_URL from "./index";
 import Cookies from "js-cookie";
 const currentUser =
   Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+console.log(currentUser);
 
-export const SaveClientForm = async (data) => { 
+export const SaveClientForm = async (data) => {
   try {
     const dataToSend = { ...data, userID: currentUser._id };
     const result = await axios
@@ -16,7 +17,9 @@ export const SaveClientForm = async (data) => {
         return true;
       })
       .catch((err) => console.log(err));
-      return result
+      console.log(result);
+      
+    return result;
   } catch (error) {
     console.log(error, "error");
     return false;

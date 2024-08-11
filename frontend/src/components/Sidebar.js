@@ -196,6 +196,28 @@ const SideBar = () => {
                         />
                       }
                       onClick={() => {
+                        setActiveMenu(103);
+                        navigate('/MyProfile/Deadlines');
+                        setCurrentTab(null);
+                      }}
+                      className={
+                        activeMenu === 103 || currentTab === 'DeliverablesDeadline'
+                          ? 'active active_color'
+                          : ''
+                      }
+                    >
+                     Deliverables Deadlines
+                    </MenuItem>
+                    <MenuItem
+                      icon={
+                        <img alt=""
+                          src={
+                            "/images/sidebar/clients.png"
+                          }
+                          width={20}
+                        />
+                      }
+                      onClick={() => {
                         setActiveMenu(102);
                         navigate('/MyProfile/Whatsapp');
                         setCurrentTab(null);
