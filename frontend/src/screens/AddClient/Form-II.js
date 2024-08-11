@@ -20,22 +20,46 @@ import { LuPlus } from "react-icons/lu";
 import { getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
-import { getAllEventOptions, updateAllEventOptions } from "../../API/FormEventOptionsAPI";
-import { getAllDeliverableOptions, updateAllDeliverableOptions } from "../../API/FormDeliverableOptionsAPI";
+import {
+  getAllEventOptions,
+  updateAllEventOptions,
+} from "../../API/FormEventOptionsAPI";
+import {
+  getAllDeliverableOptions,
+  updateAllDeliverableOptions,
+} from "../../API/FormDeliverableOptionsAPI";
 
 function FormII() {
- 
   const [allEvents, setAllEvents] = useState([]);
   const [weddingAssigned, setWeddingAssigned] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
-  const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
+  const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] =
+    useState(null);
   const [minDate, setMinDate] = useState(new Date(Date.now()));
 
-  const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
-  const deliverablePreWeddingOptionObjectKeys = ["photographers", "cinematographers", "assistants", "drones"]
-  const deliverableAlbumOptionObjectKeys = ["albums"]
-  const deliverableOptionObjectKeys = ["promos", "longFilms", "reels", "hardDrives"]
-  
+  const eventOptionObjectKeys = [
+    "travelBy",
+    "shootDirector",
+    "photographers",
+    "cinematographers",
+    "drones",
+    "sameDayPhotoEditors",
+    "sameDayVideoEditors",
+  ];
+  const deliverablePreWeddingOptionObjectKeys = [
+    "photographers",
+    "cinematographers",
+    "assistants",
+    "drones",
+  ];
+  const deliverableAlbumOptionObjectKeys = ["albums"];
+  const deliverableOptionObjectKeys = [
+    "promos",
+    "longFilms",
+    "reels",
+    "hardDrives",
+  ];
+
   const target = useRef(null);
   const [show, setShow] = useState(false);
 
@@ -66,15 +90,17 @@ function FormII() {
   };
 
   useEffect(() => {
-    if(clientData.events && clientData.events.length){
+    if (clientData.events && clientData.events.length) {
       let earliest = clientData.events.reduce((prev, curr) => {
-        return new Date(prev.eventDate) < new Date(curr.eventDate) ? prev : curr;
+        return new Date(prev.eventDate) < new Date(curr.eventDate)
+          ? prev
+          : curr;
       }, clientData.events[0]);
-      setMinDate(earliest.eventDate)
-      console.log("USE EFFECT", clientData,earliest)
-      return
+      setMinDate(earliest.eventDate);
+      console.log("USE EFFECT", clientData, earliest);
+      return;
     }
-    setMinDate(new Date(Date.now()))
+    setMinDate(new Date(Date.now()));
   }, [clientData]);
 
   const getStoredEvents = async () => {
@@ -101,7 +127,7 @@ function FormII() {
     };
     updatedDeliverables = {
       ...updatedDeliverables,
-      [e.target.name]: e.target.checked, 
+      [e.target.name]: e.target.checked,
     };
     dispatch(
       updateClintData({ ...clientData, deliverables: updatedDeliverables })
@@ -118,23 +144,22 @@ function FormII() {
     const eventOptions = await getAllEventOptions();
     const deliverableOptions = await getAllDeliverableOptions();
 
-    setEventOptionsKeyValues(eventOptions)
-    setDeliverableOptionsKeyValues(deliverableOptions)
-  }
+    setEventOptionsKeyValues(eventOptions);
+    setDeliverableOptionsKeyValues(deliverableOptions);
+  };
 
   useEffect(() => {
     if (!clientData.form1Submitted) {
       navigate("/MyProfile/AddClient/Form-I");
     }
     getStoredEvents();
-    getAllFormOptionsHandler()
+    getAllFormOptionsHandler();
   }, []);
 
   const handleAddDate = (date) => {
     setEventValues({ ...eventValues, eventDate: date });
     setShow(!show);
   };
-  
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -166,7 +191,7 @@ function FormII() {
           }}
         >
           <Row>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div ref={target}>
                 <div>
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
@@ -184,7 +209,7 @@ function FormII() {
                 </div>
               </div>
             </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div>
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Type
@@ -201,13 +226,12 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3" md="4" lg="4" >
-              <div >
+            <Col xs="12" sm="6" md="6" lg="6" xl="4">
+              <div>
                 <div className="Text16N" style={{ marginBottom: "25px" }}>
                   Is This a Wedding Event
                 </div>
                 <input
-                  
                   onChange={(e) => {
                     setEventValues({
                       ...eventValues,
@@ -221,8 +245,8 @@ function FormII() {
                 />
               </div>
             </Col>
-            <Col xs="6" sm="3" md="4" lg="4" className="pr5">
-              <div  className="mt25">
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Location
                 </div>
@@ -238,15 +262,23 @@ function FormII() {
                 />
               </div>
             </Col>
-            {eventOptionObjectKeys.map((Objkey) => 
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
+            {eventOptionObjectKeys.map((Objkey) => (
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
+                    {eventOptionsKeyValues &&
+                      eventOptionsKeyValues[Objkey].label}
                   </div>
                   <Select
                     // ref={travelSelect}
-                    value={eventValues?.[Objkey] ? {label : eventValues?.[Objkey], value : eventValues?.[Objkey]} : null}
+                    value={
+                      eventValues?.[Objkey]
+                        ? {
+                            label: eventValues?.[Objkey],
+                            value: eventValues?.[Objkey],
+                          }
+                        : null
+                    }
                     name={Objkey}
                     className="w-100"
                     onChange={(selected) => {
@@ -256,12 +288,15 @@ function FormII() {
                       });
                     }}
                     styles={customStyles}
-                    options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
+                    options={
+                      eventOptionsKeyValues &&
+                      eventOptionsKeyValues[Objkey].values
+                    }
                     required={true}
                   />
                 </div>
               </Col>
-            )}
+            ))}
           </Row>
           <Button type="submit" className="add_album album mt-4">
             Add Event
@@ -273,7 +308,7 @@ function FormII() {
             hover
             striped
             responsive
-            style={{ marginTop: "15px", width: "80%" }}
+            style={{ marginTop: "15px", width: "700px" }}
           >
             <thead>
               <tr className="Text14Semi gray3 alignCenter">
@@ -301,14 +336,18 @@ function FormII() {
                       {event.isWedding ? "Yes" : "No"}
                     </td>
                     <td className="primary2">
-                      <FaEdit onClick={()=>{
-                        if(weddingAssigned && event.isWedding){
-                          setWeddingAssigned(false)
-                        }
-                        setEventValues(event)
-                        handleDeleteEvent(event, i)
-                      }}  className="mx-1 cursor-pointer"/>
-                      <AiFillDelete className="mx-1 cursor-pointer"
+                      <FaEdit
+                        onClick={() => {
+                          if (weddingAssigned && event.isWedding) {
+                            setWeddingAssigned(false);
+                          }
+                          setEventValues(event);
+                          handleDeleteEvent(event, i);
+                        }}
+                        className="mx-1 cursor-pointer"
+                      />
+                      <AiFillDelete
+                        className="mx-1 cursor-pointer"
                         onClick={() => handleDeleteEvent(event, i)}
                       />
                     </td>
@@ -325,79 +364,87 @@ function FormII() {
             navigate("/MyProfile/AddClient/Preview");
           }}
         >
-          <div className="mt25">
-            <div className="Text16N" style={{ marginBottom: "6px" }}>
-              Deliverables
-            </div>
-            <div className="Text16N">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  updateDeliverables(e);
-                }}
-                name="preWeddingPhotos"
-                checked={clientData?.deliverables?.preWeddingPhotos}
-                disabled={false}
-              />
-              {"   "}
-              Pre Wedding Photos
-              <input
-                onChange={(e) => {
-                  updateDeliverables(e);
-                }}
-                type="checkbox"
-                name="preWeddingVideos"
-                style={{ marginLeft: "20px" }}
-                checked={clientData?.deliverables?.preWeddingVideos}
-                disabled={false}
-              />
-              {"   "}
-              Pre Wedding Videos
-            </div>
+          <div className="Text16N mt25" style={{ marginBottom: "6px" }}>
+            Deliverables
           </div>
+          
+            <div className="Text16N d-flex flex-row flex-wrap gap-3">
+              <div>
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    updateDeliverables(e);
+                  }}
+                  name="preWeddingPhotos"
+                  checked={clientData?.deliverables?.preWeddingPhotos}
+                  disabled={false}
+                />
+                {"   "}
+                Pre Wedding Photos
+              </div>
+              <div>
+                <input
+                  onChange={(e) => {
+                    updateDeliverables(e);
+                  }}
+                  type="checkbox"
+                  name="preWeddingVideos"
+                  
+                  checked={clientData?.deliverables?.preWeddingVideos}
+                  disabled={false}
+                />
+                {"   "}
+                Pre Wedding Videos
+              </div>
+            </div>
+          
           {(clientData?.deliverables?.preWeddingVideos ||
             clientData?.deliverables?.preWeddingPhotos) && (
-              <Row>
-                {deliverablePreWeddingOptionObjectKeys.map((Objkey) => 
-                  <Col xs="6" sm="3" className="pr5">
-                    <div className="mt25">
-                      <div className="Text16N" style={{ marginBottom: "6px" }}>
-                        {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
-                      </div>
-                      <Select
-                        value={
-                          clientData?.["preWed"+Objkey]
-                            ? {
-                                value: clientData?.["preWed"+Objkey],
-                                label: clientData?.["preWed"+Objkey],
-                              }
-                            : null
-                        }
-                        name={"preWed"+Objkey}
-                        onChange={(selected) => {
-                          dispatch(
-                            updateClintData({
-                              ...clientData,
-                              ["preWed"+Objkey]: selected?.value,
-                            })
-                          );
-                        }}
-                        styles={customStyles}
-                        options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
-                        required
-                      />
+            <Row>
+              {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
+                <Col xs="12" sm="6" md="6" lg="6" xl="4"  className="pr5">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].label}
                     </div>
-                  </Col>
-                )}
-              </Row>
+                    <Select
+                      value={
+                        clientData?.["preWed" + Objkey]
+                          ? {
+                              value: clientData?.["preWed" + Objkey],
+                              label: clientData?.["preWed" + Objkey],
+                            }
+                          : null
+                      }
+                      name={"preWed" + Objkey}
+                      onChange={(selected) => {
+                        dispatch(
+                          updateClintData({
+                            ...clientData,
+                            ["preWed" + Objkey]: selected?.value,
+                          })
+                        );
+                      }}
+                      styles={customStyles}
+                      options={
+                        deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].values
+                      }
+                      required
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
           )}
 
           <Row>
             <Col xl="10" sm="8">
               <Row>
-                {clientData?.albums?.map((albumValue, i) => 
-                  deliverableAlbumOptionObjectKeys.map((Objkey) => 
-                    <Col xs="4" sm="3" key={i}>
+                {clientData?.albums?.map((albumValue, i) =>
+                  deliverableAlbumOptionObjectKeys.map((Objkey) => (
+                    <Col xs="12" sm="6" key={i}>
                       <div className="Drop">
                         <h4 className="LabelDrop">Album {i + 1}</h4>
                         <Select
@@ -423,15 +470,19 @@ function FormII() {
                             });
                           }}
                           styles={customStyles}
-                          options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
+                          options={
+                            deliverableOptionsKeyValues &&
+                            deliverableOptionsKeyValues[Objkey].values
+                          }
                           required={true}
                         />
                       </div>
                     </Col>
-                ))}
+                  ))
+                )}
               </Row>
             </Col>
-            <Col xl="2" sm="4" className="mt-3">
+            <Col xs="12" sm="6" lg="6" xl="4" className="mt-3">
               <div className="d-flex fex-row">
                 {clientData?.albums?.length > 1 && (
                   <div
@@ -474,16 +525,20 @@ function FormII() {
             </Col>
           </Row>
           <Row>
-            {deliverableOptionObjectKeys.map((Objkey) => 
-              <Col xs="6" sm="3" className="pr5">
+            {deliverableOptionObjectKeys.map((Objkey) => (
+              <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
+                    {deliverableOptionsKeyValues &&
+                      deliverableOptionsKeyValues[Objkey].label}
                   </div>
                   <Select
                     value={
                       clientData?.[Objkey]
-                        ? { value: clientData?.[Objkey], label: clientData?.[Objkey] }
+                        ? {
+                            value: clientData?.[Objkey],
+                            label: clientData?.[Objkey],
+                          }
                         : null
                     }
                     name={Objkey}
@@ -496,12 +551,15 @@ function FormII() {
                       );
                     }}
                     styles={customStyles}
-                    options={deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].values}
+                    options={
+                      deliverableOptionsKeyValues &&
+                      deliverableOptionsKeyValues[Objkey].values
+                    }
                     required
                   />
                 </div>
               </Col>
-            )}
+            ))}
           </Row>
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>

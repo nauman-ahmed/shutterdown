@@ -796,8 +796,8 @@ const SideBar = () => {
               </div>
             </div>
           </SidebarHeader>
-          <SidebarContent>
-          <Menu>
+          <SidebarContent className="h-100">
+          <Menu className="mibile-side-back">
                 {currentUser.rollSelect === 'Manager' && (
                   <>
                     <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}

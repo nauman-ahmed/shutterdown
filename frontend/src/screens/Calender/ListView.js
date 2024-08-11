@@ -108,10 +108,10 @@ function ListView(props) {
   const groupByBrideName = (events) => {
     // Step 2: Group by brideName, but store the result as an array of objects
     const groupedByBrideName = events?.reduce((acc, event) => {
-      const brideName = event.client.brideName;
-      const found = acc?.find((item) => item.client.brideName === brideName);
+      const brideName = event?.client?.brideName;
+      const found = acc?.find((item) => item?.client?.brideName === brideName);
       const index = acc?.findIndex(
-        (item) => item.client.brideName === brideName
+        (item) => item?.client?.brideName === brideName
       );
       if (!found) {
         // If no existing group for this brideName, create a new group
@@ -136,7 +136,7 @@ function ListView(props) {
       } else if (currentUser.rollSelect === "Shooter") {
         const eventsToShow = res?.data?.map((event) => {
           if (
-            event?.shootDirector?.some(
+            event?.shootDirectors?.some(
               (director) => director._id === currentUser._id
             )
           ) {
@@ -372,8 +372,6 @@ function ListView(props) {
     },
   ];
 
-
-
   const applySorting = () => {
     try {
       setEventsForShow(
@@ -407,7 +405,7 @@ function ListView(props) {
     if (hasMore) {
       setLoading(true);
       try {
-        const res = await getEvents(clientId ,page === 1 ? page + 1 : page);
+        const res = await getEvents(clientId, page === 1 ? page + 1 : page);
         if (res.data.length > 0) {
           if (currentUser.rollSelect === "Manager") {
             setAllEvents([...allEvents, ...res.data]);
@@ -432,7 +430,7 @@ function ListView(props) {
           } else if (currentUser.rollSelect === "Shooter") {
             const eventsToShow = res?.data?.map((event) => {
               if (
-                event?.shootDirector?.some(
+                event?.shootDirectors?.some(
                   (director) => director._id === currentUser._id
                 )
               ) {
@@ -450,11 +448,15 @@ function ListView(props) {
               ) {
                 return { ...event, userRole: "Cinematographer" };
               } else if (
-                event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
+                event?.droneFlyers?.some(
+                  (flyer) => flyer._id === currentUser._id
+                )
               ) {
                 return { ...event, userRole: "Drone Flyer" };
               } else if (
-                event.manager?.some((manager) => manager._id === currentUser._id)
+                event.manager?.some(
+                  (manager) => manager._id === currentUser._id
+                )
               ) {
                 return { ...event, userRole: "Manager" };
               } else if (
@@ -607,11 +609,11 @@ function ListView(props) {
         <>
           <ClientHeader title="List View" options={filterOptions} calender />
           <div
-            className=" d-flex mx-auto align-items-center justify-content-between"
+            className=" d-flex mx-auto align-items-center justify-content-between flex-wrap gap-3"
             style={{ width: "100%" }}
             ref={target}
           >
-            <div className="">
+            <div style={{ width: "120px" }}>
               <button
                 onClick={() => setNewEventModel(true)}
                 className="btn btn-primary"
@@ -620,36 +622,37 @@ function ListView(props) {
                 Add Event
               </button>
             </div>
-            <Select
-              className="w-25 mx-3"
-              isSearchable={true}
-              onChange={(e) => filterByNameHanler(e.value)}
-              styles={{ ...customStyles, zIndex: -1000 }}
-              options={[
-                {
-                  value: "Reset",
-                  label: (
-                    <div className="d-flex justify-content-around">
-                      <strong>Reset</strong>
-                    </div>
-                  ),
-                },
-                ...clientData?.map((client) => {
-                  return {
-                    value: client.brideName + "<" + client.groomName,
+            <div style={{ width : '200px'}}>
+              <Select
+                isSearchable={true}
+                onChange={(e) => filterByNameHanler(e.value)}
+                styles={{ ...customStyles, zIndex: -1000, width: "300px" }}
+                options={[
+                  {
+                    value: "Reset",
                     label: (
                       <div className="d-flex justify-content-around">
-                        <span>{client.brideName}</span>{" "}
-                        <img alt="" src={Heart} />{" "}
-                        <span>{client.groomName}</span>
+                        <strong>Reset</strong>
                       </div>
                     ),
-                  };
-                }),
-              ]}
-              required
-            />
-            <div className="w-25">
+                  },
+                  ...clientData?.map((client) => {
+                    return {
+                      value: client.brideName + "<" + client.groomName,
+                      label: (
+                        <div className="d-flex justify-content-around">
+                          <span>{client.brideName}</span>{" "}
+                          <img alt="" src={Heart} />{" "}
+                          <span>{client.groomName}</span>
+                        </div>
+                      ),
+                    };
+                  }),
+                ]}
+                required
+              />
+            </div>
+            <div style={{ width: "200px" }}>
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
@@ -790,8 +793,8 @@ function ListView(props) {
                   }
 
                   if (
-                    !event?.shootDirector ||
-                    event?.shootDirector.length !== 1
+                    !event?.shootDirectors ||
+                    event?.shootDirectors.length !== 1
                   ) {
                     errorText += "Shoot Director not selected \n";
                   }
@@ -874,7 +877,7 @@ function ListView(props) {
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   teble={true}
-                                  allowedPersons={event?.shootDirector}
+                                  allowedPersons={event?.shootDirectors}
                                   usersToShow={allUsers}
                                   currentEvent={event}
                                   allEvents={allEvents}
@@ -1349,7 +1352,13 @@ function ListView(props) {
           <div class="spinner"></div>
         </div>
       )}
-      <Modal isOpen={newEventModel} centered={true} size="lg" fullscreen="md">
+      <Modal
+        className="bg-white"
+        isOpen={newEventModel}
+        centered={true}
+        size="lg"
+        fullscreen="md"
+      >
         <ModalHeader>Event Details</ModalHeader>
         <Form
           onSubmit={(e) => {
@@ -1361,7 +1370,7 @@ function ListView(props) {
             addNewEvent();
           }}
         >
-          <ModalBody>
+          <ModalBody className="bg-white">
             <Row ref={target}>
               <Col xl="6" sm="6" lg="6" className="p-2">
                 <div className="label">Client</div>
@@ -1502,7 +1511,7 @@ function ListView(props) {
               ))}
             </Row>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="bg-white">
             <Button type="submit" className="Update_btn">
               ADD
             </Button>

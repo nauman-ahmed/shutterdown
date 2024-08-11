@@ -181,11 +181,10 @@ function CheckLists(props) {
     <>
       {clientsForShow ? (
         <>
-          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
-          }} ref={target}>
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center'  ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50'>
+              <div className='w-75'>
                 <div
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: 'pointer' }}

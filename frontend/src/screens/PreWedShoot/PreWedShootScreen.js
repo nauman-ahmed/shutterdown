@@ -346,7 +346,7 @@ function PreWedShootScreen() {
           }} ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50 '>
+              <div className='w-75 '>
                 <div
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: 'pointer' }}

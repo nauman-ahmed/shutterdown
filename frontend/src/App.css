@@ -48,13 +48,13 @@
 }
 
 .widthForFilters{
-  width:  50%;
+  width:  300px;
   margin-top: -60px;
   margin-bottom: 30px;
 }
 @media only screen and (max-width: 500px){
   .widthForFilters{
-    width: 100% !important;
+    width: 300px !important;
     margin-top: 0px;
     margin-bottom: 0px;
   }
@@ -224,6 +224,9 @@ abbr[title] {
 }
 .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layou{
   margin-right: -20px !important;
+}
+.mobile-side-back {
+  height:  100% !important;
 }
 .highlight7 {
   background: #00fa9a;
