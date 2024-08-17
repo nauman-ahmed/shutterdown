@@ -9,6 +9,8 @@ import BASE_URL from "../../API";
 import MemberCardPDF from "../../components/MemberCardPDF";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import TeamPDF from "./TeamPDF";
 
 function ShootDetails(props) {
   const pdfRef = useRef();
@@ -56,7 +58,7 @@ function ShootDetails(props) {
 
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save("team_details.pdf");
-        setHidePdfDesign(true)
+        setHidePdfDesign(true);
       })
       .catch((error) => {
         console.error("Error generating PDF:", error);
@@ -68,8 +70,6 @@ function ShootDetails(props) {
       <div>
         {teamView ? (
           <>
-            
-
             <div className="shootDetailsBox">
               <div
                 className="Text24Semi"
@@ -430,74 +430,11 @@ function ShootDetails(props) {
                   </div>
                 ))}
             </div>
-            <div
-              className={`${hidePdfDesign ? "d-none" : "d-block"}`}
-              ref={pdfRef}
-            >
-              <div className="shootDetailsBoxPdf">
-                <div className="w-100 d-flex justify-content-center py-5">
-                  <img alt="" width={150} height={100} src="/images/Logo.png" />
-                </div>
-                <div
-                  className="Text24Semi merienda-medium"
-                  style={{ textAlign: "center", fontSize : "100px", marginBottom: "15px" }}
-                >
-                  MEET OUR TEAM
-                </div>
-                <div className="d-flex w-100 flex-row justify-content-center flex-wrap gap-4">
-                  <MemberCardPDF
-                    user={clientData?.userID}
-                    role={"Team Leader"}
-                  />
-
-                  {teamToShow?.shootDirectors?.length > 0 &&
-                    teamToShow?.shootDirectors?.map((user, ind) => {
-                      return (
-                        <MemberCardPDF user={user} role={"Shoot Director"} />
-                      );
-                    })}
-
-                  {teamToShow?.choosenPhotographers?.length > 0 &&
-                    teamToShow?.choosenPhotographers?.map((user, ind) => (
-                      <MemberCardPDF user={user} role={"Photographer"} />
-                    ))}
-
-                  {teamToShow?.choosenCinematographers.length > 0 &&
-                    teamToShow.choosenCinematographers?.map((user, ind) => (
-                      <MemberCardPDF user={user} role={"Cinematographer"} />
-                    ))}
-                  {teamToShow?.droneFlyers?.length > 0 &&
-                    teamToShow?.droneFlyers?.map((user, ind) => (
-                      <MemberCardPDF user={user} role={"Drone Flyer"} />
-                    ))}
-
-                  {teamToShow?.manager?.length > 0 &&
-                    teamToShow?.manager?.map((user, ind) => (
-                      <MemberCardPDF user={user} role={"Manager"} />
-                    ))}
-                  {teamToShow?.assistants.length > 0 &&
-                    teamToShow?.assistants?.map((user, ind) => (
-                      <MemberCardPDF user={user} role={"Assistant"} />
-                    ))}
-                  {teamToShow?.sameDayPhotoMakers.length > 0 &&
-                    teamToShow?.sameDayPhotoMakers?.map((user, ind) => (
-                      <MemberCardPDF
-                        user={user}
-                        role={"Same Day Photo Maker"}
-                      />
-                    ))}
-                  {teamToShow?.sameDayVideoMakers.length > 0 &&
-                    teamToShow?.sameDayVideoMakers?.map((user, ind) => (
-                      <MemberCardPDF
-                        user={user}
-                        role={"Same Day Video Maker"}
-                      />
-                    ))}
-                </div>
-              </div>
-            </div>
+           
           </>
         ) : (
+          <>
+          
           <Table bordered hover responsive>
             <thead>
               <tr className="logsHeader Text16N1">
@@ -596,26 +533,33 @@ function ShootDetails(props) {
                     )}
                   </td>
                   <td>
-                    <Button
-                      className="submit_btn submit w-100 p-1 shootDetailsBtn"
-                      style={{ marginRight: "10px" }}
-                      onClick={() => {
-                        setTeamToShow(event);
-                        setTeamView(true);
-                        setHidePdfDesign(false)
-                       setTimeout(downloadPdf, 1000)
-
-                      }}
-                    >
-                      Team
-                    </Button>
+                    <PDFDownloadLink onClick={()=>{ setTimeout(()=>{
+                      setTeamToShow(event)
+                      setTeamView(true)
+                    }, 1000)}} document={<TeamPDF client={clientData} team={event} />} fileName="team.pdf">
+               
+                      <Button
+                        className="submit_btn submit w-100 p-1 shootDetailsBtn"
+                        style={{ marginRight: "10px" }}
+                        // onClick={() => {
+                        //   // Handle any pre-download logic here
+                        //   setTeamToShow(event);
+                        //   setTeamView(true);
+                        // }}
+                      >
+                        Team
+                      </Button>
+                    </PDFDownloadLink>
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
+          </>
+          
         )}
       </div>
+      
     </div>
   );
 }
