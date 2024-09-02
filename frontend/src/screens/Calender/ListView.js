@@ -74,11 +74,11 @@ function ListView(props) {
   const { clientId } = useParams();
 
   const [directors, setDirectors] = useState([]);
-  const [assistant, setAssistant] = useState([]);
   const [photographer, setPhotographer] = useState([]);
   const [cinematographer, setCinematographer] = useState([]);
   const [flyer, setFlyer] = useState([]);
   const [manager, setManager] = useState([]);
+  const [assistant, setAssistant] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   
   const toggle = () => {
@@ -135,7 +135,13 @@ function ListView(props) {
   const getEventsData = async (clientId) => {
     try {
       const usersData = await getAllUsers();
-      setAllUsers(usersData?.users);
+      setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
+      setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
+      setCinematographer(usersData.users.filter(user => user.subRole.includes("Cinematographer")))
+      setFlyer(usersData.users.filter(user => user.subRole.includes("Drone Flyer")))
+      setManager(usersData.users.filter(user => user.subRole.includes("Manager")))
+      setAssistant(usersData.users.filter(user => user.subRole.includes("Assistant")))
+
       const res = await getEvents(clientId, page);
       if (currentUser.rollSelect === "Manager") {
         setAllEvents(res.data);
@@ -525,7 +531,7 @@ function ListView(props) {
       fetchEvents();
     }
   }, [eventsForShow]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const handleScroll = () => {
     const bottomOfWindow =
       document.documentElement.scrollTop + window.innerHeight >=
@@ -541,6 +547,7 @@ function ListView(props) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
+  
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
     setAllEvents(storedEvents.data);
@@ -886,8 +893,8 @@ function ListView(props) {
                                   role={"shootDirectors"}
                                   message={"Shoot Directors"}
                                   teble={true}
-                                  allowedPersons={event?.shootDirectors}
-                                  usersToShow={allUsers}
+                                  allowedPersons={event?.shootDirector}
+                                  usersToShow={directors}
                                   currentEvent={event}
                                   allEvents={allEvents}
                                   existedUsers={event?.shootDirectors}
@@ -977,7 +984,7 @@ function ListView(props) {
                                   currentEvent={event}
                                   allEvents={cinematographer}
                                   allowedPersons={event?.cinematographers}
-                                  usersToShow={allUsers}
+                                  usersToShow={cinematographer}
                                   existedUsers={event?.choosenCinematographers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1389,6 +1396,7 @@ function ListView(props) {
           <div class="spinner"></div>
         </div>
       )}
+
       <Modal
         className="bg-white"
         isOpen={newEventModel}

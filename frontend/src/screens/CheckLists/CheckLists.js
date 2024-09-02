@@ -152,22 +152,6 @@ function CheckLists(props) {
   const handleSaveData = async (index) => {
     try {
       const client = allClients[index];
-      // if (!client.checklistDetails) {
-      //   window.notify('Please Select the values!', 'error');
-      //   return
-      // } else if (!client.checklistDetails.whatsAppGroup) {
-      //   window.notify('Please select whatsApp Group status!', 'error');
-      //   return
-      // } else if (!client.checklistDetails.sopSentDate) {
-      //   window.notify("Please Select SOP's sent date!", 'error');
-      //   return
-      // } else if (!client.checklistDetails.questionsSentDate) {
-      //   window.notify("Please Select questions sent date!", 'error');
-      //   return
-      // } else if (!client.checklistDetails.iternaryCollection) {
-      //   window.notify("Please Select iternary Collection!", 'error');
-      //   return
-      // }
       setUpdatingIndex(index);
       await updateClient(client)
       setUpdatingIndex(null);

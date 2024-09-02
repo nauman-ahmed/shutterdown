@@ -55,7 +55,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
     },
   ];
   return (
-    <div style={{ width: "100%" }}>
+    <div className="CalenderViewWidth">
       <div className="rowBox Profile_Web_hide">
         {user?.photo ? (
           <div className="ProfileBoxForImg w-25 Text50Semi">

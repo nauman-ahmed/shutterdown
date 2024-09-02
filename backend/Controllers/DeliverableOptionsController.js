@@ -1,10 +1,20 @@
 const DeliverableOptionsSchema = require('../models/DeliverableOptionsSchema');
+const DeadlineDaysSchema = require('../models/DeadlineDays');
 const id = "6667060a0095ff6dc507f28d" // Set ID DIRECTLY FROM DB
 
 const getAllDeliverableOptions = async (req, res) => {
   try {
     const data = req.body.data;
     const allDocument = await DeliverableOptionsSchema.find();
+    res.status(200).json(allDocument);
+  } catch (error) { 
+    console.log(error, 'taskData');
+  }
+};
+
+const getAllDeliverableDays = async (req, res) => {
+  try {
+    const allDocument = await DeadlineDaysSchema.find();
     res.status(200).json(allDocument);
   } catch (error) { 
     console.log(error, 'taskData');
@@ -65,5 +75,6 @@ module.exports = {
   addDeliverableFields,
   getAllDeliverableOptions,
   updateAllDeliverableOptions,
-  addDeliverableOptionsForOnce
+  addDeliverableOptionsForOnce,
+  getAllDeliverableDays
 };

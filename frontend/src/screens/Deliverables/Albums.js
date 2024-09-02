@@ -10,7 +10,7 @@ import { getEditors } from "../../API/userApi";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
-import { getAlbums, updateDeliverable } from "../../API/Deliverables";
+import { getAlbums, updateDeliverable, getAllTheDeadline } from "../../API/Deliverables";
 import { getAllWhatsappText } from "../../API/Whatsapp";
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
@@ -34,6 +34,7 @@ function Albums(props) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [deadlineDays, setDeadlineDays] = useState([]);
 
   const extractText = () => {
     const contentState = editorState.albumTextGetImmutable.getCurrentContent();
@@ -66,6 +67,8 @@ function Albums(props) {
     try {
       const data = await getAlbums(page);
       const res = await getEditors();
+      const deadline = await getAllTheDeadline();
+      setDeadlineDays(deadline[0])
       setEditors(res.editors);
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
@@ -215,8 +218,8 @@ function Albums(props) {
       if (wedding) {
         setDeliverablesForShow(
           deliverablesForShow.sort((a, b) => {
-            const dateA = new Date(a.clientDeadline);
-            const dateB = new Date(b.clientDeadline);
+            const dateA = new Date(a.client.eventDate);
+            const dateB = new Date(b.client.eventDate);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
           })
         );
@@ -417,6 +420,20 @@ function Albums(props) {
     window.open(chatUrl, "_blank");
   };
 
+  const getrelevantDeadline = (title) => {
+    if(title == "Promo"){
+      return deadlineDays.promo
+    }
+    else if(title == "Long Film"){
+      return deadlineDays.longFilm
+    }
+    else if(title == "Reel"){
+      return deadlineDays.reel
+    }
+
+    return 45
+  }
+
   return (
     <>
       <ClientHeader
@@ -586,7 +603,7 @@ function Albums(props) {
                               new Date(deliverable?.client.eventDate).setDate(
                                 new Date(
                                   deliverable?.client.eventDate
-                                ).getDate() + 45
+                                ).getDate() + getrelevantDeadline(deliverable.deliverableName)
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -616,13 +633,7 @@ function Albums(props) {
                                     )
                                   : null
                               }
-                              min={
-                                deliverable?.clientDeadline
-                                  ? dayjs(deliverable.clientDeadline).format(
-                                      "YYYY-MM-DD"
-                                    )
-                                  : ""
-                              }
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -651,6 +662,7 @@ function Albums(props) {
                                     ).format("YYYY-MM-DD")
                                   : null
                               }
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -679,6 +691,7 @@ function Albums(props) {
                                     ).format("YYYY-MM-DD")
                                   : null
                               }
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td

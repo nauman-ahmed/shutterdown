@@ -9,7 +9,7 @@ import { getEditors } from '../../API/userApi';
 import Select from 'react-select';
 import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
-import { getPhotos, updateDeliverable } from '../../API/Deliverables';
+import { getPhotos, updateDeliverable, getAllTheDeadline } from '../../API/Deliverables';
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { useDispatch } from 'react-redux';
 
@@ -27,10 +27,14 @@ function Photos() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [deadlineDays, setDeadlineDays] = useState([]);
+  
   const fetchData = async () => {
     try {
       const data = await getPhotos(page);
       const res = await getEditors();
+      const deadline = await getAllTheDeadline();
+      setDeadlineDays(deadline[0])
       setEditors(res.editors.filter(user => user.subRole.includes('Photographer')))
       if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data)
@@ -219,8 +223,8 @@ function Photos() {
     try {
       if(wedding){
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
-          const dateA = new Date(a.clientDeadline);
-          const dateB = new Date(b.clientDeadline);
+          const dateA = new Date(a.client.eventDate);
+          const dateB = new Date(b.client.eventDate);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
         }));
         setAscendingWeding(!ascendingWeding)
@@ -322,6 +326,20 @@ function Photos() {
     }
   };
 
+  const getrelevantDeadline = (title) => {
+    if(title == "Promo"){
+      return deadlineDays.promo
+    }
+    else if(title == "Long Film"){
+      return deadlineDays.longFilm
+    }
+    else if(title == "Reel"){
+      return deadlineDays.reel
+    }
+
+    return 45
+  }
+  
   return (
     <>
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Photos" />
@@ -435,7 +453,7 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + 45)).format('DD-MMM-YYYY')}
+                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -454,7 +472,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
-                              min={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -475,6 +493,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -494,6 +513,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td

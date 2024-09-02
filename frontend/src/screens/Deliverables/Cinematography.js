@@ -9,7 +9,7 @@ import { getEditors } from '../../API/userApi';
 import Select from 'react-select';
 import Cookies from 'js-cookie';
 import ClientHeader from '../../components/ClientHeader';
-import { getCinematography, updateDeliverable } from '../../API/Deliverables';
+import { getCinematography, updateDeliverable, getAllTheDeadline } from '../../API/Deliverables';
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { getAllWhatsappText } from "../../API/Whatsapp";
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
@@ -37,6 +37,7 @@ function Cinematography(props) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [deadlineDays, setDeadlineDays] = useState([]);
 
   const loadEditorContent = (rawContent) => {
     const contentState = convertFromRaw(JSON.parse(rawContent));
@@ -151,6 +152,9 @@ const priority = {
     try {
       const data = await getCinematography(page);
       const res = await getEditors();
+      const deadline = await getAllTheDeadline();
+      setDeadlineDays(deadline[0])
+
       await getAllWhatsappTextHandler()
       if (currentUser.rollSelect === 'Manager') {
         setAllDeliverables(data);
@@ -236,8 +240,8 @@ const priority = {
     try {
       if(wedding){
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
-          const dateA = new Date(a.clientDeadline);
-          const dateB = new Date(b.clientDeadline);
+          const dateA = new Date(a.client.eventDate);
+          const dateB = new Date(b.client.eventDate);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
         }));
         setAscendingWeding(!ascendingWeding)
@@ -365,6 +369,20 @@ const priority = {
     window.open(chatUrl, '_blank');
   }
 
+  const getrelevantDeadline = (title) => {
+    if(title == "Promo"){
+      return deadlineDays.promo
+    }
+    else if(title == "Long Film"){
+      return deadlineDays.longFilm
+    }
+    else if(title == "Reel"){
+      return deadlineDays.reel
+    }
+
+    return 45
+  }
+
   return (
     <>
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Cinematography" />
@@ -479,7 +497,7 @@ const priority = {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + 45)).format('DD-MMM-YYYY')}
+                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -497,7 +515,8 @@ const priority = {
                                 updatedDeliverables[index].companyDeadline = e.target.value;
                                 setAllDeliverables(updatedDeliverables);
                               }}
-                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
+                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -507,7 +526,6 @@ const priority = {
                               paddingBottom: '15px',
                             }}
                           >
-
                             <input
                               type="date"
                               name="firstDeliveryDate"
@@ -518,7 +536,7 @@ const priority = {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -538,7 +556,7 @@ const priority = {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              max={deliverable?.clientDeadline ? dayjs(deliverable.clientDeadline).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td

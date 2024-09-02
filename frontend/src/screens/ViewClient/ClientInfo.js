@@ -194,7 +194,7 @@ function ClientInfo() {
               <br />
               {clientData?.groomName}
             </td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.phoneNumber}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">+{clientData?.phoneNumber}</td>
            
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.albums?.map((val, i) => (

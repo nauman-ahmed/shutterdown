@@ -52,6 +52,18 @@ export const getPreWeds = async (page) => {
         console.log(error);
     }
 }
+export const getAllTheDeadline = async (page) => {
+    try {
+        const res = await axios.get(BASE_URL + `/deliverableOptions/getAllDeliverableDays`,
+            {
+                Headers: { 'Content-Type': 'application/json' },
+            }
+        );
+        return res.data
+    } catch (error) {
+        console.log(error);
+    }
+}
 export const updateDeliverable = async (deliverable) => {
     try {
         await axios.post(BASE_URL +

@@ -8,6 +8,7 @@ router.post('/UpdateDeliverableFields', DeliverableOptionsController.addDelivera
 router.post('/updateAll', DeliverableOptionsController.updateAllDeliverableOptions)
 
 router.get('/getAll', DeliverableOptionsController.getAllDeliverableOptions)
+router.get('/getAllDeliverableDays', DeliverableOptionsController.getAllDeliverableDays)
 
 
 module.exports = router
