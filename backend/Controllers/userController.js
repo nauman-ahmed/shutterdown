@@ -75,7 +75,6 @@ const getAllAccountDetails = async (req, res) => {
 
     res.status(200).json(userAccountDetails);
   } catch (error) {
-    console.log("USERS ERROR",error)
     res.status(404).json('Your Email is not exists');
   }
 };

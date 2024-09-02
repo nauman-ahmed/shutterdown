@@ -5,7 +5,6 @@ const EventModel = require("../models/EventModel");
 
 const AddClientFunction = async (req, res) => {
   try {
-    console.log("roz ros");
 
     const deadlineDays = await deadlineDaysModel.find();
     let clientBody = req.body.data;
@@ -93,12 +92,6 @@ const AddClientFunction = async (req, res) => {
         return event._id;
       })
     );
-    console.log(longFilmDeadline);
-    console.log(reelDeadline);
-    console.log(promoDeadline);
-    console.log(photoDeadline);
-    console.log(preWedPhotoDeadline);
-    console.log(preWedVideoDeadline);
 
     const photosDeliverable = new deliverableModel({
       client: client._id,
@@ -231,7 +224,6 @@ const updateClient = async (req, res) => {
 const getAllClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-        console.log(page);
         const skip = (page - 1) * 10;
     const clients = await ClientModel.find().skip(skip).limit(10).populate({
       path: 'events',
@@ -264,7 +256,6 @@ const getAllClients = async (req, res) => {
 const getPreWedClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-        console.log(page);
         const skip = (page - 1) * 10;
     const clients = await ClientModel.find({ preWedding: true }).skip(skip).limit(10).populate({
       path: 'deliverables',

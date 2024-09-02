@@ -122,7 +122,6 @@ function ViewClient() {
       document.documentElement.scrollHeight - 10;
 
     if (bottomOfWindow) {
-      console.log("at bottom");
       fetchClients();
     }
   };

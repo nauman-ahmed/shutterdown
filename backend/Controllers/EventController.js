@@ -6,7 +6,6 @@ const moment = require('moment');
 
 const AddEvent = async (req, res) => {
     try {
-        console.log(req.body.data)
         const newEvent = new EventModel(req.body.data);
         const client = await ClientModel.findById(req.body.data.client)
         client.events.push(newEvent._id);
@@ -113,7 +112,6 @@ const getEventsByMonth = async (req, res) => {
 const getEvents = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        console.log(page);
         const skip = (page - 1) * 10;
         let obj = {};
         if(req.body.clientId){

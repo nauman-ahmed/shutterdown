@@ -35,17 +35,14 @@ function CalenderMulti({filterByDates}) {
       const startDate = new Date(props.activeStartDate)
       const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
 
-      console.log('Start And End Date of the Month: ',startDate,endDate)
       filterByDates(startDate,endDate,props.view)
     }
     else if(props.view == "year"){
       const startDate = new Date(props.activeStartDate);
       const endDate = new Date(startDate.getFullYear(), 11, 31, 23, 59, 59, 999);
 
-      console.log("Start And End of the Year:", startDate, endDate);
       filterByDates(startDate,endDate,props.view)
     }else{
-      console.log('onDateClickHandler: ',props)
       filterByDates(props,props,props.view)
     }
   }

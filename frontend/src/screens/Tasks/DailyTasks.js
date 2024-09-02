@@ -89,7 +89,6 @@ function DailyTasks(props) {
       document.documentElement.scrollHeight - 10;
 
     if (bottomOfWindow) {
-      console.log("at bottom");
       fetchTasks();
     }
   };

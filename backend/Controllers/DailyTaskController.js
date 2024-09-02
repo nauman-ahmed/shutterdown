@@ -14,7 +14,6 @@ const addTask = async (req, res) => {
 const getAllTasks = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    console.log(page);
     const skip = (page - 1) * 10;
     const tasks = await taskSchema.find().skip(skip).limit(10).populate("client assignBy assignTo")
     res.status(200).json(tasks);
@@ -26,7 +25,6 @@ const getAllTasks = async (req, res) => {
 const getPendingTasks = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-        console.log(page);
         const skip = (page - 1) * 10;
     const tasks = await taskSchema.find({ended : false}).skip(skip).limit(10).populate("client assignBy assignTo")
     res.status(200).json(tasks);
@@ -38,7 +36,6 @@ const getPendingTasks = async (req, res) => {
 const getEditorTasks = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    console.log(page);
     const skip = (page - 1) * 10;
     const tasks = await taskSchema.find({assignTo : req.params.editorId, ended : false}).skip(skip).limit(10).populate("client assignBy assignTo")
 

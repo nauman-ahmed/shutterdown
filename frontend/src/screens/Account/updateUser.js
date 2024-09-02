@@ -69,7 +69,6 @@ function UpdateUser(props) {
     const [currentUserDetails, setCurrentUserDetails] = useState(props.userDetails)
 
     const onSubmitHandler = async () => {
-        console.log("onSubmitHandler",currentUserDetails)
         await updateUserData(currentUserDetails);
         toggle()
     }

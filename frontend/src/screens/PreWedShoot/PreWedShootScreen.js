@@ -207,7 +207,6 @@ function PreWedShootScreen() {
       800*page;
 
     if (bottomOfWindow) {
-      console.log("at bottom");
       fetchClients();
     }
   };

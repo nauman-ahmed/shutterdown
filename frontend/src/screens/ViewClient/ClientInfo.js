@@ -153,7 +153,6 @@ function ClientInfo() {
   };
   return (
     <div>
-      {console.log("clientData",clientData)}
       <Table bordered hover responsive>
         <thead>
           <tr

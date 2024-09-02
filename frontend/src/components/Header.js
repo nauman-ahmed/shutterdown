@@ -144,8 +144,9 @@ const Header = (args) => {
   };
 
   useEffect(() => {
-    console.log(notifications);
+    console.log();
   }, [notifications]);
+
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location]);

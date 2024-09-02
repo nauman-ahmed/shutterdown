@@ -73,7 +73,6 @@ export const getEvents = async (clientId, page) => {
 
 export const getEventsByMonths = async (currentMonth) => { 
     try {
-        console.log("CURRENT",currentMonth)
         const res = await axios.post(BASE_URL +
             '/getAllEvents/byMonths',
             {

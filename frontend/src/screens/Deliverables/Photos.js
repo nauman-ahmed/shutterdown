@@ -425,8 +425,8 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}  >
-                            {dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}
+                            }}  > 
+                            {dayjs(deliverable?.client.eventDate).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -435,7 +435,7 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(deliverable?.clientDeadline).format('DD-MMM-YYYY')}
+                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + 45)).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"

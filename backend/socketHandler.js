@@ -6,14 +6,11 @@ module.exports = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("A user connected : " + socket.id);
 
     socket.on("disconnect", () => {
       console.log("user disconnected!");
     });
     socket.on("add-notification", async (data) => {
-      console.log("new notification data");
-      console.log(data);
 
       if (data.forManager) {
         const newNotification = new Notification(data);

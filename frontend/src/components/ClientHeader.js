@@ -311,7 +311,6 @@ function ClientHeader(props) {
                       key={i}
                       className={`rowalign ${(optionObj.title === 'All' || optionObj.title === 'Date Assigned' || optionObj.title === 'Date Unassigned') ? " " : " d-flex flex-row justify-content-between"} `}
                       onClick={() => {
-                        console.log("FILTER",optionObj)
                         if(currentFilter !== undefined){
                           if (currentFilter !== optionObj.title) {
                             setParentFilter(optionObj.id);
@@ -367,7 +366,6 @@ function ClientHeader(props) {
                             <div
                               className="rowalign d-flex align-item-center"
                               onClick={() => {
-                                console.log("FILTER",optionObj,option)
                                 if(optionObj.title === 'clientsFromListView' || optionObj.title === 'Assign By' || optionObj.title === 'Assign To'){
                                   handleChildFilter(option)
                                 } else {

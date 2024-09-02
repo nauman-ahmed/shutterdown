@@ -192,7 +192,6 @@ export const newPass = async (data) => {
 export const updateUserData = async (userData) => {
   try {
     await axios.post(BASE_URL + '/update-userInfo', userData).then(async (res) => {
-      console.log(res);
       await GetUserData();
       toast.success('Details Updated Successfully!')
     }).catch(err => {
