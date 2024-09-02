@@ -95,3 +95,16 @@ export const getEditorTasks = async (page) => {
 
     }
 }
+
+export const getDeadlinesDays = async () => {
+  try {
+    const res = await axios.get(BASE_URL + `/Admin/getDeadlineDays`, {
+      Headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
