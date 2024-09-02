@@ -36,6 +36,11 @@ function PreWedShootScreen() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const [assistant, setAssistant] = useState([]);
+  const [photographer, setPhotographer] = useState([]);
+  const [cinematographer, setCinematographer] = useState([]);
+  const [flyer, setFlyer] = useState([]);
+  
   const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
     if(reset){
       setShow(false)
