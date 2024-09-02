@@ -6,7 +6,7 @@ import "../../assets/css/tableRoundHeader.css";
 import { useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-import { getEditors } from "../../API/userApi";
+import { getEditors } from "../../API/userApi"; 
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
@@ -421,17 +421,7 @@ function Albums(props) {
   };
 
   const getrelevantDeadline = (title) => {
-    if(title == "Promo"){
-      return deadlineDays.promo
-    }
-    else if(title == "Long Film"){
-      return deadlineDays.longFilm
-    }
-    else if(title == "Reel"){
-      return deadlineDays.reel
-    }
-
-    return 45
+    return deadlineDays.album
   }
 
   return (

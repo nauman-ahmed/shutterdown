@@ -327,14 +327,8 @@ function Photos() {
   };
 
   const getrelevantDeadline = (title) => {
-    if(title == "Promo"){
-      return deadlineDays.promo
-    }
-    else if(title == "Long Film"){
-      return deadlineDays.longFilm
-    }
-    else if(title == "Reel"){
-      return deadlineDays.reel
+    if(title == "Photos"){
+      return deadlineDays.photo
     }
 
     return 45

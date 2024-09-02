@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import { getClientById } from "../../API/Client";
+import { getAllTheDeadline } from "../../API/Deliverables";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -10,14 +11,20 @@ function Deliverable(props) {
   const { clientId } = useParams();
   const [preWedDeliverables, setPreWedDeliverables] = useState(null);
   const [otherDeliverables, setOtherDeliverables] = useState(null);
+  const [weddingDate, setWeddingDate] = useState(null);
+  const [deadlineDays, setDeadlineDays] = useState([]);
 
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId)
+      const deadline = await getAllTheDeadline();
+      setDeadlineDays(deadline[0])
       const preWedDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName === 'Pre-Wedding Photos' || deliverable.deliverableName === 'Pre-Wedding Videos');
       setPreWedDeliverables(preWedDeliverable);
       const otherDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName !== 'Pre-Wedding Photos' && deliverable.deliverableName !== 'Pre-Wedding Videos')
       setOtherDeliverables(otherDeliverable);
+      const wedDate = res.events.filter((event) => event.isWedding)
+      setWeddingDate(wedDate[0]);
     } catch (error) {
       console.log(error);
     }
@@ -27,6 +34,33 @@ function Deliverable(props) {
     getIdData();
   })
 
+  const getrelevantDeadline = (title) => {
+    if(title == "Promo"){
+      return deadlineDays.promo
+    }
+    else if(title == "Long Film"){
+      return deadlineDays.longFilm
+    }
+    else if(title == "Reel"){
+      return deadlineDays.reel
+    }
+    else if(title == "Photos"){
+      return deadlineDays.photo
+    }
+    else if(title == "Pre-Wedding Photos"){
+      return deadlineDays.preWedPhoto
+    }
+    else if(title == "Pre-Wedding Videos"){
+      return deadlineDays.preWedVideo
+    }
+
+    return deadlineDays.album
+
+  }
+
+  const getWeddingDate = (obj) => {
+    return "2024-09-02T22:00:00.000+00:00"
+  }
 
   return (
     <div>
@@ -70,8 +104,8 @@ function Deliverable(props) {
                   <tr>
                     <td className="textPrimary Text14Semi tablePlaceContent">{deliverable.deliverableName}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(deliverable.clientDeadline).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate.eventDate).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate.eventDate).setDate(new Date(weddingDate.eventDate).getDate() - getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.status || 'Pending'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.finalDeliverDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
@@ -125,8 +159,8 @@ function Deliverable(props) {
                   <tr>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.deliverableName}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(deliverable?.clientDeadline).setDate(new Date(deliverable?.clientDeadline).getDate() - 45)).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(deliverable.clientDeadline).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate.eventDate).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate.eventDate).setDate(new Date(weddingDate.eventDate).getDate() - getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.status || 'Pending'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.finalDeliveryDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>

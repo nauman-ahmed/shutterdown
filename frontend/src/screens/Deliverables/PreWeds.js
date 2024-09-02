@@ -333,14 +333,11 @@ function PreWedDeliverables(props) {
   };
 
   const getrelevantDeadline = (title) => {
-    if(title == "Promo"){
-      return deadlineDays.promo
+    if(title == "Pre-Wedding Photos"){
+      return deadlineDays.preWedPhoto
     }
-    else if(title == "Long Film"){
-      return deadlineDays.longFilm
-    }
-    else if(title == "Reel"){
-      return deadlineDays.reel
+    else if(title == "Pre-Wedding Videos"){
+      return deadlineDays.preWedVideo
     }
 
     return 45

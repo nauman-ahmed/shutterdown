@@ -538,7 +538,6 @@ function ListView(props) {
       document.documentElement.scrollHeight - 10;
 
     if (bottomOfWindow) {
-      console.log("at bottom");
       fetchEvents();
     }
   };
@@ -650,7 +649,7 @@ function ListView(props) {
                       </div>
                     ),
                   },
-                  ...clientData?.map((client) => {
+                  clientData?.map((client) => {
                     return {
                       value: client.brideName + "<" + client.groomName,
                       label: (

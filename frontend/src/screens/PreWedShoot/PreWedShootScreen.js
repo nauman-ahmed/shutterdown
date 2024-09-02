@@ -468,6 +468,7 @@ function PreWedShootScreen() {
                             }
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                            {console.log("client", client)}
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedcinematographers}

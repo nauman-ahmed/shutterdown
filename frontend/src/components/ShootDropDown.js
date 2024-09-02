@@ -33,7 +33,7 @@ function ShootDropDown(props) {
     let pushShooter = true;
     if (allEvents && currentEvent) {
       let dummy = {};
-
+      console.log("Current Event", currentEvent.eventDate)
       allEvents?.map((event) => {
         if (event.eventDate === currentEvent.eventDate) {
           dummy[event.eventDate] = Array.isArray(dummy[event.eventDate])
@@ -45,7 +45,7 @@ function ShootDropDown(props) {
       });
       for (const date in dummy) {
         const events = dummy[date];
-        const seen = new Set(); // To store JSON stringified versions of objects
+        const seen = new Set(); 
         if (events) {
           for (const event of events) {
             const eventString = JSON.stringify(event);
@@ -63,6 +63,7 @@ function ShootDropDown(props) {
 
   return (
     <div className="d-flex">
+      {console.log("RENDER")}
       <ToastContainer />
 
       <ButtonDropdown>
@@ -94,31 +95,15 @@ function ShootDropDown(props) {
                   display: "flex",
                   justifyContent: "space-between",
                 }}
-                onClick={() => {
-                  if (
-                    existedUsers?.length > 0 &&
-                    existedUsers?.some(
-                      (existingUser) => existingUser._id === user._id
-                    )
-                  ) {
-                    userUnChecked(user);
-                  } else {
-                    if (existedUsers?.length >= allowedPersons) {
-                      window.notify(
-                        `Maximum Limit is ${allowedPersons}, uncheck previous!`,
-                        "error"
-                      );
-                      return;
-                    } else {
-                      if (shooterDatesHandler(user, props.role)) {
-                        userChecked(user);
-                      } else {
-                        window.notify(
-                          `This ${message} has already been assigned on the same date`,
-                          "error"
-                        );
-                      }
-                    }
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent event bubbling if necessary
+
+                  // Manually trigger the input's onChange event
+                  const inputElement = target.current;
+                  if (inputElement) {
+                    const event = new Event('change', { bubbles: true });
+                    inputElement.checked = !inputElement.checked; // Toggle the checked state
+                    inputElement.dispatchEvent(event); // Dispatch the event
                   }
                 }}
               >
