@@ -9,6 +9,7 @@ const getCinematography = async (req, res) => {
         const skip = (page - 1) * 10;
         const cinematographyDeliverables = await DeliverableModel.find({ deliverableName: { $in: ['Long Film', 'Reel', 'Promo'] } }).skip(skip).limit(10).populate('client editor');
         res.status(200).json(cinematographyDeliverables);
+        
     } catch (error) {
         console.log(error);
     }
