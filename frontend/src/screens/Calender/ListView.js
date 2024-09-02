@@ -73,6 +73,14 @@ function ListView(props) {
   const dispatch = useDispatch();
   const { clientId } = useParams();
 
+  const [directors, setDirectors] = useState([]);
+  const [assistant, setAssistant] = useState([]);
+  const [photographer, setPhotographer] = useState([]);
+  const [cinematographer, setCinematographer] = useState([]);
+  const [flyer, setFlyer] = useState([]);
+  const [manager, setManager] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  
   const toggle = () => {
     setShow(!show);
   };
