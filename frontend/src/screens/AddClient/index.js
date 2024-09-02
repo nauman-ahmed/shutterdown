@@ -7,7 +7,7 @@ const AddClient = () => {
   return (
     <>
       <div className="main_content">
-        <div style={{ width: "100%", padding: "0px 20px" }}>
+        <div style={{ paddingRight: "10px" }} className="CalenderViewWidth">
           <ClientHeader title="Add Client" />
           <div className="Text24Semi alignCenter">Client Booking Form</div>
           <div>
