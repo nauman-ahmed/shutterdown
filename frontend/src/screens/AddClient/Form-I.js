@@ -111,7 +111,7 @@ function FormI() {
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Phone Number
               </div>
-              <div style={{ display: 'flex' }}>
+              {/* <div style={{ display: 'flex' }}> */}
                 <PhoneInput
                   country='in'
                   name="phoneNumber"
@@ -124,7 +124,7 @@ function FormI() {
                   placeholder="Phone Number"
                   inputClass={'forminput phoneinput'}
                 />
-              </div>
+              {/* </div> */}
             </div>
           </Col>
           <Col xs="12" sm="6">
@@ -147,7 +147,7 @@ function FormI() {
           </Col>
         </Row>
         <Row>
-          <Col xs="6" sm="4" lg='6' className="pr6">
+          <Col xs="12" sm="6" lg='6' className="pr6">
             <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Booking Confirmed
@@ -157,7 +157,7 @@ function FormI() {
               }} styles={customStyles} options={bookingOptions} required />
             </div>
           </Col>
-          <Col xs="6" lg='6' sm="3">
+          <Col xs="12" lg='6' sm="6">
             <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Payment Status

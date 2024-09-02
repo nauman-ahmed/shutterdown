@@ -4,9 +4,9 @@ import BASE_URL from "./index"
 import Cookies from 'js-cookie';
 const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
 
-export const getCinematography = async () => {
+export const getCinematography = async (page) => {
     try {
-        const res = await axios.get(BASE_URL + `/get-Cinematography`,
+        const res = await axios.get(BASE_URL + `/get-Cinematography?page=${page}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }
@@ -16,9 +16,9 @@ export const getCinematography = async () => {
         console.log(error);
     }
 }
-export const getAlbums = async () => {
+export const getAlbums = async (page) => {
     try {
-        const res = await axios.get(BASE_URL + `/get-Albums`,
+        const res = await axios.get(BASE_URL + `/get-Albums?page=${page}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }
@@ -28,9 +28,9 @@ export const getAlbums = async () => {
         console.log(error);
     }
 }
-export const getPhotos = async () => { 
+export const getPhotos = async (page) => { 
     try {
-        const res = await axios.get(BASE_URL + `/get-Photos`,
+        const res = await axios.get(BASE_URL + `/get-Photos?page=${page}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }
@@ -40,9 +40,9 @@ export const getPhotos = async () => {
         console.log(error);
     }
 }
-export const getPreWeds = async () => {
+export const getPreWeds = async (page) => {
     try {
-        const res = await axios.get(BASE_URL + `/get-Pre-Weds`,
+        const res = await axios.get(BASE_URL + `/get-Pre-Weds?page=${page}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }

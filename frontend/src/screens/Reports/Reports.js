@@ -17,9 +17,14 @@ function Reports(props) {
     Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [filterBy, setFilterBy] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [filterCondition, setFilterCondition] = useState(null);
+
   const getTaskData = async () => {
     try {
-      const tasks = await getAllTasks();
+      const tasks = await getAllTasks(page);
       setAllTasks(tasks);
       setTasksToShow(tasks)
     } catch (error) {
@@ -37,6 +42,59 @@ function Reports(props) {
     getTaskData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchTasks = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        
+        const  data = await getAllTasks(page === 1 ? page + 1 : page);
+         
+        
+        if (data.length > 0) {
+          let dataToAdd;
+         
+            setAllTasks([...allTasks, ...data])
+            if(filterCondition){
+              dataToAdd = data.filter(task => eval(filterCondition))
+            } else {
+              dataToAdd = data
+            }
+            setTasksToShow([...tasksToShow, ...dataToAdd]);
+          
+
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(tasksToShow?.length < 10 && hasMore && !loading){
+      fetchTasks()
+    }
+  }, [tasksToShow])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >=
+      document.documentElement.scrollHeight - 10;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchTasks();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   const getUsersForFilters = (propertyName) => {
     const seenUsers = new Set();
@@ -101,7 +159,7 @@ function Reports(props) {
       }else{
         finalCond = "(" + conditionTo +")" 
       }
-      console.log(finalCond);
+      setFilterCondition(finalCond)
       const newData = allTasks.filter(task => eval(finalCond))
       setTasksToShow(newData)
     }else{
@@ -137,6 +195,7 @@ function Reports(props) {
         filter
       />
       {tasksToShow ? (
+         <>
         <Table
           bordered
           hover
@@ -298,6 +357,17 @@ function Reports(props) {
             ))}
           </tbody>
         </Table>
+       
+         {loading && (
+           <div className="d-flex my-3 justify-content-center align-items-center">
+            <div class="spinner"></div>
+          </div>
+        )}
+        {!hasMore && (
+          <div className="d-flex my-3 justify-content-center align-items-center">
+            <div>No more data to load.</div>
+          </div>
+        )}</>
       ) : (
         <div
           style={{ height: "400px" }}

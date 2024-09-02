@@ -30,90 +30,131 @@ const SideBar = () => {
     setMobileSideBar(false);
   };
   const [currentTab, setCurrentTab] = useState(null);
+  // useEffect(() => {
+  //   if (location.pathname.startsWith('/MyProfile/AddClient')) {
+  //     setCurrentTab('Add Client');
+  //     setActiveMenu(1)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Client')) {
+  //     setCurrentTab('View Clients');
+  //     setActiveMenu(1)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Calender')) {
+  //     setCurrentTab('Calender View');
+  //     setActiveMenu(2)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
+  //     setCurrentTab('Pre-wed Shoot');
+  //     setActiveMenu(2)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
+  //     setCurrentTab('Cinematography');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
+  //     setCurrentTab('Photos');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
+  //     setCurrentTab('Albums');
+  //     setActiveMenu(3)
+  //     setCurrentSubMenuIndex(2)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/CheckLists')) {
+  //     setCurrentTab('Checklists');
+  //     setActiveMenu(4)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Attendence')) {
+  //     setCurrentTab('Attendence');
+  //     setActiveMenu(5)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
+  //     setCurrentTab('Tasks');
+  //     setActiveMenu(6)
+  //     setCurrentSubMenuIndex(0)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
+  //     setCurrentTab('Tasks Reports');
+  //     setActiveMenu(6)
+  //     setCurrentSubMenuIndex(1)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Reports')) {
+  //     setCurrentTab('Reports');
+  //     setActiveMenu(7)
+  //   }
+  //   if (location.pathname.startsWith('/MyProfile/Team')) {
+  //     setCurrentTab('Teams');
+  //     setActiveMenu(8)
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
       setCurrentTab('Add Client');
+      setActiveMenu(1)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Client')) {
       setCurrentTab('View Clients');
+      setActiveMenu(1)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Calender')) {
       setCurrentTab('Calender View');
+      setActiveMenu(2)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
       setCurrentTab('Pre-wed Shoot');
+      setActiveMenu(2)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
       setCurrentTab('Cinematography');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
       setCurrentTab('Photos');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
       setCurrentTab('Albums');
+      setActiveMenu(3)
+      setCurrentSubMenuIndex(2)
     }
     if (location.pathname.startsWith('/MyProfile/CheckLists')) {
       setCurrentTab('Checklists');
+      setActiveMenu(4)
     }
     if (location.pathname.startsWith('/MyProfile/Attendence')) {
       setCurrentTab('Attendence');
+      setActiveMenu(5)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
       setCurrentTab('Tasks');
+      setActiveMenu(6)
+      setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
       setCurrentTab('Tasks Reports');
+      setActiveMenu(6)
+      setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Reports')) {
       setCurrentTab('Reports');
+      setActiveMenu(7)
     }
     if (location.pathname.startsWith('/MyProfile/Team')) {
       setCurrentTab('Teams');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  useEffect(() => {
-    if (location.pathname.startsWith('/MyProfile/AddClient')) {
-      setCurrentTab('Add Client');
-    }
-    if (location.pathname.startsWith('/MyProfile/Client')) {
-      setCurrentTab('View Clients');
-    }
-    if (location.pathname.startsWith('/MyProfile/Calender')) {
-      setCurrentTab('Calender View');
-    }
-    if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
-      setCurrentTab('Pre-wed Shoot');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
-      setCurrentTab('Cinematography');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
-      setCurrentTab('Photos');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
-      setCurrentTab('Albums');
-    }
-    if (location.pathname.startsWith('/MyProfile/Deliverables/PreWed-Deliverables')) {
-      setCurrentTab('PreWed-Deliverables');
-    }
-    if (location.pathname.startsWith('/MyProfile/CheckLists')) {
-      setCurrentTab('Checklists');
-    }
-    if (location.pathname.startsWith('/MyProfile/Attendence')) {
-      setCurrentTab('Attendence');
-    }
-    if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
-      setCurrentTab('Tasks');
-    }
-    if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
-      setCurrentTab('Tasks Reports');
-    }
-    if (location.pathname.startsWith('/MyProfile/Reports')) {
-      setCurrentTab('Reports');
-    }
-    if (location.pathname.startsWith('/MyProfile/Team')) {
-      setCurrentTab('Teams');
+      setActiveMenu(8)
     }
     if (location.pathname.startsWith('/MyProfile/FormOptions')) {
       setCurrentTab('FormOptions');
@@ -251,7 +292,7 @@ const SideBar = () => {
                       open={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? true : false}
                       onOpenChange={() => {
                         setActiveMenu(1);
-                        setCurrentTab(null)
+                      
                       }}
                     >
                       <MenuItem
@@ -271,7 +312,7 @@ const SideBar = () => {
                         onClick={() => {
                           setCurrentSubMenuIndex(0);
                           navigate('/MyProfile/AddClient/Form-I');
-                          setCurrentTab(null);
+                      
                         }}
                         className={
                           (currentSubMenuIndex === 0 && activeMenu === 1) || currentTab === 'Add Client'
@@ -298,7 +339,7 @@ const SideBar = () => {
                         onClick={() => {
                           setCurrentSubMenuIndex(1);
                           navigate('/MyProfile/Client/ViewClient');
-                          setCurrentTab(null)
+                      
                         }}
                         className={
                           (currentSubMenuIndex === 1 && activeMenu === 1) || currentTab === 'View Clients'
@@ -351,7 +392,7 @@ const SideBar = () => {
                       onClick={() => {
                         setCurrentSubMenuIndex(0);
                         navigate('/MyProfile/Calender/View');
-                        setCurrentTab(null)
+                    
                       }}
                       className={
                         (currentSubMenuIndex === 0 && activeMenu === 2) || currentTab === 'Calender View'
@@ -378,7 +419,7 @@ const SideBar = () => {
                       onClick={() => {
                         setCurrentSubMenuIndex(1);
                         navigate('/MyProfile/PreWedShoot/PreWedShootScreen');
-                        setCurrentTab(null)
+                  
                       }}
                       className={
                         (currentSubMenuIndex === 1 && activeMenu === 2) || currentTab === 'Pre-wed Shoot'
@@ -393,9 +434,9 @@ const SideBar = () => {
 
                 {(currentUser.rollSelect ==='Manager' || currentUser.rollSelect === 'Editor') && (
                   <SubMenu
-                    className={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'PreWed-Deliverables' || currentTab === 'Albums' ? 'active' : ''}
+                    className={activeMenu === 3 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'PreWed-Deliverables' || currentTab === 'Albums' ? 'active' : ''}
                     icon={
-                      activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? (
+                      activeMenu === 3 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? (
                         <img alt=""
                           src="/images/sidebar/deliverables.png"
                           width={20}
@@ -407,16 +448,16 @@ const SideBar = () => {
                           />
                       )
                     }
-                    open={activeMenu === 4 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? true : false}
+                    open={activeMenu === 3 || currentTab === 'Cinematography' || currentTab === 'Photos' || currentTab === 'Albums' || currentTab === 'PreWed-Deliverables' ? true : false}
                     title="Deliverables"
-                    onOpenChange={() => {
-                      setActiveMenu(4);
+                    onClick={() => {
+                      setActiveMenu(3);
                       setCurrentTab(null)
                     }}
                   >
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography' ? (
+                        (currentSubMenuIndex === 0 && activeMenu === 3) || currentTab === 'Cinematography' ? (
                           <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
@@ -429,12 +470,12 @@ const SideBar = () => {
                         )
                       }
                       onClick={() => {
-                        setCurrentSubMenuIndex(3);
+                     
                         navigate('/MyProfile/Deliverables/Cinematography');
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex === 3 && activeMenu === 4) || currentTab === 'Cinematography'
+                        (currentSubMenuIndex === 0 && activeMenu === 3) || currentTab === 'Cinematography'
                           ? 'active_submenu'
                           : ''
                       }
@@ -443,7 +484,7 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos' ? (
+                        (currentSubMenuIndex === 1 && activeMenu === 3) || currentTab === 'Photos' ? (
                           <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
@@ -456,12 +497,12 @@ const SideBar = () => {
                         )
                       }
                       onClick={() => {
-                        setCurrentSubMenuIndex(4);
+                    
                         navigate('/MyProfile/Deliverables/Photos');
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex === 4 && activeMenu === 4) || currentTab === 'Photos'
+                        (currentSubMenuIndex === 1 && activeMenu === 3) || currentTab === 'Photos'
                           ? 'active_submenu'
                           : ''
                       }
@@ -470,7 +511,7 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums' ? (
+                        (currentSubMenuIndex === 2 && activeMenu === 3) || currentTab === 'Albums' ? (
                           <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
@@ -483,12 +524,11 @@ const SideBar = () => {
                         )
                       }
                       onClick={() => {
-                        setCurrentSubMenuIndex(5);
                         navigate('/MyProfile/Deliverables/Albums');
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex === 5 && activeMenu === 4) || currentTab === 'Albums'
+                        (currentSubMenuIndex === 2 && activeMenu === 3) || currentTab === 'Albums'
                           ? 'active_submenu'
                           : ''
                       }
@@ -497,7 +537,7 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables' ? (
+                        (currentSubMenuIndex === 3 && activeMenu === 3) || currentTab === 'PreWed-Deliverables' ? (
                           <img alt=""
                             src="/images/sidebar/oval_active.png"
                             width={10}
@@ -515,7 +555,7 @@ const SideBar = () => {
                         setCurrentTab(null)
                       }}
                       className={
-                        (currentSubMenuIndex === 6 && activeMenu === 4) || currentTab === 'PreWed-Deliverables'
+                        (currentSubMenuIndex === 3 && activeMenu === 3) || currentTab === 'PreWed-Deliverables'
                           ? 'active_submenu'
                           : ''
                       }
@@ -527,17 +567,16 @@ const SideBar = () => {
                 {currentUser.rollSelect === 'Manager' && (
                   <MenuItem
                     icon={
-                      activeMenu === 10 || currentTab === 'Checklists' ? (
+                      activeMenu === 4 || currentTab === 'Checklists' ? (
                         <img alt="" src={Checklist} width={20}/>
                       ) : (
                         <img alt="" src={UnActiveChecklist} width={20}/>
                       )
                     }
                     className={
-                      activeMenu === 10 || currentTab === 'Checklists' ? 'active active_color' : ''
+                      activeMenu === 4 || currentTab === 'Checklists' ? 'active active_color' : ''
                     }
                     onClick={() => {
-                      setActiveMenu(10);
                       navigate('/MyProfile/CheckLists');
                       setCurrentTab(null)
                     }}
@@ -557,9 +596,8 @@ const SideBar = () => {
                         width={20}
                       />
                     }
-                    className={activeMenu === 3 || currentTab === 'Attendence' ? 'active active_color' : ''}
+                    className={activeMenu === 5 || currentTab === 'Attendence' ? 'active active_color' : ''}
                     onClick={() => {
-                      setActiveMenu(3);
                       navigate('/MyProfile/Attendence');
                       setCurrentTab(null)
                     }}
@@ -570,7 +608,7 @@ const SideBar = () => {
                 {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                   <>
                     <SubMenu
-                      className={activeMenu === 5 || currentTab === 'Tasks' ? 'active' : ''}
+                      className={activeMenu === 6 || currentTab === 'Tasks' ? 'active' : ''}
                       icon={
                         activeMenu === 5 || currentTab === 'Tasks' ? (
                           <img alt="" src={ActiveTask} width={20} />
@@ -580,15 +618,15 @@ const SideBar = () => {
                         )
                       }
                       title="Tasks"
-                      open={activeMenu === 5 || currentTab === 'Tasks' ? true : false}
-                      onOpenChange={() => {
+                      open={activeMenu === 6 || currentTab === 'Tasks' ? true : false}
+                      onClick={() => {
                         setCurrentTab(null)
-                        setActiveMenu(5);
+                        setActiveMenu(6);
                       }}
                     >
                       <MenuItem
                         icon={
-                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks' ? (
+                          (currentSubMenuIndex === 0 && activeMenu === 6) || currentTab === 'Tasks' ? (
                             <img alt=""
                               src="/images/sidebar/oval_active.png"
                               width={10}
@@ -606,7 +644,7 @@ const SideBar = () => {
                           setCurrentTab(null)
                         }}
                         className={
-                          (currentSubMenuIndex === 0 && activeMenu === 5) || currentTab === 'Tasks'
+                          (currentSubMenuIndex === 0 && activeMenu === 6) || currentTab === 'Tasks'
                             ? 'active_submenu'
                             : ''
                         }
@@ -615,7 +653,7 @@ const SideBar = () => {
                       {currentUser.rollSelect === 'Manager' ?
                         <MenuItem
                           icon={
-                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports' ? (
+                            (currentSubMenuIndex === 1 && activeMenu === 6) || currentTab === 'Tasks Reports' ? (
                               <img alt=""
                                 src="/images/sidebar/oval_active.png"
                                 width={10}
@@ -633,7 +671,7 @@ const SideBar = () => {
                             setCurrentTab(null)
                           }}
                           className={
-                            (currentSubMenuIndex === 1 && activeMenu === 5) || currentTab === 'Tasks Reports'
+                            (currentSubMenuIndex === 1 && activeMenu === 6) || currentTab === 'Tasks Reports'
                               ? 'active_submenu'
                               : ''
                           }
@@ -651,7 +689,7 @@ const SideBar = () => {
                   <>
                     <MenuItem
                       icon={
-                        activeMenu === 6 || currentTab === 'Reports' ? (
+                        activeMenu === 7 || currentTab === 'Reports' ? (
                           <img alt="" src={ActiveReport} width={20} />
                         ) : (
                           <img alt=""
@@ -660,9 +698,9 @@ const SideBar = () => {
                           />
                         )
                       }
-                      className={activeMenu === 6 || currentTab === 'Reports' ? 'active active_color' : ''}
+                      className={activeMenu === 7 || currentTab === 'Reports' ? 'active active_color' : ''}
                       onClick={() => {
-                        setActiveMenu(6);
+            
                         navigate('/MyProfile/Reports');
                         setCurrentTab(null);
                       }}
@@ -671,7 +709,7 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        activeMenu === 7 || currentTab === 'Teams' ? (
+                        activeMenu === 8 || currentTab === 'Teams' ? (
                           <img alt="" src={ActiveTeam} width={30} />
                         ) : (
                           <img alt=""
@@ -680,7 +718,7 @@ const SideBar = () => {
                           />
                         )
                       }
-                      className={activeMenu === 7 || currentTab === 'Teams' ? 'active active_color' : ''}
+                      className={activeMenu === 8 || currentTab === 'Teams' ? 'active active_color' : ''}
                       onClick={() => {
                         setActiveMenu(7);
                         navigate('/MyProfile/Team');
@@ -780,8 +818,8 @@ const SideBar = () => {
               </div>
             </div>
           </SidebarHeader>
-          <SidebarContent>
-          <Menu>
+          <SidebarContent className="h-100">
+          <Menu className="mibile-side-back">
                 {currentUser.rollSelect === 'Manager' && (
                   <>
                     <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}

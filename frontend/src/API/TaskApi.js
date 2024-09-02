@@ -53,53 +53,45 @@ export const updateDeadlines = async (data) => {
   }
 };
 
-export const getAllTasks = async () => {
-  try {
-    const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getAllTasks`, {
-      Headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (error) {}
-};
+export const getAllTasks = async (page) => {
+    try {
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getAllTasks`, {
+            Headers: {
+                "Content-Type": "application/json"
+            },
+            params : {
+                page : page
+            }
+        })
+        return res.data
+    } catch (error) {
 
-export const getPendingTasks = async () => {
-  try {
-    const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getPendingTasks`, {
-      Headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-export const getDeadlinesDays = async () => {
-  try {
-    const res = await axios.get(BASE_URL + `/Admin/getDeadlineDays`, {
-      Headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
+    }
+}
 
-export const getEditorTasks = async () => {
-  try {
-    const currentUser = JSON.parse(Cookies.get("currentUser"));
-    const res = await axios.get(
-      BASE_URL + `/MyProfile/Tasks/getEditorTasks/${currentUser._id}`,
-      {
-        Headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return res.data;
-  } catch (error) {}
-};
+export const getPendingTasks = async (page) => {
+    try {
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getPendingTasks?page=${page}`, {
+            Headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        return res.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getEditorTasks = async (page) => {
+    try {
+        const currentUser = JSON.parse(Cookies.get('currentUser'));
+        const res = await axios.get(BASE_URL + `/MyProfile/Tasks/getEditorTasks/${currentUser._id}?page=${page}`, {
+            Headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        return res.data
+    } catch (error) {
+
+    }
+}

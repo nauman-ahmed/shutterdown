@@ -29,7 +29,7 @@ function Calender() {
       } else if (currentUser.rollSelect === "Shooter") {
         eventsToShow = res.data.map((event) => {
           if (
-            event?.shootDirector.some(
+            event?.shootDirectors.some(
               (director) => director._id === currentUser._id
             )
           ) {

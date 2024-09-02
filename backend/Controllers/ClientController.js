@@ -181,9 +181,9 @@ const AddClientFunction = async (req, res) => {
     );
 
     client.events = eventIds;
-    client.deliverables = [...deliverables, ...albumsDeliverables];
-    await client.save();
-    res.status(200).json("Client Added SucccessFully");
+    client.deliverables = [...deliverables, ...albumsDeliverables]
+    await client.save()
+    res.status(200).json(client);
   } catch (error) {
     console.log("Client Form Error", error);
   }
@@ -230,30 +230,30 @@ const updateClient = async (req, res) => {
 
 const getAllClients = async (req, res) => {
   try {
-    const clients = await ClientModel.find()
-      .populate({
-        path: "events",
-        model: "Event",
-        populate: [
-          { path: "choosenPhotographers", model: "user" },
-          { path: "choosenCinematographers", model: "user" },
-          { path: "droneFlyers", model: "user" },
-          { path: "manager", model: "user" },
-          { path: "assistants", model: "user" },
-          { path: "sameDayPhotoMakers", model: "user" },
-          { path: "sameDayVideoMakers", model: "user" },
-          { path: "shootDirectors", model: "user" },
-        ],
-      })
-      .populate({
-        path: "deliverables",
-        model: "Deliverable",
-        populate: {
-          path: "editor",
-          model: "user",
-        },
-      })
-      .populate("userID");
+    const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+    const clients = await ClientModel.find().skip(skip).limit(10).populate({
+      path: 'events',
+      model: 'Event',
+      populate: [
+        { path: 'choosenPhotographers', model: 'user' },
+        { path: 'choosenCinematographers', model: 'user' },
+        { path: 'droneFlyers', model: 'user' },
+        { path: 'manager', model: 'user' },
+        { path: 'assistants', model: 'user' },
+        { path: 'sameDayPhotoMakers', model: 'user' },
+        { path: 'sameDayVideoMakers', model: 'user' },
+        { path: 'shootDirectors', model: 'user' },
+      ],
+    }).populate({
+      path: 'deliverables',
+      model: 'Deliverable',
+      populate: {
+        path: 'editor',
+        model: 'user'
+      }
+    }).populate('userID');
 
     res.status(200).json(clients);
   } catch (error) {
@@ -263,26 +263,25 @@ const getAllClients = async (req, res) => {
 
 const getPreWedClients = async (req, res) => {
   try {
-    const clients = await ClientModel.find({ preWedding: true })
-      .populate({
-        path: "deliverables",
-        model: "Deliverable",
-        populate: {
-          path: "editor",
-          model: "user",
-        },
-      })
-      .populate({
-        path: "preWeddingDetails",
-        populate: [
-          { path: "photographers", model: "user" },
-          { path: "cinematographers", model: "user" },
-          { path: "droneFlyers", model: "user" },
-          { path: "assistants", model: "user" },
-        ],
-      })
-      .populate("userID")
-      .populate("events");
+    const page = parseInt(req.query.page) || 1;
+        console.log(page);
+        const skip = (page - 1) * 10;
+    const clients = await ClientModel.find({ preWedding: true }).skip(skip).limit(10).populate({
+      path: 'deliverables',
+      model: 'Deliverable',
+      populate: {
+        path: 'editor',
+        model: 'user'
+      }
+    }).populate({
+      path: 'preWeddingDetails',
+      populate: [
+        { path: 'photographers', model: 'user' },
+        { path: 'cinematographers', model: 'user' },
+        { path: 'droneFlyers', model: 'user' },
+        { path: 'assistants', model: 'user' },
+      ]
+    }).populate('userID').populate('events');
 
     res.status(200).json(clients);
   } catch (error) {

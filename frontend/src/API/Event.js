@@ -54,10 +54,10 @@ export const updateEventData = async (data) => {
     }
 }
 
-export const getEvents = async (clientId) => { 
+export const getEvents = async (clientId, page) => { 
     try {
         const res = await axios.post(BASE_URL +
-            '/getAllEvents',
+            `/getAllEvents?page=${page}`,
             {
                 Headers: {
                     'Content-Type': 'application/json',

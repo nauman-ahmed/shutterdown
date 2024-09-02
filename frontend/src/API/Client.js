@@ -1,9 +1,7 @@
 import axios from "axios";
 import BASE_URL from "./index";
 import Cookies from "js-cookie";
-const currentUser =
-  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
-console.log(currentUser);
+const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
 export const SaveClientForm = async (data) => {
   try {
@@ -12,14 +10,13 @@ export const SaveClientForm = async (data) => {
       .post(BASE_URL + "/AddClient", {
         data: dataToSend,
       })
-      .then(() => {
-        window.notify("Client has been Added", "success");
-        return true;
+      .then((res) => {
+
+        return {result :true, data : res.data};
       })
       .catch((err) => console.log(err));
-      console.log(result);
-      
-    return result;
+      return result
+
   } catch (error) {
     console.log(error, "error");
     return false;
@@ -43,7 +40,7 @@ export const addCinematography = async (client) => {
 };
 export const updateClient = async (client) => {
   try {
-    const res = await axios
+    await axios
       .post(BASE_URL + "/updateClientData", {
         Headers: {
           "Content-Type": "application/json",
@@ -60,7 +57,7 @@ export const updateClient = async (client) => {
 
 export const addPhotosDeliverables = async (client) => {
   try {
-    const res = await axios
+   await axios
       .post(BASE_URL + "/AddPhotosDeliverables", {
         Headers: {
           "Content-Type": "application/json",
@@ -77,7 +74,7 @@ export const addPhotosDeliverables = async (client) => {
 
 export const addAlbumsDeliverables = async (client) => {
   try {
-    const res = await axios
+    await axios
       .post(BASE_URL + "/AddAlbumsDeliverables", {
         Headers: {
           "Content-Type": "application/json",
@@ -93,9 +90,9 @@ export const addAlbumsDeliverables = async (client) => {
   }
 };
 
-export const getClients = async () => {
+export const getClients = async (page) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getAllClients`, {
+    const res = await axios.get(BASE_URL + `/Client/getAllClients?page=${page}`, {
       Headers: { "Content-Type": "application/json" },
     });
     return res.data;
@@ -103,9 +100,9 @@ export const getClients = async () => {
     console.log(error);
   }
 };
-export const getPreWedClients = async () => {
+export const getPreWedClients = async (page) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getPreWedClients`, {
+    const res = await axios.get(BASE_URL + `/Client/getPreWedClients?page=${page}`, {
       Headers: { "Content-Type": "application/json" },
     });
     return res.data;

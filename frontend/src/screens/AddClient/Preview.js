@@ -13,6 +13,7 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import { updateClintData } from "../../redux/clientBookingForm";
 import { getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
+import Cookies from "js-cookie";
 
 function Preview() {
   const navigate = useNavigate();
@@ -23,24 +24,39 @@ function Preview() {
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientData]);
   useEffect(() => {
     if (!clientData || !clientData.events) {
       navigate("/MyProfile/AddClient/Form-I");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const currentUser =
+    Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [eventIndex, setEventIndex] = useState(0);
   const submitClient = async () => {
-    if (requesting === false ) {
+    if (requesting === false) {
       setRequesting(true);
-      const saveResult = await SaveClientForm(clientData); 
+      const saveResult = await SaveClientForm(clientData);
       setRequesting(false);
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "add-notification",
+          data: {
+            notificationOf: "client",
+            data: saveResult.data,
+            forManager: true,
+            read: false,
+            readBy: [currentUser._id],
+          },
+        },
+      });
       const storedEvents = await getEvents();
       dispatch(updateAllEvents(storedEvents.data));
       dispatch(updateClintData({ albums: [""] }));
-      if (saveResult) {
+      if (saveResult.result) {
         navigate("/MyProfile/AddClient/Form-I");
       }
     }
@@ -51,7 +67,7 @@ function Preview() {
     <>
       <div className="mt18">
         <Row>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div ref={target}>
               <div>
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
@@ -71,7 +87,7 @@ function Preview() {
               </div>
             </div>
           </Col>
-          <Col xs="6" sm="3"  md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div>
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Event Type
@@ -91,21 +107,20 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4">
             <div className="Text16N" style={{ marginBottom: "25px" }}>
               Is This a Wedding Event
             </div>
             <input
               type="checkbox"
               name="isWedding"
-              // style={{ marginLeft: "20px" }}
               checked={
                 clientData?.events && clientData?.events[eventIndex]?.isWedding
               }
               disabled={true}
             />
           </Col>
-          <Col xs="4" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Location
@@ -126,7 +141,8 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Travel By
@@ -145,7 +161,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Shoot Directors
@@ -166,7 +182,7 @@ function Preview() {
           </Col>
         </Row>
         <Row>
-          <Col xs="4" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Photographers
@@ -186,7 +202,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Cinematographers
@@ -206,7 +222,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3"  md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Drones
@@ -225,7 +241,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Same Day Photo Editor
@@ -245,7 +261,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="4" lg="4" className="pr5">
+          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Same Day Video Editor
@@ -272,7 +288,7 @@ function Preview() {
             hover
             striped
             responsive
-            style={{ marginTop: "15px", width: "80%" }}
+            style={{ marginTop: "15px", width: "700px" }}
           >
             <thead>
               <tr className="Text14Semi gray3 alignCenter">
@@ -288,7 +304,10 @@ function Preview() {
               {clientData?.events?.map((event, i) => (
                 <tr>
                   <td className="primary2 alignCenter">
-                    <div class="form-check" style={{display:"contents", justifyContent: "center"}}>
+                    <div
+                      class="form-check"
+                      style={{ display: "contents", justifyContent: "center" }}
+                    >
                       <input
                         style={{ marginLeft: "20px" }}
                         class="form-check-input"
@@ -300,9 +319,7 @@ function Preview() {
                       />
                     </div>
                   </td>
-                  <td>
-                    {event.eventType}
-                  </td>
+                  <td>{event.eventType}</td>
                   <td className="primary2">
                     {dayjs(event.eventDate).format("DD-MMM-YYYY")}
                   </td>
@@ -314,99 +331,103 @@ function Preview() {
             </tbody>
           </Table>
         </div>
+        <div className="Text16N mt25" style={{ marginBottom: "6px" }}>
+          Deliverables
+        </div>
         <div className="mt25">
-          <div className="Text16N" style={{ marginBottom: "6px" }}>
-            Deliverables
-          </div>
-          <div className="Text16N">
-            <input
-              type="checkbox"
-              name="preWeddingPhotos"
-              checked={clientData?.deliverables?.preWeddingPhotos}
-              disabled={true}
-            />
-            {"   "}
-            Pre Wedding Photos
-            <input
-              type="checkbox"
-              name="preWeddingVideos"
-              style={{ marginLeft: "20px" }}
-              checked={clientData?.deliverables?.preWeddingVideos}
-              disabled={true}
-            />
-            {"   "}
-            Pre Wedding Videos
+          <div className="Text16N d-flex flex-row flex-wrap gap-3">
+            <div>
+              <input
+                type="checkbox"
+                name="preWeddingPhotos"
+                checked={clientData?.deliverables?.preWeddingPhotos}
+                disabled={true}
+              />
+              {"   "}
+              Pre Wedding Photos
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                name="preWeddingVideos"
+                style={{ marginLeft: "20px" }}
+                checked={clientData?.deliverables?.preWeddingVideos}
+                disabled={true}
+              />
+              {"   "}
+              Pre Wedding Videos
+            </div>
           </div>
         </div>
         {(clientData?.deliverables?.preWeddingVideos ||
           clientData?.deliverables?.preWeddingPhotos) && (
-            <Row>
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Photographers
-                  </div>
-                  <Input
-                    type="text"
-                    name="preWedAssistants"
-                    disabled={true}
-                    className="forminput"
-                    value={clientData?.preWedphotographers}
-                    required={true}
-                  />
+          <Row>
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  Photographers
                 </div>
-              </Col>
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Cinematograpers
-                  </div>
-                  <Input
-                    type="text"
-                    name="preWedCinematographers"
-                    disabled={true}
-                    className="forminput"
-                    value={clientData?.preWedcinematographers}
-                    required={true}
-                  />
+                <Input
+                  type="text"
+                  name="preWedAssistants"
+                  disabled={true}
+                  className="forminput"
+                  value={clientData?.preWedphotographers}
+                  required={true}
+                />
+              </div>
+            </Col>
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  Cinematograpers
                 </div>
-              </Col>
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Assistants
-                  </div>
-                  <Input
-                    type="text"
-                    name="preWedAssistants"
-                    disabled={true}
-                    className="forminput"
-                    value={clientData?.preWedassistants}
-                    required={true}
-                  />
+                <Input
+                  type="text"
+                  name="preWedCinematographers"
+                  disabled={true}
+                  className="forminput"
+                  value={clientData?.preWedcinematographers}
+                  required={true}
+                />
+              </div>
+            </Col>
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  Assistants
                 </div>
-              </Col>
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    Drone Flyers
-                  </div>
-                  <Input
-                    type="text"
-                    name="preWedDroneFlyerss"
-                    disabled={true}
-                    className="forminput"
-                    value={clientData?.preWeddrones}
-                    required={true}
-                  />
+                <Input
+                  type="text"
+                  name="preWedAssistants"
+                  disabled={true}
+                  className="forminput"
+                  value={clientData?.preWedassistants}
+                  required={true}
+                />
+              </div>
+            </Col>
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  Drone Flyers
                 </div>
-              </Col>
-            </Row>
+                <Input
+                  type="text"
+                  name="preWedDroneFlyerss"
+                  disabled={true}
+                  className="forminput"
+                  value={clientData?.preWeddrones}
+                  required={true}
+                />
+              </div>
+            </Col>
+          </Row>
         )}
         <Row>
           {clientData?.albums?.map((albumValue, i) => {
             return (
-              <Col xs="6" sm="3" md="3" lg="3" className="pr5" key={i}>
+              <Col xs="12" sm="6" className="pr5" key={i}>
                 <div className="Drop">
                   <h4 className="LabelDrop">Album {i + 1}</h4>
                   <Input
@@ -424,7 +445,7 @@ function Preview() {
           })}
         </Row>
         <Row>
-          <Col xs="6" sm="3" md="3" lg="3"  className="pr5">
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Promo
@@ -440,7 +461,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="3" lg="3"  className="pr5">
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Long Films
@@ -456,7 +477,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="3" lg="3" className="pr5">
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Reels
@@ -472,7 +493,7 @@ function Preview() {
               />
             </div>
           </Col>
-          <Col xs="6" sm="3" md="3" lg="3" className="pr5">
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Hard Drives

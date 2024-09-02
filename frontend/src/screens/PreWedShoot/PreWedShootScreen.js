@@ -16,26 +16,25 @@ import ShootDropDown from "../../components/ShootDropDown";
 import ClientHeader from "../../components/ClientHeader";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
+import { useDispatch } from "react-redux";
 
 function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const [filterFor, setFilterFor] = useState('day')
+  const [filterCondition, setFilterCondition] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [shooters, setShooters] = useState([]);
-
-  const [assistant, setAssistant] = useState([]);
-  const [photographer, setPhotographer] = useState([]);
-  const [cinematographer, setCinematographer] = useState([]);
-  const [flyer, setFlyer] = useState([]);
-
+  const dispatch = useDispatch()
   const toggle = () => {
     setShow(!show);
   };
   const [filteringDay, setFilteringDay] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
     if(reset){
@@ -95,7 +94,7 @@ function PreWedShootScreen() {
 
   const getClients = async () => {
     try {
-      const allPreWedClients = await getPreWedClients();
+      const allPreWedClients = await getPreWedClients(page);
       const res = await getShooters();
 
       setShooters(res.shooters)
@@ -134,6 +133,85 @@ function PreWedShootScreen() {
     }
   }
 
+  const fetchClients = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const data = await getPreWedClients(page === 1 ? page + 1 : page);
+        if (data.length > 0) {
+          let dataToAdd;
+          if (currentUser?.rollSelect === "Manager") {
+  
+            setPreWedClients([...preWedClients, ...data])
+            if(filterCondition){
+              dataToAdd = data.filter(client => eval(filterCondition))
+            } else {
+              dataToAdd = data
+            }
+            setClientsForShow([...clientsForShow, ...dataToAdd]);
+          } else if (currentUser.rollSelect === 'Shooter') {
+            const clientsToShow = data.filter(client => {
+              return client.preWeddingDetails?.photographers?.some(photographer => photographer._id === currentUser._id) || client.preWeddingDetails?.cinematographers?.some(cinematographer => cinematographer._id === currentUser._id) || client.preWeddingDetails?.assistants?.some(assistant => assistant._id === currentUser._id) || client.preWeddingDetails?.droneFlyers?.some(flyer => flyer._id === currentUser._id)
+            });
+            setPreWedClients([...preWedClients, ...clientsToShow])
+            if(filterCondition){
+              dataToAdd = clientsToShow.filter(client => eval(filterCondition))
+            } else {
+              dataToAdd = clientsToShow
+            }
+            for (let client_index = 0; client_index < dataToAdd.length; client_index++) {
+              if (dataToAdd[client_index]?.preWeddingDetails.photographers?.some(photographer => photographer._id === currentUser._id)) {
+                dataToAdd[client_index].userRole = "Photographer"
+                break
+              } else if (dataToAdd[client_index]?.preWeddingDetails.photographers?.some(cinematographer => cinematographer._id === currentUser._id)) {
+                dataToAdd[client_index].userRole = "Cinematographer"
+                break
+              } else if (dataToAdd[client_index]?.preWeddingDetails.photographers?.some(flyer => flyer._id === currentUser._id)) {
+                dataToAdd[client_index].userRole = "Drone Flyer"
+                break
+              } else if (dataToAdd[client_index]?.preWeddingDetails.photographers?.some(assistant => assistant === currentUser._id)) {
+                dataToAdd[client_index].userRole = "Assistant"
+                break
+              } else {
+                dataToAdd[client_index].userRole = "Not Assigned"
+              }
+    
+            }
+            setClientsForShow([...clientsForShow, ...dataToAdd]);
+          }
+
+          setPage(page + 1);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(clientsForShow?.length < 10 && hasMore && !loading){
+      fetchClients()
+    }
+  }, [clientsForShow])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleScroll = () => {
+    const bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >=
+      800*page;
+
+    if (bottomOfWindow) {
+      console.log("at bottom");
+      fetchClients();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   const applyFilterNew = (filterValue) => {
     if(filterValue.length){
       let conditionAssigned = null
@@ -157,6 +235,7 @@ function PreWedShootScreen() {
       }else{
         finalCond = "(" + conditionUnassigned +")" 
       }
+      setFilterCondition(finalCond)
       const newData = preWedClients.filter(client => eval(finalCond))
       setClientsForShow(newData)
     }else{
@@ -204,6 +283,70 @@ function PreWedShootScreen() {
       const client = preWedClients[index];
       setUpdatingIndex(index);
       await addPreWedData(client);
+      client.preWeddingDetails?.photographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.cinematographers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.assistants?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
+      client.preWeddingDetails?.droneFlyers?.forEach((userObj) => {
+        dispatch({
+          type: "SOCKET_EMIT_EVENT",
+          payload: {
+            event: "add-notification",
+            data: {
+              notificationOf: "Pre-Wed Shoot",
+              data: client,
+              forManager: false,
+              forUser: userObj._id,
+              read: false,
+              dataId: client._id,
+            },
+          },
+        });
+      });
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
@@ -218,7 +361,7 @@ function PreWedShootScreen() {
           }} ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-50 '>
+              <div className='w-75 '>
                 <div
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: 'pointer' }}
@@ -246,7 +389,6 @@ function PreWedShootScreen() {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column-prewed">Couple</th>
                     <th className="tableBody sticky-column-prewed">Wedding Date</th>
-                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Photographers</th>
                     <th className="tableBody">Cinematographers</th>
                     <th className="tableBody">Assistants</th>
@@ -259,7 +401,6 @@ function PreWedShootScreen() {
                 {currentUser.rollSelect === 'Shooter' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple</th>
-                    {/* <th className="tableBody">POC</th> */}
                     <th className="tableBody">Shoot Date</th>
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Status</th>
@@ -519,6 +660,16 @@ function PreWedShootScreen() {
                 )}
               </tbody>
             </Table>
+            {loading && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div class="spinner"></div>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <div>No more data to load.</div>
+              </div>
+            )}
             <Overlay
               rootClose={true}
               onHide={() => setShow(false)}
