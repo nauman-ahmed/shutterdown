@@ -692,8 +692,8 @@ function ListView(props) {
               <thead>
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
-                    <th className="tableBody sticky-column">Couple Location</th>
-                    <th className="tableBody sticky-column">
+                    <th className="tableBody ">Couple Location</th>
+                    <th className="tableBody ">
                       Date{" "}
                       {ascending ? (
                         <IoIosArrowRoundDown
@@ -1575,7 +1575,7 @@ function ListView(props) {
   );
 }
 const ButtonWithHoverBox = ({ hoverText }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(true);
 
   const handleMouseEnter = (e) => {
     setIsHovered(true);

@@ -126,7 +126,7 @@ function Calender() {
                     </div>
                     <div 
                       className={eventInfo.event?.extendedProps.allDataCompleted ? "Text10N p-1 calenderEventBox" : "Text10N p-1 calenderEventBoxYellow" }
-                      style={{ marginLeft: "5px", width: "100%",  }}
+                      style={{ marginLeft: "5px", width: "100%", overflow: "auto" }}
                     >
                       {" "}
                       • {eventInfo.event?.extendedProps.client?.brideName} X  {eventInfo.event?.extendedProps.client?.groomName}
