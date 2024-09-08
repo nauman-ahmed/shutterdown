@@ -821,7 +821,7 @@ function ListView(props) {
                         <>
                           {currentUser.rollSelect === "Manager" && (
                             <tr>
-                              <td className="tableBody Text14Semi primary2 sticky-column tablePlaceContent">
+                              <td  className="tableBody Text14Semi primary2  tablePlaceContent">
                                 <div className="d-flex flex-row">
                                   {errorText.length > 0 && (
                                     <ButtonWithHoverBox
@@ -853,8 +853,9 @@ function ListView(props) {
                                 style={{
                                   width: "90px",
                                   marginLeft: 10,
+                           
                                 }}
-                                className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
+                                className="tableBody Text14Semi primary2  tablePlaceContent"
                               >
                                 <div
                                   style={{

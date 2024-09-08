@@ -44,7 +44,8 @@ function Cinematography(props) {
    return EditorState.createWithContent(contentState);
     // Use `newEditorState` in your editor component
   };
-
+  console.log(deliverablesForShow);
+  
   const getAllWhatsappTextHandler = async () => {
     const res = await getAllWhatsappText()
     const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)

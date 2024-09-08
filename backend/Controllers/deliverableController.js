@@ -11,21 +11,27 @@ const getCinematography = async (req, res) => {
 
         const cinematographyDeliverablesWithEvents = []
         for (let index = 0; index < cinematographyDeliverables.length; index++) {
-            const events = await eventModel.find({client : cinematographyDeliverables[index].client.toObject(), isWedding: true})
-            let dummyObj = {...cinematographyDeliverables[index].toObject()}
-            dummyObj["client"]["eventDate"] = events[0]?.eventDate
-            dummyObj["client"]["isWedding"] = events[0]?.isWedding
+            const events = await eventModel.find({ client: cinematographyDeliverables[index].client.toObject()._id })
+            const weddingEvent = events.filter(event => event.isWedding)
+            let dummyObj = { ...cinematographyDeliverables[index].toObject() }
+            if (weddingEvent?.length > 0) {
+                dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate
+                dummyObj["client"]["isWedding"] = true
+            } else {
+                dummyObj["client"]["eventDate"] = events[0]?.eventDate
+                dummyObj["client"]["isWedding"] = false
+            }
             cinematographyDeliverablesWithEvents.push(dummyObj)
         }
 
-    res.status(200).json(cinematographyDeliverablesWithEvents);
+        res.status(200).json(cinematographyDeliverablesWithEvents);
     } catch (error) {
         console.log(error);
     }
 }
 const getAlbums = async (req, res) => {
     try {
-        const allDocument = await DeliverableOptionsSchema.find({},{"albums":1});
+        const allDocument = await DeliverableOptionsSchema.find({}, { "albums": 1 });
         let albumValues = []
 
         for (let index = 0; index < allDocument[0].albums.values.length; index++) {
@@ -34,14 +40,21 @@ const getAlbums = async (req, res) => {
 
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
-        const albumsDeliverables = await DeliverableModel.find({ deliverableName:  { $in: albumValues } }).skip(skip).limit(10).populate('client editor');
-        
+        const albumsDeliverables = await DeliverableModel.find({ deliverableName: { $in: albumValues } }).skip(skip).limit(10).populate('client editor');
+
         const albumDeliverablesWithEvents = []
         for (let index = 0; index < albumsDeliverables.length; index++) {
-            const events = await eventModel.find({client : albumsDeliverables[index].client.toObject(), isWedding: true})
-            let dummyObj = {...albumsDeliverables[index].toObject()}
-            dummyObj["client"]["eventDate"] = events[0]?.eventDate
-            dummyObj["client"]["isWedding"] = events[0]?.isWedding
+            const events = await eventModel.find({ client: albumsDeliverables[index].client.toObject()})
+            const weddingEvent = events.filter(event => event.isWedding)
+            let dummyObj = { ...albumsDeliverables[index].toObject() }
+            if (weddingEvent?.length > 0) {
+                dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate
+                dummyObj["client"]["isWedding"] = true
+            } else {
+                dummyObj["client"]["eventDate"] = events[0]?.eventDate
+                dummyObj["client"]["isWedding"] = false
+            }
+         
             albumDeliverablesWithEvents.push(dummyObj)
         }
 
@@ -55,13 +68,20 @@ const getPhotos = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
         const photosDeliverables = await DeliverableModel.find({ deliverableName: 'Photos' }).skip(skip).limit(10).populate('client editor');
-        
+
         const photosDeliverablesWithEvents = []
         for (let index = 0; index < photosDeliverables.length; index++) {
-            const events = await eventModel.find({client : photosDeliverables[index].client.toObject(), isWedding: true})
-            let dummyObj = {...photosDeliverables[index].toObject()}
-            dummyObj["client"]["eventDate"] = events[0]?.eventDate
-            dummyObj["client"]["isWedding"] = events[0]?.isWedding
+            const events = await eventModel.find({ client: photosDeliverables[index].client.toObject()})
+            const weddingEvent = events.filter(event => event.isWedding)
+            let dummyObj = { ...photosDeliverables[index].toObject() }
+            if (weddingEvent?.length > 0) {
+                dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate
+                dummyObj["client"]["isWedding"] = true
+            } else {
+                dummyObj["client"]["eventDate"] = events[0]?.eventDate
+                dummyObj["client"]["isWedding"] = false
+            }
+           
             photosDeliverablesWithEvents.push(dummyObj)
         }
 
@@ -74,14 +94,20 @@ const getPreWeds = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
-        const preWedDeliverables = await DeliverableModel.find({ deliverableName:  { $in: ['Pre-Wedding Photos', 'Pre-Wedding Videos'] } }).skip(skip).limit(10).populate('client editor');
-        
+        const preWedDeliverables = await DeliverableModel.find({ deliverableName: { $in: ['Pre-Wedding Photos', 'Pre-Wedding Videos'] } }).skip(skip).limit(10).populate('client editor');
+
         const preWedDeliverablesWithEvents = []
         for (let index = 0; index < preWedDeliverables.length; index++) {
-            const events = await eventModel.find({client : preWedDeliverables[index].client.toObject(), isWedding: true})
-            let dummyObj = {...preWedDeliverables[index].toObject()}
-            dummyObj["client"]["eventDate"] = events[0]?.eventDate
-            dummyObj["client"]["isWedding"] = events[0]?.isWedding
+            const events = await eventModel.find({ client: preWedDeliverables[index].client.toObject()})
+            const weddingEvent = events.filter(event => event.isWedding)
+            let dummyObj = { ...preWedDeliverables[index].toObject() }
+            if (weddingEvent?.length > 0) {
+                dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate
+                dummyObj["client"]["isWedding"] = true
+            } else {
+                dummyObj["client"]["eventDate"] = events[0]?.eventDate
+                dummyObj["client"]["isWedding"] = false
+            }
             preWedDeliverablesWithEvents.push(dummyObj)
         }
 

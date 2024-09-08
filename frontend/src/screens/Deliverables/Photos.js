@@ -333,7 +333,8 @@ function Photos() {
 
     return 45
   }
-  
+    console.log(deliverablesForShow);
+    
   return (
     <>
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Photos" />
