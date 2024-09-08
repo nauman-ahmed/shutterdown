@@ -179,7 +179,7 @@ const login =  useGoogleLogin({
                   </Label>
                 </FormGroup> */}
                 <button
-                  className="transparent_btn"
+                  className="transparent_btn mt-1"
                   onClick={() => navigate('/emailVerify')}
                 >
                   Forgot Password

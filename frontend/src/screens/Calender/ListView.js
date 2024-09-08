@@ -821,7 +821,11 @@ function ListView(props) {
                         <>
                           {currentUser.rollSelect === "Manager" && (
                             <tr>
-                              <td className="tableBody Text14Semi primary2 sticky-column tablePlaceContent">
+                              <td className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
+                               style={{
+                                zIndex:-index
+                              }}
+                              >
                                 <div className="d-flex flex-row">
                                   {errorText.length > 0 && (
                                     <ButtonWithHoverBox
@@ -853,6 +857,7 @@ function ListView(props) {
                                 style={{
                                   width: "90px",
                                   marginLeft: 10,
+                                  zIndex:-index
                                 }}
                                 className="tableBody Text14Semi primary2 sticky-column tablePlaceContent"
                               >
@@ -1574,7 +1579,7 @@ function ListView(props) {
   );
 }
 const ButtonWithHoverBox = ({ hoverText }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(true);
 
   const handleMouseEnter = (e) => {
     setIsHovered(true);
