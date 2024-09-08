@@ -1575,7 +1575,7 @@ function ListView(props) {
   );
 }
 const ButtonWithHoverBox = ({ hoverText }) => {
-  const [isHovered, setIsHovered] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = (e) => {
     setIsHovered(true);
