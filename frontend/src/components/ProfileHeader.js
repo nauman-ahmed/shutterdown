@@ -75,7 +75,8 @@ function ProfileHeader({ attendence = false, profile = false }) {
             >
               <div className="d-flex align-items-center">
                 <img alt="" src={locate} className="marginrightsmall" />
-                <p className="title_profile">{user?.currentAddress}</p>
+                {/* <p className="title_profile">{user?.currentAddress}</p> */}
+                <p className="title_profile">India</p>
               </div>
               <div className="d-flex align-items-center">
                 <img alt="" src={mail} className="marginrightsmall" />

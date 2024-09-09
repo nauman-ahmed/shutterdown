@@ -211,7 +211,7 @@ const login =  useGoogleLogin({
                 style={{ marginRight: 10, marginTop: -3 }}
                 onClick={login}
               />
-              Sign in google
+              Sign in with Google
             </Button>
             {/* <GoogleLogin
               onSuccess={(credentialResponse) => {

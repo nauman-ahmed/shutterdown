@@ -332,6 +332,7 @@ function ClientInfo() {
                   <div
                     style={{
                       zIndex: "5",
+                      width: "300px"
                     }}
                     className="position-absolute"
                   >
