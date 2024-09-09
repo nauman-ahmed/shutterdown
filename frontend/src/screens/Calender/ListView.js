@@ -40,6 +40,7 @@ import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
 import { getClients } from "../../API/Client";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
+import { all } from "axios";
 
 function ListView(props) {
   const [clientData, setClientData] = useState(null);
@@ -104,10 +105,11 @@ function ListView(props) {
     setFilteringDay(startDate);
     setFilterStartDate(startDate);
     setFilterEndDate(endDate);
+   
     let filteredData = allEvents?.filter(
       (event) =>
-        new Date(event.eventDate).getTime() >= new Date(startDate).getTime() &&
-        new Date(event.eventDate).getTime() <= new Date(endDate).getTime()
+        new Date(event.eventDate).setHours(0,0,0,0) >= new Date(startDate).setHours(0,0,0,0) &&
+        new Date(event.eventDate).setHours(0,0,0,0) <= new Date(endDate).setHours(0,0,0,0)
     );
     setEventsForShow(groupByBrideName(filteredData));
   };
@@ -614,7 +616,8 @@ function ListView(props) {
       }
     }
   };
-
+  console.log(allEvents);
+  
   return (
     <>
       <ToastContainer />
@@ -649,18 +652,25 @@ function ListView(props) {
                       </div>
                     ),
                   },
-                  clientData?.map((client) => {
-                    return {
-                      value: client.brideName + "<" + client.groomName,
-                      label: (
-                        <div className="d-flex justify-content-around">
-                          <span>{client.brideName}</span>{" "}
-                          <img alt="" src={Heart} />{" "}
-                          <span>{client.groomName}</span>
-                        </div>
-                      ),
-                    };
-                  }),
+                  ...Array.from(
+                    // Use a Map to filter out duplicate clients
+                    new Map(
+                      allEvents?.map((event) => [
+                        // Use a unique key based on both bride and groom names
+                        event?.client?.brideName + "<" + event.client?.groomName,
+                        event,
+                      ])
+                    ).values() // Extract the unique events from the Map
+                  ).map((event) => ({
+                    value: event?.client?.brideName + "<" + event.client?.groomName,
+                    label: (
+                      <div className="d-flex justify-content-around">
+                        <span>{event.client?.brideName}</span>{" "}
+                        <img alt="" src={Heart} />{" "}
+                        <span>{event.client?.groomName}</span>
+                      </div>
+                    ),
+                  })),
                 ]}
                 required
               />

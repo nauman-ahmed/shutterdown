@@ -43,6 +43,8 @@ function CalenderMulti({filterByDates}) {
 
       filterByDates(startDate,endDate,props.view)
     }else{
+      console.log(props);
+      
       filterByDates(props,props,props.view)
     }
   }
