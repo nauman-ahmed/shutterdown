@@ -45,7 +45,7 @@ function ShootDropDown(props) {
       });
       for (const date in dummy) {
         const events = dummy[date];
-        const seen = new Set(); 
+        const seen = new Set();
         if (events) {
           for (const event of events) {
             const eventString = JSON.stringify(event);
@@ -96,6 +96,9 @@ function ShootDropDown(props) {
                   justifyContent: "space-between",
                 }}
                 onClick={() => {
+                  console.log(currentEvent);
+
+
                   if (
                     existedUsers?.length > 0 &&
                     existedUsers?.some(
@@ -112,13 +115,15 @@ function ShootDropDown(props) {
                       return;
                     } else {
                       // if (shooterDatesHandler(user, props.role)) {
+
+                      if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+                        window.notify(
+                          `This ${message} has already been assigned in some other role on the same event!`,
+                          "error"
+                        );
+                      } else {
                         userChecked(user);
-                      // } else {
-                      //   window.notify(
-                      //     `This ${message} has already been assigned on the same date`,
-                      //     "error"
-                      //   );
-                      // }
+                      }
                     }
                   }
                 }}
@@ -128,28 +133,30 @@ function ShootDropDown(props) {
                   ref={target}
                   className="ml-2 mx-2"
                   type="checkbox"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      if (existedUsers?.length >= allowedPersons) {
-                        window.notify(
-                          `Maximum Limit is ${allowedPersons}, uncheck previous!`,
-                          "error"
-                        );
-                        return;
-                      } else {
-                        if (shooterDatesHandler(user, props.role)) {
-                          userChecked(user);
-                        } else {
-                          window.notify(
-                            `This ${message} has already been assigned on the same date`,
-                            "error"
-                          );
-                        }
-                      }
-                    } else {
-                      userUnChecked(user);
-                    }
-                  }}
+                  // onChange={(e) => {
+                  //   if (e.target.checked) {
+                  //     if (existedUsers?.length >= allowedPersons) {
+                  //       window.notify(
+                  //         `Maximum Limit is ${allowedPersons}, uncheck previous!`,
+                  //         "error"
+                  //       );
+                  //       return;
+                  //     } else {
+                  //      // if (shooterDatesHandler(user, props.role)) {
+
+                  //     if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+                  //       window.notify(
+                  //         `This ${message} has already been assigned in some other role on the same event!`,
+                  //         "error"
+                  //       );
+                  //     } else {
+                  //       userChecked(user);
+                  //     }
+                  //     }
+                  //   } else {
+                  //     userUnChecked(user);
+                  //   }
+                  // }}
                   checked={
                     existedUsers?.length > 0 &&
                     existedUsers?.some(

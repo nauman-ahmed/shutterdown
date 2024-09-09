@@ -31,7 +31,7 @@
 .sticky-column-prewed {
   position: sticky;
   left: 0;
-  z-index: 0;
+  z-index: 100 !important;
   background-color: white;
 }
 
@@ -41,18 +41,18 @@
 }
 
 .sticky-column-prewed + .sticky-column-prewed {
-  left: 80px; /* This needs to be adjusted based on the actual width of the first column */
+  left: 100px; /*This needs to be adjusted based on the actual width of the first column*/
 }
 
 .sticky-column {
   position: sticky;
   left: 0;
-  z-index: 100;
+  z-index: 100 !important;
   background-color: white;
 }
 
 .sticky-column + .sticky-column {
-  left: 100px; /* This needs to be adjusted based on the actual width of the first column */
+  left: 120px; /*This needs to be adjusted based on the actual width of the first column*/
 }
 
 .widthForFilters{

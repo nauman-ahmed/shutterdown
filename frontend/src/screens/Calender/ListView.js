@@ -26,6 +26,8 @@ import { IoIosArrowRoundDown } from "react-icons/io";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { updateAllEvents } from "../../redux/eventsSlice";
+import tippy from 'tippy.js';
+
 import {
   Button,
   Col,
@@ -65,7 +67,7 @@ function ListView(props) {
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [filteringDay, setFilteringDay] = useState(null);
-
+  const [rowOfWarning, setRowOfWarnig] = useState(null)
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -593,6 +595,10 @@ function ListView(props) {
       )
     );
   };
+  useEffect(()=>{
+    console.log(rowOfWarning);
+    
+  }, [rowOfWarning])
 
   const returnOneRow = (event, prevEvent) => {
     if (prevEvent && !clientId) {
@@ -702,8 +708,8 @@ function ListView(props) {
               <thead>
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
-                    <th className="tableBody ">Couple Location</th>
-                    <th className="tableBody ">
+                    <th className="tableBody sticky-column">Couple Location</th>
+                    <th className="tableBody sticky-column">
                       Date{" "}
                       {ascending ? (
                         <IoIosArrowRoundDown
@@ -830,15 +836,18 @@ function ListView(props) {
                       {event && (
                         <>
                           {currentUser.rollSelect === "Manager" && (
-                            <tr>
-                              <td  className="tableBody Text14Semi primary2  tablePlaceContent">
-                                <div className="d-flex flex-row">
-                                  {errorText.length > 0 && (
+                            <tr className="relative">
+                              <td  className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 90)) ? " " : " sticky-column "} tablePlaceContent`}>
+                              {errorText.length > 0 && (
                                     <ButtonWithHoverBox
                                       buttonText="error"
                                       hoverText={errorText}
+                                      setRowOfWarnig={setRowOfWarnig}
+                                      i={index}
                                     />
                                   )}
+                                <div className="d-flex flex-row ps-5">
+                                  
                                   <div
                                     className={`${
                                       errorText.length === 0 && "ms-4"
@@ -865,7 +874,7 @@ function ListView(props) {
                                   marginLeft: 10,
                            
                                 }}
-                                className="tableBody Text14Semi primary2  tablePlaceContent"
+                                className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 90)) ? " " : " sticky-column "}  tablePlaceContent`}
                               >
                                 <div
                                   style={{
@@ -1584,36 +1593,32 @@ function ListView(props) {
     </>
   );
 }
-const ButtonWithHoverBox = ({ hoverText }) => {
+const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   const [isHovered, setIsHovered] = useState(false);
-
   const handleMouseEnter = (e) => {
     setIsHovered(true);
+    setRowOfWarnig(i)
   };
-
   const handleMouseLeave = () => {
     setIsHovered(false);
+    setRowOfWarnig(null)
   };
 
   return (
-    <div
-      style={{ position: "relative", display: "flex", alignItems: "center" }}
-    >
+    <div style={{ position: "absolute" }}>
       <IoIosWarning
         className="fs-3 text-danger"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />
-
       {isHovered && (
         <div
           style={{
             position: "absolute",
-            display: "block",
-            width: "300px",
             top: 30,
             left: 20,
-            zIndex: 9999, // Ensure it's above other elements
+            zIndex: 10000,
+            width: "300px",
             background: "silver",
             borderRadius: "10px",
             color: "red",
@@ -1625,6 +1630,7 @@ const ButtonWithHoverBox = ({ hoverText }) => {
         </div>
       )}
     </div>
+
   );
 };
 
