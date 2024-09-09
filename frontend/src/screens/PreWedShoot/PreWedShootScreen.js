@@ -11,7 +11,7 @@ import Cookies from "js-cookie";
 import CalenderImg from '../../assets/Profile/Calender.svg';
 import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
-import { getShooters } from "../../API/userApi";
+import { getShooters, getAllUsers } from "../../API/userApi";
 import ShootDropDown from "../../components/ShootDropDown";
 import ClientHeader from "../../components/ClientHeader";
 import CalenderMulti from "../../components/Calendar";
@@ -101,9 +101,10 @@ function PreWedShootScreen() {
     try {
       const allPreWedClients = await getPreWedClients(page);
       const res = await getShooters();
+      const usersData = await getAllUsers();
 
       setShooters(res.shooters)
-      getFilterdUsers(res.shooters)
+      getFilterdUsers(usersData.users)
 
       if (currentUser.rollSelect === 'Manager') {
         setPreWedClients(allPreWedClients);

@@ -96,9 +96,6 @@ function ShootDropDown(props) {
                   justifyContent: "space-between",
                 }}
                 onClick={() => {
-                  console.log(currentEvent);
-
-
                   if (
                     existedUsers?.length > 0 &&
                     existedUsers?.some(
@@ -114,9 +111,8 @@ function ShootDropDown(props) {
                       );
                       return;
                     } else {
-                      // if (shooterDatesHandler(user, props.role)) {
-
-                      if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+                      console.log("Current Event", currentEvent)
+                      if ([...currentEvent?.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
                         window.notify(
                           `This ${message} has already been assigned in some other role on the same event!`,
                           "error"

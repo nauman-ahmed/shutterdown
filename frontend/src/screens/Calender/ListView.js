@@ -1401,7 +1401,7 @@ function ListView(props) {
               show={show}
               placement="bottom"
             >
-              <div>
+              <div style={{ zIndex: 1 }}>
                 <CalenderMulti filterByDates={filterByDates} />
               </div>
             </Overlay>
@@ -1475,6 +1475,7 @@ function ListView(props) {
                   <div
                     style={{
                       zIndex: "5",
+                      width: "300px"
                     }}
                     className="position-absolute"
                   >

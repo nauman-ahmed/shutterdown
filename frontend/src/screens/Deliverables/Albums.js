@@ -421,7 +421,7 @@ function Albums(props) {
   };
 
   const getrelevantDeadline = (title) => {
-    return deadlineDays.album
+    return deadlineDays.album 
   }
 
   return (
@@ -445,7 +445,7 @@ function Albums(props) {
               className="tableViewClient"
               style={
                 currentUser.rollSelect === "Manager"
-                  ? { width: "120%", marginTop: "15px"}
+                  ? { width: "150%", marginTop: "15px"}
                   : { width: "100%", marginTop: "15px" }
               }
             >
@@ -530,7 +530,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "10%",
                             }}
                           >
                             <div>{deliverable.deliverableName}</div>
@@ -540,7 +539,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "20%",
                             }}
                           >
                             <Select
@@ -576,7 +574,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "10%",
                             }}
                           >
                             {dayjs(deliverable?.client.eventDate).format('DD-MMM-YYYY')}
@@ -586,7 +583,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "10%",
                             }}
                           >
                             {dayjs(
@@ -688,7 +684,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "10%",
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
@@ -732,7 +727,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "15%",
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
@@ -742,7 +736,6 @@ function Albums(props) {
                             style={{
                               paddingTop: "15px",
                               paddingBottom: "15px",
-                              width: "10%",
                             }}
                             className="tableBody tablePlaceContent"
                           >

@@ -95,7 +95,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
           <div className="line linestyle" />
           <div className="padding_leftSmall rowalign mtsmall">
             <div
-              className="d-flex align-items-center justify-content-around"
+              className="d-flex align-items-center justify-content-between"
               style={{ width: "95%" }}
             >
               <div>
