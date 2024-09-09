@@ -6,7 +6,7 @@ const Attendence = (props) => {
   return (
     <>
       <div className="main_content">
-        <div style={{ width: '100%' }}>
+        <div style={{ paddingRight: "10px" }} className="CalenderViewWidth">
           <Logs />
         </div>
         <CalenderBar Attendence />
