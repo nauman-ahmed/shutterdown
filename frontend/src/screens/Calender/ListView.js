@@ -837,7 +837,7 @@ function ListView(props) {
                         <>
                           {currentUser.rollSelect === "Manager" && (
                             <tr className="relative">
-                              <td  className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 90)) ? " " : " sticky-column "} tablePlaceContent`}>
+                              <td  className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 150)) ? " " : " sticky-column "} tablePlaceContent`}>
                               {errorText.length > 0 && (
                                     <ButtonWithHoverBox
                                       buttonText="error"
@@ -1615,7 +1615,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
         <div
           style={{
             position: "absolute",
-            top: 30,
+            top: 10,
             left: 20,
             zIndex: 10000,
             width: "300px",
