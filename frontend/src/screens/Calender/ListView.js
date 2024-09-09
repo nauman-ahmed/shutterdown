@@ -1596,12 +1596,16 @@ function ListView(props) {
 const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = (e) => {
-    setIsHovered(true);
-    setRowOfWarnig(i)
+    setTimeout(() => {
+      setIsHovered(true);
+      setRowOfWarnig(i)
+    }, 200);
   };
   const handleMouseLeave = () => {
-    setIsHovered(false);
-    setRowOfWarnig(null)
+    setTimeout(() => {
+      setIsHovered(false);
+      setRowOfWarnig(null)
+    }, 200);
   };
 
   return (
