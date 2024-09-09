@@ -392,7 +392,7 @@ function PreWedShootScreen() {
                 {currentUser.rollSelect === 'Manager' && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column-prewed">Couple</th>
-                    <th className="tableBody sticky-column-prewed">Wedding Date</th>
+                    <th className="tableBody ">Wedding Date</th>
                     <th className="tableBody">Photographers</th>
                     <th className="tableBody">Cinematographers</th>
                     <th className="tableBody">Assistants</th>
@@ -432,7 +432,7 @@ function PreWedShootScreen() {
                             <br />
                             {client.groomName}
                           </td>
-                          <td className="tableBody Text14Semi sticky-column-prewed primary2 tablePlaceContent">
+                          <td className="tableBody Text14Semi  primary2 tablePlaceContent">
                             <>
                               {dayjs(client.events.find(event => event.isWedding === true)?.eventDate).format('DD-MMM-YYYY')}<br />
                             </>
@@ -468,7 +468,6 @@ function PreWedShootScreen() {
                             }
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                            {console.log("client", client)}
                             <ShootDropDown
                               teble={true}
                               allowedPersons={client?.preWedcinematographers}
