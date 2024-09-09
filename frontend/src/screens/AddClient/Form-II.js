@@ -33,6 +33,7 @@ function FormII() {
   const [allEvents, setAllEvents] = useState([]);
   const [weddingAssigned, setWeddingAssigned] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const [editingEvent, setEditingEvent] = useState(null);
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] =
     useState(null);
   const [minDate, setMinDate] = useState(new Date(Date.now()));
@@ -186,7 +187,24 @@ function FormII() {
         <Form
           onSubmit={(e) => {
             e.preventDefault();
-            handleAddEvent(e);
+            if(editingEvent === null){
+
+              handleAddEvent(e);
+            } else {
+              const clientEvents = [...clientData.events]
+              clientEvents[editingEvent] = eventValues
+              const isWeddingAvailable = clientEvents.filter(
+                (event) => event.isWedding === true
+              );
+              if (isWeddingAvailable.length > 0) {
+                setWeddingAssigned(true);
+              }
+              dispatch(updateClintData({ ...clientData, events: clientEvents }));
+              const updatedStoredEvents = [...allEvents];
+              updatedStoredEvents[editingEvent] = eventValues;
+              setAllEvents(updatedStoredEvents);
+              setEditingEvent(null)
+            }
             setEventValues(null);
           }}
         >
@@ -299,7 +317,8 @@ function FormII() {
             ))}
           </Row>
           <Button type="submit" className="add_album album mt-4">
-            Add Event
+            {editingEvent !== null ? 'Edit ' : 'Add '}
+             Event
           </Button>
         </Form>
         <div className="mt-4">
@@ -342,7 +361,8 @@ function FormII() {
                             setWeddingAssigned(false);
                           }
                           setEventValues(event);
-                          handleDeleteEvent(event, i);
+                          setEditingEvent(i)
+                          // handleDeleteEvent(event, i);
                         }}
                         className="mx-1 cursor-pointer"
                       />

@@ -54,10 +54,10 @@ function ViewClient() {
       allClients.filter((clientData) => {
         return clientData.events.some(
           (eventData) =>
-            new Date(eventData.eventDate).getTime() >=
-              new Date(startDate).getTime() &&
-            new Date(eventData.eventDate).getTime() <=
-              new Date(endDate).getTime()
+            new Date(eventData.eventDate).setHours(0,0,0,0) >=
+              new Date(startDate).setHours(0,0,0,0) &&
+            new Date(eventData.eventDate).setHours(0,0,0,0) <=
+              new Date(endDate).setHours(0,0,0,0)
         );
       })
     );

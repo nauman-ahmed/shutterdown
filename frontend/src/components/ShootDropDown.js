@@ -95,15 +95,31 @@ function ShootDropDown(props) {
                   display: "flex",
                   justifyContent: "space-between",
                 }}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent event bubbling if necessary
-
-                  // Manually trigger the input's onChange event
-                  const inputElement = target.current;
-                  if (inputElement) {
-                    const event = new Event('change', { bubbles: true });
-                    inputElement.checked = !inputElement.checked; // Toggle the checked state
-                    inputElement.dispatchEvent(event); // Dispatch the event
+                onClick={() => {
+                  if (
+                    existedUsers?.length > 0 &&
+                    existedUsers?.some(
+                      (existingUser) => existingUser._id === user._id
+                    )
+                  ) {
+                    userUnChecked(user);
+                  } else {
+                    if (existedUsers?.length >= allowedPersons) {
+                      window.notify(
+                        `Maximum Limit is ${allowedPersons}, uncheck previous!`,
+                        "error"
+                      );
+                      return;
+                    } else {
+                      // if (shooterDatesHandler(user, props.role)) {
+                        userChecked(user);
+                      // } else {
+                      //   window.notify(
+                      //     `This ${message} has already been assigned on the same date`,
+                      //     "error"
+                      //   );
+                      // }
+                    }
                   }
                 }}
               >

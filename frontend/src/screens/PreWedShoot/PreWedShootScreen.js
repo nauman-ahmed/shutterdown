@@ -40,22 +40,22 @@ function PreWedShootScreen() {
   const [photographer, setPhotographer] = useState([]);
   const [cinematographer, setCinematographer] = useState([]);
   const [flyer, setFlyer] = useState([]);
-  
-  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
-    if(reset){
+
+  const filterByDates = (startDate = null, endDate = null, view = null, reset = false) => {
+    if (reset) {
       setShow(false)
       setClientsForShow(preWedClients)
       setFilteringDay(null)
       return
     }
-    else if(view !== "month" && view !== "year"){
+    else if (view !== "month" && view !== "year") {
       setShow(false)
     }
     setFilteringDay(startDate)
     setClientsForShow(preWedClients.filter(clientData => {
       const weddingEvent = clientData.events.find(eventData => eventData.isWedding === true);
       if (weddingEvent) {
-        return new Date(weddingEvent.eventDate).getTime() >= (new Date(startDate)).getTime() && new Date(weddingEvent.eventDate).getTime() <= (new Date(endDate)).getTime()
+        return new Date(weddingEvent.eventDate).setHours(0, 0, 0, 0) >= (new Date(startDate)).setHours(0, 0, 0, 0) && new Date(weddingEvent.eventDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0)
       } else {
         return false
       }
@@ -77,7 +77,7 @@ function PreWedShootScreen() {
         },
       ]
     },
-    
+
   ];
 
   // Define priority for parentTitle
@@ -95,7 +95,7 @@ function PreWedShootScreen() {
     setPhotographer(PhotographerDummy)
     setCinematographer(CinematographerDummy)
     setFlyer(FlyerDummy)
-  }   
+  }
 
   const getClients = async () => {
     try {
@@ -146,9 +146,9 @@ function PreWedShootScreen() {
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-  
+
             setPreWedClients([...preWedClients, ...data])
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = data.filter(client => eval(filterCondition))
             } else {
               dataToAdd = data
@@ -159,7 +159,7 @@ function PreWedShootScreen() {
               return client.preWeddingDetails?.photographers?.some(photographer => photographer._id === currentUser._id) || client.preWeddingDetails?.cinematographers?.some(cinematographer => cinematographer._id === currentUser._id) || client.preWeddingDetails?.assistants?.some(assistant => assistant._id === currentUser._id) || client.preWeddingDetails?.droneFlyers?.some(flyer => flyer._id === currentUser._id)
             });
             setPreWedClients([...preWedClients, ...clientsToShow])
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = clientsToShow.filter(client => eval(filterCondition))
             } else {
               dataToAdd = clientsToShow
@@ -180,7 +180,7 @@ function PreWedShootScreen() {
               } else {
                 dataToAdd[client_index].userRole = "Not Assigned"
               }
-    
+
             }
             setClientsForShow([...clientsForShow, ...dataToAdd]);
           }
@@ -196,15 +196,15 @@ function PreWedShootScreen() {
     }
   };
 
-  useEffect(()=>{
-    if(clientsForShow?.length < 10 && hasMore && !loading){
+  useEffect(() => {
+    if (clientsForShow?.length < 10 && hasMore && !loading) {
       fetchClients()
     }
   }, [clientsForShow])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >=
-      800*page;
+      800 * page;
 
     if (bottomOfWindow) {
       fetchClients();
@@ -217,11 +217,11 @@ function PreWedShootScreen() {
   }, [handleScroll]);
 
   const applyFilterNew = (filterValue) => {
-    if(filterValue.length){
+    if (filterValue.length) {
       let conditionAssigned = null
       let conditionUnassigned = null
       filterValue.map((obj) => {
-        if(obj.parentTitle == "Date Filter"){
+        if (obj.parentTitle == "Date Filter") {
           if (obj.title === 'Date Assigned') {
             conditionAssigned = conditionAssigned ? conditionAssigned + " || client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate" : "client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate"
           } else if (obj.title === 'Date Unassigned') {
@@ -230,25 +230,25 @@ function PreWedShootScreen() {
         }
       })
       let finalCond = null
-      if(conditionAssigned){
-        if(conditionUnassigned){
-          finalCond = "(" + conditionAssigned +")" + " || " + "(" + conditionUnassigned + ")"
-        }else{
-          finalCond = "(" + conditionAssigned +")" 
+      if (conditionAssigned) {
+        if (conditionUnassigned) {
+          finalCond = "(" + conditionAssigned + ")" + " || " + "(" + conditionUnassigned + ")"
+        } else {
+          finalCond = "(" + conditionAssigned + ")"
         }
-      }else{
-        finalCond = "(" + conditionUnassigned +")" 
+      } else {
+        finalCond = "(" + conditionUnassigned + ")"
       }
       setFilterCondition(finalCond)
       const newData = preWedClients.filter(client => eval(finalCond))
       setClientsForShow(newData)
-    }else{
+    } else {
       setClientsForShow(preWedClients)
     }
   }
 
   const applyFilter = (filterTitle) => {
-    if(filterTitle == null){
+    if (filterTitle == null) {
       setClientsForShow(preWedClients)
       return
     }
@@ -256,12 +256,12 @@ function PreWedShootScreen() {
       setClientsForShow(preWedClients.filter(client => client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate))
     } else if (filterTitle === 'Date Unassigned') {
       setClientsForShow(preWedClients.filter(client => !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDate))
-    }else {
+    } else {
       getClients()
     }
   }
-  
-  
+
+
   useEffect(() => {
     getClients();
   }, [])
@@ -372,8 +372,8 @@ function PreWedShootScreen() {
                 >
                   {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
                   <div className="d-flex align-items-center">
-                    <img alt="" src={CalenderImg} onClick={toggle}/>
-                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
+                    <img alt="" src={CalenderImg} onClick={toggle} />
+                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null, null, null, true)} />
                   </div>
                 </div>
               </div>
@@ -683,7 +683,7 @@ function PreWedShootScreen() {
               placement="bottom"
             >
               <div>
-                <CalenderMulti filterByDates={filterByDates}/>
+                <CalenderMulti filterByDates={filterByDates} />
               </div>
             </Overlay>
           </div>
