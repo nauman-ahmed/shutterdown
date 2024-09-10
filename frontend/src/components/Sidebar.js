@@ -550,7 +550,7 @@ const SideBar = () => {
                         )
                       }
                       onClick={() => {
-                        setCurrentSubMenuIndex(6);
+                        setCurrentSubMenuIndex(3);
                         navigate('/MyProfile/Deliverables/PreWed-Deliverables');
                         setCurrentTab(null)
                       }}
@@ -599,7 +599,7 @@ const SideBar = () => {
                     className={activeMenu === 5 || currentTab === 'Attendence' ? 'active active_color' : ''}
                     onClick={() => {
                       navigate('/MyProfile/Attendence');
-                      setCurrentTab(null)
+                      setCurrentTab('Attendance')
                     }}
                   >
                     Attendence
@@ -610,7 +610,7 @@ const SideBar = () => {
                     <SubMenu
                       className={activeMenu === 6 || currentTab === 'Tasks' ? 'active' : ''}
                       icon={
-                        activeMenu === 5 || currentTab === 'Tasks' ? (
+                        activeMenu === 6 || currentTab === 'Tasks' ? (
                           <img alt="" src={ActiveTask} width={20} />
                         ) : (
                           <img alt="" src="/images/sidebar/tasks.png"

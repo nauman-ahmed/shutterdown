@@ -21,6 +21,8 @@ function ShootDropDown(props) {
     allEvents,
     currentEvent,
     message,
+    fromPreWed,
+    preWedDetails
   } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const target = useRef(null);
@@ -96,36 +98,78 @@ function ShootDropDown(props) {
                   justifyContent: "space-between",
                 }}
                 onClick={() => {
-                  console.log(currentEvent);
+                 
 
-
-                  if (
-                    existedUsers?.length > 0 &&
-                    existedUsers?.some(
-                      (existingUser) => existingUser._id === user._id
-                    )
-                  ) {
-                    userUnChecked(user);
-                  } else {
-                    if (existedUsers?.length >= allowedPersons) {
-                      window.notify(
-                        `Maximum Limit is ${allowedPersons}, uncheck previous!`,
-                        "error"
-                      );
-                      return;
+                  if (fromPreWed) {
+                    
+                    
+                    if (
+                      existedUsers?.length > 0 &&
+                      existedUsers?.some(
+                        (existingUser) => existingUser._id === user._id
+                      )
+                    ) {
+                      userUnChecked(user);
                     } else {
-                      // if (shooterDatesHandler(user, props.role)) {
-
-                      if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+                      if (existedUsers?.length >= allowedPersons) {
                         window.notify(
-                          `This ${message} has already been assigned in some other role on the same event!`,
+                          `Maximum Limit is ${allowedPersons}, uncheck previous!`,
                           "error"
                         );
+                        return;
                       } else {
-                        userChecked(user);
+                       
+                       
+                        
+                        if (
+                          preWedDetails &&
+                          [
+                            ...(preWedDetails?.photographers || []),
+                            ...(preWedDetails?.cinematographers || []),
+                            ...(preWedDetails?.assistants || []),
+                            ...(preWedDetails?.droneFlyers || [])
+                          ].some(preUser => preUser.email === user.email)
+                        ) {
+                          window.notify(
+                            `This ${message} has already been assigned in some other role on the same event!`,
+                            "error"
+                          );
+                        } else {
+                          userChecked(user);
+                        }
+                        
+                      }
+                    }
+                  } else {
+                    if (
+                      existedUsers?.length > 0 &&
+                      existedUsers?.some(
+                        (existingUser) => existingUser._id === user._id
+                      )
+                    ) {
+                      userUnChecked(user);
+                    } else {
+                      if (existedUsers?.length >= allowedPersons) {
+                        window.notify(
+                          `Maximum Limit is ${allowedPersons}, uncheck previous!`,
+                          "error"
+                        );
+                        return;
+                      } else {
+                        // if (shooterDatesHandler(user, props.role)) {
+
+                        if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+                          window.notify(
+                            `This ${message} has already been assigned in some other role on the same event!`,
+                            "error"
+                          );
+                        } else {
+                          userChecked(user);
+                        }
                       }
                     }
                   }
+
                 }}
               >
                 {user.firstName} {user.lastName}

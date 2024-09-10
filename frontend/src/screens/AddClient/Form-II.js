@@ -63,7 +63,7 @@ function FormII() {
 
   const target = useRef(null);
   const [show, setShow] = useState(false);
-
+  const [storedEvents, setStoredEvents] = useState(null)
   const dispatch = useDispatch();
   const clientData = useSelector((state) => state.clientData);
   const [eventValues, setEventValues] = useState(null);
@@ -105,9 +105,10 @@ function FormII() {
   }, [clientData]);
 
   const getStoredEvents = async () => {
-    const storedEvents = await getEvents();
-    setAllEvents(storedEvents.data);
-    dispatch(updateAllEvents(storedEvents.data));
+    const storedEventsDB = await getEvents();
+    setStoredEvents(storedEventsDB.data)
+    setAllEvents(storedEventsDB.data);
+    dispatch(updateAllEvents(storedEventsDB.data));
   };
 
   const handleDeleteEvent = (event, index) => {
@@ -199,10 +200,14 @@ function FormII() {
               if (isWeddingAvailable.length > 0) {
                 setWeddingAssigned(true);
               }
+              console.log(clientEvents);
+              
               dispatch(updateClintData({ ...clientData, events: clientEvents }));
-              const updatedStoredEvents = [...allEvents];
-              updatedStoredEvents[editingEvent] = eventValues;
-              setAllEvents(updatedStoredEvents);
+              // const updatedStoredEvents = [...allEvents];
+              // updatedStoredEvents[editingEvent] = eventValues;
+              // console.log(updatedStoredEvents);
+              
+              setAllEvents([...storedEvents, ...clientEvents]);
               setEditingEvent(null)
             }
             setEventValues(null);

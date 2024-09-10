@@ -282,12 +282,12 @@ const Header = (args) => {
         >
           {(props) => (
             <Tooltip id="overlay-example" {...props}>
-              <div className="nav_popover">
+              <div >
                 <div
                   className={
                     path === "/MyProfile"
-                      ? "d-flex flex-row align-items-center  active_path"
-                      : "d-flex flex-row align-items-center mt-1 non_active_path"
+                      ? "d-flex flex-row align-items-center cursor-pointer  active_path"
+                      : "d-flex flex-row align-items-center cursor-pointer mt-1 non_active_path"
                   }
                 >
                   <img
@@ -312,8 +312,8 @@ const Header = (args) => {
                   onClick={() => navigate("/MyProfile/Attendence")}
                   className={
                     path === "/MyProfile/Attendence"
-                      ? "d-flex flex-row align-items-center  active_path"
-                      : "d-flex flex-row align-items-center mt-1 non_active_path"
+                      ? "d-flex flex-row align-items-center cursor-pointer active_path"
+                      : "d-flex flex-row align-items-center cursor-pointer mt-1 non_active_path"
                   }
                 >
                   <img
@@ -334,7 +334,7 @@ const Header = (args) => {
 
                 <div
                   onClick={toggle}
-                  className="d-flex align-items-center mt-2 non_active_path"
+                  className="d-flex align-items-center cursor-pointer mt-2 non_active_path"
                 >
                   <img
                     alt=""
@@ -345,7 +345,7 @@ const Header = (args) => {
                 </div>
 
                 <div
-                  className="d-flex align-items-center mt-2 mb-1 non_active_path"
+                  className="d-flex align-items-center cursor-pointer mt-2 mb-1 non_active_path"
                   onClick={() => {
                     Cookies.remove("currentUser");
                     navigate("/");

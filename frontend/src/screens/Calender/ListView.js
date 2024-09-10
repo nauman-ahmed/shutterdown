@@ -83,7 +83,7 @@ function ListView(props) {
   const [manager, setManager] = useState([]);
   const [assistant, setAssistant] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-  
+
   const toggle = () => {
     setShow(!show);
   };
@@ -107,11 +107,11 @@ function ListView(props) {
     setFilteringDay(startDate);
     setFilterStartDate(startDate);
     setFilterEndDate(endDate);
-   
+
     let filteredData = allEvents?.filter(
       (event) =>
-        new Date(event.eventDate).setHours(0,0,0,0) >= new Date(startDate).setHours(0,0,0,0) &&
-        new Date(event.eventDate).setHours(0,0,0,0) <= new Date(endDate).setHours(0,0,0,0)
+        new Date(event.eventDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) &&
+        new Date(event.eventDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0)
     );
     setEventsForShow(groupByBrideName(filteredData));
   };
@@ -430,9 +430,9 @@ function ListView(props) {
               let filteredData = res.data?.filter(
                 (event) =>
                   new Date(event.eventDate).getTime() >=
-                    new Date(filterStartDate).getTime() &&
+                  new Date(filterStartDate).getTime() &&
                   new Date(event.eventDate).getTime() <=
-                    new Date(filterEndDate).getTime()
+                  new Date(filterEndDate).getTime()
               );
               setEventsForShow([
                 ...eventsForShow,
@@ -503,9 +503,9 @@ function ListView(props) {
               let filteredData = eventsToShow?.filter(
                 (event) =>
                   new Date(event.eventDate).getTime() >=
-                    new Date(filterStartDate).getTime() &&
+                  new Date(filterStartDate).getTime() &&
                   new Date(event.eventDate).getTime() <=
-                    new Date(filterEndDate).getTime()
+                  new Date(filterEndDate).getTime()
               );
               setEventsForShow([
                 ...eventsForShow,
@@ -550,7 +550,7 @@ function ListView(props) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
-  
+
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
     setAllEvents(storedEvents.data);
@@ -595,9 +595,9 @@ function ListView(props) {
       )
     );
   };
-  useEffect(()=>{
+  useEffect(() => {
     console.log(rowOfWarning);
-    
+
   }, [rowOfWarning])
 
   const returnOneRow = (event, prevEvent) => {
@@ -623,7 +623,7 @@ function ListView(props) {
     }
   };
   console.log(allEvents);
-  
+
   return (
     <>
       <ToastContainer />
@@ -644,7 +644,7 @@ function ListView(props) {
                 Add Event
               </button>
             </div>
-            <div style={{ width : '200px'}}>
+            <div style={{ width: '200px' }}>
               <Select
                 isSearchable={true}
                 onChange={(e) => filterByNameHanler(e.value)}
@@ -681,7 +681,8 @@ function ListView(props) {
                 required
               />
             </div>
-            <div style={{ width: "200px" }}>
+            <div style={{ width: "200px", position: 'relative' }}>
+              
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
@@ -689,12 +690,20 @@ function ListView(props) {
                 {filteringDay
                   ? dayjs(filteringDay).format("DD-MMM-YYYY")
                   : "Date"}
-                <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center" style={{position : 'relative'}}>
                   <img alt="" src={CalenderImg} onClick={toggle} />
                   <GrPowerReset
                     className="mx-1"
                     onClick={() => filterByDates(null, null, null, true)}
                   />
+                  {show && (
+
+                <div style={{ position: 'absolute', top: '30px', right : '10px', zIndex : 1000}}>
+                  <div >
+                    <CalenderMulti filterByDates={filterByDates} />
+                  </div>
+                </div>
+              )}
                 </div>
               </div>
             </div>
@@ -794,7 +803,7 @@ function ListView(props) {
                   if (
                     !event?.choosenCinematographers ||
                     event?.choosenCinematographers.length !==
-                      event.cinematographers
+                    event.cinematographers
                   ) {
                     errorText += "Cinematographers are not complete \n";
                   }
@@ -837,21 +846,20 @@ function ListView(props) {
                         <>
                           {currentUser.rollSelect === "Manager" && (
                             <tr className="relative">
-                              <td  className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 150)) ? " " : " sticky-column "} tablePlaceContent`}>
-                              {errorText.length > 0 && (
-                                    <ButtonWithHoverBox
-                                      buttonText="error"
-                                      hoverText={errorText}
-                                      setRowOfWarnig={setRowOfWarnig}
-                                      i={index}
-                                    />
-                                  )}
+                              <td className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index - 1 && errorText?.length > 150)) ? " " : " sticky-column "} tablePlaceContent`}>
+                                {errorText.length > 0 && (
+                                  <ButtonWithHoverBox
+                                    buttonText="error"
+                                    hoverText={errorText}
+                                    setRowOfWarnig={setRowOfWarnig}
+                                    i={index}
+                                  />
+                                )}
                                 <div className="d-flex flex-row ps-5">
-                                  
+
                                   <div
-                                    className={`${
-                                      errorText.length === 0 && "ms-4"
-                                    }`}
+                                    className={`${errorText.length === 0 && "ms-4"
+                                      }`}
                                   >
                                     {event?.client?.brideName}
                                     <br />
@@ -872,9 +880,9 @@ function ListView(props) {
                                 style={{
                                   width: "90px",
                                   marginLeft: 10,
-                           
+
                                 }}
-                                className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index-1 && errorText?.length > 90)) ? " " : " sticky-column "}  tablePlaceContent`}
+                                className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index - 1 && errorText?.length > 90)) ? " " : " sticky-column "}  tablePlaceContent`}
                               >
                                 <div
                                   style={{
@@ -888,7 +896,7 @@ function ListView(props) {
                                   )}
                                 </div>
                                 {event?.travelBy === "By Car" ||
-                                event?.travelBy === "By Bus" ? (
+                                  event?.travelBy === "By Bus" ? (
                                   <img alt="" src={Car} />
                                 ) : event?.travelBy === "By Air" ? (
                                   <img alt="" src={Plane} />
@@ -964,9 +972,9 @@ function ListView(props) {
                                     updatedEvents[index].choosenPhotographers =
                                       Array.isArray(event?.choosenPhotographers)
                                         ? [
-                                            ...event?.choosenPhotographers,
-                                            userObj,
-                                          ]
+                                          ...event?.choosenPhotographers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
@@ -1012,11 +1020,11 @@ function ListView(props) {
                                     ].choosenCinematographers = Array.isArray(
                                       event?.choosenCinematographers
                                     )
-                                      ? [
+                                        ? [
                                           ...event?.choosenCinematographers,
                                           userObj,
                                         ]
-                                      : [userObj];
+                                        : [userObj];
                                     setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
                                   }}
@@ -1204,9 +1212,9 @@ function ListView(props) {
                                     updatedEvents[index].sameDayPhotoMakers =
                                       Array.isArray(event?.sameDayPhotoMakers)
                                         ? [
-                                            ...event?.sameDayPhotoMakers,
-                                            userObj,
-                                          ]
+                                          ...event?.sameDayPhotoMakers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
@@ -1259,9 +1267,9 @@ function ListView(props) {
                                     updatedEvents[index].sameDayVideoMakers =
                                       Array.isArray(event?.sameDayVideoMakers)
                                         ? [
-                                            ...event?.sameDayVideoMakers,
-                                            userObj,
-                                          ]
+                                          ...event?.sameDayVideoMakers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                     setAllEvents(updatedEvents);
@@ -1361,7 +1369,7 @@ function ListView(props) {
                               </td>
                               <td className="tableBody Text14Semi primary2">
                                 {event?.travelBy === "Car" ||
-                                event?.travelBy === "Bus" ? (
+                                  event?.travelBy === "Bus" ? (
                                   <img alt="" src={Car} />
                                 ) : event?.travelBy === "By Air" ? (
                                   <img alt="" src={Plane} />
@@ -1394,18 +1402,9 @@ function ListView(props) {
                 <div>No more data to load.</div>
               </div>
             )}
-            <Overlay
-              rootClose={true}
-              onHide={() => setShow(false)}
-              target={target.current}
-              show={show}
-              placement="bottom"
-            >
-              <div>
-                <CalenderMulti filterByDates={filterByDates} />
-              </div>
-            </Overlay>
+
           </div>
+
         </>
       ) : (
         <div
@@ -1553,9 +1552,9 @@ function ListView(props) {
                       value={
                         newEvent?.[Objkey]
                           ? {
-                              value: newEvent?.[Objkey],
-                              label: newEvent?.[Objkey],
-                            }
+                            value: newEvent?.[Objkey],
+                            label: newEvent?.[Objkey],
+                          }
                           : null
                       }
                       name={Objkey}

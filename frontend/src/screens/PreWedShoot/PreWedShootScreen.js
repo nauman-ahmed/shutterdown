@@ -443,9 +443,13 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
+                              fromPreWed={true}
+                              preWedDetails={preWedClients[index]?.preWeddingDetails}
                               allowedPersons={client.preWedphotographers}
                               usersToShow={photographer}
-                              existedUsers={client?.preWeddingDetails?.photographers}
+                              message ="phtotographer"
+                              existedUsers={client?.preWeddingDetails?.photographers || []}
+
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
                                 client.preWeddingDetails = { ...client.preWeddingDetails } || {}
@@ -471,9 +475,12 @@ function PreWedShootScreen() {
                             {console.log("client", client)}
                             <ShootDropDown
                               teble={true}
+                              fromPreWed={true}
+                              message="cinematographer"
+                              preWedDetails={preWedClients[index]?.preWeddingDetails}
                               allowedPersons={client?.preWedcinematographers}
                               usersToShow={cinematographer}
-                              existedUsers={client?.preWeddingDetails?.cinematographers}
+                              existedUsers={client?.preWeddingDetails?.cinematographers || []}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
                                 client.preWeddingDetails = { ...client.preWeddingDetails } || {}
@@ -501,9 +508,12 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
+                              fromPreWed={true}
+                              message="assistant"
+                              preWedDetails={preWedClients[index]?.preWeddingDetails}
                               allowedPersons={client?.preWedassistants}
                               usersToShow={assistant}
-                              existedUsers={client?.preWeddingDetails?.assistants}
+                              existedUsers={client?.preWeddingDetails?.assistants || []}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
                                 client.preWeddingDetails = { ...client.preWeddingDetails } || {}
@@ -531,9 +541,12 @@ function PreWedShootScreen() {
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
                             <ShootDropDown
                               teble={true}
+                              fromPreWed={true}
+                              message="drone flyer"
+                              preWedDetails={preWedClients[index]?.preWeddingDetails}
                               allowedPersons={client?.preWeddrones}
                               usersToShow={flyer}
-                              existedUsers={client?.preWeddingDetails?.droneFlyers}
+                              existedUsers={client?.preWeddingDetails?.droneFlyers || []}
                               userChecked={(userObj) => {
                                 const updatedClients = [...preWedClients];
                                 client.preWeddingDetails = { ...client.preWeddingDetails } || {}

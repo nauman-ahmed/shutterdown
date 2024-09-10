@@ -187,6 +187,9 @@ abbr[title] {
   animation: spinner-d3wgkg 1s infinite linear;
 }
 
+.tooltip-arrow, .arrow {
+  display: none !important;
+}
 
 @keyframes spinner-d3wgkg {
   to {
