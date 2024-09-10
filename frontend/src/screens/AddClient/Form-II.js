@@ -389,9 +389,7 @@ function FormII() {
             navigate("/MyProfile/AddClient/Preview");
           }}
         >
-          <div className="Text16N mt25" style={{ marginBottom: "6px" }}>
-            Deliverables
-          </div>
+         
           
             <div className="Text16N d-flex flex-row flex-wrap gap-3">
               <div>
@@ -464,9 +462,15 @@ function FormII() {
             </Row>
           )}
 
+          
+
           <Row>
+          
             <Col xl="10" sm="8">
               <Row>
+                <div className="Text16N mt25" style={{ marginTop: "30px", marginBottom: "0px !important" }}>
+                  Deliverables
+                </div>
                 {clientData?.albums?.map((albumValue, i) =>
                   deliverableAlbumOptionObjectKeys.map((Objkey) => (
                     <Col xs="12" sm="6" key={i}>

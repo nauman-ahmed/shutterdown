@@ -55,17 +55,32 @@
   left: 120px; /*This needs to be adjusted based on the actual width of the first column*/
 }
 
+.widthForFiltersViewClient{
+  width:  50%;
+  margin-top: -60px;
+  margin-bottom: 30px;
+}
+
+
 .widthForFilters{
   width:  300px;
   margin-top: -60px;
   margin-bottom: 30px;
 }
+
 @media only screen and (max-width: 500px){
+
   .widthForFilters{
     width: 300px !important;
     margin-top: 0px;
     margin-bottom: 0px;
   }
+  .widthForFiltersViewClient{
+    width: 50% !important;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+  
 }
 
 .calendar-container {

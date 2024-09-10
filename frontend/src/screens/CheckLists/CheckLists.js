@@ -187,7 +187,7 @@ function CheckLists(props) {
             hover
             // borderless
             responsive
-            style={{ width: '150%', marginTop: '15px' }}
+            style={{ width: '120%', marginTop: '15px' }}
           >
             <thead>
               <tr className="logsHeader Text16N1">
@@ -335,7 +335,7 @@ function CheckLists(props) {
             target={target.current}
             show={show}
             placement="bottom">
-            <div>
+            <div style={{ width: "300px" }} >
               <CalenderMulti filterByDates={filterByDates}/>
             </div>
           </Overlay>

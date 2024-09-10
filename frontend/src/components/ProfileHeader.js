@@ -75,7 +75,8 @@ function ProfileHeader({ attendence = false, profile = false }) {
             >
               <div className="d-flex align-items-center">
                 <img alt="" src={locate} className="marginrightsmall" />
-                <p className="title_profile">{user?.currentAddress}</p>
+                {/* <p className="title_profile">{user?.currentAddress}</p> */}
+                <p className="title_profile">India</p>
               </div>
               <div className="d-flex align-items-center">
                 <img alt="" src={mail} className="marginrightsmall" />
@@ -94,7 +95,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
           <div className="line linestyle" />
           <div className="padding_leftSmall rowalign mtsmall">
             <div
-              className="d-flex align-items-center justify-content-around"
+              className="d-flex align-items-center justify-content-between"
               style={{ width: "95%" }}
             >
               <div>

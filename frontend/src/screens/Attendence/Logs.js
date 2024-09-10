@@ -96,7 +96,7 @@ function Logs(props) {
 
                 <div className="plt12" style={{ paddingTop: '15px' }}>
                   <Row>
-                    <Col xs={12} sm={6} className="px-1">
+                    <Col xs={12} sm={12} className="px-1">
                       <Button className="submit_btn submit m-1" onClick={() => checkInHandler()}>
                         Check In
                       </Button>
@@ -106,10 +106,8 @@ function Logs(props) {
                       }}>
                         Check Out
                       </Button>
-                    </Col>
-                    <Col xs={12} sm={6} className="px-1">
-                      <Button className="submit submit_btn" style={{ marginLeft:"5px" }}  onClick={() => checkInHandler({home:"yes"})}>
-                        Check In From Home
+                      <Button className="submit submit_btn" style={{ marginLeft:"10%", fontSize: "90%" }}  onClick={() => checkInHandler({home:"yes"})}>
+                        Check In (Home)
                       </Button>
                     </Col>
                   </Row>
@@ -129,7 +127,7 @@ function Logs(props) {
                 <th className="tableBody">Date</th>
                 <th className="tableBody">Check In Time</th>
                 <th className="tableBody">Check Out Time</th>
-                <th className="tableBody">Check In From Home</th>
+                <th className="tableBody">Check In (Home)</th>
               </tr>
             </thead>
             <tbody
