@@ -602,23 +602,37 @@ function ListView(props) {
 
   const returnOneRow = (event, prevEvent) => {
     if (prevEvent && !clientId) {
-      if (event.client._id !== prevEvent.client._id) {
-        return (
-          <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-            <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-          </tr>
-        );
+      if (event?.client._id !== prevEvent?.client._id) {
+        if(currentUser?.rollSelect === 'Manager' ){
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        } else {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              
+            </tr>
+          );
+        }
+       
       }
     }
   };
@@ -663,17 +677,17 @@ function ListView(props) {
                     new Map(
                       allEvents?.map((event) => [
                         // Use a unique key based on both bride and groom names
-                        event?.client?.brideName + "<" + event.client?.groomName,
+                        event?.client?.brideName + "<" + event?.client?.groomName,
                         event,
                       ])
                     ).values() // Extract the unique events from the Map
                   ).map((event) => ({
-                    value: event?.client?.brideName + "<" + event.client?.groomName,
+                    value: event?.client?.brideName + "<" + event?.client?.groomName,
                     label: (
                       <div className="d-flex justify-content-around">
-                        <span>{event.client?.brideName}</span>{" "}
+                        <span>{event?.client?.brideName}</span>{" "}
                         <img alt="" src={Heart} />{" "}
-                        <span>{event.client?.groomName}</span>
+                        <span>{event?.client?.groomName}</span>
                       </div>
                     ),
                   })),
@@ -712,7 +726,7 @@ function ListView(props) {
             <Table
               striped
               responsive
-              style={{ marginTop: "15px", width: "180%" }}
+              style={{ marginTop: "15px", width: currentUser?.rollSelect === 'Manager' ? "180%" : "100%" }}
             >
               <thead>
                 {currentUser.rollSelect === "Manager" && (
@@ -803,7 +817,7 @@ function ListView(props) {
                   if (
                     !event?.choosenCinematographers ||
                     event?.choosenCinematographers.length !==
-                    event.cinematographers
+                    event?.cinematographers
                   ) {
                     errorText += "Cinematographers are not complete \n";
                   }
@@ -825,7 +839,7 @@ function ListView(props) {
 
                   if (
                     !event?.choosenPhotographers ||
-                    event?.choosenPhotographers.length !== event.photographers
+                    event?.choosenPhotographers.length !== event?.photographers
                   ) {
                     errorText += "Photographers are not complete \n";
                   }
@@ -842,7 +856,7 @@ function ListView(props) {
                         event,
                         index >= 0 ? eventsForShow[index - 1] : null
                       )}
-                      {event && (
+                      {event && event !== null && (
                         <>
                           {currentUser.rollSelect === "Manager" && (
                             <tr className="relative">
@@ -1355,7 +1369,7 @@ function ListView(props) {
                               <td className="tableBody Text14Semi primary2">
                                 {event?.eventType}
                               </td>
-                              <td
+                              {/* <td
                                 style={{
                                   paddingTop: "15px",
                                   paddingBottom: "15px",
@@ -1363,7 +1377,7 @@ function ListView(props) {
                                 className="tableBody Text14Semi primary2"
                               >
                                 {event?.eventStatus}
-                              </td>
+                              </td> */}
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
                               </td>

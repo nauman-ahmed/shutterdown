@@ -96,67 +96,109 @@ const SideBar = () => {
   // }, [])
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
-      setCurrentTab('Add Client');
-      setActiveMenu(1)
-      setCurrentSubMenuIndex(0)
+      if(currentUser?.rollSelect !== 'Manager'){
+        navigate('/')
+      }
+        setCurrentTab('Add Client');
+        setActiveMenu(1)
+        setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Client')) {
+      if(currentUser?.rollSelect !== 'Manager'){
+        navigate('/')
+      }
       setCurrentTab('View Clients');
       setActiveMenu(1)
       setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Calender')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Shooter'){
+        navigate('/')
+      }
       setCurrentTab('Calender View');
       setActiveMenu(2)
       setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Shooter'){
+        navigate('/')
+      }
       setCurrentTab('Pre-wed Shoot');
       setActiveMenu(2)
       setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor'){
+        navigate('/')
+      }
       setCurrentTab('Cinematography');
       setActiveMenu(3)
       setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor'){
+        navigate('/')
+      }
       setCurrentTab('Photos');
       setActiveMenu(3)
       setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor'){
+        navigate('/')
+      }
       setCurrentTab('Albums');
       setActiveMenu(3)
       setCurrentSubMenuIndex(2)
     }
     if (location.pathname.startsWith('/MyProfile/CheckLists')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor' && currentUser?.rollSelect !== 'Shooter' ){
+        navigate('/')
+      }
       setCurrentTab('Checklists');
       setActiveMenu(4)
     }
     if (location.pathname.startsWith('/MyProfile/Attendence')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor' && currentUser?.rollSelect !== 'Shooter' ){
+        navigate('/')
+      }
       setCurrentTab('Attendence');
       setActiveMenu(5)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
+      if(currentUser?.rollSelect !== 'Manager' && currentUser?.rollSelect !== 'Editor'){
+        navigate('/')
+      }
       setCurrentTab('Tasks');
       setActiveMenu(6)
       setCurrentSubMenuIndex(0)
     }
     if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
+      if(currentUser?.rollSelect !== 'Manager' ){
+        navigate('/')
+      }
       setCurrentTab('Tasks Reports');
       setActiveMenu(6)
       setCurrentSubMenuIndex(1)
     }
     if (location.pathname.startsWith('/MyProfile/Reports')) {
+      if(currentUser?.rollSelect !== 'Manager'){
+        navigate('/')
+      }
       setCurrentTab('Reports');
       setActiveMenu(7)
     }
     if (location.pathname.startsWith('/MyProfile/Team')) {
+      if(currentUser?.rollSelect !== 'Manager' ){
+        navigate('/')
+      }
       setCurrentTab('Teams');
       setActiveMenu(8)
     }
     if (location.pathname.startsWith('/MyProfile/FormOptions')) {
+      if(currentUser?.rollSelect !== 'Admin' ){
+        navigate('/')
+      }
       setCurrentTab('FormOptions');
     }
   }, [location])
@@ -589,9 +631,9 @@ const SideBar = () => {
                     icon={
                       <img alt=""
                         src={
-                          activeMenu !== 3 || currentTab === 'Attendence'
-                            ? '/images/sidebar/attendance.png'
-                            : '/images/sidebar/attendanceActive.png'
+                          activeMenu ===5 || currentTab === 'Attendence'
+                            ?  '/images/sidebar/attendanceActive.png'
+                            : '/images/sidebar/attendance.png'
                         }
                         width={20}
                       />

@@ -74,12 +74,12 @@ const Header = (args) => {
     const uniqueData = data?.filter((item, index, self) =>
       index === self.findIndex((t) => JSON.stringify(removeId(t)) === JSON.stringify(removeId(item)))
     );
-    
+
     const todayNotifications = uniqueData?.filter(
       (noti) =>
         dayjs(noti.date).format("YYYY-MM-DD") === dayjs().format("YYYY-MM-DD")
     );
-    
+
     const previousNotifications = uniqueData?.filter(
       (noti) =>
         dayjs(noti.date).format("YYYY-MM-DD") !== dayjs().format("YYYY-MM-DD")
@@ -93,7 +93,7 @@ const Header = (args) => {
   };
   const notifications = useSelector((state) => state.notifications);
   const [confirmPassword, setConfirmPassword] = useState(null);
-  const currentUser =Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+  const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
   function CheckPassword(submittedPassword) {
     if (submittedPassword?.length < 8) {
@@ -144,7 +144,7 @@ const Header = (args) => {
   };
 
   useEffect(() => {
-    console.log();
+    console.log(notifications);
   }, [notifications]);
 
   useEffect(() => {
@@ -179,11 +179,10 @@ const Header = (args) => {
               />
               {validationMessage && (
                 <p
-                  className={`${
-                    validationMessage === "Password is valid!"
+                  className={`${validationMessage === "Password is valid!"
                       ? "text-success"
                       : "text-danger"
-                  } `}
+                    } `}
                 >
                   {validationMessage}
                 </p>
@@ -258,13 +257,11 @@ const Header = (args) => {
                       style={{ position: "absolute", cursor: "pointer" }}
                     />
                     <div className="name_div">
-                      <p style={{ marginBottom: 0 }}>{`${
-                        currentUser?.firstName.charAt(0).toUpperCase() +
+                      <p style={{ marginBottom: 0 }}>{`${currentUser?.firstName.charAt(0).toUpperCase() +
                         currentUser?.firstName.slice(1).toLowerCase()
-                      } ${
-                        currentUser?.lastName.charAt(0).toUpperCase() +
+                        } ${currentUser?.lastName.charAt(0).toUpperCase() +
                         currentUser?.lastName.slice(1).toLowerCase()
-                      }`}</p>
+                        }`}</p>
                     </div>
                   </div>
                 </div>
@@ -364,11 +361,11 @@ const Header = (args) => {
           target={targetNoti.current}
           show={showNoti}
           placement="bottom"
-          
+
         >
           {(props) => (
             <Tooltip id="overlay-example" {...props}>
-              <div style={{ width: "420px"  }}>
+              <div style={{ width: "420px" }}>
                 <div className="nav_Noti_popover Text18S white">
                   <div>Notifications</div>
                 </div>
@@ -401,8 +398,8 @@ const Header = (args) => {
                       <div className="notificationsBox mt12 R_A_Justify">
                         {notification.forManager
                           ? !notification.readBy.includes(currentUser._id) && (
-                              <div className="Circle" />
-                            )
+                            <div className="Circle" />
+                          )
                           : !notification.read && <div className="Circle" />}
 
                         <div>
@@ -418,13 +415,13 @@ const Header = (args) => {
                             <text className="gray">
                               {(notification.notificationOf === "client" || notification.notificationOf === 'Pre-Wed Shoot')
                                 ? notification.data.brideName +
-                                  " Weds " +
-                                  notification.data.groomName
+                                " Weds " +
+                                notification.data.groomName
                                 : ""}
                               {notification.notificationOf === "event"
                                 ? notification.data.client?.brideName +
-                                  " Weds " +
-                                  notification.data.client?.groomName
+                                " Weds " +
+                                notification.data.client?.groomName
                                 : ""}
                             </text>
                           </div>
@@ -479,7 +476,7 @@ const Header = (args) => {
                               }
                             }
 
-                            notification.notificationOf === 'client' ? navigate('/MyProfile/Client/ViewClient') : notification.notificationOf === 'event' ? navigate('/MyProfile/Calender/ListView') : notification.notificationOf === 'Pre-Wed Shoot' ? navigate('/MyProfile/PreWedShoot/PreWedShootScreen') : notification.notificationOf === 'Cinema Deliverable' ? navigate('/MyProfile/Deliverables/Cinematography') : notification.notificationOf === 'Photos Deliverable' ? navigate('/MyProfile/Deliverables/Photos') : notification.notificationOf === 'Albums Deliverable' ? navigate('/MyProfile/Deliverables/Albums') : notification.notificationOf === 'Pre-Wed Deliverable' ? navigate('/MyProfile/Deliverables/PreWed-Deliverables') : navigate("/")
+                            notification.notificationOf === 'client' ? navigate('/MyProfile/Client/ViewClient') : notification.notificationOf === 'event' ? navigate(currentUser?.rollSelect === 'Manager' ? '/MyProfile/Calender/ListView' : '/MyProfile/Deliverables/Cinematography') : notification.notificationOf === 'Pre-Wed Shoot' ? navigate(currentUser?.rollSelect === 'Manager' ? '/MyProfile/PreWedShoot/PreWedShootScreen' : '/MyProfile/Deliverables/PreWed-Deliverables') : notification.notificationOf === 'Cinema Deliverable' ? navigate('/MyProfile/Deliverables/Cinematography') : notification.notificationOf === 'Photos Deliverable' ? navigate('/MyProfile/Deliverables/Photos') : notification.notificationOf === 'Albums Deliverable' ? navigate('/MyProfile/Deliverables/Albums') : notification.notificationOf === 'Pre-Wed Deliverable' ? navigate('/MyProfile/Deliverables/PreWed-Deliverables') : navigate("/")
                             setShowNoti(false)
                           }}
                           alt=""
@@ -495,8 +492,8 @@ const Header = (args) => {
                       <div className="notificationsBox mt12 R_A_Justify">
                         {notification.forManager
                           ? !notification.readBy.includes(currentUser._id) && (
-                              <div className="Circle" />
-                            )
+                            <div className="Circle" />
+                          )
                           : !notification.read && <div className="Circle" />}
 
                         <div>
@@ -510,15 +507,15 @@ const Header = (args) => {
                             New {notification.notificationOf}
                             <br />
                             <text className="gray">
-                            {(notification.notificationOf === "client" || notification.notificationOf === 'Pre-Wed Shoot')
+                              {(notification.notificationOf === "client" || notification.notificationOf === 'Pre-Wed Shoot')
                                 ? notification.data.brideName +
-                                  " Weds " +
-                                  notification.data.groomName
+                                " Weds " +
+                                notification.data.groomName
                                 : ""}
                               {notification.notificationOf === "event"
                                 ? notification.data.client?.brideName +
-                                  " Weds " +
-                                  notification.data.client?.groomName
+                                " Weds " +
+                                notification.data.client?.groomName
                                 : ""}
                             </text>
                           </div>
@@ -529,13 +526,52 @@ const Header = (args) => {
                             Location
                             <br />
                             <text className="gray">
-                              {notification.notificationOf === "client"
-                                ? notification.data.events[0].location
+                              {notification?.notificationOf === "client"
+                                ? notification?.data?.events[0]?.location
+                                : ""}{" "}
+                              {notification?.notificationOf === "event"
+                                ? notification?.data?.location
                                 : ""}{" "}
                             </text>
                           </div>
                         </div>
-                        <img alt="" src={NotiSelect} />
+                        <img className="cursor-pointer" onClick={() => {
+                          if (notification.forManager) {
+                            if (
+                              !notification.readBy.includes(currentUser._id)
+                            ) {
+                              dispatch({
+                                type: "SOCKET_EMIT_EVENT",
+                                payload: {
+                                  event: "read-notification",
+                                  data: {
+                                    ...notification,
+                                    readBy: [
+                                      ...notification.readBy,
+                                      currentUser._id,
+                                    ],
+                                  },
+                                },
+                              });
+                            }
+                          } else {
+                            if (!notification.read) {
+                              dispatch({
+                                type: "SOCKET_EMIT_EVENT",
+                                payload: {
+                                  event: "read-notification",
+                                  data: {
+                                    ...notification,
+                                    read: true,
+                                  },
+                                },
+                              });
+                            }
+                          }
+
+                          notification.notificationOf === 'client' ? navigate('/MyProfile/Client/ViewClient') : notification.notificationOf === 'event' ? navigate('/MyProfile/Calender/ListView') : notification.notificationOf === 'Pre-Wed Shoot' ? navigate('/MyProfile/PreWedShoot/PreWedShootScreen') : notification.notificationOf === 'Cinema Deliverable' ? navigate('/MyProfile/Deliverables/Cinematography') : notification.notificationOf === 'Photos Deliverable' ? navigate('/MyProfile/Deliverables/Photos') : notification.notificationOf === 'Albums Deliverable' ? navigate('/MyProfile/Deliverables/Albums') : notification.notificationOf === 'Pre-Wed Deliverable' ? navigate('/MyProfile/Deliverables/PreWed-Deliverables') : navigate("/")
+                          setShowNoti(false)
+                        }} alt="" src={NotiSelect} />
                       </div>
                     ))}
                   </>

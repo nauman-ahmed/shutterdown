@@ -19,6 +19,7 @@ function CalenderBar(props) {
   const EventsList = useSelector(state => state.allEvents);
   const dispatch = useDispatch()
   const currentUser = JSON.parse(Cookies.get('currentUser'));
+  const [activeStartDate, setActiveStartDate] = useState(new Date());
   
   const getEventsData = async () => {
     try {
@@ -80,7 +81,7 @@ function CalenderBar(props) {
           <>
             <div className="Text20Semi">{getCurrentMonthAndYear()}</div>
             <div className="calendar-container">
-              <Calendar tileClassName={({ date }) => {
+              <Calendar activeStartDate={activeStartDate} tileClassName={({ date }) => {
                 let count = 0
                 for (let index = 0; index < EventsList?.length; index++) {
                   if (EventsList[index]) {
@@ -120,13 +121,20 @@ function CalenderBar(props) {
                   <div>
                     <Button
                       className="mx-1 mt-1"
-                      onClick={() => setCurrentMonth(moment().month(currentMonth).add(-1,"months").format('MMMM'))}
+                      onClick={() => {
+                        const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth() - 1));
+    setActiveStartDate(new Date(newDate))
+                        setCurrentMonth(moment().month(currentMonth).add(-1,"months").format('MMMM'))
+                      }}
                     >
                       {"<"}
                     </Button>
                     <Button
                       className="mx-1 mt-1"
-                      onClick={() => setCurrentMonth(moment().month(currentMonth).add(1,"months").format('MMMM'))}
+                      onClick={() => {
+                        const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth()+ 1));
+    setActiveStartDate(new Date(newDate))
+                        setCurrentMonth(moment().month(currentMonth).add(1,"months").format('MMMM'))}}
                     >
                       {">"}
                     </Button>
