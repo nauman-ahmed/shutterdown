@@ -32,6 +32,7 @@ const downloadFile = async (req, res) => {
       // Set Content-Type for the file
       res.set("Content-Type", file.contentType);
       console.log(file.filename);
+      console.log(file);
       
       // Set Content-Disposition header to prompt download with a specified filename
       res.set(
