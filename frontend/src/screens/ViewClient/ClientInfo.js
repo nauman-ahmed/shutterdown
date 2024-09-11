@@ -40,8 +40,8 @@ function ClientInfo() {
   const dispatch = useDispatch();
   const getStoredEvents = async () => {
     const storedEvents = await getEvents();
-    setAllEvents(storedEvents.data);
-    dispatch(updateAllEvents(storedEvents.data));
+    setAllEvents(storedEvents?.data);
+    dispatch(updateAllEvents(storedEvents?.data));
   };
 
   const target = useRef(null);

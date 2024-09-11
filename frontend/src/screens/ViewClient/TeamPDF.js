@@ -29,7 +29,7 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 20,
     width: "100%",
     height: "100%",
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 30,
     justifyContent: "center",
   },
   logoImage: {
@@ -53,9 +53,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   colOneThird: {
-    flexBasis: "30%",
-    maxWidth: "30%",
-    paddingHorizontal: 15,
+    flexBasis: "27%",
+    maxWidth: "27%",
     height: 340,
   },
   textCenter: {
@@ -69,14 +68,17 @@ const styles = StyleSheet.create({
     color: "#5d3f26",
   },
   memberImage: {
-    width: "85%",
+    width: "100%",
     height: "100%",
     marginHorizontal: "auto",
+    borderRadius : 10
   },
   memberImageBox: {
     width: "100%",
-    height: 200,
-    borderRadius: 10,
+    height: 250,
+    borderRadius: 15,
+    overflow: "hidden",
+
   },
   nameFont: {
     fontSize: 12,
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000000",
     borderStyle: "solid",
-    borderRadius: 5,
+    borderRadius: 8,
     marginVertical: 8,
     fontWeight: "bold",
   },
@@ -106,279 +108,75 @@ const styles = StyleSheet.create({
   },
 });
 
-const TeamPDF = ({ team, client }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <Image style={styles.logoImage} src={"/images/pdfLogo.png"} />
-      <Text style={[styles.heading, styles.textCenter]}>MEET OUR TEAM</Text>
+const TeamPDF = ({ team, client }) => {
+  // Combine all users into a single array
+  const users = [
+    ...(client ? [{ ...client.userID, role: 'Team Leader' }] : []),
+    ...team.shootDirectors?.map(user => ({ ...user, role: 'Shoot Director' })) || [],
+    ...team.choosenPhotographers?.map(user => ({ ...user, role: 'Photographer' })) || [],
+    ...team.choosenCinematographers?.map(user => ({ ...user, role: 'Cinematographer' })) || [],
+    ...team.droneFlyers?.map(user => ({ ...user, role: 'Drone Flyer' })) || [],
+    ...team.manager?.map(user => ({ ...user, role: 'Manager' })) || [],
+    ...team.assistants?.map(user => ({ ...user, role: 'Assistant' })) || [],
+    ...team.sameDayPhotoMakers?.map(user => ({ ...user, role: 'Same Day Photo Maker' })) || [],
+    ...team.sameDayVideoMakers?.map(user => ({ ...user, role: 'Same Day Video Maker' })) || []
+  ];
 
-      {/* Wrap the entire content in a view with wrap set to true */}
-      <View style={[styles.row, { flexWrap: "wrap" }]}>
-        {client && (
-          <View style={styles.colOneThird}>
-            <View style={styles.memberImageBox}>
-              {client?.userID?.photo ? (
-                <Image
-                  style={styles.memberImage}
-                  src={BASE_URL + "/" + client?.userID?.photo}
-                />
-              ) : (
-                <Text style={styles.textCenter}>
-                  {`${client?.userID?.firstName
-                    .charAt(0)
-                    .toUpperCase()}${client?.userID?.lastName
-                    .charAt(0)
-                    .toUpperCase()}`}
-                </Text>
-              )}
-            </View>
-            <Text style={[styles.textCenter, styles.nameFont]}>
-              {client.userID?.firstName + " " + client.userID?.lastName}
-            </Text>
-            <Text style={[styles.textCenter, styles.designationText]}>
-              Team Leader
-            </Text>
-            <Text style={[styles.textCenter, styles.description]}>
-              {client.userID?.About}
-            </Text>
-          </View>
+  // Paginate users: First page shows 3, subsequent pages show 6
+  const firstPageUsers = users.slice(0, 3);
+  const subsequentPagesUsers = users.slice(3);
+
+  // Split subsequent users into groups of 6 per page
+  const groupedUsers = [];
+  for (let i = 0; i < subsequentPagesUsers.length; i += 6) {
+    groupedUsers.push(subsequentPagesUsers.slice(i, i + 6));
+  }
+
+  const renderUser = (user) => (
+    <View style={styles.colOneThird}>
+      <View style={styles.memberImageBox}>
+        {user?.photo ? (
+          <Image style={styles.memberImage} src={BASE_URL + "/preview-file/" + user?.photo} />
+        ) : (
+          <Text style={styles.textCenter}>
+            {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+          </Text>
         )}
-
-        {/* Other team members rendering */}
-        {team?.shootDirectors?.length > 0 &&
-          team.shootDirectors.map((user, ind) => (
-            <View key={ind} style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Shoot Director
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.choosenPhotographers?.length > 0 &&
-          team?.choosenPhotographers?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Photographer
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.choosenCinematographers?.length > 0 &&
-          team?.choosenCinematographers?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Cinematographer
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.droneFlyers?.length > 0 &&
-          team?.droneFlyers?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Drone Flyer
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.manager?.length > 0 &&
-          team?.manager?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Manager
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.assistants?.length > 0 &&
-          team?.assistants?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Assistant
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.sameDayPhotoMakers?.length > 0 &&
-          team?.sameDayPhotoMakers?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Same Day Photo Maker
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
-
-        {team?.sameDayVideoMakers?.length > 0 &&
-          team?.sameDayVideoMakers?.map((user, ind) => (
-            <View style={styles.colOneThird}>
-              <View style={styles.memberImageBox}>
-                {user?.photo ? (
-                  <Image
-                    style={styles.memberImage}
-                    src={BASE_URL + "/" + user?.photo}
-                  />
-                ) : (
-                  <Text style={styles.textCenter}>
-                    {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName
-                      .charAt(0)
-                      .toUpperCase()}`}
-                  </Text>
-                )}
-              </View>
-              <Text style={[styles.textCenter, styles.nameFont]}>
-                {user?.firstName + " " + user?.lastName}
-              </Text>
-              <Text style={[styles.textCenter, styles.designationText]}>
-                Same Day Video Maker
-              </Text>
-              <Text style={[styles.textCenter, styles.description]}>
-                {user?.About}
-              </Text>
-            </View>
-          ))}
       </View>
-    </Page>
-  </Document>
-);
+      <Text style={[styles.textCenter, styles.nameFont]}>
+        {user?.firstName + " " + user?.lastName}
+      </Text>
+      <Text style={[styles.textCenter, styles.designationText]}>
+        {user?.role}
+      </Text>
+      <Text style={[styles.textCenter, styles.description]}>
+        {user?.about}
+      </Text>
+    </View>
+  );
+
+  
+  return (
+    <Document>
+      {/* First Page */}
+      <Page size="A4" style={styles.page}>
+        <Image style={styles.logoImage} src={"/images/pdfLogo.png"} />
+        <Text style={[styles.heading, styles.textCenter]}>MEET OUR TEAM</Text>
+        <View style={[styles.row, { flexWrap: "wrap" }]}>
+          {firstPageUsers.map((user, ind) => renderUser(user))}
+        </View>
+      </Page>
+
+      {/* Subsequent Pages */}
+      {groupedUsers.map((pageUsers, pageIndex) => (
+        <Page key={pageIndex} size="A4" style={styles.page}>
+          <View style={[styles.row, { flexWrap: "wrap" }]}>
+            {pageUsers.map((user, ind) => renderUser(user))}
+          </View>
+        </Page>
+      ))}
+    </Document>
+  );
+};
 
 export default TeamPDF;

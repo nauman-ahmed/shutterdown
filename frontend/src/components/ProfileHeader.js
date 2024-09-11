@@ -59,7 +59,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
       <div className="rowBox Profile_Web_hide">
         {user?.photo ? (
           <div className="ProfileBoxForImg w-25 Text50Semi">
-            <img alt="" className="w-100 h-100 imgRadius" src={BASE_URL + '/' + user.photo} />
+            <img alt="" className="w-100 h-100 imgRadius" src={BASE_URL + '/preview-file/' + user.photo} />
           </div>
         ) : (
           <div className="ProfileBox Text50Semi">

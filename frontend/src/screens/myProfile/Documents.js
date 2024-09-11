@@ -103,11 +103,7 @@ function Documents() {
     setSignature(files[0])
     reader.readAsDataURL(files[0])
   };
-  useEffect(()=>{
-    console.log(uploadingFiles);
 
-  }, [uploadingFiles])
-  console.log(user);
   
   return (
     <>
@@ -121,12 +117,12 @@ function Documents() {
               <div className="line" />
               <form onSubmit={ async (e) => {
                 e.preventDefault();
-                console.log('form submiotted');
+               
                 if (!uploadingFiles) {
                   setUploadingFiles(true)
                   const filesData = new FormData(e.target);
                  await  axios.post(BASE_URL + '/upload-files/' + user?._id, filesData).then(async (res) => {
-                    console.log(res);
+                   
                     
                     await GetUserData();
                     getUserData();

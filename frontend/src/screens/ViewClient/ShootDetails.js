@@ -65,6 +65,7 @@ function ShootDetails(props) {
       });
   };
 
+
   return (
     <div>
       <div>
@@ -83,15 +84,15 @@ function ShootDetails(props) {
                     <img
                       alt=""
                       className="imgRadius w-100 h-100"
-                      src={BASE_URL + "/" + clientData?.userID?.photo}
+                      src={BASE_URL + '/preview-file/' + clientData?.userID?.photo}
                     />
                   ) : (
                     <div className="ProfileBox Text38Semi p-2">
                       {`${clientData?.userID?.firstName
                         .charAt(0)
                         .toUpperCase()}${clientData?.userID?.lastName
-                        .charAt(0)
-                        .toUpperCase()}`}
+                          .charAt(0)
+                          .toUpperCase()}`}
                     </div>
                   )}
                 </div>
@@ -121,15 +122,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -161,15 +162,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -201,15 +202,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -241,15 +242,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -281,15 +282,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -320,15 +321,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -359,15 +360,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -398,15 +399,15 @@ function ShootDetails(props) {
                         <img
                           alt=""
                           className="imgRadius w-100 h-100"
-                          src={BASE_URL + "/" + user.photo}
+                          src={BASE_URL + '/preview-file/' + user.photo}
                         />
                       ) : (
                         <div className="ProfileBox Text38Semi p-2">
                           {`${user?.firstName
                             .charAt(0)
                             .toUpperCase()}${user?.lastName
-                            .charAt(0)
-                            .toUpperCase()}`}
+                              .charAt(0)
+                              .toUpperCase()}`}
                         </div>
                       )}
                     </div>
@@ -430,136 +431,138 @@ function ShootDetails(props) {
                   </div>
                 ))}
             </div>
-           
+
           </>
         ) : (
           <>
-          
-          <Table bordered hover responsive>
-            <thead>
-              <tr className="logsHeader Text16N1">
-                <th>Client</th>
-                <th>Event</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th style={{ whiteSpace: "nowrap" }}>Team Leader</th>
-                <th style={{ whiteSpace: "nowrap" }}>Photographers</th>
-                <th style={{ whiteSpace: "nowrap" }}>Cinematographers</th>
-                <th style={{ whiteSpace: "nowrap" }}>Drone Flyers</th>
-                <th>Team Details</th>
-              </tr>
-            </thead>
-            <tbody
-              className="Text12 primary2"
-              style={{
-                textAlign: "center",
-                borderWidth: "1px 1px 1px 1px",
-                // background: "#EFF0F5",
-              }}
-            >
-              {clientData?.events?.map((event, index) => (
-                <tr>
-                  <td className="Text14Semi textPrimary">
-                    {clientData.brideName}
-                    <br />
-                    <img alt="" src={Heart} />
-                    <br />
-                    {clientData.groomName}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {event.eventType}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {dayjs(event.eventDate).format("DD-MMM-YYYY")}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {event.location}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {clientData.userID &&
-                      clientData.userID?.firstName +
+
+            <Table bordered hover responsive>
+              <thead>
+                <tr className="logsHeader Text16N1">
+                  <th>Client</th>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Location</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Team Leader</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Photographers</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Cinematographers</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Drone Flyers</th>
+                  <th>Team Details</th>
+                </tr>
+              </thead>
+              <tbody
+                className="Text12 primary2"
+                style={{
+                  textAlign: "center",
+                  borderWidth: "1px 1px 1px 1px",
+                  // background: "#EFF0F5",
+                }}
+              >
+                {clientData?.events?.map((event, index) => (
+                  <tr>
+                    <td className="Text14Semi textPrimary">
+                      {clientData.brideName}
+                      <br />
+                      <img alt="" src={Heart} />
+                      <br />
+                      {clientData.groomName}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.eventType}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {dayjs(event.eventDate).format("DD-MMM-YYYY")}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.location}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {clientData.userID &&
+                        clientData.userID?.firstName +
                         " " +
                         clientData.userID?.lastName}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {event.choosenPhotographers?.length > 0 && (
-                      <div>
-                        {event.choosenPhotographers?.map((photographer, i) => {
-                          return (
-                            <>
-                              {i + 1}.{" "}
-                              {photographer.firstName +
-                                " " +
-                                photographer.lastName}
-                              <br />
-                            </>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {event.choosenCinematographers?.length > 0 && (
-                      <div>
-                        {event.choosenCinematographers?.map(
-                          (cinematographer, i) => {
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.choosenPhotographers?.length > 0 && (
+                        <div>
+                          {event.choosenPhotographers?.map((photographer, i) => {
                             return (
                               <>
                                 {i + 1}.{" "}
-                                {cinematographer.firstName +
+                                {photographer.firstName +
                                   " " +
-                                  cinematographer.lastName}
+                                  photographer.lastName}
                                 <br />
                               </>
                             );
-                          }
-                        )}
-                      </div>
-                    )}
-                  </td>
-                  <td className="tablePlaceContent  textPrimary fs-6">
-                    {event.droneFlyers?.length > 0 && (
-                      <div>
-                        {event.droneFlyers.map((droneFlyer, i) => {
-                          return (
-                            <>
-                              {i + 1}.{" "}
-                              {droneFlyer.firstName + " " + droneFlyer.lastName}
-                              <br />
-                            </>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </td>
-                  <td>
-                    <PDFDownloadLink onClick={()=>{ setTimeout(()=>{
-                      setTeamToShow(event)
-                      setTeamView(true)
-                    }, 1000)}} document={<TeamPDF client={clientData} team={event} />} fileName="team.pdf">
-               
-                      <Button
-                        className="submit_btn submit w-100 p-1 shootDetailsBtn"
-                        style={{ marginRight: "10px" }}
+                          })}
+                        </div>
+                      )}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.choosenCinematographers?.length > 0 && (
+                        <div>
+                          {event.choosenCinematographers?.map(
+                            (cinematographer, i) => {
+                              return (
+                                <>
+                                  {i + 1}.{" "}
+                                  {cinematographer.firstName +
+                                    " " +
+                                    cinematographer.lastName}
+                                  <br />
+                                </>
+                              );
+                            }
+                          )}
+                        </div>
+                      )}
+                    </td>
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.droneFlyers?.length > 0 && (
+                        <div>
+                          {event.droneFlyers.map((droneFlyer, i) => {
+                            return (
+                              <>
+                                {i + 1}.{" "}
+                                {droneFlyer.firstName + " " + droneFlyer.lastName}
+                                <br />
+                              </>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <PDFDownloadLink onClick={() => {
+                        setTimeout(() => {
+                          setTeamToShow(event)
+                          setTeamView(true)
+                        }, 1000)
+                      }} document={<TeamPDF client={clientData} team={event} />} fileName="team.pdf">
+
+                        <Button
+                          className="submit_btn submit w-100 p-1 shootDetailsBtn"
+                          style={{ marginRight: "10px" }}
                         // onClick={() => {
                         //   // Handle any pre-download logic here
                         //   setTeamToShow(event);
                         //   setTeamView(true);
                         // }}
-                      >
-                        Team
-                      </Button>
-                    </PDFDownloadLink>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                        >
+                          Team
+                        </Button>
+                      </PDFDownloadLink>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           </>
-          
+
         )}
       </div>
-      
+
     </div>
   );
 }

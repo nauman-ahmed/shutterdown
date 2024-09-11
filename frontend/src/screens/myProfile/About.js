@@ -40,11 +40,11 @@ function About() {
         <>
           <div className="AboutCard ">
             <div className="Text16N">About</div>
-            <textarea name="about" placeholder="Add your answer here" value={userData?.about} className="input mt7 Text10N" cols="20" rows="5" onChange={handleChange}></textarea>
+            <textarea name="about" maxLength={150} placeholder="Add your answer here" value={userData?.about} className="input mt7 Text10N" cols="20" rows="3" onChange={handleChange}></textarea>
             <div className="Text16N mt15">What I love about my job?</div>
-            <textarea name="aboutJob" placeholder="Add your answer here" value={userData?.aboutJob} className="input mt7 Text10N" cols="20" rows="5" onChange={handleChange}></textarea>
+            <textarea name="aboutJob" placeholder="Add your answer here" value={userData?.aboutJob} className="input mt7 Text10N" cols="20" rows="3" onChange={handleChange}></textarea>
             <div className="Text16N mt15">My Interests and Hobbies</div>
-            <textarea name="interestHobbies" placeholder="Add your answer here" value={userData?.interestHobbies} className="input mt7 Text10N" cols="20" rows="5" onChange={handleChange}></textarea>
+            <textarea name="interestHobbies" placeholder="Add your answer here" value={userData?.interestHobbies} className="input mt7 Text10N" cols="20" rows="3" onChange={handleChange}></textarea>
           </div>
           <div className="pb-5 mb-3 text-center">
             <Button className="Update_btn btnWidth" onClick={!updating && handleUpdateUserData}>
