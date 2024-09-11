@@ -158,6 +158,7 @@ const uploadFile = async (file, userData, fieldName) => {
     })
     userData[fieldName] = uploadStream.id
     console.log('file uploaded');
+    await userData.save()
 
 
 
