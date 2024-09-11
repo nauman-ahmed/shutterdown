@@ -25,18 +25,35 @@ const updateUserData = async (req, res) => {
 const downloadFile = async (req, res) => {
   try {
     const fileId = req.params.fileId;
-    let downloadStream = bucket.openDownloadStream( new mongoose.Types.ObjectId(fileId))
+    let downloadStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(fileId));
 
-    downloadStream.on("file", (file)=>{
-        res.set("Content-Type", file.contentType)
-    })
+    // Fetch the file metadata to set the correct headers
+    downloadStream.on("file", (file) => {
+      // Set Content-Type for the file
+      res.set("Content-Type", file.contentType);
 
-    downloadStream.pipe(res)
+      // Set Content-Disposition header to prompt download with a specified filename
+      res.set(
+        "Content-Disposition",
+        `attachment; filename="${file.filename || 'downloaded-file'}"`
+      );
+    });
+
+    // Handle the error if no file is found or any other issue
+    downloadStream.on("error", (error) => {
+      console.error('Error during file download:', error);
+      return res.status(404).json({ error: 'File not found in GridFS' });
+    });
+
+    // Pipe the file data into the response
+    downloadStream.pipe(res);
+    
   } catch (error) {
     console.log(error);
-    return res.status(404).json({ error: 'File not found in GridFS' });
+    return res.status(500).json({ error: 'An error occurred while downloading the file' });
   }
 };
+
 
 const getUserAccountbanned = async (req, res) => {
   try {
@@ -111,17 +128,13 @@ const previewFile = async (req, res) => {
     // Get the file ID from the request parameters
     const fileId = req.params.fileId;
 
-    // Read the file from GridFS
-    const readStream = gfs.createReadStream({
-      _id: fileId
-    });
+    let readStream = bucket.openDownloadStream( new mongoose.Types.ObjectId(fileId))
 
-    // Set the response headers
-    res.set("Content-Disposition", `inline; filename="${fileId}"`);
-    res.set("Content-Type", readStream.contentType);
+    readStream.on("file", (file)=>{
+        res.set("Content-Type", file.contentType)
+    })
 
-    // Pipe the file to the response
-    readStream.pipe(res);
+    readStream.pipe(res)
   } catch (error) {
     console.log(error);
     return res.status(404).json({ error: 'File not found in GridFS' });
