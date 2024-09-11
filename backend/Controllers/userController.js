@@ -31,11 +31,11 @@ const downloadFile = async (req, res) => {
     downloadStream.on("file", (file) => {
       // Set Content-Type for the file
       res.set("Content-Type", file.contentType);
-      
+
       // Set Content-Disposition header to prompt download with a specified filename
       res.set(
         "Content-Disposition",
-        `attachment;"`
+        `attachment; filename="${file.filename || 'downloaded-file'}"`
       );
     });
 
@@ -47,7 +47,7 @@ const downloadFile = async (req, res) => {
 
     // Pipe the file data into the response
     downloadStream.pipe(res);
-    
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: 'An error occurred while downloading the file' });
@@ -128,10 +128,10 @@ const previewFile = async (req, res) => {
     // Get the file ID from the request parameters
     const fileId = req.params.fileId;
 
-    let readStream = bucket.openDownloadStream( new mongoose.Types.ObjectId(fileId))
+    let readStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(fileId))
 
-    readStream.on("file", (file)=>{
-        res.set("Content-Type", file.contentType)
+    readStream.on("file", (file) => {
+      res.set("Content-Type", file.contentType)
     })
 
     readStream.pipe(res)
@@ -140,12 +140,12 @@ const previewFile = async (req, res) => {
     return res.status(404).json({ error: 'File not found in GridFS' });
   }
 };
-const uploadFile = async (file, userData, fieldName) => {
+const uploadFile = async (file, userData, fileName, fieldName) => {
   try {
     console.log(file);
     let { fieldname, originalname, mimetype, buffer } = file
 
-    let uploadStream = bucket.openUploadStream(fieldname)
+    let uploadStream = bucket.openUploadStream(fileName + '.' + originalname.split('.').pop())
     let readBuffer = new Readable()
     readBuffer.push(buffer)
     readBuffer.push(null)
@@ -158,9 +158,6 @@ const uploadFile = async (file, userData, fieldName) => {
     })
     userData[fieldName] = uploadStream.id
     console.log('file uploaded');
-    await userData.save()
-
-
 
   } catch (error) {
     console.log('error in file upload function');
@@ -173,13 +170,13 @@ const uploadFiles = async (req, res) => {
     console.log(req.files);
     const userData = await userSchema.findById(req.params.userId);
 
-    if (req.files['Adhar-Card']) await uploadFile(req.files['Adhar-Card'][0], userData, 'Adhar-Card');
-    if (req.files['Pan-Card']) await uploadFile(req.files['Pan-Card'][0], userData, 'Pan-Card');
-    if (req.files['Driving-License']) await uploadFile(req.files['Driving-License'][0], userData, 'Driving-License');
-    if (req.files['Voter-ID']) await uploadFile(req.files['Voter-ID'][0], userData, 'Voter-ID');
-    if (req.files['Passport']) await uploadFile(req.files['Passport'][0], userData, 'Passport');
-    if (req.files['Photo']) await uploadFile(req.files['Photo'][0], userData, 'Photo');
-    if (req.files['Signature']) await uploadFile(req.files['Signature'][0], userData, 'Signature');
+    if (req.files['Adhar-Card']) await uploadFile(req.files['Adhar-Card'][0], userData, 'Adhar-Card', 'adharCard');
+    if (req.files['Pan-Card']) await uploadFile(req.files['Pan-Card'][0], userData, 'Pan-card', 'panCard');
+    if (req.files['Driving-License']) await uploadFile(req.files['Driving-License'][0], userData, 'Driving-Licenese', 'drivingLicense');
+    if (req.files['Voter-ID']) await uploadFile(req.files['Voter-ID'][0], userData, 'Voter_ID', 'voterID');
+    if (req.files['Passport']) await uploadFile(req.files['Passport'][0], userData, 'Passport', 'passport');
+    if (req.files['Photo']) await uploadFile(req.files['Photo'][0], userData, 'Photo', 'photo');
+    if (req.files['Signature']) await uploadFile(req.files['Signature'][0], userData, 'Signature', 'signature');
 
     await userData.save();
     res.status(200).json({ message: 'Files saved!' });
