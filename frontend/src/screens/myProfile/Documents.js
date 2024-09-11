@@ -103,7 +103,11 @@ function Documents() {
     setSignature(files[0])
     reader.readAsDataURL(files[0])
   };
+  useEffect(()=>{
+    console.log(uploadingFiles);
 
+  }, [uploadingFiles])
+  
   return (
     <>
       <div style={{ marginBottom: "30px" }}>
@@ -114,12 +118,15 @@ function Documents() {
                 <div className="Text14Semi">Identity Documents</div>
               </div>
               <div className="line" />
-              <form onSubmit={(e) => {
+              <form onSubmit={ async (e) => {
                 e.preventDefault();
+                console.log('form submiotted');
                 if (!uploadingFiles) {
                   setUploadingFiles(true)
                   const filesData = new FormData(e.target);
-                  axios.post(BASE_URL + '/upload-files/' + user?._id, filesData).then(async (res) => {
+                 await  axios.post(BASE_URL + '/upload-files/' + user?._id, filesData).then(async (res) => {
+                    console.log(res);
+                    
                     await GetUserData();
                     getUserData();
                     setAdhar(null);
@@ -132,7 +139,7 @@ function Documents() {
                     window.notify('Files uploaded', 'success');
                   }).catch(err => {
                     console.log(err)
-                  }).finally(setUploadingFiles(false))
+                  }).finally(()=> setUploadingFiles(false))
                 }
               }}>
                 <div className="plt12">

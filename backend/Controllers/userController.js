@@ -133,17 +133,22 @@ const previewFile = async (req, res) => {
 };
 const uploadFile = async (file, userData, fieldName) => {
   try {
+    console.log(file);
+    
     const writeStream = gfsBucket.openUploadStream(file.originalname, {
       contentType: file.mimetype
     });
-
-    console.log('upload stream: ', writeStream);
 
     // Write the file buffer to GridFS
     await new Promise((resolve, reject) => {
       writeStream.write(file.buffer); // Use file.buffer instead of file.data
       writeStream.end((err) => {
-        if (err) reject(err);
+        if (err){
+          console.log(err);
+          
+          reject(err);
+
+        } 
         else resolve();
       });
     });
@@ -172,10 +177,10 @@ const uploadFiles = async (req, res) => {
     if (req.files['adharCard']) await uploadFile(req.files['adharCard'][0], userData, 'adharCard');
     if (req.files['panCard']) await uploadFile(req.files['panCard'][0], userData, 'panCard');
     if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'][0], userData, 'drivingLicense');
-    if (req.files['voterID']) await uploadFile(req.files['voterID'], userData, 'voterID');
-    if (req.files['passport']) await uploadFile(req.files['passport'], userData, 'passport');
-    if (req.files['photo']) await uploadFile(req.files['photo'], userData, 'photo');
-    if (req.files['signature']) await uploadFile(req.files['signature'], userData, 'signature');
+    if (req.files['voterID']) await uploadFile(req.files['voterID'][0], userData, 'voterID');
+    if (req.files['passport']) await uploadFile(req.files['passport'][0], userData, 'passport');
+    if (req.files['photo']) await uploadFile(req.files['photo'][0], userData, 'photo');
+    if (req.files['signature']) await uploadFile(req.files['signature'][0], userData, 'signature');
 
     await userData.save();
     res.status(200).json({ message: 'Files saved!' });
