@@ -158,10 +158,10 @@ function Documents() {
                           </div>
                           {user?.adharCard && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.adharCard} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.adharCard} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.adharCard} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.adharCard} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>

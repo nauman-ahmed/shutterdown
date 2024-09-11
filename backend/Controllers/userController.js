@@ -2,6 +2,17 @@ const userSchema = require('../models/userSchema');
 const path = require('path');
 const fs = require('fs');
 const mimeTypes = require('mime-types');
+const mongoose = require('mongoose');
+const Grid = require('gridfs-stream');
+
+// Initialize GridFS
+let gfs;
+mongoose.connection.once('open', () => {
+  gfs = Grid(mongoose.connection.db, mongoose.mongo);
+  gfs.collection('uploads');
+});
+
+
 
 const updateUserData = async (req, res) => {
   try {
@@ -13,16 +24,26 @@ const updateUserData = async (req, res) => {
 }
 const downloadFile = async (req, res) => {
   try {
-    const filePath = path.join(__dirname, '../uploads/', req.params.filePath);
-    res.download(filePath);
+    const fileId = req.params.fileId;
+    const readStream = gfs.createReadStream({
+      _id: fileId
+    });
+
+    // Set the response headers
+    res.set("Content-Disposition", `attachment; filename="${fileId}"`);
+    res.set("Content-Type", readStream.contentType);
+
+    // Pipe the file to the response
+    readStream.pipe(res);
   } catch (error) {
-    return res.status(404).json({ error: 'File not found on the server' });
+    console.log(error);
+    return res.status(404).json({ error: 'File not found in GridFS' });
   }
-}
+};
 
 const getUserAccountbanned = async (req, res) => {
   try {
-    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : true}, { new: true });
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, { banAccount: true }, { new: true });
     res.status(200).json({ message: 'Account has been banned' })
   } catch (error) {
     console.log(error);
@@ -31,7 +52,7 @@ const getUserAccountbanned = async (req, res) => {
 
 const getUserAccountUnbanned = async (req, res) => {
   try {
-    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {banAccount : false}, { new: true });
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, { banAccount: false }, { new: true });
     res.status(200).json({ message: 'Account has been unbanned' })
   } catch (error) {
     console.log(error);
@@ -40,7 +61,7 @@ const getUserAccountUnbanned = async (req, res) => {
 
 const getUserAccountApproved = async (req, res) => {
   try {
-    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, {accountRequest : false}, { new: true });
+    const updatedUser = await userSchema.findByIdAndUpdate(req.body.data._id, { accountRequest: false }, { new: true });
     res.status(200).json({ message: 'Account Approved' })
   } catch (error) {
     console.log(error);
@@ -49,8 +70,8 @@ const getUserAccountApproved = async (req, res) => {
 
 const getAllAccountDetails = async (req, res) => {
   try {
-    let userAccountDetails = await userSchema.find({  });
-    
+    let userAccountDetails = await userSchema.find({});
+
     // Assuming 'userAccountDetails' is your original array of Mongoose documents
     userAccountDetails = userAccountDetails.map(doc => {
       // Convert the Mongoose document to a plain JavaScript object
@@ -58,7 +79,7 @@ const getAllAccountDetails = async (req, res) => {
 
       // Add the fullname field by merging firstName and lastName
       return {
-          ...obj,
+        ...obj,
         fullname: `${obj.firstName} ${obj.lastName}`
       };
     });
@@ -81,7 +102,7 @@ const getAllAccountDetails = async (req, res) => {
 
 const getAllAccountRequestCount = async (req, res) => {
   try {
-    const userAccountRequests = await userSchema.find({ accountRequest: true  });
+    const userAccountRequests = await userSchema.find({ accountRequest: true });
     res.status(200).json(userAccountRequests.length);
   } catch (error) {
     res.status(404).json('Your Email is not exists');
@@ -90,99 +111,67 @@ const getAllAccountRequestCount = async (req, res) => {
 
 const previewFile = async (req, res) => {
   try {
-    const filePath = path.join(__dirname, '../uploads/', req.params.filePath);
-    res.set({
-      'Content-Type': mimeTypes.contentType(filePath)
+    // Get the file ID from the request parameters
+    const fileId = req.params.fileId;
+
+    // Read the file from GridFS
+    const readStream = gfs.createReadStream({
+      _id: fileId
     });
-    const readStream = fs.createReadStream(filePath);
+
+    // Set the response headers
+    res.set("Content-Disposition", `inline; filename="${fileId}"`);
+    res.set("Content-Type", readStream.contentType);
+
+    // Pipe the file to the response
     readStream.pipe(res);
   } catch (error) {
     console.log(error);
-    return res.status(404).json({ error: 'File not found on the server' });
+    return res.status(404).json({ error: 'File not found in GridFS' });
   }
-}
-
-const uploadFiles = async (req, res) => {
+};
+const uploadFile = async (file, userData, fieldName) => {
   try {
-    const dirPath = path.join(__dirname, '../');
-    const userData = await userSchema.findById(req.params.userId);
-    if (req.files['adharCard']) {
-      fs.unlink(dirPath + userData?.adharCard, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.adharCard = req.files['adharCard'][0].path;
-    }
-    if (req.files['panCard']) {
-      fs.unlink(dirPath + userData?.panCard, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.panCard = req.files['panCard'][0].path;
-    }
-    if (req.files['drivingLicense']) {
-      fs.unlink(dirPath + userData?.drivingLicense, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.drivingLicense = req.files['drivingLicense'][0].path;
-    }
-    if (req.files['voterID']) {
-      fs.unlink(dirPath + userData?.voterID, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.voterID = req.files['voterID'][0].path;
-    }
-    if (req.files['pasport']) {
-      fs.unlink(dirPath + userData?.passport, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.passport = req.files['passport'][0].path;
-    }
-    if (req.files['photo']) {
-      fs.unlink(dirPath + userData?.photo, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.photo = req.files['photo'][0].path;
-    }
-    if (req.files['signature']) {
-      fs.unlink(dirPath + userData?.signature, (err) => {
-        if (err) {
-          console.error(err); // Handle any errors
-        } else {
-          console.log('File deleted successfully!');
-        }
-      })
-      userData.signature = req.files['signature'][0].path;
-    }
-    await userData.save();
-    res.status(200).json({ message: 'Files saved!' })
+    const uploadStream = gfs.createWriteStream({
+      filename: file.name,
+      contentType: file.mimetype
+    });
+
+    await new Promise((resolve, reject) => {
+      uploadStream.write(file.data);
+      uploadStream.end((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    const fileId = uploadStream.id;
+    userData[fieldName] = fileId;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
+const uploadFiles = async (req, res) => {
+  try {
+    console.log(req.files);
+    const userData = await userSchema.findById(req.params.userId);
+    
+
+    if (req.files['adharCard']) await uploadFile(req.files['adharCard'], userData, 'adharCard');
+    if (req.files['panCard']) await uploadFile(req.files['panCard'], userData, 'panCard');
+    if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'], userData, 'drivingLicense');
+    if (req.files['voterID']) await uploadFile(req.files['voterID'], userData, 'voterID');
+    if (req.files['pasport']) await uploadFile(req.files['pasport'], userData, 'passport');
+    if (req.files['photo']) await uploadFile(req.files['photo'], userData, 'photo');
+    if (req.files['signature']) await uploadFile(req.files['signature'], userData, 'signature');
+
+    await userData.save();
+    res.status(200).json({ message: 'Files saved!' });
+  } catch (error) {
+    console.log(error);
+  }
+};
 const RegisterPostRequest = async (req, res) => {
   try {
     if (!req.body.data) {
@@ -249,11 +238,11 @@ const SignInPostRequest = async (req, res) => {
       password: req.body.password,
     });
     if (loginUser) {
-      if(loginUser.accountRequest){
+      if (loginUser.accountRequest) {
         res.status(404).json({ message: 'Your account is not approved' });
         return
       }
-      if(loginUser.banAccount){
+      if (loginUser.banAccount) {
         res.status(404).json({ message: 'Your account access is limited' });
         return
       }
