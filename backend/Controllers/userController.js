@@ -3,13 +3,14 @@ const path = require('path');
 const fs = require('fs');
 const mimeTypes = require('mime-types');
 const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
+const { GridFSBucket } = require('mongodb');
 
-// Initialize GridFS
-let gfs;
+// Initialize GridFSBucket
+let gfsBucket;
 mongoose.connection.once('open', () => {
-  gfs = Grid(mongoose.connection.db, mongoose.mongo);
-  gfs.collection('uploads');
+  gfsBucket = new GridFSBucket(mongoose.connection.db, {
+    bucketName: 'uploads' // This is the bucket name you'll use for storing files
+  });
 });
 
 
@@ -132,16 +133,16 @@ const previewFile = async (req, res) => {
 };
 const uploadFile = async (file, userData, fieldName) => {
   try {
-    const writeStream = gfs.createWriteStream({
-      filename: file.name,
+    const writeStream = gfsBucket.openUploadStream(file.name, {
       contentType: file.mimetype
     });
 
-    console.log('upload stream : ', writeStream);
+    console.log('upload stream: ', writeStream);
 
+    // Write the file data to GridFS
     await new Promise((resolve, reject) => {
       writeStream.write(file.data);
-      writeStream.end((err) => {
+      writeStream.end(err => {
         if (err) reject(err);
         else resolve();
       });
@@ -149,12 +150,14 @@ const uploadFile = async (file, userData, fieldName) => {
 
     console.log('promise resolved');
 
-    // Get the GridFSFile object
-    const fileDoc = await gfs.files.findOne({ filename: file.name });
-
-    // Use the _id property of the GridFSFile object
-    const fileId = fileDoc._id;
-    userData[fieldName] = fileId;
+    // Get the GridFS file document after upload
+    const fileDoc = await gfsBucket.find({ filename: file.name }).toArray();
+    
+    if (fileDoc.length > 0) {
+      // Use the _id property of the uploaded GridFS file document
+      const fileId = fileDoc[0]._id;
+      userData[fieldName] = fileId;
+    }
   } catch (error) {
     console.log('error in file upload function');
     console.log(error);
@@ -165,13 +168,12 @@ const uploadFiles = async (req, res) => {
   try {
     console.log(req.files);
     const userData = await userSchema.findById(req.params.userId);
-    
 
     if (req.files['adharCard']) await uploadFile(req.files['adharCard'], userData, 'adharCard');
     if (req.files['panCard']) await uploadFile(req.files['panCard'], userData, 'panCard');
     if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'], userData, 'drivingLicense');
     if (req.files['voterID']) await uploadFile(req.files['voterID'], userData, 'voterID');
-    if (req.files['pasport']) await uploadFile(req.files['pasport'], userData, 'passport');
+    if (req.files['passport']) await uploadFile(req.files['passport'], userData, 'passport');
     if (req.files['photo']) await uploadFile(req.files['photo'], userData, 'photo');
     if (req.files['signature']) await uploadFile(req.files['signature'], userData, 'signature');
 
@@ -179,6 +181,7 @@ const uploadFiles = async (req, res) => {
     res.status(200).json({ message: 'Files saved!' });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: 'File upload failed' });
   }
 };
 const RegisterPostRequest = async (req, res) => {
