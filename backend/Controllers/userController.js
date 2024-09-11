@@ -132,26 +132,31 @@ const previewFile = async (req, res) => {
 };
 const uploadFile = async (file, userData, fieldName) => {
   try {
-    const uploadStream = gfs.createWriteStream({
+    const writeStream = gfs.createWriteStream({
       filename: file.name,
       contentType: file.mimetype
     });
-    console.log('upload stream : ', uploadStream);
-    
+
+    console.log('upload stream : ', writeStream);
+
     await new Promise((resolve, reject) => {
-      uploadStream.write(file.data);
-      uploadStream.end((err) => {
+      writeStream.write(file.data);
+      writeStream.end((err) => {
         if (err) reject(err);
         else resolve();
       });
     });
-    console.log('promise resolved : ', uploadStream);
-    
-    const fileId = uploadStream.id;
+
+    console.log('promise resolved');
+
+    // Get the GridFSFile object
+    const fileDoc = await gfs.files.findOne({ filename: file.name });
+
+    // Use the _id property of the GridFSFile object
+    const fileId = fileDoc._id;
     userData[fieldName] = fileId;
   } catch (error) {
     console.log('error in file upload function');
-    
     console.log(error);
   }
 };
