@@ -156,7 +156,7 @@ const uploadFile = async (file, userData, fieldName) => {
         .on("finish", resolve("successfull"))
         .on("error", reject("error occured while creating stream"))
     })
-    userData[fieldName] = uploadStream.id
+    userData[fieldName] = {id : uploadStream.id, ext : originalname.split('.').pop()}
     console.log('file uploaded');
 
 
