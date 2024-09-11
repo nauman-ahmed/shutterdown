@@ -31,8 +31,6 @@ const downloadFile = async (req, res) => {
     downloadStream.on("file", (file) => {
       // Set Content-Type for the file
       res.set("Content-Type", file.contentType);
-      console.log(file.filename);
-      console.log(file);
       
       // Set Content-Disposition header to prompt download with a specified filename
       res.set(
@@ -147,7 +145,7 @@ const uploadFile = async (file, userData, fieldName) => {
     console.log(file);
     let { fieldname, originalname, mimetype, buffer } = file
 
-    let uploadStream = bucket.openUploadStream(fieldname + '.' + originalname.split('.').pop())
+    let uploadStream = bucket.openUploadStream(fieldname)
     let readBuffer = new Readable()
     readBuffer.push(buffer)
     readBuffer.push(null)
