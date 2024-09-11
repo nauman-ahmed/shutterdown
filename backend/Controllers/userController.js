@@ -133,16 +133,16 @@ const previewFile = async (req, res) => {
 };
 const uploadFile = async (file, userData, fieldName) => {
   try {
-    const writeStream = gfsBucket.openUploadStream(file.name, {
+    const writeStream = gfsBucket.openUploadStream(file.originalname, {
       contentType: file.mimetype
     });
 
     console.log('upload stream: ', writeStream);
 
-    // Write the file data to GridFS
+    // Write the file buffer to GridFS
     await new Promise((resolve, reject) => {
-      writeStream.write(file.data);
-      writeStream.end(err => {
+      writeStream.write(file.buffer); // Use file.buffer instead of file.data
+      writeStream.end((err) => {
         if (err) reject(err);
         else resolve();
       });
@@ -151,7 +151,7 @@ const uploadFile = async (file, userData, fieldName) => {
     console.log('promise resolved');
 
     // Get the GridFS file document after upload
-    const fileDoc = await gfsBucket.find({ filename: file.name }).toArray();
+    const fileDoc = await gfsBucket.find({ filename: file.originalname }).toArray();
     
     if (fileDoc.length > 0) {
       // Use the _id property of the uploaded GridFS file document
@@ -169,9 +169,9 @@ const uploadFiles = async (req, res) => {
     console.log(req.files);
     const userData = await userSchema.findById(req.params.userId);
 
-    if (req.files['adharCard']) await uploadFile(req.files['adharCard'], userData, 'adharCard');
-    if (req.files['panCard']) await uploadFile(req.files['panCard'], userData, 'panCard');
-    if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'], userData, 'drivingLicense');
+    if (req.files['adharCard']) await uploadFile(req.files['adharCard'][0], userData, 'adharCard');
+    if (req.files['panCard']) await uploadFile(req.files['panCard'][0], userData, 'panCard');
+    if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'][0], userData, 'drivingLicense');
     if (req.files['voterID']) await uploadFile(req.files['voterID'], userData, 'voterID');
     if (req.files['passport']) await uploadFile(req.files['passport'], userData, 'passport');
     if (req.files['photo']) await uploadFile(req.files['photo'], userData, 'photo');
