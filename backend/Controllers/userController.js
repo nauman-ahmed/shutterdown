@@ -3,21 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const mimeTypes = require('mime-types');
 const mongoose = require('mongoose');
-const { GridFSBucket } = require('mongodb');
-const Grid = require("gridfs-stream");
-const config = require("config");
-const multer = require("multer");
 const { Readable } = require("stream");
 
 // Initialize GridFSBucket
 let bucket;
 mongoose.connection.once('open', () => {
   console.log("connection established successfully")
-    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db)
-
-  // gfsBucket = new GridFSBucket(mongoose.connection.db, {
-  //   bucketName: 'uploads' // This is the bucket name you'll use for storing files
-  // });
+  bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db)
 });
 
 
@@ -33,16 +25,13 @@ const updateUserData = async (req, res) => {
 const downloadFile = async (req, res) => {
   try {
     const fileId = req.params.fileId;
-    const readStream = gfs.createReadStream({
-      _id: fileId
-    });
+    let downloadStream = bucket.openDownloadStream( new mongoose.Types.ObjectId(fileId))
 
-    // Set the response headers
-    res.set("Content-Disposition", `attachment; filename="${fileId}"`);
-    res.set("Content-Type", readStream.contentType);
+    downloadStream.on("file", (file)=>{
+        res.set("Content-Type", file.contentType)
+    })
 
-    // Pipe the file to the response
-    readStream.pipe(res);
+    downloadStream.pipe(res)
   } catch (error) {
     console.log(error);
     return res.status(404).json({ error: 'File not found in GridFS' });
@@ -141,51 +130,24 @@ const previewFile = async (req, res) => {
 const uploadFile = async (file, userData, fieldName) => {
   try {
     console.log(file);
-    let {fieldname, originalname, mimetype, buffer} = file
+    let { fieldname, originalname, mimetype, buffer } = file
 
     let uploadStream = bucket.openUploadStream(fieldname)
-            let readBuffer = new Readable()
-            readBuffer.push(buffer)
-            readBuffer.push(null)
-    
-    
-            const isUploaded = await new Promise((resolve, reject)=>{
-                readBuffer.pipe(uploadStream)
-                .on("finish", resolve("successfull"))
-                .on("error" , reject("error occured while creating stream") )
-            })
-            userData[fieldName] = uploadStream.id
-            console.log('file uploaded');
-            
-    
-    // const writeStream = gfsBucket.openUploadStream(file.originalname, {
-    //   contentType: file.mimetype
-    // });
+    let readBuffer = new Readable()
+    readBuffer.push(buffer)
+    readBuffer.push(null)
 
-    // // Write the file buffer to GridFS
-    // await new Promise((resolve, reject) => {
-    //   writeStream.write(file.buffer); // Use file.buffer instead of file.data
-    //   writeStream.end((err) => {
-    //     if (err){
-    //       console.log(err);
-          
-    //       reject(err);
 
-    //     } 
-    //     else resolve();
-    //   });
-    // });
+    const isUploaded = await new Promise((resolve, reject) => {
+      readBuffer.pipe(uploadStream)
+        .on("finish", resolve("successfull"))
+        .on("error", reject("error occured while creating stream"))
+    })
+    userData[fieldName] = uploadStream.id
+    console.log('file uploaded');
 
-    // console.log('promise resolved');
 
-    // // Get the GridFS file document after upload
-    // const fileDoc = await gfsBucket.find({ filename: file.originalname }).toArray();
-    
-    // if (fileDoc.length > 0) {
-    //   // Use the _id property of the uploaded GridFS file document
-    //   const fileId = fileDoc[0]._id;
-    //   userData[fieldName] = fileId;
-    // }
+
   } catch (error) {
     console.log('error in file upload function');
     console.log(error);
