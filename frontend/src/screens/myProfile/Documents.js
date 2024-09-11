@@ -154,7 +154,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={adharCard}
-                            name="adharCard"
+                            name="Adhar-Card"
                             onChange={handleChangeAdhar}
                             style={{ display: "none" }}
                           />
@@ -166,7 +166,7 @@ function Documents() {
                           </div>
                           {user?.adharCard && (
                             <div>
-                              <a href={BASE_URL + '/download/' + user?.adharCard?.id} download={user?.firstName + `-Adhar.${user?.adharCard?.ext}`}>
+                              <a href={BASE_URL + '/download/' + user?.adharCard?.id} download={user?.firstName + `-Adhar`}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
                               <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.adharCard?.id} target="_blank">
@@ -184,7 +184,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={panCard}
-                            name="panCard"
+                            name="Pan-Card"
                             onChange={handleChangePan}
                             style={{ display: "none" }}
                           />
@@ -216,7 +216,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={drivingLicenseCard}
-                            name="drivingLicense"
+                            name="Driving-License"
                             onChange={handleChangeDrivingLicense}
                             style={{ display: "none" }}
                           />
@@ -247,7 +247,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={VoterIDCard}
-                            name="voterID"
+                            name="Voter-ID"
                             onChange={handleChangeVoterIDCard}
                             style={{ display: "none" }}
                           />
@@ -278,7 +278,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={passportCard}
-                            name="passport"
+                            name="Passport"
                             onChange={handleChangePassportCard}
                             style={{ display: "none" }}
                           />
@@ -311,7 +311,7 @@ function Documents() {
                           <input type="file"
                             ref={photoCard}
                             accept=".jpg, .jpeg, .png"
-                            name="photo"
+                            name="Photo"
                             onChange={handleChangePhotoCard}
                             style={{ display: "none" }}
                           />
@@ -342,7 +342,7 @@ function Documents() {
                         <div>
                           <input type="file"
                             ref={signatureCard}
-                            name="signature"
+                            name="Signature"
                             onChange={handleChangeSignatureCard}
                             style={{ display: "none" }}
                           />

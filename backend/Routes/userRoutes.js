@@ -17,7 +17,7 @@ router.post('/emailVerify', userController.verifyEmail);
 router.put("/ResetPassword",userController.newPassword);
 router.post('/',userController.getExistEmail);
 router.post('/update-userInfo',userController.updateUserData);
-router.post('/upload-files/:userId',upload.fields([{name : 'adharCard'}, {name : 'panCard'}, {name : 'drivingLicense' }, {name : 'voterID'}, {name : 'passport'}, {name : 'photo'}, {name : 'signature'}]) ,userController.uploadFiles);
+router.post('/upload-files/:userId',upload.fields([{name : 'Adhar-Card'}, {name : 'Pan-Card'}, {name : 'Driving-License' }, {name : 'Voter-ID'}, {name : 'Passport'}, {name : 'Photo'}, {name : 'Signature'}]) ,userController.uploadFiles);
 // router.post('/upload-files/:userId', userController.uploadFiles);
 router.post('/getUserAccountApproved',userController.getUserAccountApproved);
 router.post('/getUserAccountbanned',userController.getUserAccountbanned);

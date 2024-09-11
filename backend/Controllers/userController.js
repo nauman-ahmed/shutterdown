@@ -35,7 +35,7 @@ const downloadFile = async (req, res) => {
       // Set Content-Disposition header to prompt download with a specified filename
       res.set(
         "Content-Disposition",
-        `attachment; filename="${file.filename || 'downloaded-file.jpg'}"`
+        `attachment; filename="${file.filename || 'downloaded-file'}"`
       );
     });
 
@@ -145,7 +145,7 @@ const uploadFile = async (file, userData, fieldName) => {
     console.log(file);
     let { fieldname, originalname, mimetype, buffer } = file
 
-    let uploadStream = bucket.openUploadStream(fieldname)
+    let uploadStream = bucket.openUploadStream(fieldname + '.' + originalname.split('.').pop())
     let readBuffer = new Readable()
     readBuffer.push(buffer)
     readBuffer.push(null)
@@ -156,7 +156,7 @@ const uploadFile = async (file, userData, fieldName) => {
         .on("finish", resolve("successfull"))
         .on("error", reject("error occured while creating stream"))
     })
-    userData[fieldName] = {id : uploadStream.id, ext : originalname.split('.').pop()}
+    userData[fieldName] = uploadStream.id
     console.log('file uploaded');
 
 
@@ -172,13 +172,13 @@ const uploadFiles = async (req, res) => {
     console.log(req.files);
     const userData = await userSchema.findById(req.params.userId);
 
-    if (req.files['adharCard']) await uploadFile(req.files['adharCard'][0], userData, 'adharCard');
-    if (req.files['panCard']) await uploadFile(req.files['panCard'][0], userData, 'panCard');
-    if (req.files['drivingLicense']) await uploadFile(req.files['drivingLicense'][0], userData, 'drivingLicense');
-    if (req.files['voterID']) await uploadFile(req.files['voterID'][0], userData, 'voterID');
-    if (req.files['passport']) await uploadFile(req.files['passport'][0], userData, 'passport');
-    if (req.files['photo']) await uploadFile(req.files['photo'][0], userData, 'photo');
-    if (req.files['signature']) await uploadFile(req.files['signature'][0], userData, 'signature');
+    if (req.files['Adhar-Card']) await uploadFile(req.files['Adhar-Card'][0], userData, 'Adhar-Card');
+    if (req.files['Pan-Card']) await uploadFile(req.files['Pan-Card'][0], userData, 'Pan-Card');
+    if (req.files['Driving-License']) await uploadFile(req.files['Driving-License'][0], userData, 'Driving-License');
+    if (req.files['Voter-ID']) await uploadFile(req.files['Voter-ID'][0], userData, 'Voter-ID');
+    if (req.files['Passport']) await uploadFile(req.files['Passport'][0], userData, 'Passport');
+    if (req.files['Photo']) await uploadFile(req.files['Photo'][0], userData, 'Photo');
+    if (req.files['Signature']) await uploadFile(req.files['Signature'][0], userData, 'Signature');
 
     await userData.save();
     res.status(200).json({ message: 'Files saved!' });
