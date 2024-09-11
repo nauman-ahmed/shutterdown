@@ -136,7 +136,8 @@ const uploadFile = async (file, userData, fieldName) => {
       filename: file.name,
       contentType: file.mimetype
     });
-
+    console.log('upload stream : ', uploadStream);
+    
     await new Promise((resolve, reject) => {
       uploadStream.write(file.data);
       uploadStream.end((err) => {
@@ -144,10 +145,13 @@ const uploadFile = async (file, userData, fieldName) => {
         else resolve();
       });
     });
-
+    console.log('promise resolved : ', uploadStream);
+    
     const fileId = uploadStream.id;
     userData[fieldName] = fileId;
   } catch (error) {
+    console.log('error in file upload function');
+    
     console.log(error);
   }
 };
