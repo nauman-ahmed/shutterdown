@@ -92,19 +92,19 @@ const userSchema = mongoose.Schema({
     type: String
   },
   adharCard : {
-    type : String
+    type : Object
   },
   panCard : {
-    type : String
+    type : Object
   },
   drivingLicense : {
-    type : String
+    type : Object
   },
   voterID : {
-    type : String
+    type : Object
   },
   passport : {
-    type : String
+    type : Object
   },
   subRole : [{
     type : String
