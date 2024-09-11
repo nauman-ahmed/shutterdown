@@ -166,10 +166,10 @@ function Documents() {
                           </div>
                           {user?.adharCard && (
                             <div>
-                              <a href={BASE_URL + '/download/' + user?.adharCard?.id} download={user?.firstName + `-Adhar`}>
+                              <a href={BASE_URL + '/download/' + user?.adharCard} download={user?.firstName + `-Adhar`}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.adharCard?.id} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.adharCard} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -197,10 +197,10 @@ function Documents() {
                           </div>
                           {user?.panCard && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.panCard} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.panCard} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.panCard} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.panCard} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -228,10 +228,10 @@ function Documents() {
                           </div>
                           {user?.drivingLicense && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.drivingLicense} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.drivingLicense} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.drivingLicense} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.drivingLicense} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -259,10 +259,10 @@ function Documents() {
                           </div>
                           {user?.voterID && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.voterID} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.voterID} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.voterID} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.voterID} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -290,10 +290,10 @@ function Documents() {
                           </div>
                           {user?.passport && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.passport} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.passport} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.passport} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.passport} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -324,10 +324,10 @@ function Documents() {
                           </div>
                           {user?.photo && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.photo} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.photo} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.photo} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.photo} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
@@ -355,10 +355,10 @@ function Documents() {
                           </div>
                           {user?.signature && (
                             <div>
-                              <a href={BASE_URL + '/' + user?.signature} download={user?.firstName + '-Adhar'}>
+                              <a href={BASE_URL + '/download/' + user?.signature} download={user?.firstName + '-Adhar'}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
-                              <a rel="noreferrer" href={BASE_URL + '/preview/' + user?.signature} target="_blank">
+                              <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.signature} target="_blank">
                                 <ImNewTab className="fs-4 me-3 text-primary mt-2" />
                               </a>
                             </div>
