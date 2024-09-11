@@ -35,7 +35,7 @@ const downloadFile = async (req, res) => {
       // Set Content-Disposition header to prompt download with a specified filename
       res.set(
         "Content-Disposition",
-        `attachment; filename="${file.filename || 'downloaded-file'}"`
+        `attachment; filename="${file.filename || 'downloaded-file.jpg'}"`
       );
     });
 

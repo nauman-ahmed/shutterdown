@@ -107,6 +107,7 @@ function Documents() {
     console.log(uploadingFiles);
 
   }, [uploadingFiles])
+  console.log(user);
   
   return (
     <>
@@ -165,7 +166,7 @@ function Documents() {
                           </div>
                           {user?.adharCard && (
                             <div>
-                              <a href={BASE_URL + '/download/' + user?.adharCard?.id} download={user?.firstName + '-Adhar' + user?.adharCard.ext }>
+                              <a href={BASE_URL + '/download/' + user?.adharCard?.id} download={user?.firstName + `-Adhar.${user?.adharCard?.ext}`}>
                                 <IoMdDownload className="fs-3 me-1 text-primary mt-2" />
                               </a>
                               <a rel="noreferrer" href={BASE_URL + '/preview-file/' + user?.adharCard?.id} target="_blank">
