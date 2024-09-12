@@ -153,7 +153,7 @@ const DeleteEvent = async (req, res) => {
         client.events = client.events.filter(eventId => !eventId.equals(eventToDelete._id));
         await client.save();
         await eventModel.findByIdAndDelete(eventToDelete._id)
-        res.status(200).json('Event Added SucccessFully');
+        res.status(200).json('Event Deleted SucccessFully');
     } catch (error) {
         console.log(error, 'error');
     }

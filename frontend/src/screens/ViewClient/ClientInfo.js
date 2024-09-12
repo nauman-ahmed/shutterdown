@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Col,
@@ -18,7 +18,7 @@ import { getClientById } from "../../API/Client";
 import Calendar from "react-calendar";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import Select from "react-select";
-import { addEvent, deleteEvent, getEvents, updateEventData } from "../../API/Event";
+import { addEvent, deleteClient, deleteEvent, getEvents, updateEventData } from "../../API/Event";
 import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { updateAllEvents } from "../../redux/eventsSlice";
@@ -151,6 +151,7 @@ function ClientInfo() {
       console.log(error);
     }
   };
+  const navigate = useNavigate()
   return (
     <div>
       <Table bordered hover responsive>
@@ -170,6 +171,7 @@ function ClientInfo() {
             <th>Promo</th>
             <th>Payment Status</th>
             <th>Client Suggestion</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody
@@ -216,6 +218,14 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.promos}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.suggestion}</td>
+            <td className="textPrimary fs-6 tablePlaceContent"><MdDelete
+                    onClick={async () => {
+                      await deleteClient(clientData._id)
+                      getStoredEvents()
+                     navigate('/MyProfile/Client/ViewClient')
+                    }}
+                    className="text-danger cursor-pointer fs-3"
+                  /></td>
           </tr>
         </tbody>
       </Table>

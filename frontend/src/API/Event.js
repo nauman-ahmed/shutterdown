@@ -104,3 +104,20 @@ export const deleteEvent = async (eventId) => {
         console.log(error);
     }
 }
+
+export const deleteClient = async (clientId) => {
+    try {
+        const res = await axios.delete(BASE_URL +
+            `/DeleteClient/${clientId}`,
+            {
+                Headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        ).then(()=>{
+            window.notify('Client Deleted!', 'success')
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}

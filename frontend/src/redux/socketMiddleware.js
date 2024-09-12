@@ -10,6 +10,8 @@ const socketMiddleware = (store) => (next) => (action) => {
 
   if (action.type === "SOCKET_DISCONNECT") {
     if (socketInstance) {
+      console.log('disconnecting socket');
+      
       socketInstance.disconnect();
     }
   }

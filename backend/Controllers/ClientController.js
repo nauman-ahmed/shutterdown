@@ -1,6 +1,7 @@
 const ClientModel = require("../models/ClientModel");
 const deadlineDaysModel = require("../models/DeadlineDays");
 const deliverableModel = require("../models/DeliverableModel");
+const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
 
 const AddClientFunction = async (req, res) => {
@@ -313,6 +314,24 @@ const getClientById = async (req, res) => {
   }
 };
 
+
+const DeleteClient = async (req, res) => {
+  try {
+      const clientToDelete = await ClientModel.findById(req.params.clientId);
+      clientToDelete.events.forEach(async (client) => {
+        await eventModel.findByIdAndDelete(client)
+      })
+      clientToDelete.deliverables.forEach(async (client) => {
+        await deliverableModel.findByIdAndDelete(client)
+      })
+      
+      await ClientModel.findByIdAndDelete(clientToDelete._id)
+      res.status(200).json('Client Deleted Succcessfully!');
+  } catch (error) {
+      console.log(error, 'error');
+  }
+};
+
 module.exports = {
   AddClientFunction,
   getAllClients,
@@ -320,4 +339,5 @@ module.exports = {
   getPreWedClients,
   updateClient,
   AddPreWedDetails,
+  DeleteClient
 };

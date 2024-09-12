@@ -48,15 +48,25 @@ const Header = (args) => {
   };
   const dispatch = useDispatch();
   const [userData, setUserData] = useState(null);
+//   window.addEventListener('DOMContentLoaded', function() {
+//     console.log('Website loaded');
+//     console.log('connecting socket');
+//     const currentUser = JSON.parse(Cookies.get("currentUser"));
+//     if(currentUser){
+//       store.dispatch({ type: "SOCKET_CONNECT" });
+//     }
+// });
+// window.addEventListener('beforeunload', function (event) {
+//   console.log('Website about to be unloaded');
+//   console.log('disconnecting');
+  
+//   store.dispatch({ type: "SOCKET_DISCONNECT" });
+// });
   useEffect(() => {
     try {
       getUserData();
 
-      store.dispatch({ type: "SOCKET_CONNECT" });
-
-      return () => {
-        store.dispatch({ type: "SOCKET_DISCONNECT" });
-      };
+     
     } catch (error) {
       console.log(error);
     }
