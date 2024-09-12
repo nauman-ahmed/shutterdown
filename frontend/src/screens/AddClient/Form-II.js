@@ -640,7 +640,7 @@ function FormII() {
             <div style={{ width: "300px" }} className="tooltipBg">
               <Calendar
                 value={minDate}
-                minDate={new Date(Date.now())}
+                // minDate={new Date(Date.now())}
                 CalenderPress={toggle}
                 onClickDay={(date) => {
                   handleAddDate(date);
