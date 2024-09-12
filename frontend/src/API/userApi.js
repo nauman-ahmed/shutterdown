@@ -153,6 +153,7 @@ export const GetUserData = async () => {
     email: email,
     password: password,
   }).then(res => {
+    Cookies.remove('currentUser')
     Cookies.set('currentUser', JSON.stringify(res.data.User));
   })
 };

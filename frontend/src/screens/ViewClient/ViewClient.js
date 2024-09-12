@@ -54,10 +54,10 @@ function ViewClient() {
       allClients.filter((clientData) => {
         return clientData.events.some(
           (eventData) =>
-            new Date(eventData.eventDate).setHours(0,0,0,0) >=
-              new Date(startDate).setHours(0,0,0,0) &&
-            new Date(eventData.eventDate).setHours(0,0,0,0) <=
-              new Date(endDate).setHours(0,0,0,0)
+            new Date(eventData.eventDate).setHours(0, 0, 0, 0) >=
+            new Date(startDate).setHours(0, 0, 0, 0) &&
+            new Date(eventData.eventDate).setHours(0, 0, 0, 0) <=
+            new Date(endDate).setHours(0, 0, 0, 0)
         );
       })
     );
@@ -89,9 +89,9 @@ function ViewClient() {
               return clientData.events.some(
                 (eventData) =>
                   new Date(eventData.eventDate).getTime() >=
-                    new Date(filterStartDate).getTime() &&
+                  new Date(filterStartDate).getTime() &&
                   new Date(eventData.eventDate).getTime() <=
-                    new Date(filterEndDate).getTime()
+                  new Date(filterEndDate).getTime()
               );
             });
             setClients([...clients, ...clientsToAdd]);
@@ -265,16 +265,21 @@ function ViewClient() {
                         paddingBottom: "15px",
                         width: "33%",
                       }}
-                    >
-                      {client.events.map((eventData) => {
-                        return (
-                          eventData.isWedding && (
-                            <p className="mb-0">
-                              {dayjs(eventData.eventDate).format("DD-MMM-YYYY")}
-                            </p>
+                    > {(client.events?.filter(event => event.isWedding))?.length !== 0 ? (
+                      <>
+                        {client.events.map((eventData) => {
+                          return (
+                            eventData.isWedding && (
+                              <p className="mb-0">
+                                {dayjs(eventData.eventDate).format("DD-MMM-YYYY")}
+                              </p>
+                            )
                           )
-                        );
-                      })}
+                        })}
+                      </>
+                    ) : (
+                      'Not Defined'
+                    )}
                     </td>
                   </tr>
                   <div style={{ marginTop: "15px" }} />

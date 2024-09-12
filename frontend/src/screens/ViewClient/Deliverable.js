@@ -24,7 +24,8 @@ function Deliverable(props) {
       const otherDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName !== 'Pre-Wedding Photos' && deliverable.deliverableName !== 'Pre-Wedding Videos')
       setOtherDeliverables(otherDeliverable);
       const wedDate = res.events.filter((event) => event.isWedding)
-      setWeddingDate(wedDate[0]);
+
+      setWeddingDate(wedDate?.length > 0 ? wedDate[0] : res.events[0]);
     } catch (error) {
       console.log(error);
     }
@@ -35,22 +36,22 @@ function Deliverable(props) {
   })
 
   const getrelevantDeadline = (title) => {
-    if(title == "Promo"){
+    if (title == "Promo") {
       return deadlineDays.promo
     }
-    else if(title == "Long Film"){
+    else if (title == "Long Film") {
       return deadlineDays.longFilm
     }
-    else if(title == "Reel"){
+    else if (title == "Reel") {
       return deadlineDays.reel
     }
-    else if(title == "Photos"){
+    else if (title == "Photos") {
       return deadlineDays.photo
     }
-    else if(title == "Pre-Wedding Photos"){
+    else if (title == "Pre-Wedding Photos") {
       return deadlineDays.preWedPhoto
     }
-    else if(title == "Pre-Wedding Videos"){
+    else if (title == "Pre-Wedding Videos") {
       return deadlineDays.preWedVideo
     }
 
@@ -62,6 +63,8 @@ function Deliverable(props) {
     return "2024-09-02T22:00:00.000+00:00"
   }
 
+  
+  
   return (
     <div>
       {preWedDeliverables?.length > 0 && (
@@ -100,16 +103,18 @@ function Deliverable(props) {
               }}
             >
               {preWedDeliverables.map((deliverable, i) => {
+                
+                
                 return (
                   <tr>
-                    <td className="textPrimary Text14Semi tablePlaceContent">{deliverable.deliverableName}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate.eventDate).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate.eventDate).setDate(new Date(weddingDate.eventDate).getDate() - getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.status || 'Pending'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.finalDeliverDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.clientRating || 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent">{deliverable?.deliverableName}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.editor?.firstName || 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate?.eventDate).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" > {dayjs(new Date(weddingDate?.eventDate).setDate(new Date(weddingDate?.eventDate).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.status || 'Pending'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.finalDeliverDate ? dayjs(deliverable?.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.clientRating || 'Not Assigned'}</td>
                   </tr>
                 )
               })}
@@ -127,7 +132,7 @@ function Deliverable(props) {
               style={{
                 background:
                   // "#040A80"
-                "#FF9797",
+                  "#FF9797",
               }}
             >
               Other Deliverables
@@ -157,14 +162,14 @@ function Deliverable(props) {
               {otherDeliverables.map((deliverable, i) => {
                 return (
                   <tr>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.deliverableName}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate.eventDate).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate.eventDate).setDate(new Date(weddingDate.eventDate).getDate() - getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.status || 'Pending'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.firstDeliveryDate ? dayjs(deliverable.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.finalDeliveryDate ? dayjs(deliverable.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable.clientRating || 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.deliverableName}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.editor?.firstName || 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate?.eventDate).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate?.eventDate).setDate(new Date(weddingDate?.eventDate).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.status || 'Pending'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.clientRating || 'Not Assigned'}</td>
                   </tr>
                 )
               })}
