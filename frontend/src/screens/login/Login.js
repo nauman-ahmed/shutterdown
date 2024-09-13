@@ -10,6 +10,9 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { checkExistEmail } from '../../API/userApi';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { getEvents } from '../../API/Event';
+import { useDispatch } from 'react-redux';
+import { updateAllEvents } from '../../redux/eventsSlice';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,6 +28,8 @@ const Login = () => {
     setInputData({ ...inputData, [name]: value });
     setError(false);
   };
+  const dispatch = useDispatch()
+ 
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();

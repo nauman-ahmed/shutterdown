@@ -19,6 +19,8 @@ import ActiveReport from "../assets/Profile/ActiveReport.svg";
 import UnActiveChecklist from "../assets/Profile/UnActiveChecklist.svg";
 import ActiveTeam from "../assets/Profile/ActiveTeam.png";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { updateAllEvents } from "../redux/eventsSlice";
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -94,6 +96,8 @@ const SideBar = () => {
   //   }
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
+  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
+  const dispatch = useDispatch()
   useEffect(() => {
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
       if(currentUser?.rollSelect !== 'Manager'){
@@ -202,7 +206,7 @@ const SideBar = () => {
       setCurrentTab('FormOptions');
     }
   }, [location])
-  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
+  
   return (
     <>
       <div
@@ -776,6 +780,7 @@ const SideBar = () => {
                     <img alt="" src="/images/sidebar/logout.png" width={20} />
                   }
                   onClick={() => {
+                    dispatch(updateAllEvents([]))
                     Cookies.remove('currentUser');
                     navigate('/')
                   }}
@@ -1339,6 +1344,7 @@ const SideBar = () => {
                     <img alt="" src="/images/sidebar/logout.png" width={20} />
                   }
                   onClick={() => {
+                    dispatch(updateAllEvents([]))
                     Cookies.remove('currentUser');
                     navigate('/')
                     setMobileSideBar(false)

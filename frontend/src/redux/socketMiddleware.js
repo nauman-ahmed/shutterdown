@@ -1,28 +1,39 @@
 import BASE_URL from "../API";
 import { io } from "socket.io-client";
-import {
-  addNewNotification,
-  updateReadNotification,
-} from "./notificationsSlice";
+import { addNewNotification, updateReadNotification } from "./notificationsSlice";
+
+let socketInstance = null; // Socket instance initialized as null
 
 const socketMiddleware = (store) => (next) => (action) => {
-  let socketInstance = io(BASE_URL); // Declare socket instance outside
+  // Handle socket connection
+  if (action.type === "SOCKET_CONNECT") {
+    if (!socketInstance) {
+      console.log("Connecting socket...");
+      socketInstance = io(BASE_URL);
 
-  if (action.type === "SOCKET_DISCONNECT") {
-    if (socketInstance) {
-      console.log('disconnecting socket');
-      
-      socketInstance.disconnect();
+      // Handle socket events inside the connection block
+      socketInstance.on("update-read-notification", (notification) => {
+        store.dispatch(updateReadNotification(notification));
+      });
+
+      socketInstance.on("receive-notification", (notification) => {
+        store.dispatch(addNewNotification(notification));
+      });
+    } else {
+      console.log("Socket already connected");
     }
   }
-  socketInstance.on("update-read-notification", (notification) => {
-    store.dispatch(updateReadNotification(notification));
-  });
 
-  socketInstance.on("receive-notification", (notification) => {
-    store.dispatch(addNewNotification(notification));
-  });
+  // Handle socket disconnection
+  if (action.type === "SOCKET_DISCONNECT") {
+    if (socketInstance) {
+      console.log("Disconnecting socket...");
+      socketInstance.disconnect();
+      socketInstance = null; // Reset the socket instance
+    }
+  }
 
+  // Handle socket event emission
   if (action.type === "SOCKET_EMIT_EVENT") {
     const { event, data } = action.payload;
     if (socketInstance) {

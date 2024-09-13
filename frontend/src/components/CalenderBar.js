@@ -20,16 +20,17 @@ function CalenderBar(props) {
   const dispatch = useDispatch()
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [activeStartDate, setActiveStartDate] = useState(new Date());
-  
+
   const getEventsData = async () => {
     try {
       // const res = await getEvents();
+
       const res = await getEventsByMonths(currentMonth);
       if (currentUser.rollSelect === 'Manager') {
         dispatch(updateAllEvents(res?.data));
       } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
         const eventsToShow = res.data?.map(event => {
-          console.log(event);
+
           if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
             return { ...event, userRole: 'Shoot Director' };
           } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
@@ -123,8 +124,8 @@ function CalenderBar(props) {
                       className="mx-1 mt-1"
                       onClick={() => {
                         const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth() - 1));
-    setActiveStartDate(new Date(newDate))
-                        setCurrentMonth(moment().month(currentMonth).add(-1,"months").format('MMMM'))
+                        setActiveStartDate(new Date(newDate))
+                        setCurrentMonth(moment().month(currentMonth).add(-1, "months").format('MMMM'))
                       }}
                     >
                       {"<"}
@@ -132,9 +133,10 @@ function CalenderBar(props) {
                     <Button
                       className="mx-1 mt-1"
                       onClick={() => {
-                        const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth()+ 1));
-    setActiveStartDate(new Date(newDate))
-                        setCurrentMonth(moment().month(currentMonth).add(1,"months").format('MMMM'))}}
+                        const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth() + 1));
+                        setActiveStartDate(new Date(newDate))
+                        setCurrentMonth(moment().month(currentMonth).add(1, "months").format('MMMM'))
+                      }}
                     >
                       {">"}
                     </Button>
@@ -150,10 +152,10 @@ function CalenderBar(props) {
                 >
                   <thead>
                     <tr className="Text10S gray3 alignTop">
-                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Date</th>
-                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Couple </th>
-                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Location</th>
-                      <th style={{ fontSize:"smaller", textAlign: "center" }}>Photographer: Cinematographer</th>
+                      <th style={{ fontSize: "smaller", textAlign: "center" }}>Date</th>
+                      <th style={{ fontSize: "smaller", textAlign: "center" }}>Couple </th>
+                      <th style={{ fontSize: "smaller", textAlign: "center" }}>Location</th>
+                      <th style={{ fontSize: "smaller", textAlign: "center" }}>Photographer: Cinematographer</th>
                     </tr>
                   </thead>
                   <tbody className="Text10S alignCenter">

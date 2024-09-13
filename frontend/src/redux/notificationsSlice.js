@@ -43,8 +43,8 @@ const notifications = createSlice({
       const isToday = dayjs(action.payload.date).format("YYYY-MM-DD") === dayjs().format("YYYY-MM-DD");
       const newNotification = removeId(action.payload);
       
-      const existsToday = state.today.some(noti => JSON.stringify(removeId(noti)) === JSON.stringify(newNotification));
-      const existsPrevious = state.previous.some(noti => JSON.stringify(removeId(noti)) === JSON.stringify(newNotification));
+      const existsToday = state.today?.some(noti => JSON.stringify(removeId(noti)) === JSON.stringify(newNotification));
+      const existsPrevious = state.previous?.some(noti => JSON.stringify(removeId(noti)) === JSON.stringify(newNotification));
       
       if (existsToday || existsPrevious) {
         return state;

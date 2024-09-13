@@ -24,6 +24,7 @@ import { useDispatch } from "react-redux";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
 import { getAllEventOptions, updateAllEventOptions } from "../../API/FormEventOptionsAPI";
+import Cookies from "js-cookie";
 
 function ClientInfo() {
   const [clientData, setClientData] = useState(null);
@@ -36,12 +37,40 @@ function ClientInfo() {
   const [allEvents, setAllEvents] = useState(null);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
-  
+  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   const dispatch = useDispatch();
   const getStoredEvents = async () => {
-    const storedEvents = await getEvents();
-    setAllEvents(storedEvents?.data);
-    dispatch(updateAllEvents(storedEvents?.data));
+    const res = await getEvents();
+    if (currentUser.rollSelect === 'Manager') {
+      dispatch(updateAllEvents(res?.data));
+      setAllEvents(res?.data);
+    } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
+      const eventsToShow = res.data?.map(event => {
+  
+        if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
+          return { ...event, userRole: 'Shoot Director' };
+        } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
+          return { ...event, userRole: 'Photographer' };
+        } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
+          return { ...event, userRole: 'Cinematographer' };
+        } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
+          return { ...event, userRole: 'Drone Flyer' };
+        } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
+          return { ...event, userRole: 'Manager' };
+        } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
+          return { ...event, userRole: 'Same Day Photos Maker' };
+        } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
+          return { ...event, userRole: 'Same Day Video Maker' };
+        } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
+          return { ...event, userRole: 'Assistant' };
+        } else {
+          return null;
+        }
+      });
+      setAllEvents(eventsToShow)
+      dispatch(updateAllEvents(eventsToShow));
+    }
+    
   };
 
   const target = useRef(null);
