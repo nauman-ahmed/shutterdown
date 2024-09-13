@@ -515,7 +515,7 @@ function ListView(props) {
                 ...groupByBrideName(eventsToShow),
               ]);
             }
-            setEventsForShow(groupByBrideName(eventsToShow));
+           
           }
           setPage(page + 1);
         } else {
@@ -934,14 +934,15 @@ function ListView(props) {
                                     "DD-MMM-YYYY"
                                   )}
                                 </div>
-                                {event?.travelBy === "By Car" ||
+                                {event.travelBy ? "By " + event.travelBy : "N/A"}
+                                {/* {event?.travelBy === "By Car" ||
                                   event?.travelBy === "By Bus" ? (
                                   <img alt="" src={Car} />
                                 ) : event?.travelBy === "By Air" ? (
                                   <img alt="" src={Plane} />
                                 ) : (
                                   "N/A"
-                                )}
+                                )} */}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <p
@@ -1407,14 +1408,15 @@ function ListView(props) {
                                 {event?.userRole}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                {event?.travelBy === "Car" ||
+                              {event.travelBy ? "By " + event.travelBy : "N/A"}
+                                {/* {event?.travelBy === "Car" ||
                                   event?.travelBy === "Bus" ? (
                                   <img alt="" src={Car} />
                                 ) : event?.travelBy === "By Air" ? (
                                   <img alt="" src={Plane} />
                                 ) : (
                                   "N/A"
-                                )}
+                                )} */}
                                 <div
                                   className="mt-2"
                                   style={{ color: "green" }}
