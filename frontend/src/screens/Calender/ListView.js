@@ -1457,10 +1457,11 @@ function ListView(props) {
 
       <Modal
         className="bg-white"
+        style={{ borderRadius : '10px'}}
         isOpen={newEventModel}
         centered={true}
         size="lg"
-        fullscreen="md"
+       
       >
         <ModalHeader>Event Details</ModalHeader>
         <Form
@@ -1473,12 +1474,12 @@ function ListView(props) {
             addNewEvent();
           }}
         >
-          <ModalBody className="bg-white">
+          <ModalBody className="bg-white ">
             <Row ref={target}>
               <Col xl="6" sm="6" lg="6" className="p-2">
                 <div className="label">Client</div>
                 <Select
-                  className="w-75"
+                  className="w-full"
                   onChange={(selected) => {
                     setNewEvent({ ...newEvent, client: selected.value._id });
                   }}
@@ -1514,9 +1515,10 @@ function ListView(props) {
                   <div
                     style={{
                       zIndex: "5",
-                      width: "300px"
+                      width: "300px",
+                      right : '5px'
                     }}
-                    className="position-absolute"
+                    className="position-absolute top-5 right-5"
                   >
                     <Calendar
                       minDate={new Date(Date.now())}
@@ -1599,7 +1601,7 @@ function ListView(props) {
                           : null
                       }
                       name={Objkey}
-                      className="w-75"
+                      className="w-full"
                       onChange={(selected) => {
                         setNewEvent({ ...newEvent, [Objkey]: selected.value });
                       }}

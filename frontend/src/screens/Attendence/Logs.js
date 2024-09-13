@@ -96,17 +96,17 @@ function Logs(props) {
 
                 <div className="plt12" style={{ paddingTop: '15px' }}>
                   <Row>
-                    <Col xs={12} sm={12} className="px-1">
-                      <Button className="submit_btn submit m-1" onClick={() => checkInHandler()}>
+                    <Col xs={12} sm={12} className="px-1 gap-2">
+                      <Button style={{ width : '150px'}} className="submit_btn submit m-1" onClick={() => checkInHandler()}>
                         Check In
                       </Button>
-                      <Button type="submit" className="submit_btn submit m-1" style={{ marginLeft:"5px" }} onClick={async () => {
+                      <Button style={{ width : '150px'}} type="submit" className="submit_btn submit m-1"  onClick={async () => {
                         await checkOutUser();
                         getUserAttendaces();
                       }}>
                         Check Out
                       </Button>
-                      <Button className="submit submit_btn" style={{ marginLeft:"10%", fontSize: "90%" }}  onClick={() => checkInHandler({home:"yes"})}>
+                      <Button style={{ width : '150px'}} className="submit submit_btn ms-sm-4 m-1"   onClick={() => checkInHandler({home:"yes"})}>
                         Check In (Home)
                       </Button>
                     </Col>

@@ -216,7 +216,7 @@ function FormII() {
           <Row>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div ref={target}>
-                <div>
+              <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Add Date
                   </div>
@@ -233,7 +233,7 @@ function FormII() {
               </div>
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-              <div>
+            <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Type
                 </div>
@@ -250,7 +250,7 @@ function FormII() {
               </div>
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4">
-              <div>
+            <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "25px" }}>
                   Is This a Wedding Event
                 </div>
@@ -391,7 +391,7 @@ function FormII() {
         >
          
           
-            <div className="Text16N d-flex flex-row flex-wrap gap-3">
+            <div className="Text16N d-flex flex-row flex-wrap gap-3 mt-2">
               <div>
                 <input
                   type="checkbox"

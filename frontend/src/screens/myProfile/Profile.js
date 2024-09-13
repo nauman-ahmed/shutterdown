@@ -70,7 +70,7 @@ function Profile() {
         userData
           ? <>
             <Row className="W90 mb-5">
-              <Col xs="12" sm="6" className="pr6">
+              <Col xs="12" sm="5" className="pr6">
                 <div className="profileCard mt40">
                   <div className="R_A_Justify p10">
                     <div className="Text14Semi">Primary Details</div>
@@ -117,7 +117,7 @@ function Profile() {
                   </div>
                 </div>
               </Col>
-              <Col xs="12" sm="6" className="pr6">
+              <Col xs="12" sm="5" className="pr6">
                 <div className="profileCard mt40">
                   <div className="R_A_Justify p10">
                     <div className="Text14Semi">Contact Details</div>
@@ -148,7 +148,7 @@ function Profile() {
                   </div>
                 </div>
               </Col>
-              <Col xs="12" sm="6" className="pr6">
+              <Col xs="12" sm="5" className="pr6">
                 <div className="profileCard mt40">
                   <div className="R_A_Justify p10">
                     <div className="Text14Semi">Address Details</div>
@@ -171,7 +171,7 @@ function Profile() {
                   </div>
                 </div>
               </Col>
-              <Col xs="12" sm="6" className="pr6">
+              <Col xs="12" sm="5" className="pr6">
                 <div className="profileCard mt40">
                   <div className="R_A_Justify p10">
                     <div className="Text14Semi">Experience</div>
@@ -195,7 +195,7 @@ function Profile() {
             <div class="spinner"></div>
           </div>
       }
-      <Modal isOpen={primaryModal} primary={primary} centered={true} fullscreen="md" size="lg">
+      <Modal isOpen={primaryModal} primary={primary} centered={true} size="lg">
         <ModalHeader primary={primary}>Primary Details</ModalHeader>
         <ModalBody>
           <div>
@@ -268,7 +268,7 @@ function Profile() {
 
       {/* This is Contact Model Section Start */}
 
-      <Modal isOpen={contactModel} contact={contact} centered={true} size="lg" fullscreen="md" >
+      <Modal isOpen={contactModel} contact={contact} centered={true} size="lg"  >
         <ModalHeader contact={contact}>Contact Details</ModalHeader>
         <ModalBody>
           <Row>
@@ -345,7 +345,7 @@ function Profile() {
 
       {/* This is Experience Model Section Start */}
 
-      <Modal isOpen={experienceModel} experience={experience} centered={true} fullscreen="sm" size="sm">
+      <Modal isOpen={experienceModel} experience={experience} centered={true} size="sm">
         <ModalHeader experience={experience}>Experience</ModalHeader>
         <ModalBody>
 

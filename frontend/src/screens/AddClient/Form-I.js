@@ -71,7 +71,7 @@ function FormI() {
       <Form onSubmit={(e) => { handleSubmit(e) }}>
         <Row>
           <Col xs="12" sm="6" className="pr6">
-            <div>
+          <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Bride Name
               </div>
@@ -88,7 +88,7 @@ function FormI() {
             </div>
           </Col>
           <Col xs="12" sm="6">
-            <div>
+          <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Groom Name
               </div>
@@ -120,6 +120,7 @@ function FormI() {
                   onChange={(value) => {
                     setFormValues({ ...formValues, phoneNumber: value })
                   }}
+                  
                   value={formValues?.phoneNumber}
                   placeholder="Phone Number"
                   inputClass={'forminput phoneinput'}

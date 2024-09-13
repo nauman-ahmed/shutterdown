@@ -106,8 +106,12 @@ function Calender() {
   return (
     <>
       <ClientHeader title="Calender View" calender />
-      <div>
+      <div style={{ width : '100%', overflowX : 'scroll'}}>
+
         {allEvents ? (
+          <div style={{ minWidth : '600px'}}>
+
+        
           <FullCalendar
             plugins={[
               dayGridPlugin,
@@ -210,6 +214,7 @@ function Calender() {
               end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
             }}
           />
+            </div>
         ) : (
           <div
             style={{ height: "400px" }}

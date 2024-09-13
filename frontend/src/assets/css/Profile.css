@@ -183,7 +183,7 @@ td {
 }
 
 .ViewClientParticular {
-     width: 50% !important;
+     width: 70% !important;
 }
 
 .ViewClientParticularContent {
@@ -436,7 +436,7 @@ blockquote h3:after {
      }
 
      .ViewClientParticular {
-          width: 90% !important;
+          width: 100% !important;
      }
 
      .ViewClientParticularContent {

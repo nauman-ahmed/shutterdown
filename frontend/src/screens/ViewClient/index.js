@@ -8,7 +8,8 @@ const Client = () => {
   return (
     <>
       <div className="main_content">
-        <div style={location.pathname === "/MyProfile/Client/ViewClient" ? { width: "70%", paddingRight: "20px" }: { width: "100%", paddingRight: "20px" }}>
+        {/* <div style={location.pathname === "/MyProfile/Client/ViewClient" ? { width: "70%", paddingRight: "20px" }: { width: "100%", paddingRight: "20px" }}> */}
+        <div style={{ width: "100%", paddingRight: "20px" }}>
           <ClientHeader  title="View Clients"  />
           <div>
             <Outlet />

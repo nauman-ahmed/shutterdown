@@ -172,7 +172,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
         </div>
         <div className="Profile_mobile_View center">
           {user?.photo ?
-            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img alt="" style={{ borderRadius: '50px' }} className="w-100" src={BASE_URL + '/' + user.photo} /></div>
+            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img alt="" style={{ borderRadius: '50px' }} className="w-100" src={BASE_URL + '/preview-file/' + user.photo} /></div>
             : <div className="HeaderName Text35R mt25">{user?.firstName.charAt(0).toUpperCase()}{user?.lastName.charAt(0).toUpperCase()}</div>
           }
           <div className="Text16N mt12">{user?.firstName + ' ' + user?.lastName}</div>

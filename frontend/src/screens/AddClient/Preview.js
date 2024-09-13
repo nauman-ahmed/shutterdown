@@ -69,7 +69,7 @@ function Preview() {
         <Row>
           <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div ref={target}>
-              <div>
+            <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Date
                 </div>
@@ -88,7 +88,7 @@ function Preview() {
             </div>
           </Col>
           <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div>
+          <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Event Type
               </div>
@@ -108,7 +108,7 @@ function Preview() {
             </div>
           </Col>
           <Col xs="12" sm="6" md="6" lg="6" xl="4">
-            <div className="Text16N" style={{ marginBottom: "25px" }}>
+            <div className="Text16N" style={{ marginBottom: "25px", marginTop : '25px' }}>
               Is This a Wedding Event
             </div>
             <input
@@ -350,7 +350,7 @@ function Preview() {
               <input
                 type="checkbox"
                 name="preWeddingVideos"
-                style={{ marginLeft: "20px" }}
+                // style={{ marginLeft: "20px" }}
                 checked={clientData?.deliverables?.preWeddingVideos}
                 disabled={true}
               />

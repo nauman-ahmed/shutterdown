@@ -191,9 +191,7 @@ const getStoredEvents = async () => {
     }
   };
 
-  useEffect(() => {
-    console.log(notifications);
-  }, [notifications]);
+
 
   useEffect(() => {
     setCurrentPath(location.pathname);

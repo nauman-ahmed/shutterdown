@@ -381,7 +381,9 @@ function PreWedShootScreen() {
             </div>
 
           </div>
-          <div style={{ overflowX: 'hidden', width: '100%' }}>
+          <div 
+          // style={{ overflowX: 'scroll', minWidth: '100%' }}
+          >
             <ToastContainer />
             <Table
               hover

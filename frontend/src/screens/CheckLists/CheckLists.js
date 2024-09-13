@@ -335,7 +335,7 @@ function CheckLists(props) {
             target={target.current}
             show={show}
             placement="bottom">
-            <div style={{ width: "300px" }} >
+            <div style={{ width: "300px", zIndex : '100' }} >
               <CalenderMulti filterByDates={filterByDates}/>
             </div>
           </Overlay>
