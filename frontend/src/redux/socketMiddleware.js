@@ -8,7 +8,6 @@ const socketMiddleware = (store) => (next) => (action) => {
   // Handle socket connection
   if (action.type === "SOCKET_CONNECT") {
     if (!socketInstance) {
-      console.log("Connecting socket...");
       socketInstance = io(BASE_URL);
 
       // Handle socket events inside the connection block
@@ -27,7 +26,6 @@ const socketMiddleware = (store) => (next) => (action) => {
   // Handle socket disconnection
   if (action.type === "SOCKET_DISCONNECT") {
     if (socketInstance) {
-      console.log("Disconnecting socket...");
       socketInstance.disconnect();
       socketInstance = null; // Reset the socket instance
     }
