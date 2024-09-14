@@ -360,8 +360,7 @@ function ClientInfo() {
                 <td className=" textPrimary fs-6">
                   <div className="d-flex flex-row align-items-center gap-2">
 
-
-                    <FaEdit className="fs-5 cursor-pointer"
+                    <FaEdit className="fs-5 cursor-pointer" 
                       onClick={() => {
                         setEventToEdit(event);
                         setEditEventModel(true);
