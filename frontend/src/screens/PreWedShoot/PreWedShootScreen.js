@@ -17,11 +17,14 @@ import ClientHeader from "../../components/ClientHeader";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 import { useDispatch } from "react-redux";
+import 'react-calendar/dist/Calendar.css';
+import Edit from "../../assets/Profile/Edit.svg";
 
 function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [clientsForShow, setClientsForShow] = useState(null);
+  const [rangeFor, setRangeFor] = useState(-1)
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [filterCondition, setFilterCondition] = useState(null);
   const target = useRef(null);
@@ -265,6 +268,13 @@ function PreWedShootScreen() {
 
   useEffect(() => {
     getClients();
+    // Add event listener when the component mounts
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener when component unmounts
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [])
 
   const customStyles = {
@@ -357,6 +367,18 @@ function PreWedShootScreen() {
       console.log(error);
     }
   };
+
+
+  const rangeRef = useRef(null);
+
+  const handleClickOutside = (event) => {
+
+    // If the click is outside the element (ref)
+    if (rangeRef?.current && !rangeRef?.current?.contains(event.target)) {
+
+      setRangeFor(-1); // Close the element
+    }
+  };
   return (
     <>
       <ClientHeader priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Pre-Wedding" />
@@ -381,7 +403,7 @@ function PreWedShootScreen() {
             </div>
 
           </div>
-          <div 
+          <div
           // style={{ overflowX: 'scroll', minWidth: '100%' }}
           >
             <ToastContainer />
@@ -450,7 +472,7 @@ function PreWedShootScreen() {
                               preWedDetails={preWedClients[index]?.preWeddingDetails}
                               allowedPersons={client.preWedphotographers}
                               usersToShow={photographer}
-                              message ="phtotographer"
+                              message="phtotographer"
                               existedUsers={client?.preWeddingDetails?.photographers || []}
 
                               userChecked={(userObj) => {
@@ -573,8 +595,44 @@ function PreWedShootScreen() {
                             }
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                            <div className="d-flex flex-column">
-                              <input
+                            <div className="d-flex flex-column position-relative">
+                              {client?.preWeddingDetails?.shootStartDate && client?.preWeddingDetails?.shootEndDate && (
+                                <>
+                                  <p className="mb-0">{dayjs(client?.preWeddingDetails?.shootStartDate).format("DD-MMM-YYYY")}</p>
+                                  <p className=" text-center mb-0 my-1">TO</p>
+                                  <p className=" mb-0">{dayjs(client?.preWeddingDetails?.shootEndDate).format("DD-MMM-YYYY")}</p>
+                                </>
+                              )}
+                              <div ref={rangeRef}>
+
+
+
+                                <div style={{ whiteSpace: "nowrap" }}>
+                                  <img style={{ cursor: 'pointer' }} onClick={() => setRangeFor(rangeFor === index ? -1 : index)} alt="" src={Edit} />
+                                </div>
+
+                                {rangeFor === index && (
+                                  <div style={{ zIndex: 200, top: client?.preWeddingDetails?.shootStartDate ? '90px' : '30px', right: '0px', transition: '0.5s ease-in-out' }} className={`position-absolute transition-calendar ${rangeFor === index ? "fade-in" : "fade-out"
+                                    }`} >
+
+                                    <Calendar
+                                      selectRange
+                                      value={[client?.preWeddingDetails?.shootStartDate ? new Date(client?.preWeddingDetails?.shootStartDate) : new Date(), client?.preWeddingDetails?.shootEndDate ? new Date(client?.preWeddingDetails?.shootEndDate) : new Date()]}
+                                      onChange={(value) => {
+                                        const updatedClients = [...preWedClients]
+                                        updatedClients[index].preWeddingDetails = client.preWeddingDetails || {};
+                                        updatedClients[index].preWeddingDetails.shootStartDate = new Date(value[0]);
+                                        updatedClients[index].preWeddingDetails.shootEndDate = new Date(value[1]);
+                                        setPreWedClients(updatedClients)
+
+                                        setRangeFor(-1)
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* <input
                                 type="date"
                                 name="shootStartDate"
                                 className="dateInput"
@@ -600,7 +658,7 @@ function PreWedShootScreen() {
                                 }}
                                 readOnly={currentUser.rollSelect === 'Shooter'}
                                 value={client.preWeddingDetails?.shootEndDate ? new Date(client.preWeddingDetails.shootEndDate).toISOString().split('T')[0] : ''}
-                              />
+                              /> */}
                             </div>
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">

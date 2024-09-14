@@ -267,15 +267,11 @@ function ViewClient() {
                       }}
                     > {(client.events?.filter(event => event.isWedding))?.length !== 0 ? (
                       <>
-                        {client.events.map((eventData) => {
-                          return (
-                            eventData.isWedding && (
-                              <p className="mb-0">
-                                {dayjs(eventData.eventDate).format("DD-MMM-YYYY")}
-                              </p>
-                            )
-                          )
-                        })}
+                        {client.events.find(eventData => eventData.isWedding) && (
+                          <p className="mb-0">
+                            {dayjs(client.events.find(eventData => eventData.isWedding).eventDate).format("DD-MMM-YYYY")}
+                          </p>
+                        )}
                       </>
                     ) : (
                       'Not Defined'

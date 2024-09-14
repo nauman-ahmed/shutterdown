@@ -54,6 +54,26 @@ export const updateEventData = async (data) => {
     }
 }
 
+export const updateClientData = async (data) => {
+    try {
+        console.log(data);
+        
+        await axios.patch(BASE_URL +
+            '/updateClient',
+            {
+                Headers: {
+                    'Content-Type': 'application/json',
+                },
+                data
+            }
+        ).then(()=>{
+            window.notify('Details updated Successfully!', 'success')
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const getEvents = async (clientId, page) => { 
     try {
         const res = await axios.post(BASE_URL +
@@ -63,6 +83,21 @@ export const getEvents = async (clientId, page) => {
                     'Content-Type': 'application/json',
                 },
                 clientId
+            },
+        );
+        return res;
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const getAllEvents = async () => { 
+    try {
+        const res = await axios.get(BASE_URL +
+            `/get-All-Events`,
+            {
+                Headers: {
+                    'Content-Type': 'application/json',
+                }
             },
         );
         return res;

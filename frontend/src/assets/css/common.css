@@ -252,6 +252,14 @@ Label {
 .PhoneInput {
     padding-top: 12px !important;
 }
+.editClientPhone {
+    margin-top: 50px !important;
+    background-color: #eff0f5 !important;
+    border-width:  0px !important;
+}
+.editClientPhone ::placeholder {
+    color: rgb(119, 68, 68) !important;
+}
 
 .PhoneInputInput {
     border: none;

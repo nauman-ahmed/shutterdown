@@ -24,7 +24,7 @@ const ClientSchema = mongoose.Schema({
   email: {
     type: String,
   },
-  bookingConfirmed: {
+  bookingStatus: {
     type: String,
   },
   paymentStatus: {

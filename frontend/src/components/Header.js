@@ -65,40 +65,40 @@ window.addEventListener('beforeunload', function (event) {
   store.dispatch({ type: "SOCKET_DISCONNECT" });
 });
 
-const getStoredEvents = async () => {
-  const res = await getEvents();
-  if (currentUser.rollSelect === 'Manager') {
-    dispatch(updateAllEvents(res?.data));
-  } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
-    const eventsToShow = res.data?.map(event => {
+// const getStoredEvents = async () => {
+//   const res = await getEvents();
+//   if (currentUser.rollSelect === 'Manager') {
+//     dispatch(updateAllEvents(res?.data));
+//   } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
+//     const eventsToShow = res.data?.map(event => {
 
-      if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
-        return { ...event, userRole: 'Shoot Director' };
-      } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
-        return { ...event, userRole: 'Photographer' };
-      } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
-        return { ...event, userRole: 'Cinematographer' };
-      } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
-        return { ...event, userRole: 'Drone Flyer' };
-      } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
-        return { ...event, userRole: 'Manager' };
-      } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
-        return { ...event, userRole: 'Same Day Photos Maker' };
-      } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
-        return { ...event, userRole: 'Same Day Video Maker' };
-      } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
-        return { ...event, userRole: 'Assistant' };
-      } else {
-        return null;
-      }
-    });
-    dispatch(updateAllEvents(eventsToShow));
-  }
-};
+//       if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
+//         return { ...event, userRole: 'Shoot Director' };
+//       } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
+//         return { ...event, userRole: 'Photographer' };
+//       } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
+//         return { ...event, userRole: 'Cinematographer' };
+//       } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
+//         return { ...event, userRole: 'Drone Flyer' };
+//       } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
+//         return { ...event, userRole: 'Manager' };
+//       } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
+//         return { ...event, userRole: 'Same Day Photos Maker' };
+//       } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
+//         return { ...event, userRole: 'Same Day Video Maker' };
+//       } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
+//         return { ...event, userRole: 'Assistant' };
+//       } else {
+//         return null;
+//       }
+//     });
+//     dispatch(updateAllEvents(eventsToShow));
+//   }
+// };
   useEffect(() => {
     try {
       getUserData();
-      getStoredEvents()
+      // getStoredEvents()
       store.dispatch({ type: "SOCKET_CONNECT" });
 
       return (()=>{

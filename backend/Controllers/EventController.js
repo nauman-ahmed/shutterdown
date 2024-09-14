@@ -146,6 +146,25 @@ const getEvents = async (req, res) => {
         console.log(error, 'error');
     }
 };
+const getAllEvents = async (req, res) => {
+    try {
+        
+        const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+        
+        // Step 1: Sort by eventDate
+        events.sort((a, b) => {
+            const dateA = new Date(a.eventDate);
+            const dateB = new Date(b.eventDate);
+            return dateA - dateB 
+        })
+        
+      
+        
+        res.status(200).json(events);
+    } catch (error) {
+        console.log(error, 'error');
+    }
+};
 const DeleteEvent = async (req, res) => {
     try {
         const eventToDelete = await EventModel.findById(req.params.eventId);
@@ -160,4 +179,4 @@ const DeleteEvent = async (req, res) => {
 };
 
 
-module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth }
+module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth, getAllEvents }

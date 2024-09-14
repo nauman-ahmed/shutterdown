@@ -8,7 +8,7 @@ import "../App.css";
 import { Button, Table } from "reactstrap";
 import Chat from "../assets/Profile/Chat.svg";
 import Heart from "../assets/Profile/Heart.svg";
-import { getEvents, getEventsByMonths } from "../API/Event";
+import { getAllEvents, getEvents, getEventsByMonths } from "../API/Event";
 import dayjs from 'dayjs';
 import Cookies from "js-cookie";
 import { updateAllEvents } from "../redux/eventsSlice";
@@ -20,12 +20,13 @@ function CalenderBar(props) {
   const dispatch = useDispatch()
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [activeStartDate, setActiveStartDate] = useState(new Date());
+  const [monthEvents, setMonthEvents] = useState()
 
   const getEventsData = async () => {
     try {
       // const res = await getEvents();
 
-      const res = await getEventsByMonths(currentMonth);
+      const res = await getAllEvents();
       if (currentUser.rollSelect === 'Manager') {
         dispatch(updateAllEvents(res?.data));
       } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
@@ -60,13 +61,22 @@ function CalenderBar(props) {
 
   useEffect(() => {
     getEventsData();
-  }, [currentMonth])
+  }, [])
+  useEffect(() => {
+    const eventsCopy = EventsList && [...EventsList]
+    const filteredMonthEvents = eventsCopy?.filter((event) => (months[new Date(event?.eventDate).getMonth()] === currentMonth))
+    console.log(filteredMonthEvents);
+    
+    setMonthEvents(filteredMonthEvents)
+  }, [currentMonth, EventsList])
+  console.log(currentMonth);
+
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
   function getCurrentMonthAndYear() {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
 
     const currentDate = new Date();
     const currentMonth = months[currentDate.getMonth()];
@@ -159,7 +169,7 @@ function CalenderBar(props) {
                     </tr>
                   </thead>
                   <tbody className="Text10S alignCenter">
-                    {EventsList && EventsList?.map((event, i) => (
+                    {monthEvents && monthEvents?.map((event, i) => (
                       <>
                         {event && (
                           <tr>

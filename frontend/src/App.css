@@ -60,12 +60,37 @@
   margin-top: -60px;
   margin-bottom: 30px;
 }
-
+.widthViewClient {
+  width:  70%;
+}
 
 .widthForFilters{
  max-width:  300px;
   margin-top: -60px;
   margin-bottom: 30px;
+}
+@media (max-width : 991px){
+  .widthViewClient {
+    width: 100% !important;
+  }
+}
+.transition-calendar {
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  opacity: 0;
+  transform: translateY(-10px); /* Initial position above */
+  visibility: hidden;
+}
+
+.transition-calendar.fade-in {
+  opacity: 1;
+  transform: translateY(0); /* Move to the original position */
+  visibility: visible;
+}
+
+.transition-calendar.fade-out {
+  opacity: 0;
+  transform: translateY(-10px); /* Move back up when hiding */
+  visibility: hidden;
 }
 
 @media only screen and (max-width: 500px){

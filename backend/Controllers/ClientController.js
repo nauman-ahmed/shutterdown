@@ -163,14 +163,19 @@ const AddClientFunction = async (req, res) => {
 
     const albumsDeliverables = await Promise.all(
       req.body.data.albums.map(async (album) => {
-        const newAlbum = new deliverableModel({
-          client: client._id,
-          deliverableName: album,
-          quantity: 1,
-          albumDeadline,
-        });
-        await newAlbum.save();
-        return newAlbum._id;
+        if (album !== 'Not inlcuded') {
+
+          const newAlbum = new deliverableModel({
+            client: client._id,
+            deliverableName: album,
+            quantity: 1,
+            albumDeadline,
+          });
+          await newAlbum.save();
+          return newAlbum._id;
+        } else {
+          return null
+        }
       })
     );
 
@@ -221,11 +226,144 @@ const updateClient = async (req, res) => {
     console.log(error, "error");
   }
 };
+const updateWholeClient = async (req, res) => {
+  try {
+    console.log('from request');
+    console.log(req.body.data);
+
+    const reqClientData = { ...req.body.data }
+    const deadlineDays = await deadlineDaysModel.find();
+    const clientToEdit = await ClientModel.findById(req.body.data._id).populate('events')
+    let preWedPhotoDeadline = null;
+    let preWedVideoDeadline = null;
+    const weddingEvent = clientToEdit.events.find(event => event.isWedding === true)
+    if (weddingEvent) {
+      preWedPhotoDeadline = new Date(weddingEvent.eventDate.getTime());
+      preWedVideoDeadline = new Date(weddingEvent.eventDate.getTime());
+      preWedPhotoDeadline.setDate(
+        preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
+      );
+      preWedVideoDeadline.setDate(
+        preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
+      );
+    } else {
+      preWedPhotoDeadline = new Date(clientToEdit.events[clientToEdit.events.length - 1].eventDate.getTime());
+      preWedVideoDeadline = new Date(clientToEdit.events[clientToEdit.events.length - 1].eventDate.getTime());
+      preWedPhotoDeadline.setDate(
+        preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
+      );
+      preWedVideoDeadline.setDate(
+        preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
+      );
+    }
+    await Promise.all(
+      reqClientData.deliverables.map(async (deliverableData) => {
+        if (deliverableData.quantity > 0) {
+          const updatedDeliverable = await deliverableModel.findById(deliverableData._id)
+          updatedDeliverable.quantity = deliverableData.quantity;
+          await updatedDeliverable.save()
+        } else {
+          await deliverableModel.findByIdAndDelete(deliverableData._id)
+          clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableData._id))
+        }
+      })
+    )
+
+
+    if (reqClientData?.preWeddingPhotos === true && clientToEdit?.preWeddingPhotos === true) {
+      const updatedDeliverable = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Photos", client: clientToEdit._id })
+      updatedDeliverable.quantity = reqClientData.reels;
+      await updatedDeliverable.save()
+
+    } else if (reqClientData?.preWeddingPhotos === true && clientToEdit?.preWeddingPhotos === false) {
+      reqClientData.preWedding = true;
+      const newPreWedPhotosDeliverable = new deliverableModel({
+        client: clientToEdit._id,
+        deliverableName: "Pre-Wedding Photos",
+        quantity: reqClientData.reels,
+        preWedPhotoDeadline,
+      });
+      await newPreWedPhotosDeliverable.save().then(() => {
+        clientToEdit.deliverables = [...clientToEdit.deliverables, newPreWedPhotosDeliverable._id]
+      });
+    } else if (reqClientData?.preWeddingPhotos === false && clientToEdit?.preWeddingPhotos === true) {
+      const deliverableToDelete = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Photos", client: clientToEdit._id })
+      await deliverableModel.findByIdAndDelete(deliverableToDelete._id);
+      clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableToDelete._id))
+
+    }
+
+    if (reqClientData?.preWeddingVideos === true && clientToEdit?.preWeddingVideos === true) {
+      const updatedDeliverable = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Videos", client: clientToEdit._id })
+      updatedDeliverable.quantity = reqClientData.reels;
+      await updatedDeliverable.save()
+
+    } else if (reqClientData?.preWeddingVideos === true && clientToEdit?.preWeddingVideos === false) {
+      reqClientData.preWedding = true;
+      const newPreWedVideosDeliverable = new deliverableModel({
+        client: clientToEdit._id,
+        deliverableName: "Pre-Wedding Videos",
+        quantity: reqClientData.reels,
+        preWedPhotoDeadline,
+      });
+      await newPreWedVideosDeliverable.save().then(() => {
+        clientToEdit.deliverables = [...clientToEdit.deliverables, newPreWedVideosDeliverable._id]
+      });
+    } else if (reqClientData?.preWeddingVideos === false && clientToEdit?.preWeddingVideos === true) {
+      const deliverableToDelete = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Videos", client: clientToEdit._id })
+      await deliverableModel.findByIdAndDelete(deliverableToDelete._id);
+      clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableToDelete._id))
+    }
+
+    if (reqClientData.preWeddingPhotos === false && reqClientData.preWeddingVideos === false) {
+      reqClientData.preWedding = false;
+      reqClientData.preWeddingDetails = null;
+      reqClientData.preWedphotographers = null;
+      reqClientData.preWedcinematographers = null;
+      reqClientData.preWedassistants = null;
+      reqClientData.preWeddrones = null;
+    }
+
+    await Promise.all(
+      reqClientData.albums.map(async (album) => {
+        if (album !== 'Not inlcuded') {
+
+
+          const existAlbum = await deliverableModel.findOne({ deliverableName: album, client: clientToEdit._id })
+          if (!existAlbum) {
+            const newAlbum = new deliverableModel({
+              client: client._id,
+              deliverableName: album,
+              quantity: 1,
+              albumDeadline,
+            });
+            await newAlbum.save();
+            clientToEdit.deliverables = [...clientToEdit.deliverables, newAlbum._id]
+
+          }
+        }
+      })
+    );
+
+    reqClientData.events = clientToEdit.events.map(eventData => eventData._id)
+    reqClientData.deliverables = clientToEdit.deliverables;
+    reqClientData.userID = reqClientData.userID._id;
+
+    console.log('updated client');
+
+    console.log(reqClientData);
+    await ClientModel.findByIdAndUpdate(reqClientData._id, reqClientData);
+
+    res.status(200).json("client Updated SucccessFully");
+  } catch (error) {
+    console.log(error, "error");
+  }
+};
 
 const getAllClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-        const skip = (page - 1) * 10;
+    const skip = (page - 1) * 10;
     const clients = await ClientModel.find().skip(skip).limit(10).populate({
       path: 'events',
       model: 'Event',
@@ -257,7 +395,7 @@ const getAllClients = async (req, res) => {
 const getPreWedClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-        const skip = (page - 1) * 10;
+    const skip = (page - 1) * 10;
     const clients = await ClientModel.find({ preWedding: true }).skip(skip).limit(10).populate({
       path: 'deliverables',
       model: 'Deliverable',
@@ -317,18 +455,18 @@ const getClientById = async (req, res) => {
 
 const DeleteClient = async (req, res) => {
   try {
-      const clientToDelete = await ClientModel.findById(req.params.clientId);
-      clientToDelete.events.forEach(async (client) => {
-        await eventModel.findByIdAndDelete(client)
-      })
-      clientToDelete.deliverables.forEach(async (client) => {
-        await deliverableModel.findByIdAndDelete(client)
-      })
-      
-      await ClientModel.findByIdAndDelete(clientToDelete._id)
-      res.status(200).json('Client Deleted Succcessfully!');
+    const clientToDelete = await ClientModel.findById(req.params.clientId);
+    clientToDelete.events.forEach(async (client) => {
+      await eventModel.findByIdAndDelete(client)
+    })
+    clientToDelete.deliverables.forEach(async (client) => {
+      await deliverableModel.findByIdAndDelete(client)
+    })
+
+    await ClientModel.findByIdAndDelete(clientToDelete._id)
+    res.status(200).json('Client Deleted Succcessfully!');
   } catch (error) {
-      console.log(error, 'error');
+    console.log(error, 'error');
   }
 };
 
@@ -339,5 +477,6 @@ module.exports = {
   getPreWedClients,
   updateClient,
   AddPreWedDetails,
-  DeleteClient
+  DeleteClient,
+  updateWholeClient
 };

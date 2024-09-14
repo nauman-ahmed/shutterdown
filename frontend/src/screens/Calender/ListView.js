@@ -10,7 +10,7 @@ import Assistant from "../../assets/Profile/Assistant.svg";
 import Car from "../../assets/Profile/Car.svg";
 import Plane from "../../assets/Profile/Plane.svg";
 import ShootDropDown from "../../components/ShootDropDown";
-import { addEvent } from "../../API/Event";
+import { addEvent, getAllEvents } from "../../API/Event";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import { assignEventTeam, getEvents } from "../../API/Event";
@@ -550,7 +550,7 @@ function ListView(props) {
   }, [handleScroll]);
 
   const getStoredEvents = async () => {
-    const res = await getEvents();
+    const res = await getAllEvents();
     if (currentUser.rollSelect === 'Manager') {
       dispatch(updateAllEvents(res?.data));
       setAllEvents(res.data);
@@ -620,10 +620,7 @@ function ListView(props) {
       )
     );
   };
-  useEffect(() => {
-    console.log(rowOfWarning);
 
-  }, [rowOfWarning])
 
   const returnOneRow = (event, prevEvent) => {
     if (prevEvent && !clientId) {
@@ -1583,6 +1580,20 @@ function ListView(props) {
                   placeholder="Location"
                   required
                 />
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label mt25">Is This a Wedding Event</div>
+                <input
+                  onChange={(e) => {
+                    setNewEvent({ ...newEvent, isWedding: e.target.checked });
+                  }}
+                  type="checkbox"
+                  name="isWedding"
+                  style={{ width : '16px', height : '16px'}}
+                  checked={newEvent?.isWedding}
+                  // disabled={weddingAssigned}
+                />
+                
               </Col>
               {eventOptionObjectKeys?.map((Objkey) => (
                 <Col xl="6" sm="6" className="p-2">
