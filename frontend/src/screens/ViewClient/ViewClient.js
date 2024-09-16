@@ -134,6 +134,7 @@ function ViewClient() {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
       color: state.isSelected ? "white" : "black",
+      fontSize: "90%",
       backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
     }),
     control: (defaultStyles) => ({
@@ -206,8 +207,8 @@ function ViewClient() {
                       value: client.brideName + "<" + client.groomName,
                       label: (
                         <div className="d-flex justify-content-around">
-                          <span>{client.brideName}</span>{" "}
-                          <img alt="" src={Heart} />{" "}
+                          <span>{client.brideName}</span>
+                          <img className="mx-1" alt="" src={Heart} />
                           <span>{client.groomName}</span>
                         </div>
                       ),

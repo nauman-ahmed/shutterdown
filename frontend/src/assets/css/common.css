@@ -827,7 +827,7 @@ Label {
 
 .centerAlign {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -960,8 +960,23 @@ Label {
     padding: 0px 10px
 }
 
+.halfwidth{
+    width: 25%;
+}
+
+.addMarginForCalendar{
+    margin-left: 0%;
+}
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
+    .addMarginForCalendar{
+        margin-left: 25%;
+    }
+
+    .halfwidth {
+        width: 50%;
+    }
+
     .hide_img {
         display: none;
     }
@@ -1286,3 +1301,4 @@ Label {
 .shooterNameHidden {
     display: none !important;
 }
+

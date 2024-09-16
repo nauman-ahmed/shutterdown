@@ -623,7 +623,7 @@ function FormII() {
             >
               Back
             </Button>
-            <Button type="submit" className="submit_btn submit me-5">
+            <Button type="submit" className="submit_btn submit me-3">
               Next/Preview
             </Button>
           </div>

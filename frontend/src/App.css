@@ -52,7 +52,7 @@
 }
 
 .sticky-column + .sticky-column {
-  left: 120px; /*This needs to be adjusted based on the actual width of the first column*/
+  left: 100px; /*This needs to be adjusted based on the actual width of the first column*/
 }
 
 .widthForFiltersViewClient{

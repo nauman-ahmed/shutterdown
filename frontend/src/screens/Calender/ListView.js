@@ -717,7 +717,7 @@ function ListView(props) {
                 required
               />
             </div>
-            <div style={{ width: "200px", position: 'relative' }}>
+            <div className="addMarginForCalendar" style={{ width: "200px", position: 'relative' }}>
               
               <div
                 className={`forminput R_A_Justify1`}
@@ -734,7 +734,7 @@ function ListView(props) {
                   />
                   {show && (
 
-                <div style={{ position: 'absolute', top: '30px', right : '10px', zIndex : 1000}}>
+                <div  style={{ width: "300px", position: 'absolute', top: '30px', right : '-10px', zIndex : 1000}}>
                   <div >
                     <CalenderMulti filterByDates={filterByDates} />
                   </div>
