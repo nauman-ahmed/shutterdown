@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from "./index"
+import dayjs from 'dayjs';
 
 export const addEvent = async (data) => {
     try {
@@ -74,22 +75,49 @@ export const updateClientData = async (data) => {
     }
 }
 
-export const getEvents = async (clientId, page) => { 
+export const getEvents = async (clientId, page, monthForData, yearForData) => { 
     try {
-        const res = await axios.post(BASE_URL +
-            `/getAllEvents?page=${page}`,
+        const res = await axios.post(
+            `${BASE_URL}/getAllEvents?page=${page}`,
             {
-                Headers: {
-                    'Content-Type': 'application/json',
-                },
-                clientId
+                clientId,
+                currentMonth: monthForData,  // Month name like 'January', 'February', etc.
+                currentYear: yearForData     // Year like '2023', '2024', etc.
             },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
         );
         return res;
     } catch (error) {
         console.log(error);
     }
-}
+};
+export const getEventsByFixDate = async (clientId, page, date) => { 
+    try {
+        console.log(date);
+        
+        const res = await axios.post(
+            `${BASE_URL}/getAllEvents/byDate?page=${page}`,
+            {
+                clientId,
+                eventDate : dayjs(date).format('YYYY-MM-DD')
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return res;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
 export const getAllEvents = async () => { 
     try {
         const res = await axios.get(BASE_URL +
@@ -106,22 +134,24 @@ export const getAllEvents = async () => {
     }
 }
 
-export const getEventsByMonths = async (currentMonth) => { 
+export const getEventsByMonth = async (currentMonth, page) => { 
     try {
-        const res = await axios.post(BASE_URL +
-            '/getAllEvents/byMonths',
+        const res = await axios.post(BASE_URL + `/getAllEvents/byMonths?page=${page}`,
             {
-                Headers: {
-                    'Content-Type': 'application/json',
-                },
                 currentMonth
             },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
         );
         return res;
     } catch (error) {
         console.log(error);
     }
 }
+
 
 export const deleteEvent = async (eventId) => {
     try {

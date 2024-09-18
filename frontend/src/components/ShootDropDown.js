@@ -65,7 +65,6 @@ function ShootDropDown(props) {
 
   return (
     <div className="d-flex">
-      {console.log("RENDER")}
       <ToastContainer />
 
       <ButtonDropdown>

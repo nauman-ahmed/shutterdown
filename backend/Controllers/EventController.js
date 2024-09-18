@@ -68,84 +68,166 @@ const updateEvent = async (req, res) => {
 
 const getEventsByMonth = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1; // Get the page from the query, default to 1
+        const limit = 10; // Define how many events to return per page
+        const skip = (page - 1) * limit; // Calculate how many records to skip
 
-        let currentMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').toDate()
-        let endOfMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate()
+        // Ensure currentMonth is passed as a full month name (e.g., "January")
+        let currentMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').toDate();
+        let endOfMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
         
         const query = {
             eventDate: {
-              $gte: currentMonth,
-              $lte: endOfMonth
+                $gte: currentMonth,
+                $lte: endOfMonth
             }
-          };
-        
-        const events = await EventModel.find(query).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
-        
-        // Step 1: Sort by eventDate
-        events.sort((a, b) => {
-            const dateA = new Date(a.eventDate);
-            const dateB = new Date(b.eventDate);
-            return dateA - dateB 
-        })
-        
-        // Step 2: Group by brideName, but store the result as an array of objects
+        };
+
+        // Fetch the events with pagination
+        const events = await EventModel.find(query)
+            .populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers')
+            .sort({ eventDate: 1 }) // Sort by eventDate in ascending order
+            .skip(skip) // Skip the previous pages
+            .limit(limit); // Limit the results to 10 per page
+
+        // Group events by brideName as an array of objects
         const groupedByBrideName = events.reduce((acc, event) => {
             const brideName = event.client.brideName;
             const found = acc.find(item => item.client.brideName === brideName);
             const index = acc.findIndex(item => item.client.brideName === brideName);
             if (!found) {
-                // If no existing group for this brideName, create a new group
                 acc.push(event);
             } else {
-                // Add to the existing group's events array
-                acc.splice(index+1, 0, event);
+                acc.splice(index + 1, 0, event);
             }
             return acc;
         }, []);
-        
+
         res.status(200).json(groupedByBrideName);
     } catch (error) {
         console.log(error, 'error');
+        res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 const getEvents = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
         let obj = {};
-        if(req.body.clientId){
-            obj = {client: req.body.clientId}
+
+        // Apply clientId filter if present
+        if (req.body.clientId) {
+            obj.client = req.body.clientId;
         }
-        const events = await EventModel.find(obj).skip(skip).limit(10).populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
-        
+
+        // Apply filtering for the specific month and year
+        if (req.body.currentMonth && req.body.currentYear) {
+            const year = req.body.currentYear;
+            const month = req.body.currentMonth;
+            
+            // Generate the start and end date for the given month and year
+            let startOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
+            let endOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
+
+            // Add date filtering for the specified month and year
+            obj.eventDate = {
+                $gte: startOfMonth,
+                $lte: endOfMonth
+            };
+        }
+
+        // Fetch events based on the filters
+        const events = await EventModel.find(obj)
+            .skip(skip)
+            .limit(10)
+            .populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+
         // Step 1: Sort by eventDate
         events.sort((a, b) => {
             const dateA = new Date(a.eventDate);
             const dateB = new Date(b.eventDate);
-            return dateA - dateB 
-        })
-        
+            return dateA - dateB;
+        });
+
         // Step 2: Group by brideName, but store the result as an array of objects
         const groupedByBrideName = events.reduce((acc, event) => {
             const brideName = event.client.brideName;
             const found = acc.find(item => item.client.brideName === brideName);
             const index = acc.findIndex(item => item.client.brideName === brideName);
             if (!found) {
-                // If no existing group for this brideName, create a new group
                 acc.push(event);
             } else {
-                // Add to the existing group's events array
-                acc.splice(index+1, 0, event);
+                acc.splice(index + 1, 0, event);
             }
             return acc;
         }, []);
-        
+
         res.status(200).json(groupedByBrideName);
     } catch (error) {
         console.log(error, 'error');
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
+const getEventsByDate = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const skip = (page - 1) * 10;
+        let obj = {};
+
+        if (req.body.clientId) {
+            obj.client = req.body.clientId;
+        }
+        console.log(req.body.eventDate);
+        
+        // Get specific date from frontend
+        if (req.body.eventDate) {
+            const date = moment(req.body.eventDate, "YYYY-MM-DD").startOf('day').toDate();
+            const endOfDay = moment(req.body.eventDate, "YYYY-MM-DD").endOf('day').toDate();
+            
+            // Filter by exact date
+            obj.eventDate = {
+                $gte: date,
+                $lte: endOfDay
+            };
+        }
+
+        const events = await EventModel.find(obj)
+            .skip(skip)
+            .limit(10)
+            .populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
+
+        // Sort by eventDate
+        events.sort((a, b) => {
+            const dateA = new Date(a.eventDate);
+            const dateB = new Date(b.eventDate);
+            return dateA - dateB;
+        });
+
+        // Group by brideName
+        const groupedByBrideName = events.reduce((acc, event) => {
+            const brideName = event.client.brideName;
+            const found = acc.find(item => item.client.brideName === brideName);
+            const index = acc.findIndex(item => item.client.brideName === brideName);
+            if (!found) {
+                acc.push(event);
+            } else {
+                acc.splice(index + 1, 0, event);
+            }
+            return acc;
+        }, []);
+
+        res.status(200).json(groupedByBrideName);
+    } catch (error) {
+        console.log(error, 'error');
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
 const getAllEvents = async (req, res) => {
     try {
         
@@ -179,4 +261,4 @@ const DeleteEvent = async (req, res) => {
 };
 
 
-module.exports = { AddEvent, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth, getAllEvents }
+module.exports = { AddEvent, getEventsByDate, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth, getAllEvents }
