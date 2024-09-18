@@ -295,7 +295,7 @@ function ClientInfo() {
           </tr>
         </tbody>
       </Table>
-      <div className="clientBtn d-flex flex-row justify-content-between">
+      <div className="clientBtn d-flex mb-3 flex-row justify-content-between">
         <h3 className=" my-1 py-1 Text24Semi d-sm-none d-md-block">Events</h3>
         <div>
           <button

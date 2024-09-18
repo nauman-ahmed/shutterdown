@@ -693,8 +693,8 @@ function ListView(props) {
                 required
               />
             </div>
-            <div style={{ width: "200px", position: 'relative' }}>
-
+            <div className="addMarginForCalendar" style={{ width: "200px", position: 'relative' }}>
+              
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
@@ -714,12 +714,12 @@ function ListView(props) {
                   />
                   {show && (
 
-                    <div style={{ position: 'absolute', top: '30px', right: '10px', zIndex: 1000 }}>
-                      <div >
-                        <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter}  />
-                      </div>
-                    </div>
-                  )}
+                <div  style={{ width: "300px", position: 'absolute', top: '30px', right : '-10px', zIndex : 1000}}>
+                  <div >
+                  <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter}  />
+                  </div>
+                </div>
+              )}
                 </div>
               </div>
             </div>

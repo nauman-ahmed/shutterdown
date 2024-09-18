@@ -440,9 +440,9 @@ window.addEventListener('beforeunload', function (event) {
                 </div>
                 <div className="line" />
                 {notiTab === "1" && (
-                  <>
+                  <div style={{ maxHeight: "300px", overflow: "scroll"  }}>
                     {notifications?.today?.map((notification, index) => (
-                      <div className="notificationsBox mt12 R_A_Justify">
+                      <div className="notificationsBox mt12 R_A_Justify" style={{ maxHeight: "300px"  }}>
                         {notification.forManager
                           ? !notification.readBy.includes(currentUser._id) && (
                             <div className="Circle" />
@@ -531,12 +531,12 @@ window.addEventListener('beforeunload', function (event) {
                         />
                       </div>
                     ))}
-                  </>
+                  </div>
                 )}
                 {notiTab === "2" && (
-                  <>
+                  <div style={{ maxHeight: "300px", overflow: "scroll"  }}>
                     {notifications?.previous?.map((notification, index) => (
-                      <div className="notificationsBox mt12 R_A_Justify">
+                      <div className="notificationsBox mt12 R_A_Justify" >
                         {notification.forManager
                           ? !notification.readBy.includes(currentUser._id) && (
                             <div className="Circle" />
@@ -621,7 +621,7 @@ window.addEventListener('beforeunload', function (event) {
                         }} alt="" src={NotiSelect} />
                       </div>
                     ))}
-                  </>
+                  </div>
                 )}
               </div>
             </Tooltip>
