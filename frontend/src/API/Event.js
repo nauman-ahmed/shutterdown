@@ -77,6 +77,7 @@ export const updateClientData = async (data) => {
 
 export const getEvents = async (clientId, page, monthForData, yearForData) => { 
     try {
+        console.log('getting by page ', page);
         const res = await axios.post(
             `${BASE_URL}/getAllEvents?page=${page}`,
             {
@@ -97,7 +98,8 @@ export const getEvents = async (clientId, page, monthForData, yearForData) => {
 };
 export const getEventsByFixDate = async (clientId, page, date) => { 
     try {
-        console.log(date);
+        console.log('getting by page ', page);
+        
         
         const res = await axios.post(
             `${BASE_URL}/getAllEvents/byDate?page=${page}`,

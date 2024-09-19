@@ -44,7 +44,6 @@ import { all } from "axios";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 function ListView(props) {
-  const [clientData, setClientData] = useState(null);
   const allEvents = useSelector(state => state.allEvents);
   const [eventsForShow, setEventsForShow] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
@@ -65,13 +64,10 @@ function ListView(props) {
   ];
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const [filteringDay, setFilteringDay] = useState(null);
   const [rowOfWarning, setRowOfWarnig] = useState(null)
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [filterStartDate, setFilterStartDate] = useState(null);
-  const [filterEndDate, setFilterEndDate] = useState(null);
   const dispatch = useDispatch();
   const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
   const [directors, setDirectors] = useState([]);
@@ -80,7 +76,6 @@ function ListView(props) {
   const [flyer, setFlyer] = useState([]);
   const [manager, setManager] = useState([]);
   const [assistant, setAssistant] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
   const [yearForData, setYearForData] = useState(new Date().getFullYear())
   const [dateForFilter, setDateForFilter] = useState(null)
   const [clientId, setClientId] = useState(null)
@@ -89,30 +84,50 @@ function ListView(props) {
     setShow(!show);
   };
 
-
   const groupByBrideName = (events) => {
-    // Step 2: Group by brideName, but store the result as an array of objects
+    // Step 1: Group events by brideName
     const groupedByBrideName = events?.reduce((acc, event) => {
       const brideName = event?.client?.brideName;
-      const found = acc?.find((item) => item?.client?.brideName === brideName);
-      const index = acc?.findIndex(
-        (item) => item?.client?.brideName === brideName
-      );
+  
+      // Check if the bride's group already exists in acc
+      let found = acc?.find(group => group.brideName === brideName);
+  
       if (!found) {
-        // If no existing group for this brideName, create a new group
-        acc.push(event);
-      } else {
-        // Add to the existing group's events array
-        acc.splice(index + 1, 0, event);
+        // Create a new group for this bride
+        found = { brideName, events: [] };
+        acc.push(found);
       }
+  
+      // Add the current event to the bride's group
+      found.events.push(event);
+  
       return acc;
     }, []);
-    return groupedByBrideName;
+  
+    // Step 2: Sort events within each bride's group
+    groupedByBrideName.forEach(group => {
+      group.events.sort((a, b) => {
+        const dateA = new Date(a.eventDate);
+        const dateB = new Date(b.eventDate);
+        return ascending ? dateA - dateB : dateB - dateA;
+      });
+    });
+  
+    // Step 3: Flatten the groups back into a single array of events
+    const sortedEvents = groupedByBrideName.reduce((acc, group) => {
+      acc.push(...group.events);  // Append each group's sorted events
+      return acc;
+    }, []);
+  
+    return sortedEvents;
   };
+  
 
 
   const getEventsData = async () => {
     try {
+      console.log('running first function to get data');
+      
       const usersData = await getAllUsers();
       setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
       setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
@@ -122,16 +137,21 @@ function ListView(props) {
       setAssistant(usersData.users.filter(user => user.subRole.includes("Assistant")))
       // setEventsForShow(null)
       let res;
-      if(dateForFilter){
-         res = await getEventsByFixDate(clientId, page, dateForFilter);
-        console.log(res);
-        
+      if (dateForFilter) {
+        res = await getEventsByFixDate(clientId, 1, dateForFilter);
+
       } else {
-         res = await getEvents(clientId, page, monthForData, yearForData);
+        res = await getEvents(clientId, 1, monthForData, yearForData);
 
       }
+
       if (currentUser.rollSelect === "Manager") {
-        setEventsForShow(groupByBrideName(res.data));
+        setEventsForShow(groupByBrideName(res.data?.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateB - dateA : dateA - dateB;
+        })));
+      
       } else if (currentUser.rollSelect === "Shooter") {
         const eventsToShow = res?.data?.map((event) => {
           if (
@@ -182,7 +202,12 @@ function ListView(props) {
             return null;
           }
         });
-        setEventsForShow(groupByBrideName(eventsToShow));
+        setEventsForShow(groupByBrideName(eventsToShow?.sort((a, b) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+          return ascending ? dateB - dateA : dateA - dateB;
+        })));
+ 
       }
     } catch (error) {
       console.log(error);
@@ -190,7 +215,6 @@ function ListView(props) {
   };
   useEffect(() => {
     setHasMore(true)
-    setPage(1);
     getEventsData()
   }, [monthForData, yearForData, dateForFilter, clientId])
 
@@ -375,18 +399,19 @@ function ListView(props) {
     },
   ];
 
-  const applySorting = () => {
+  const applySorting = (order) => {
     try {
       setEventsForShow(
         groupByBrideName(
           eventsForShow?.sort((a, b) => {
             const dateA = new Date(a.eventDate);
             const dateB = new Date(b.eventDate);
-            return ascending ? dateB - dateA : dateA - dateB;
+            return order ? dateB - dateA : dateA - dateB;
           })
         )
       );
-      setAscending(!ascending);
+     
+
     } catch (error) {
       console.log("applySorting ERROR", error);
     }
@@ -402,34 +427,28 @@ function ListView(props) {
     getStoredEvents();
     getAllFormOptionsHandler();
   }, []);
-  
+
 
   const fetchEvents = async () => {
+    console.log('running scroll function');
+    
     if (hasMore) {
       setLoading(true);
       try {
-      const res = dateForFilter ? await getEventsByFixDate(clientId, page, dateForFilter) : await getEvents(clientId, page, monthForData, yearForData);
+        const res = dateForFilter ? await getEventsByFixDate(clientId, page, dateForFilter) : await getEvents(clientId, page, monthForData, yearForData);
         if (res.data.length > 0) {
           if (currentUser.rollSelect === "Manager") {
-           
-            if (filterStartDate && filterEndDate) {
-              let filteredData = res.data?.filter(
-                (event) =>
-                  new Date(event.eventDate).getTime() >=
-                  new Date(filterStartDate).getTime() &&
-                  new Date(event.eventDate).getTime() <=
-                  new Date(filterEndDate).getTime()
-              );
-              setEventsForShow([
-                ...eventsForShow,
-                ...groupByBrideName(filteredData),
-              ]);
-            } else {
-              setEventsForShow([
-                ...eventsForShow,
-                ...groupByBrideName(res.data),
-              ]);
-            }
+
+            setEventsForShow(groupByBrideName([
+              ...eventsForShow,
+              ...res.data
+            ]?.sort((a, b) => {
+              const dateA = new Date(a.eventDate);
+              const dateB = new Date(b.eventDate);
+              return ascending ? dateB - dateA : dateA - dateB;
+            })));
+          
+
           } else if (currentUser.rollSelect === "Shooter") {
             const eventsToShow = res?.data?.map((event) => {
               if (
@@ -484,25 +503,18 @@ function ListView(props) {
                 return null;
               }
             });
-          
-            if (filterStartDate && filterEndDate) {
-              let filteredData = eventsToShow?.filter(
-                (event) =>
-                  new Date(event.eventDate).getTime() >=
-                  new Date(filterStartDate).getTime() &&
-                  new Date(event.eventDate).getTime() <=
-                  new Date(filterEndDate).getTime()
-              );
-              setEventsForShow([
-                ...eventsForShow,
-                ...groupByBrideName(filteredData),
-              ]);
-            } else {
-              setEventsForShow([
-                ...eventsForShow,
-                ...groupByBrideName(eventsToShow),
-              ]);
-            }
+
+
+
+            setEventsForShow(groupByBrideName([
+              ...eventsForShow,
+              ...eventsToShow
+            ]?.sort((a, b) => {
+              const dateA = new Date(a.eventDate);
+              const dateB = new Date(b.eventDate);
+              return ascending ? dateB - dateA : dateA - dateB;
+            })));
+           
 
           }
           setPage(page + 1);
@@ -588,12 +600,12 @@ function ListView(props) {
 
 
   const filterByNameHanler = (idOfClient) => {
-    
+
     if (idOfClient == "Reset") {
       setClientId(null)
       return;
     }
-   setClientId(idOfClient)
+    setClientId(idOfClient)
   };
 
 
@@ -633,7 +645,6 @@ function ListView(props) {
       }
     }
   };
-
 
   return (
     <>
@@ -694,7 +705,7 @@ function ListView(props) {
               />
             </div>
             <div className="addMarginForCalendar" style={{ width: "200px", position: 'relative' }}>
-              
+
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
@@ -714,12 +725,12 @@ function ListView(props) {
                   />
                   {show && (
 
-                <div  style={{ width: "300px", position: 'absolute', top: '30px', right : '-10px', zIndex : 1000}}>
-                  <div >
-                  <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter}  />
-                  </div>
-                </div>
-              )}
+                    <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
+                      <div >
+                        <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -739,14 +750,20 @@ function ListView(props) {
                       {ascending ? (
                         <IoIosArrowRoundDown
                           style={{ color: "#666DFF" }}
-                          onClick={applySorting}
+                          onClick={() => {
+                            setAscending(false)
+                            applySorting(false)
+                          }}
                           className="fs-4 cursor-pointer"
                         />
                       ) : (
                         <IoIosArrowRoundUp
                           style={{ color: "#666DFF" }}
                           className="fs-4 cursor-pointer"
-                          onClick={applySorting}
+                          onClick={() => {
+                            setAscending(true)
+                            applySorting(true)
+                          }}
                         />
                       )}
                     </th>
@@ -949,7 +966,7 @@ function ListView(props) {
                                         ? [...event?.shootDirectors, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                                   
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -958,7 +975,7 @@ function ListView(props) {
                                         (director) => director !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                                 
+
                                   }}
                                 />
                                 {Array.isArray(event?.shootDirectors) &&
@@ -994,7 +1011,7 @@ function ListView(props) {
                                         ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                                
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1004,7 +1021,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                             
+
                                   }}
                                 />
                                 {Array.isArray(event?.choosenPhotographers) &&
@@ -1043,7 +1060,7 @@ function ListView(props) {
                                         ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                              
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1055,7 +1072,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                                
+
                                   }}
                                 />
                                 {Array.isArray(
@@ -1093,7 +1110,7 @@ function ListView(props) {
                                         ? [...event?.droneFlyers, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                           
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1103,7 +1120,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                           
+
                                   }}
                                 />
                                 {Array.isArray(event?.droneFlyers) &&
@@ -1136,7 +1153,7 @@ function ListView(props) {
                                         ? [...event?.manager, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                        
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1146,7 +1163,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-            
+
                                   }}
                                 />
                                 {Array.isArray(event?.manager) &&
@@ -1179,7 +1196,7 @@ function ListView(props) {
                                         ? [...event?.assistants, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                       
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1189,7 +1206,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                     
+
                                   }}
                                 />
                                 {Array.isArray(event?.assistants) &&
@@ -1234,7 +1251,7 @@ function ListView(props) {
                                         ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                   
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1244,7 +1261,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                        
+
                                   }}
                                 />
                                 {Array.isArray(event?.sameDayPhotoMakers) &&
@@ -1289,7 +1306,7 @@ function ListView(props) {
                                         ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-                     
+
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1299,7 +1316,7 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-                
+
                                   }}
                                 />
                                 {Array.isArray(event?.sameDayVideoMakers) &&

@@ -65,11 +65,10 @@ function CalenderBar(props) {
   useEffect(() => {
     const eventsCopy = EventsList && [...EventsList]
     const filteredMonthEvents = eventsCopy?.filter((event) => (months[new Date(event?.eventDate).getMonth()] === currentMonth))
-    console.log(filteredMonthEvents);
     
     setMonthEvents(filteredMonthEvents)
   }, [currentMonth, EventsList])
-  console.log(currentMonth);
+
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',

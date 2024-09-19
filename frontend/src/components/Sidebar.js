@@ -300,7 +300,7 @@ const SideBar = () => {
       setCurrentTab('FormOptions');
     }
   }, [location])
-  console.log(showNoti);
+
 
   return (
     <>
