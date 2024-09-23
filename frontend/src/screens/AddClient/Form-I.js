@@ -141,7 +141,7 @@ function FormI() {
                 onChange={(e) => updateValues(e)}
                 className='forminput'
                 style={{ color: '#666DFF !important' }}
-                required={true}
+                required={false}
                 placeholder={'Email Id'}
               />
             </div>
