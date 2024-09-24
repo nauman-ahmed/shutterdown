@@ -25,7 +25,7 @@ function PreWedDeliverables(props) {
   const [filterCondition, setFilterCondition] = useState(null);
   const [deadlineDays, setDeadlineDays] = useState([]);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const filterOptions = currentUser?.rollSelect === 'Manager' ? [
@@ -115,7 +115,7 @@ function PreWedDeliverables(props) {
 
   const fetchData = async () => {
     try {
-      const data = await getPreWeds(page);
+      const data = await getPreWeds(1);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -141,7 +141,7 @@ function PreWedDeliverables(props) {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getPreWeds(page === 1 ? page + 1 : page);
+        const data = await getPreWeds(page);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {

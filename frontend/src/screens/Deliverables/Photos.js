@@ -24,14 +24,14 @@ function Photos() {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(true);
   const [filterCondition, setFilterCondition] = useState(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [deadlineDays, setDeadlineDays] = useState([]);
   
   const fetchData = async () => {
     try {
-      const data = await getPhotos(page);
+      const data = await getPhotos(1);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -56,7 +56,7 @@ function Photos() {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getPhotos(page === 1 ? page + 1 : page);
+        const data = await getPhotos(page);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {

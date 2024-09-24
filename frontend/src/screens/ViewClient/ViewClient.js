@@ -26,7 +26,7 @@ function ViewClient() {
   const [filteringDay, setFilteringDay] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [filterStartDate, setFilterStartDate] = useState(null);
@@ -65,7 +65,7 @@ function ViewClient() {
 
   const fetchData = async () => {
     try {
-      const data = await getClients(page);
+      const data = await getClients(1);
       setClients(data);
       setAllClients(data);
     } catch (error) {
@@ -81,7 +81,7 @@ function ViewClient() {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page === 1 ? page + 1 : page);
+        const data = await getClients(page);
         if (data.length > 0) {
           setAllClients([...allClients, ...data]);
           if (filterStartDate && filterEndDate) {

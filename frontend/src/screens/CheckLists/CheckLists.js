@@ -15,7 +15,7 @@ function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
   const [filterFor, setFilterFor] = useState('Day');
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [filterStartDate, setFilterStartDate] = useState(null);
@@ -59,7 +59,7 @@ function CheckLists(props) {
 
   const fetchClients = async () => {
     try {
-      const clients = await getClients(page);
+      const clients = await getClients(1);
       setClientsForShow(clients);
       setAllClients(clients);
     } catch (error) {
@@ -75,7 +75,7 @@ function CheckLists(props) {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page === 1 ? page + 1 : page);
+        const data = await getClients(page);
         if (data.length > 0) {
           setAllClients([...allClients, ...data]);
           if (filterStartDate && filterEndDate) {

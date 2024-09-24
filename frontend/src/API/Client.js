@@ -2,9 +2,10 @@ import axios from "axios";
 import BASE_URL from "./index";
 import Cookies from "js-cookie";
 const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
-console.log(currentUser);
 
 export const SaveClientForm = async (data) => {
+  console.log('saving client', data);
+  
   try {
     const dataToSend = { ...data, userID: currentUser?._id };
     const result = await axios

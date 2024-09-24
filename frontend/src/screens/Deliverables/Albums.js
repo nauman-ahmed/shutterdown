@@ -31,7 +31,7 @@ function Albums(props) {
     cinematographyTextGetImmutable: EditorState.createEmpty(),
     _id: null,
   });
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [deadlineDays, setDeadlineDays] = useState([]);
@@ -65,7 +65,7 @@ function Albums(props) {
 
   const fetchData = async () => {
     try {
-      const data = await getAlbums(page);
+      const data = await getAlbums(1);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -95,7 +95,7 @@ function Albums(props) {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getAlbums(page === 1 ? page + 1 : page);
+        const data = await getAlbums(page);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {

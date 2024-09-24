@@ -34,7 +34,7 @@ function Cinematography(props) {
     const contentState = editorState.cinematographyTextGetImmutable.getCurrentContent();
     return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
   };
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [deadlineDays, setDeadlineDays] = useState([]);
@@ -44,7 +44,6 @@ function Cinematography(props) {
    return EditorState.createWithContent(contentState);
     // Use `newEditorState` in your editor component
   };
-  console.log(deliverablesForShow);
   
   const getAllWhatsappTextHandler = async () => {
     const res = await getAllWhatsappText()
@@ -151,7 +150,7 @@ const priority = {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
-      const data = await getCinematography(page);
+      const data = await getCinematography(1);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -178,7 +177,7 @@ const priority = {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getCinematography(page === 1 ? page + 1 : page);
+        const data = await getCinematography(page);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {

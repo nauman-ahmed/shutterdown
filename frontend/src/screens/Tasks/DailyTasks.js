@@ -17,7 +17,7 @@ function DailyTasks(props) {
   const [filterBy, setFilterBy] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [filterCondition, setFilterCondition] = useState(null);
@@ -25,11 +25,11 @@ function DailyTasks(props) {
   const getTaskData = async () => {
     try {
       if (currentUser.rollSelect === "Manager") {
-        const allData = await getPendingTasks(page);
+        const allData = await getPendingTasks(1);
         setAllTasks(allData);
         setTasksToShow(allData);
       } else if (currentUser.rollSelect === "Editor") {
-        const editorTasks = await getEditorTasks(page);
+        const editorTasks = await getEditorTasks(1);
         setAllTasks(editorTasks);
         setTasksToShow(editorTasks);
       }
@@ -48,10 +48,10 @@ function DailyTasks(props) {
       try {
         let data;
         if (currentUser.rollSelect === "Manager") {
-          data = await getPendingTasks(page === 1 ? page + 1 : page);
+          data = await getPendingTasks(page);
          
         } else if (currentUser.rollSelect === "Editor") {
-          data = await getEditorTasks(page === 1 ? page + 1 : page);
+          data = await getEditorTasks(page);
         }
        
         if (data.length > 0) {

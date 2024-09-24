@@ -107,8 +107,8 @@ function ListView(props) {
     // Step 2: Sort events within each bride's group
     groupedByBrideName.forEach(group => {
       group.events.sort((a, b) => {
-        const dateA = new Date(a.eventDate);
-        const dateB = new Date(b.eventDate);
+        const dateA = new Date(a?.eventDate);
+        const dateB = new Date(b?.eventDate);
         return ascending ? dateA - dateB : dateB - dateA;
       });
     });
@@ -147,8 +147,8 @@ function ListView(props) {
 
       if (currentUser.rollSelect === "Manager") {
         setEventsForShow(groupByBrideName(res.data?.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
+          const dateA = new Date(a?.eventDate);
+          const dateB = new Date(b?.eventDate);
           return ascending ? dateB - dateA : dateA - dateB;
         })));
       
@@ -203,8 +203,8 @@ function ListView(props) {
           }
         });
         setEventsForShow(groupByBrideName(eventsToShow?.sort((a, b) => {
-          const dateA = new Date(a.eventDate);
-          const dateB = new Date(b.eventDate);
+          const dateA = new Date(a?.eventDate);
+          const dateB = new Date(b?.eventDate);
           return ascending ? dateB - dateA : dateA - dateB;
         })));
  
@@ -234,6 +234,7 @@ function ListView(props) {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
+  
   const onSubmitHandler = async (event, index) => {
     try {
       setUpdatingIndex(index);
@@ -376,6 +377,8 @@ function ListView(props) {
 
   const getClientsForFilters = () => {
     const seenClients = new Set();
+
+    
     return allEvents
       ?.map((eventObj, i) => ({
         title: `${eventObj?.client?.brideName} Weds ${eventObj?.client?.groomName}`,
@@ -404,8 +407,8 @@ function ListView(props) {
       setEventsForShow(
         groupByBrideName(
           eventsForShow?.sort((a, b) => {
-            const dateA = new Date(a.eventDate);
-            const dateB = new Date(b.eventDate);
+            const dateA = new Date(a?.eventDate);
+            const dateB = new Date(b?.eventDate);
             return order ? dateB - dateA : dateA - dateB;
           })
         )
@@ -443,8 +446,8 @@ function ListView(props) {
               ...eventsForShow,
               ...res.data
             ]?.sort((a, b) => {
-              const dateA = new Date(a.eventDate);
-              const dateB = new Date(b.eventDate);
+              const dateA = new Date(a?.eventDate);
+              const dateB = new Date(b?.eventDate);
               return ascending ? dateB - dateA : dateA - dateB;
             })));
           
@@ -510,8 +513,8 @@ function ListView(props) {
               ...eventsForShow,
               ...eventsToShow
             ]?.sort((a, b) => {
-              const dateA = new Date(a.eventDate);
-              const dateB = new Date(b.eventDate);
+              const dateA = new Date(a?.eventDate);
+              const dateB = new Date(b?.eventDate);
               return ascending ? dateB - dateA : dateA - dateB;
             })));
            

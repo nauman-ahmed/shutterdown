@@ -35,7 +35,7 @@ function PreWedShootScreen() {
     setShow(!show);
   };
   const [filteringDay, setFilteringDay] = useState(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
@@ -102,7 +102,7 @@ function PreWedShootScreen() {
 
   const getClients = async () => {
     try {
-      const allPreWedClients = await getPreWedClients(page);
+      const allPreWedClients = await getPreWedClients(1);
       const res = await getShooters();
       const usersData = await getAllUsers();
 
@@ -146,7 +146,7 @@ function PreWedShootScreen() {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getPreWedClients(page === 1 ? page + 1 : page);
+        const data = await getPreWedClients(page);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {

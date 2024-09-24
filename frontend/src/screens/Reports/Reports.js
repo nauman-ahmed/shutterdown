@@ -17,14 +17,14 @@ function Reports(props) {
     Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [filterBy, setFilterBy] = useState(null);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [filterCondition, setFilterCondition] = useState(null);
 
   const getTaskData = async () => {
     try {
-      const tasks = await getAllTasks(page);
+      const tasks = await getAllTasks(1);
       setAllTasks(tasks);
       setTasksToShow(tasks)
     } catch (error) {
@@ -48,7 +48,7 @@ function Reports(props) {
       setLoading(true);
       try {
         
-        const  data = await getAllTasks(page === 1 ? page + 1 : page);
+        const  data = await getAllTasks(page);
          
         
         if (data.length > 0) {

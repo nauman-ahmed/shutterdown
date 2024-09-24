@@ -63,11 +63,25 @@ function CalenderBar(props) {
     getEventsData();
   }, [])
   useEffect(() => {
-    const eventsCopy = EventsList && [...EventsList]
-    const filteredMonthEvents = eventsCopy?.filter((event) => (months[new Date(event?.eventDate).getMonth()] === currentMonth))
+    const eventsCopy = EventsList && [...EventsList];
     
-    setMonthEvents(filteredMonthEvents)
-  }, [currentMonth, EventsList])
+    // Get the current active year and month from the activeStartDate state
+    const currentYear = new Date(activeStartDate).getFullYear(); 
+    const currentMonthIndex = new Date(activeStartDate).getMonth(); // Get the month as a number (0 - 11)
+  
+    // Filter events by both month and year
+    const filteredMonthEvents = eventsCopy?.filter((event) => {
+      const eventDate = new Date(event?.eventDate);
+      const eventYear = eventDate.getFullYear();
+      const eventMonthIndex = eventDate.getMonth();
+  
+      // Check if both year and month match the current active date
+      return eventYear === currentYear && eventMonthIndex === currentMonthIndex;
+    });
+  
+    setMonthEvents(filteredMonthEvents);
+  }, [activeStartDate, EventsList]); // Dependency on activeStartDate to detect month or year changes
+  
 
 
   const months = [
@@ -117,6 +131,10 @@ function CalenderBar(props) {
                 }
               }}
                 onChange={() => null}
+                onActiveStartDateChange={({ activeStartDate }) => {
+                  setActiveStartDate(activeStartDate);
+                  setCurrentMonth(moment(activeStartDate).format('MMMM'));
+                }}
               />
             </div>
             {props.Attendence && (
@@ -133,8 +151,8 @@ function CalenderBar(props) {
                       className="mx-1 mt-1"
                       onClick={() => {
                         const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth() - 1));
-                        setActiveStartDate(new Date(newDate))
-                        setCurrentMonth(moment().month(currentMonth).add(-1, "months").format('MMMM'))
+                        setActiveStartDate(new Date(newDate));
+                        setCurrentMonth(moment(newDate).format('MMMM'));
                       }}
                     >
                       {"<"}
@@ -143,8 +161,8 @@ function CalenderBar(props) {
                       className="mx-1 mt-1"
                       onClick={() => {
                         const newDate = new Date(activeStartDate.setMonth(activeStartDate.getMonth() + 1));
-                        setActiveStartDate(new Date(newDate))
-                        setCurrentMonth(moment().month(currentMonth).add(1, "months").format('MMMM'))
+                        setActiveStartDate(new Date(newDate));
+                        setCurrentMonth(moment(newDate).format('MMMM'));
                       }}
                     >
                       {">"}

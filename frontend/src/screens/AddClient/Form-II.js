@@ -17,7 +17,7 @@ import Select from "react-select";
 import { updateClintData } from "../../redux/clientBookingForm";
 import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
-import { getEvents } from "../../API/Event";
+import { getAllEvents, getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
 import {
@@ -63,7 +63,7 @@ function FormII() {
 
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const [storedEvents, setStoredEvents] = useState(null)
+  const storedEvents = useSelector((state) => state.allEvents);
   const dispatch = useDispatch();
   const clientData = useSelector((state) => state.clientData);
   const [eventValues, setEventValues] = useState(null);
@@ -104,12 +104,6 @@ function FormII() {
     setMinDate(new Date(Date.now()));
   }, [clientData]);
 
-  const getStoredEvents = async () => {
-    const storedEventsDB = await getEvents();
-    setStoredEvents(storedEventsDB.data)
-    setAllEvents(storedEventsDB.data);
-    dispatch(updateAllEvents(storedEventsDB.data));
-  };
 
   const handleDeleteEvent = (event, index) => {
     let updatedEvents = [...clientData?.events];
@@ -154,7 +148,6 @@ function FormII() {
     if (!clientData.form1Submitted) {
       navigate("/MyProfile/AddClient/Form-I");
     }
-    getStoredEvents();
     getAllFormOptionsHandler();
   }, []);
 
@@ -648,8 +641,8 @@ function FormII() {
                 }}
                 tileClassName={({ date }) => {
                   let count = 0;
-                  for (let index = 0; index < allEvents?.length; index++) {
-                    const initialDate = new Date(allEvents[index].eventDate);
+                  for (let index = 0; index < storedEvents?.length; index++) {
+                    const initialDate = new Date(storedEvents[index].eventDate);
                     const targetDate = new Date(date);
                     const initialDatePart = initialDate
                       .toISOString()
