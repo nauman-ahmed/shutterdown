@@ -106,9 +106,10 @@ const userSchema = mongoose.Schema({
   passport : {
     type : String
   },
-  subRole : [{
-    type : String
-  }],
+  subRole: {
+    type: [String],
+    default: ["Photographer"], // Default value for subRole array
+  },
   photo : {
     type : String
   },

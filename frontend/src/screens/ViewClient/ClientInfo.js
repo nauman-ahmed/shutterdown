@@ -416,7 +416,7 @@ function ClientInfo() {
                     className="position-absolute"
                   >
                     <Calendar
-                      minDate={new Date(Date.now())}
+                      
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
@@ -570,8 +570,7 @@ function ClientInfo() {
                     }}
                     className="position-absolute"
                   >
-                    <Calendar
-                      minDate={new Date(Date.now())}
+                    <Calendar                    
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);

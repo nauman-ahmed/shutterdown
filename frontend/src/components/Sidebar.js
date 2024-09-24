@@ -93,7 +93,7 @@ const SideBar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const getUserData = async () => {
-    const currentUser = JSON.parse(Cookies.get("currentUser"));
+    const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
     setUserData(currentUser);
     const data = await getUserNotifications();
     const uniqueData = data?.filter((item, index, self) =>

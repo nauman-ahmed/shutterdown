@@ -9,6 +9,7 @@ const EventOptionsRouter = require('./Routes/EventOptionsRoutes');
 const WhatsappRouter = require('./Routes/Whatsapp');
 const DeliverableOptionsRouter = require('./Routes/DeliverableOptionsRoutes');
 const AttendenceRouter = require('./Routes/AttendenceRoutes');
+const DeadlineDaysRouter = require('./Routes/DeadlineDaysRoutes');
 const notificationRouter = require("./Routes/notificationRoutes")
 const Database = require('./DataBase/db');
 const cors = require('cors');
@@ -59,6 +60,7 @@ app.use(clientRouter);
 app.use(eventRouter);
 app.use(deliverableRouter);
 app.use(notificationRouter);
+app.use(DeadlineDaysRouter);
 app.use('/', AttendenceRouter);
 app.use('/', viewClientRouter);
 app.use('/', DailyTaskRouter);

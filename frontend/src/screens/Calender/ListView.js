@@ -129,6 +129,8 @@ function ListView(props) {
       console.log('running first function to get data');
       
       const usersData = await getAllUsers();
+      console.log(usersData);
+      
       setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
       setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
       setCinematographer(usersData.users.filter(user => user.subRole.includes("Cinematographer")))
