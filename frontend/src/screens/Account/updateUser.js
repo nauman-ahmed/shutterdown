@@ -64,6 +64,21 @@ function UpdateUser(props) {
             label: 'Manager',
             index: 5
         },
+        {
+            value: 'Video Editor',
+            label: 'Video Editor',
+            index: 6
+        },
+        {
+            value: 'Photo Editor',
+            label: 'Photo Editor',
+            index: 7
+        },
+        {
+            value: 'Production',
+            label: 'Production',
+            index: 8
+        },
       ];
 
     const [currentUserDetails, setCurrentUserDetails] = useState(props.userDetails)

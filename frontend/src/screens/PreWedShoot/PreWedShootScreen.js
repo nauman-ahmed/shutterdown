@@ -268,13 +268,7 @@ function PreWedShootScreen() {
 
   useEffect(() => {
     getClients();
-    // Add event listener when the component mounts
-    document.addEventListener("mousedown", handleClickOutside);
-
-    // Cleanup event listener when component unmounts
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+  
   }, [])
 
   const customStyles = {
@@ -371,14 +365,7 @@ function PreWedShootScreen() {
 
   const rangeRef = useRef(null);
 
-  const handleClickOutside = (event) => {
 
-    // If the click is outside the element (ref)
-    if (rangeRef?.current && !rangeRef?.current?.contains(event.target)) {
-
-      setRangeFor(-1); // Close the element
-    }
-  };
   return (
     <>
       <ClientHeader priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Pre-Wedding" />
@@ -607,8 +594,8 @@ function PreWedShootScreen() {
 
 
 
-                                <div style={{ whiteSpace: "nowrap" }}>
-                                  <img style={{ cursor: 'pointer' }} onClick={() => setRangeFor(rangeFor === index ? -1 : index)} alt="" src={Edit} />
+                                <div onClick={() => setRangeFor(rangeFor === index ? -1 : index)}  style={{ whiteSpace: "nowrap" }}>
+                                  <img style={{ cursor: 'pointer' }} alt="" src={Edit} />
                                 </div>
 
                                 {rangeFor === index && (

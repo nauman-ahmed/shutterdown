@@ -81,7 +81,7 @@ function Albums(props) {
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
-      setEditors(res.editors);
+      setEditors(res.editors.filter(user => user.subRole.includes('Photo Editor')));
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data);

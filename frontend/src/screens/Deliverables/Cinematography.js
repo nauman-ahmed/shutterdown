@@ -180,7 +180,7 @@ function Cinematography(props) {
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
-      setEditors(res.editors.filter(user => user.subRole.includes("Cinematographer")))
+      setEditors(res.editors.filter(user => user.subRole.includes("Video Editor")))
     } catch (error) {
       console.log(error)
     }
@@ -399,7 +399,7 @@ function Cinematography(props) {
 
     return 45
   }
-  console.log(deliverablesForShow);
+
 
 
   return (

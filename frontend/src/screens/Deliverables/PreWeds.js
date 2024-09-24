@@ -133,7 +133,7 @@ function PreWedDeliverables(props) {
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
-      setEditors(res.editors);
+      setEditors(res.editors.filter(user => user.subRole.includes('Video Editor') || user.subRole.includes('Photo Editor')));
       if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data)
         setDeliverablesForShow(data)
