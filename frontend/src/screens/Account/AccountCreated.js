@@ -29,8 +29,8 @@ function AccountCreated() {
     <>
       <div
         style={{
-          width:"300px",
-          height:"200px",
+          width:"250px",
+          height:"150px",
           backgroundColor:"orange",
           margin:"auto",
           borderRadius:"20px",

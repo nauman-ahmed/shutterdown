@@ -28,6 +28,11 @@ import { getUserNotifications } from "../API/notifictions";
 import dayjs from "dayjs";
 import { Overlay } from "react-bootstrap";
 import { getEvents } from "../API/Event";
+import { MdOutlineManageAccounts } from "react-icons/md";
+import { LuFormInput } from "react-icons/lu";
+import { BsCalendar4Range } from "react-icons/bs";
+import { FaWhatsapp } from "react-icons/fa";
+
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -47,36 +52,8 @@ const SideBar = () => {
     const { _id, ...rest } = obj;
     return rest;
   };
-  // const getStoredEvents = async () => {
-  //   const res = await getEvents();
-  //   if (currentUser.rollSelect === 'Manager') {
-  //     dispatch(updateAllEvents(res?.data));
-  //   } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
-  //     const eventsToShow = res.data?.map(event => {
-  
-  //       if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Shoot Director' };
-  //       } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Photographer' };
-  //       } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Cinematographer' };
-  //       } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Drone Flyer' };
-  //       } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Manager' };
-  //       } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Same Day Photos Maker' };
-  //       } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Same Day Video Maker' };
-  //       } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
-  //         return { ...event, userRole: 'Assistant' };
-  //       } else {
-  //         return null;
-  //       }
-  //     });
-  //     dispatch(updateAllEvents(eventsToShow));
-  //   }
-  // };
+
+
   useEffect(() => {
     try {
       getUserData();
@@ -117,73 +94,40 @@ const SideBar = () => {
     );
   };
   const notifications = useSelector((state) => state.notifications);
-  // useEffect(() => {
-  //   if (location.pathname.startsWith('/MyProfile/AddClient')) {
-  //     setCurrentTab('Add Client');
-  //     setActiveMenu(1)
-  //     setCurrentSubMenuIndex(0)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Client')) {
-  //     setCurrentTab('View Clients');
-  //     setActiveMenu(1)
-  //     setCurrentSubMenuIndex(1)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Calender')) {
-  //     setCurrentTab('Calender View');
-  //     setActiveMenu(2)
-  //     setCurrentSubMenuIndex(0)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/PreWedShoot')) {
-  //     setCurrentTab('Pre-wed Shoot');
-  //     setActiveMenu(2)
-  //     setCurrentSubMenuIndex(1)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Cinematography')) {
-  //     setCurrentTab('Cinematography');
-  //     setActiveMenu(3)
-  //     setCurrentSubMenuIndex(0)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Photos')) {
-  //     setCurrentTab('Photos');
-  //     setActiveMenu(3)
-  //     setCurrentSubMenuIndex(1)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Deliverables/Albums')) {
-  //     setCurrentTab('Albums');
-  //     setActiveMenu(3)
-  //     setCurrentSubMenuIndex(2)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/CheckLists')) {
-  //     setCurrentTab('Checklists');
-  //     setActiveMenu(4)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Attendence')) {
-  //     setCurrentTab('Attendence');
-  //     setActiveMenu(5)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Tasks/DailyTasks')) {
-  //     setCurrentTab('Tasks');
-  //     setActiveMenu(6)
-  //     setCurrentSubMenuIndex(0)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Tasks/Reports')) {
-  //     setCurrentTab('Tasks Reports');
-  //     setActiveMenu(6)
-  //     setCurrentSubMenuIndex(1)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Reports')) {
-  //     setCurrentTab('Reports');
-  //     setActiveMenu(7)
-  //   }
-  //   if (location.pathname.startsWith('/MyProfile/Team')) {
-  //     setCurrentTab('Teams');
-  //     setActiveMenu(8)
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
+
   const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   const dispatch = useDispatch()
   useEffect(() => {
+    if (location.pathname.startsWith('/MyProfile/Whatsapp')) {
+      if (currentUser?.rollSelect !== 'Admin') {
+        navigate('/')
+      }
+      setCurrentTab('Whatsapp');
+      setActiveMenu(104)
+    }
+    if (location.pathname.startsWith('/MyProfile/Deadlines')) {
+      if (currentUser?.rollSelect !== 'Admin') {
+        navigate('/')
+      }
+      setCurrentTab('Deliverables Deadlines');
+      setActiveMenu(103)
+    }
+    if (location.pathname.startsWith('/MyProfile/FormOptions')) {
+      if (currentUser?.rollSelect !== 'Admin') {
+        navigate('/')
+      }
+      setCurrentTab('Form Options');
+      setActiveMenu(102)
+    }
+    if (location.pathname.startsWith('/MyProfile/Accounts') || location.pathname.startsWith('/Myprofile/Accounts')) {
+      if (currentUser?.rollSelect !== 'Admin') {
+        navigate('/')
+      }
+      setCurrentTab('Accounts');
+      setActiveMenu(101)
+
+    }
+
     if (location.pathname.startsWith('/MyProfile/AddClient')) {
       if (currentUser?.rollSelect !== 'Manager') {
         navigate('/')
@@ -327,12 +271,7 @@ const SideBar = () => {
                   <>
                     < MenuItem
                       icon={
-                        <img alt=""
-                          src={
-                            "/images/sidebar/clients.png"
-                          }
-                          width={20}
-                        />
+                        <MdOutlineManageAccounts className="fs-4" />
                       }
                       onClick={() => {
                         setActiveMenu(101);
@@ -349,20 +288,15 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        <img alt=""
-                          src={
-                            "/images/sidebar/clients.png"
-                          }
-                          width={20}
-                        />
+                        <LuFormInput className="fs-4" />
                       }
                       onClick={() => {
-                        setActiveMenu(100);
+                        setActiveMenu(102);
                         navigate('/MyProfile/FormOptions');
                         setCurrentTab(null);
                       }}
                       className={
-                        activeMenu === 100 || currentTab === 'FormOptions'
+                        activeMenu === 102 || currentTab === 'Form Options'
                           ? 'active active_color'
                           : ''
                       }
@@ -371,12 +305,7 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        <img alt=""
-                          src={
-                            "/images/sidebar/clients.png"
-                          }
-                          width={20}
-                        />
+                        <BsCalendar4Range className="fs-5" />
                       }
                       onClick={() => {
                         setActiveMenu(103);
@@ -384,7 +313,7 @@ const SideBar = () => {
                         setCurrentTab(null);
                       }}
                       className={
-                        activeMenu === 103 || currentTab === 'DeliverablesDeadline'
+                        activeMenu === 103 || currentTab === 'Deliverables Deadlines'
                           ? 'active active_color'
                           : ''
                       }
@@ -393,20 +322,15 @@ const SideBar = () => {
                     </MenuItem>
                     <MenuItem
                       icon={
-                        <img alt=""
-                          src={
-                            "/images/sidebar/clients.png"
-                          }
-                          width={20}
-                        />
+                        <FaWhatsapp className="fs-4" />
                       }
                       onClick={() => {
-                        setActiveMenu(102);
+                        setActiveMenu(104);
                         navigate('/MyProfile/Whatsapp');
                         setCurrentTab(null);
                       }}
                       className={
-                        activeMenu === 102 || currentTab === 'Whatsapp'
+                        activeMenu === 104 || currentTab === 'Whatsapp'
                           ? 'active active_color'
                           : ''
                       }
@@ -744,7 +668,7 @@ const SideBar = () => {
                       setCurrentTab('Attendance')
                     }}
                   >
-                    Attendence
+                    Attendance
                   </MenuItem>
                 )}
                 {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
@@ -1187,8 +1111,9 @@ const SideBar = () => {
                 setActiveMenu(0)
                 setCurrentTab(null)
                 toggle()
-                navigate('/MyProfile/About')}
-              } 
+                navigate('/MyProfile')
+              }
+              }
             >
               <div className="d-flex align-items-center">
                 <div className="name_div_side">
@@ -1210,6 +1135,82 @@ const SideBar = () => {
           </SidebarHeader>
           <SidebarContent className="h-100">
             <Menu className="mibile-side-back">
+              {currentUser.rollSelect === 'Admin' && (
+                <>
+                  < MenuItem
+                    icon={
+                      <MdOutlineManageAccounts className="fs-4" />
+                    }
+                    onClick={() => {
+                      setActiveMenu(101);
+                      navigate('/MyProfile/Accounts/Count');
+                      setCurrentTab(null);
+                      setMobileSideBar(false)
+                    }}
+                    className={
+                      activeMenu === 101 || currentTab === 'Accounts'
+                        ? 'active active_color'
+                        : ''
+                    }
+                  >
+                    Accounts
+                  </MenuItem>
+                  <MenuItem
+                    icon={
+                      <LuFormInput className="fs-4" />
+                    }
+                    onClick={() => {
+                      setActiveMenu(102);
+                      navigate('/MyProfile/FormOptions');
+                      setCurrentTab(null);
+                      setMobileSideBar(false)
+                    }}
+                    className={
+                      activeMenu === 102 || currentTab === 'Form Options'
+                        ? 'active active_color'
+                        : ''
+                    }
+                  >
+                    Form Options
+                  </MenuItem>
+                  <MenuItem
+                    icon={
+                      <BsCalendar4Range className="fs-5" />
+                    }
+                    onClick={() => {
+                      setActiveMenu(103);
+                      navigate('/MyProfile/Deadlines');
+                      setCurrentTab(null);
+                      setMobileSideBar(false)
+                    }}
+                    className={
+                      activeMenu === 103 || currentTab === 'Deliverables Deadlines'
+                        ? 'active active_color'
+                        : ''
+                    }
+                  >
+                    Deliverables Deadlines
+                  </MenuItem>
+                  <MenuItem
+                    icon={
+                      <FaWhatsapp className="fs-4" />
+                    }
+                    onClick={() => {
+                      setActiveMenu(104);
+                      navigate('/MyProfile/Whatsapp');
+                      setCurrentTab(null);
+                      setMobileSideBar(false)
+                    }}
+                    className={
+                      activeMenu === 104 || currentTab === 'Whatsapp'
+                        ? 'active active_color'
+                        : ''
+                    }
+                  >
+                    Whatsapp
+                  </MenuItem>
+                </>
+              )}
               {currentUser.rollSelect === 'Manager' && (
                 <>
                   <SubMenu className={activeMenu === 1 || currentTab === 'Add Client' || currentTab === 'View Clients' ? 'active' : ''}
@@ -1532,27 +1533,30 @@ const SideBar = () => {
                   Checklists
                 </MenuItem>
               )}
-              <MenuItem
-                icon={
-                  <img alt=""
-                    src={
-                      activeMenu === 5 || currentTab === 'Attendence'
-                        ? '/images/sidebar/attendanceActive.png'
-                        : '/images/sidebar/attendance.png'
-                    }
-                    width={20}
-                  />
-                }
-                className={activeMenu === 5 || currentTab === 'Attendence' ? 'active active_color' : ''}
-                onClick={() => {
-                  setActiveMenu(5);
-                  navigate('/MyProfile/Attendence');
-                  setCurrentTab(null);
-                  setMobileSideBar(false)
-                }}
-              >
-                Attendence
-              </MenuItem>
+              {currentUser.rollSelect !== 'Admin' && (
+
+                <MenuItem
+                  icon={
+                    <img alt=""
+                      src={
+                        activeMenu === 5 || currentTab === 'Attendence'
+                          ? '/images/sidebar/attendanceActive.png'
+                          : '/images/sidebar/attendance.png'
+                      }
+                      width={20}
+                    />
+                  }
+                  className={activeMenu === 5 || currentTab === 'Attendence' ? 'active active_color' : ''}
+                  onClick={() => {
+                    setActiveMenu(5);
+                    navigate('/MyProfile/Attendence');
+                    setCurrentTab(null);
+                    setMobileSideBar(false)
+                  }}
+                >
+                  Attendance
+                </MenuItem>
+              )}
 
               {(currentUser.rollSelect === 'Manager' || currentUser.rollSelect === 'Editor') && (
                 <>

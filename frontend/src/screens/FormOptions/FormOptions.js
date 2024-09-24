@@ -41,52 +41,7 @@ function FormOptions() {
       {label: "5", value:"5"},
     ]}
   );
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const clientData = useSelector((state) => state.clientData);
-  const [eventValues, setEventValues] = useState(null);
-  let travelByOptions = [
-    {
-      value: "By Car",
-      label: "By Car",
-    },
-    {
-      value: "By Bus",
-      label: "By Bus",
-    },
-    {
-      value: "By Air",
-      label: "By Air",
-    },
-    {
-      value: "N/A",
-      label: "N/A",
-    },
-  ];
-  let numberOptions = [
-    {
-      value: "1",
-      label: "1",
-    },
-    {
-      value: "2",
-      label: "2",
-    },
-    {
-      value: "3",
-      label: "3",
-    },
-  ];
-  let yesNoOptions = [
-    {
-      value: "Yes",
-      label: "Yes",
-    },
-    {
-      value: "No",
-      label: "NO",
-    },
-  ];  
+
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
   const deliverablePreWeddingOptionObjectKeys = ["assistants", "photographers", "cinematographers", "drones"]
   const deliverableAlbumOptionObjectKeys = ["albums"]
@@ -255,7 +210,7 @@ function FormOptions() {
         >
           <Row>
             {eventOptionObjectKeys.map((Objkey) => 
-              <Col xs="6" sm="6">
+              <Col xs="12" sm="6">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     {eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}
@@ -264,7 +219,7 @@ function FormOptions() {
                     <Select
                       // ref={travelSelect}
                       name="travelBy"
-                      className="w-50"
+                      className="w-50 "
                       styles={customStyles}
                       options={eventOptionsKeyValues && eventOptionsKeyValues[Objkey].values}
                       required={true}
@@ -291,7 +246,7 @@ function FormOptions() {
               <p className=" text16N mb-0 fw-bold">For Pre-Wedding:</p>
               <Row>
                 {deliverablePreWeddingOptionObjectKeys.map((Objkey) => 
-                  <Col xs="3" sm="3">
+                  <Col xs="12" sm="3">
                     <div className="mt25">
                       <div className="Text16N" style={{ marginBottom: "6px" }}>
                         {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
@@ -316,7 +271,7 @@ function FormOptions() {
 
           <Row>
             {deliverableAlbumOptionObjectKeys.map((Objkey) => 
-              <Col xs="3" sm="3">
+              <Col xs="12" sm="3">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
@@ -338,7 +293,7 @@ function FormOptions() {
           </Row>
           <Row style={{ marginBottom: "100px" }}>
             {deliverableOptionObjectKeys.map((Objkey) => 
-              <Col xs="3" sm="3">
+              <Col xs="12" sm="3">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     {deliverableOptionsKeyValues && deliverableOptionsKeyValues[Objkey].label}
