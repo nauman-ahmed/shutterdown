@@ -4,9 +4,23 @@ import BASE_URL from "./index"
 import Cookies from 'js-cookie';
 const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
 
-export const getCinematography = async (page) => {
+export const getCinematography = async (page, monthForData, yearForData, dateForFilter) => {
     try {
-        const res = await axios.get(BASE_URL + `/get-Cinematography?page=${page}`,
+        const res = await axios.get(
+            `${BASE_URL}/get-Cinematography?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+            {
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
+        return res.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const getAlbums = async (page, monthForData, yearForData, dateForFilter) => {
+    try {
+        const res = await axios.get(BASE_URL + `/get-Albums?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }
@@ -16,9 +30,9 @@ export const getCinematography = async (page) => {
         console.log(error);
     }
 }
-export const getAlbums = async (page) => {
+export const getPhotos = async (page, monthForData, yearForData, dateForFilter) => { 
     try {
-        const res = await axios.get(BASE_URL + `/get-Albums?page=${page}`,
+        const res = await axios.get(BASE_URL + `/get-Photos?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }
@@ -28,21 +42,9 @@ export const getAlbums = async (page) => {
         console.log(error);
     }
 }
-export const getPhotos = async (page) => { 
+export const getPreWeds = async (page, monthForData, yearForData, dateForFilter) => {
     try {
-        const res = await axios.get(BASE_URL + `/get-Photos?page=${page}`,
-            {
-                Headers: { 'Content-Type': 'application/json' },
-            }
-        );
-        return res.data
-    } catch (error) {
-        console.log(error);
-    }
-}
-export const getPreWeds = async (page) => {
-    try {
-        const res = await axios.get(BASE_URL + `/get-Pre-Weds?page=${page}`,
+        const res = await axios.get(BASE_URL + `/get-Pre-Weds?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
             {
                 Headers: { 'Content-Type': 'application/json' },
             }

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
@@ -16,6 +16,11 @@ import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import { useDispatch } from "react-redux";
+import { GrPowerReset } from "react-icons/gr";
+import CalenderImg from "../../assets/Profile/Calender.svg";
+import CalenderMultiListView from '../../components/CalendarFilterListView';
+
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function Albums(props) {
   const [editors, setEditors] = useState(null);
@@ -35,7 +40,14 @@ function Albums(props) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [deadlineDays, setDeadlineDays] = useState([]);
-
+  const [dateForFilter, setDateForFilter] = useState(null)
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
+  const [yearForData, setYearForData] = useState(new Date().getFullYear())
+  const [show, setShow] = useState(false);
+  const toggle = () => {
+    setShow(!show);
+  };
+  const target = useRef(null);
   const extractText = () => {
     const contentState = editorState.albumTextGetImmutable.getCurrentContent();
     return contentState.getPlainText("\u0001"); // Using a delimiter, if needed
@@ -65,7 +77,7 @@ function Albums(props) {
 
   const fetchData = async () => {
     try {
-      const data = await getAlbums(1);
+      const data = await getAlbums(1, monthForData, yearForData, dateForFilter);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -87,15 +99,16 @@ function Albums(props) {
     }
   };
   useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setHasMore(true)
+    setPage(2)
+    fetchData()
+  }, [monthForData, yearForData, dateForFilter])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchAlbums = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getAlbums(page);
+        const data = await getAlbums(page, monthForData, yearForData, dateForFilter);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
@@ -437,6 +450,43 @@ function Albums(props) {
       />
       {deliverablesForShow ? (
         <>
+         <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
+          }} ref={target}>
+
+            <div className='w-100 d-flex flex-row align-items-center'>
+              <div className='w-75 '>
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+
+                  {dateForFilter
+                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    : "Date"}
+                  <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                    <img alt="" src={CalenderImg} onClick={toggle} />
+                    <GrPowerReset
+                      className="mx-1"
+                      onClick={() => {
+                        setDateForFilter(null)
+                        setMonthForData(months[new Date().getMonth()])
+                        setYearForData(new Date().getFullYear())
+                      }}
+                    />
+                    {show && (
+
+                      <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
+                        <div >
+                          <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
           <div style={{ overflowX: "hidden", width: "100%" }}>
             <Table
               hover

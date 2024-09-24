@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table } from 'reactstrap';
 import '../../assets/css/Profile.css';
 import Heart from '../../assets/Profile/Heart.svg';
@@ -12,7 +12,11 @@ import ClientHeader from '../../components/ClientHeader';
 import { getPreWeds, updateDeliverable, getAllTheDeadline } from '../../API/Deliverables';
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { useDispatch } from 'react-redux';
+import { GrPowerReset } from "react-icons/gr";
+import CalenderImg from "../../assets/Profile/Calender.svg";
+import CalenderMultiListView from '../../components/CalendarFilterListView';
 
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function PreWedDeliverables(props) {
 
@@ -28,19 +32,29 @@ function PreWedDeliverables(props) {
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [dateForFilter, setDateForFilter] = useState(null)
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
+  const [yearForData, setYearForData] = useState(new Date().getFullYear())
+  const [show, setShow] = useState(false);
+  const toggle = () => {
+    setShow(!show);
+  };
+  const target = useRef(null);
+
+
   const filterOptions = currentUser?.rollSelect === 'Manager' ? [
     {
       title: 'Assigned Editor',
       id: 1,
       filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 2 }
-      }),{ title: 'Unassigned Editor', id: editors.length+3 }]
+      }), { title: 'Unassigned Editor', id: editors.length + 3 }]
     },
     {
       title: 'Current Status',
       id: 5,
       filters: [
-        
+
         {
           title: 'Yet to Start',
           id: 2
@@ -76,15 +90,15 @@ function PreWedDeliverables(props) {
     },
   ]
 
-    // Define priority for parentTitle
-    const priority = {
-      "Assigned Editor": 1,
-      'Current Status': 2
-    };
+  // Define priority for parentTitle
+  const priority = {
+    "Assigned Editor": 1,
+    'Current Status': 2
+  };
 
-  const applySorting = (wedding = false)=>{
+  const applySorting = (wedding = false) => {
     try {
-      if(wedding){
+      if (wedding) {
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.client.eventDate);
           const dateB = new Date(b.client.eventDate);
@@ -93,7 +107,7 @@ function PreWedDeliverables(props) {
         setAscendingWeding(!ascendingWeding)
       }
     } catch (error) {
-      console.log("applySorting ERROR",error)
+      console.log("applySorting ERROR", error)
     }
   }
 
@@ -102,7 +116,7 @@ function PreWedDeliverables(props) {
       if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
-        if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
+        if (filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting') {
           setDeliverablesForShow(allDeliverables)
         }
       }
@@ -115,7 +129,7 @@ function PreWedDeliverables(props) {
 
   const fetchData = async () => {
     try {
-      const data = await getPreWeds(1);
+      const data = await getPreWeds(1, monthForData, yearForData, dateForFilter);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -133,20 +147,21 @@ function PreWedDeliverables(props) {
     }
   }
   useEffect(() => {
+    setHasMore(true)
+    setPage(2)
     fetchData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [monthForData, yearForData, dateForFilter])
 
   const fetchPreWeds = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getPreWeds(page);
+        const data = await getPreWeds(page, monthForData, yearForData, dateForFilter);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
             setAllDeliverables([...allDeliverables, ...data])
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = data.filter(deliverable => eval(filterCondition))
             } else {
               dataToAdd = data
@@ -157,7 +172,7 @@ function PreWedDeliverables(props) {
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
             } else {
               dataToAdd = deliverablesToShow
@@ -180,8 +195,8 @@ function PreWedDeliverables(props) {
   };
 
 
-  useEffect(()=>{
-    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+  useEffect(() => {
+    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchPreWeds()
     }
   }, [deliverablesForShow])
@@ -202,50 +217,50 @@ function PreWedDeliverables(props) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const applyFilterNew = (filterValue) => { 
-    if(filterValue.length){
+  const applyFilterNew = (filterValue) => {
+    if (filterValue.length) {
       let conditionDeliverable = null
       let conditionEditor = null
       let conditionStatus = null
       filterValue.map((obj) => {
-        if(obj.parentTitle == "Deliverable"){
+        if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable ? conditionDeliverable + " || deliverable.deliverableName === '" + obj.title + "'" : "deliverable.deliverableName === '" + obj.title + "'"
-        }else if(obj.parentTitle == "Assigned Editor"){
-          if(obj.title === 'Unassigned Editor'){
+        } else if (obj.parentTitle == "Assigned Editor") {
+          if (obj.title === 'Unassigned Editor') {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
-          }else{
+          } else {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor?.firstName === '" + obj.title + "'" : " deliverable.editor?.firstName === '" + obj.title + "'"
           }
-        }else if(obj.parentTitle == "Current Status"){
+        } else if (obj.parentTitle == "Current Status") {
           conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
         }
       })
       let finalCond = null
-      if(conditionDeliverable){
-        if(conditionEditor){
-          if(conditionStatus){
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-          }else{
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
+      if (conditionDeliverable) {
+        if (conditionEditor) {
+          if (conditionStatus) {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+          } else {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")"
           }
-        }else if(conditionStatus){
-          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus +")" 
-        }else{
-          finalCond = "(" + conditionDeliverable + ")" 
+        } else if (conditionStatus) {
+          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionDeliverable + ")"
         }
-      }else if(conditionEditor){
-        if(conditionStatus){
-          finalCond = "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-        }else{
-          finalCond = "(" + conditionEditor +")" 
+      } else if (conditionEditor) {
+        if (conditionStatus) {
+          finalCond = "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionEditor + ")"
         }
-      }else{
-        finalCond = "(" + conditionStatus +")" 
+      } else {
+        finalCond = "(" + conditionStatus + ")"
       }
       setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
       setDeliverablesForShow(newData)
-    }else{
+    } else {
       setDeliverablesForShow(allDeliverables)
     }
   }
@@ -333,10 +348,10 @@ function PreWedDeliverables(props) {
   };
 
   const getrelevantDeadline = (title) => {
-    if(title == "Pre-Wedding Photos"){
+    if (title == "Pre-Wedding Photos") {
       return deadlineDays.preWedPhoto
     }
-    else if(title == "Pre-Wedding Videos"){
+    else if (title == "Pre-Wedding Videos") {
       return deadlineDays.preWedVideo
     }
 
@@ -348,7 +363,43 @@ function PreWedDeliverables(props) {
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Pre-Wedding" />
       {deliverablesForShow ? (
         <>
-        
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
+          }} ref={target}>
+
+            <div className='w-100 d-flex flex-row align-items-center'>
+              <div className='w-75 '>
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+
+                  {dateForFilter
+                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    : "Date"}
+                  <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                    <img alt="" src={CalenderImg} onClick={toggle} />
+                    <GrPowerReset
+                      className="mx-1"
+                      onClick={() => {
+                        setDateForFilter(null)
+                        setMonthForData(months[new Date().getMonth()])
+                        setYearForData(new Date().getFullYear())
+                      }}
+                    />
+                    {show && (
+
+                      <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
+                        <div >
+                          <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
           <div style={{ overflowX: 'hidden', width: '100%' }}>
             <Table
               hover
@@ -366,12 +417,12 @@ function PreWedDeliverables(props) {
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
                   </tr>
-                  :currentUser?.rollSelect === 'Manager' ?
+                  : currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
+                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -381,7 +432,7 @@ function PreWedDeliverables(props) {
                       <th className="tableBody">Client Ratings</th>
                       <th className="tableBody">Save</th>
                     </tr>
-                  :null
+                    : null
                 }
               </thead>
               <tbody
@@ -533,7 +584,7 @@ function PreWedDeliverables(props) {
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          
+
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
@@ -550,7 +601,7 @@ function PreWedDeliverables(props) {
                               { value: 4, label: 4 },
                               { value: 5, label: 5 },
                               { value: 6, label: 6 },
-                              ]} required />
+                            ]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',
@@ -628,11 +679,11 @@ function PreWedDeliverables(props) {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                              width:"20%"
+                              width: "20%"
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             {dayjs(deliverable?.companyDeadline).format('YYYY-MMM-DD')}
-                          </td> 
+                          </td>
                           <td
                             style={{
                               paddingTop: '15px',

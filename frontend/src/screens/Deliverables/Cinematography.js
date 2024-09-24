@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table } from 'reactstrap';
 import '../../assets/css/Profile.css';
 import Heart from '../../assets/Profile/Heart.svg';
@@ -15,8 +15,14 @@ import { getAllWhatsappText } from "../../API/Whatsapp";
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 import { Editor } from "react-draft-wysiwyg";
 import { useDispatch } from 'react-redux';
+import { GrPowerReset } from 'react-icons/gr';
+import CalenderImg from "../../assets/Profile/Calender.svg";
+import CalenderMultiListView from '../../components/CalendarFilterListView';
+
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function Cinematography(props) {
+  const target = useRef(null);
   const [editors, setEditors] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
@@ -25,8 +31,8 @@ function Cinematography(props) {
   const [filterCondition, setFilterCondition] = useState(null);
   const currentUser = JSON.parse(Cookies.get('currentUser'));
   const [editorState, setEditorState] = useState({
-    albumTextGetImmutable:EditorState.createEmpty(),
-    cinematographyTextGetImmutable:EditorState.createEmpty(),
+    albumTextGetImmutable: EditorState.createEmpty(),
+    cinematographyTextGetImmutable: EditorState.createEmpty(),
     _id: null
   });
   const dispatch = useDispatch()
@@ -34,17 +40,24 @@ function Cinematography(props) {
     const contentState = editorState.cinematographyTextGetImmutable.getCurrentContent();
     return contentState.getPlainText('\u0001'); // Using a delimiter, if needed
   };
+  const toggle = () => {
+    setShow(!show);
+  };
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [deadlineDays, setDeadlineDays] = useState([]);
+  const [dateForFilter, setDateForFilter] = useState(null)
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
+  const [yearForData, setYearForData] = useState(new Date().getFullYear())
+  const [show, setShow] = useState(false);
 
   const loadEditorContent = (rawContent) => {
     const contentState = convertFromRaw(JSON.parse(rawContent));
-   return EditorState.createWithContent(contentState);
+    return EditorState.createWithContent(contentState);
     // Use `newEditorState` in your editor component
   };
-  
+
   const getAllWhatsappTextHandler = async () => {
     const res = await getAllWhatsappText()
     const newEditorStateAlbum = loadEditorContent(res.data[0].albumTextGetImmutable)
@@ -81,9 +94,9 @@ function Cinematography(props) {
       id: 2,
       filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 3 }
-      }),{ title: 'Unassigned Editor', id: editors.length+3 }]
+      }), { title: 'Unassigned Editor', id: editors.length + 3 }]
     },
-    
+
     {
       title: 'Current Status',
       id: 6,
@@ -138,19 +151,22 @@ function Cinematography(props) {
       },
     ]
   },
-]
+  ]
 
-// Define priority for parentTitle
-const priority = {
-  "Deliverable": 1,
-  "Assigned Editor": 2,
-  'Current Status': 3
-};
-
+  // Define priority for parentTitle
+  const priority = {
+    "Deliverable": 1,
+    "Assigned Editor": 2,
+    'Current Status': 3
+  };
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
-      const data = await getCinematography(1);
+
+      const data = await getCinematography(1, monthForData, yearForData, dateForFilter);
+
+
+
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -170,19 +186,20 @@ const priority = {
     }
   }
   useEffect(() => {
+    setHasMore(true)
+    setPage(2)
     fetchData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [monthForData, yearForData, dateForFilter])
   const fetchCinemas = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getCinematography(page);
+        const data = await getCinematography(page, monthForData, yearForData, dateForFilter);
         if (data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
             setAllDeliverables([...allDeliverables, ...data])
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = data.filter(deliverable => eval(filterCondition))
             } else {
               dataToAdd = data
@@ -193,7 +210,7 @@ const priority = {
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
             } else {
               dataToAdd = deliverablesToShow
@@ -214,8 +231,8 @@ const priority = {
       setLoading(false);
     }
   };
-  useEffect(()=>{
-    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+  useEffect(() => {
+    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchCinemas()
     }
   }, [deliverablesForShow])
@@ -236,9 +253,9 @@ const priority = {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const applySorting = (wedding = false)=>{
+  const applySorting = (wedding = false) => {
     try {
-      if(wedding){
+      if (wedding) {
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.client.eventDate);
           const dateB = new Date(b.client.eventDate);
@@ -247,54 +264,54 @@ const priority = {
         setAscendingWeding(!ascendingWeding)
       }
     } catch (error) {
-      console.log("applySorting ERROR",error)
+      console.log("applySorting ERROR", error)
     }
   }
 
-  const applyFilterNew = (filterValue) => { 
-    if(filterValue.length){
+  const applyFilterNew = (filterValue) => {
+    if (filterValue.length) {
       let conditionDeliverable = null
       let conditionEditor = null
       let conditionStatus = null
       filterValue.map((obj) => {
-        if(obj.parentTitle == "Deliverable"){
+        if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable ? conditionDeliverable + " || deliverable.deliverableName === '" + obj.title + "'" : "deliverable.deliverableName === '" + obj.title + "'"
-        }else if(obj.parentTitle == "Assigned Editor"){
-          if(obj.title === 'Unassigned Editor'){
+        } else if (obj.parentTitle == "Assigned Editor") {
+          if (obj.title === 'Unassigned Editor') {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
-          }else{
+          } else {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor?.firstName === '" + obj.title + "'" : " deliverable.editor?.firstName === '" + obj.title + "'"
           }
-        }else if(obj.parentTitle == "Current Status"){
+        } else if (obj.parentTitle == "Current Status") {
           conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
         }
       })
       let finalCond = null
-      if(conditionDeliverable){
-        if(conditionEditor){
-          if(conditionStatus){
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-          }else{
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
+      if (conditionDeliverable) {
+        if (conditionEditor) {
+          if (conditionStatus) {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+          } else {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")"
           }
-        }else if(conditionStatus){
-          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus +")" 
-        }else{
-          finalCond = "(" + conditionDeliverable + ")" 
+        } else if (conditionStatus) {
+          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionDeliverable + ")"
         }
-      }else if(conditionEditor){
-        if(conditionStatus){
-          finalCond = "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-        }else{
-          finalCond = "(" + conditionEditor +")" 
+      } else if (conditionEditor) {
+        if (conditionStatus) {
+          finalCond = "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionEditor + ")"
         }
-      }else{
-        finalCond = "(" + conditionStatus +")" 
+      } else {
+        finalCond = "(" + conditionStatus + ")"
       }
       setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
       setDeliverablesForShow(newData)
-    }else{
+    } else {
       setDeliverablesForShow(allDeliverables)
     }
   }
@@ -305,14 +322,14 @@ const priority = {
       if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
-        if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
+        if (filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting') {
           setDeliverablesForShow(allDeliverables)
         }
       }
     }
     setFilterBy(filterType);
   }
-  
+
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -336,22 +353,22 @@ const priority = {
       const deliverable = allDeliverables[index];
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
-     
-        dispatch({
-          type: "SOCKET_EMIT_EVENT",
-          payload: {
-            event: "add-notification",
-            data: {
-              notificationOf: "Cinema Deliverable",
-              data: deliverable,
-              forManager: false,
-              forUser: deliverable?.editor._id,
-              read: false,
-              dataId: deliverable._id,
-            },
+
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "add-notification",
+          data: {
+            notificationOf: "Cinema Deliverable",
+            data: deliverable,
+            forManager: false,
+            forUser: deliverable?.editor._id,
+            read: false,
+            dataId: deliverable._id,
           },
-        });
-   
+        },
+      });
+
       setUpdatingIndex(null)
     } catch (error) {
       console.log(error);
@@ -370,24 +387,63 @@ const priority = {
   }
 
   const getrelevantDeadline = (title) => {
-    if(title == "Promo"){
+    if (title == "Promo") {
       return deadlineDays.promo
     }
-    else if(title == "Long Film"){
+    else if (title == "Long Film") {
       return deadlineDays.longFilm
     }
-    else if(title == "Reel"){
+    else if (title == "Reel") {
       return deadlineDays.reel
     }
 
     return 45
   }
+  console.log(deliverablesForShow);
+
 
   return (
     <>
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Cinematography" />
       {deliverablesForShow ? (
         <>
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
+          }} ref={target}>
+
+            <div className='w-100 d-flex flex-row align-items-center'>
+              <div className='w-75 '>
+                <div
+                  className={`forminput R_A_Justify1`}
+                  style={{ cursor: 'pointer' }}
+                >
+
+                  {dateForFilter
+                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    : "Date"}
+                  <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                    <img alt="" src={CalenderImg} onClick={toggle} />
+                    <GrPowerReset
+                      className="mx-1"
+                      onClick={() => {
+                        setDateForFilter(null)
+                        setMonthForData(months[new Date().getMonth()])
+                        setYearForData(new Date().getFullYear())
+                      }}
+                    />
+                    {show && (
+
+                      <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
+                        <div >
+                          <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
           <div >
             <Table
               hover
@@ -411,7 +467,7 @@ const priority = {
                       <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
+                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -600,7 +656,7 @@ const priority = {
                               { value: 4, label: 4 },
                               { value: 5, label: 5 },
                               { value: 6, label: 6 },
-                              ]} required />
+                            ]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',
