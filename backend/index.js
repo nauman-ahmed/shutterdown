@@ -21,7 +21,7 @@ dotenv.config({ path: './config.env' });
 const path = require('path');
 const PORT = 5002;
 
-// app.use(cors());
+app.use(cors());
 // Set CORS headers manually
 // Add middleware to set CORS headers
 app.use((req, res, next) => {
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

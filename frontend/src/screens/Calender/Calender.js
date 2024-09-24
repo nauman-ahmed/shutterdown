@@ -7,7 +7,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "../../assets/css/Calender.css";
 import "../../assets/css/Calender.css";
 import * as bootstrap from "bootstrap";
-import { getEvents } from "../../API/Event";
+import { getAllEvents, getEvents } from "../../API/Event";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { FaDirections } from "react-icons/fa";
@@ -22,7 +22,7 @@ function Calender() {
 
   const getEventsData = async () => {
     try {
-      const res = await getEvents();
+      const res = await getAllEvents();
       let eventsToShow;
       if (currentUser.rollSelect === "Manager") {
         eventsToShow = res.data;
@@ -102,6 +102,7 @@ function Calender() {
   useEffect(() => {
     getEventsData();
   }, []);
+console.log(allEvents);
 
   return (
     <>

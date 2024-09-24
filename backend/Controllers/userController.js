@@ -304,7 +304,11 @@ const newPassword = async (req, res) => {
 const getExistEmail = async (req, res) => {
   try {
     const email = await userSchema.findOne({ email: req.body.data });
-  } catch (error) { }
+    res.status(200).json(email)
+  } catch (error) { 
+    console.log(error);
+    
+   }
 };
 
 const getAllUsers = async (req, res) => {

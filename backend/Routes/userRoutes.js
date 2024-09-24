@@ -15,7 +15,7 @@ router.get('/getShooters',userController.getShooters);
 router.post('/', userController.SignInPostRequest);
 router.post('/emailVerify', userController.verifyEmail);
 router.put("/ResetPassword",userController.newPassword);
-router.post('/',userController.getExistEmail);
+router.post('/check-exist-email',userController.getExistEmail);
 router.post('/update-userInfo',userController.updateUserData);
 router.post('/upload-files/:userId',upload.fields([{name : 'Adhar-Card'}, {name : 'Pan-Card'}, {name : 'Driving-License' }, {name : 'Voter-ID'}, {name : 'Passport'}, {name : 'Photo'}, {name : 'Signature'}]) ,userController.uploadFiles);
 // router.post('/upload-files/:userId', userController.uploadFiles);

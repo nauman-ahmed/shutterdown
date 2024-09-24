@@ -77,7 +77,8 @@ const login =  useGoogleLogin({
       "Authorization":`Bearer ${tokenResponse.access_token}`
     }
    })
-
+   console.log(res);
+   
    await checkExistEmail(res.data.email)
    
    if (res.status===200) {
@@ -92,15 +93,7 @@ const login =  useGoogleLogin({
           'userEmail',
           JSON.stringify(response?.data?.User._id)
         );
-        const shooter = JSON.parse(localStorage.getItem('loginUser'));
-        if (shooter.data.User.rollSelect === 'Shooter') {
-          navigate('/photographer-CalenderView/View');
-        }   else if (shooter.data.User.rollSelect === 'Editor') {
-          navigate('/MyProfile/Deliverables/Cinematography');
-        } else if (shooter.data.User.rollSelect==="Manager") {
-          
-          navigate('/MyProfile');
-        } 
+       
       }
   }
   else if (!res) {

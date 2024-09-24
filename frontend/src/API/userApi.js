@@ -111,7 +111,7 @@ export const GetSignInWithGoogleData = async (data, phoneNo) => {
 };
 export const checkExistEmail = async (data) => {
   try {
-    const res = await axios.post("http://localhost:5002/", {
+    const res = await axios.post(BASE_URL + '/check-exist-email', {
       Headers: {
         "Content-Type": "application/json"
       },

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SaveClientForm } from "../../API/Client";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import { updateClintData } from "../../redux/clientBookingForm";
-import { getEvents } from "../../API/Event";
+import { getAllEvents, getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import Cookies from "js-cookie";
 
@@ -53,7 +53,7 @@ function Preview() {
           },
         },
       });
-      const storedEvents = await getEvents();
+      const storedEvents = await getAllEvents();
       dispatch(updateAllEvents(storedEvents.data));
       dispatch(updateClintData({ albums: [""] }));
       if (saveResult.result) {
