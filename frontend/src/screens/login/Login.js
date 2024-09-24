@@ -29,7 +29,7 @@ const Login = () => {
     setError(false);
   };
   const dispatch = useDispatch()
- 
+
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
@@ -46,19 +46,9 @@ const Login = () => {
         const user = Cookies.get('currentUser');
         if (user) {
           setSuccess(true);
-         
-          if (user.rollSelect==="Shooter") {
-            navigate('/photographer-CalenderView/View');
-          }
-         else if (user.rollSelect==='Editor') {
-            navigate('/Deliverables/Cinematography')
-          }
-          else if (user.rollSelect==='Admin') {
-            navigate('/Deliverables/Cinematography')
-          }
-          else {
-            navigate('/MyProfile');
-          }
+
+          navigate('/MyProfile');
+
         }
       } catch (error) {
         toast.error('Invalid Credentials');
@@ -68,58 +58,36 @@ const Login = () => {
   const signup = () => {
     navigate('Signup');
   };
- 
+
   const { email, password } = inputData;
-const login =  useGoogleLogin({
-  onSuccess: async(tokenResponse) =>{
-   const res=await  axios.get("https://www.googleapis.com/oauth2/v3/userinfo",{
-    headers:{
-      "Authorization":`Bearer ${tokenResponse.access_token}`
-    }
-   })
-   console.log(res);
-   
-   await checkExistEmail(res.data.email)
-   
-   if (res.status===200) {
-    localStorage.setItem("signInWithGoogle",JSON.stringify(res))
-      const response = JSON.parse(localStorage.getItem('res'));
-      if (response?.data===null) {
-        navigate("/signInWithGoogle")
-      }
-      else if (response?.data!==null) {
-        // const response = JSON.parse(localStorage.getItem('res'));
-        localStorage.setItem(
-          'userEmail',
-          JSON.stringify(response?.data?.User._id)
-        );
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: {
+          "Authorization": `Bearer ${tokenResponse.access_token}`
+        }
+      })
+      console.log(res);
+
+      const accountExist = await checkExistEmail(res.data.email)
+      console.log(accountExist);
+
+      if (res.status === 200) {
+        if (accountExist?.email) {
+          Cookies.set('currentUser', JSON.stringify(accountExist));
+          toast.success('Logged in successfully!')
+          navigate('/MyProfile');
+        } else {
+          localStorage.setItem("signInWithGoogle", JSON.stringify(res.data))
+          navigate("/signInWithGoogle")
+        }
        
       }
-  }
-  else if (!res) {
-    navigate("/signInWithGoogle")
-  }
-  else{
-   const response=JSON.parse(localStorage.getItem('res'))
-    localStorage.setItem('userEmail', JSON.stringify(response?.data?.User._id));
-    const shooter = JSON.parse(localStorage.getItem('loginUser'));
-    if (shooter.data.User.rollSelect === 'Shooter') {
-      navigate('/photographer-CalenderView/View');
-    }  
-    else if (shooter.data.User.rollSelect === 'Editor') {
-       navigate('/MyProfile/Deliverables/Cinematography');
-     }
-    else  if(shooter.data.User.rollSelect === "Manager"){
-      navigate('/MyProfile');
-    }
-    else  if(shooter.data.User.rollSelect === "Admin"){
-      navigate('/MyProfile/FormOptions');
-    }
-    
-  }
-  },
-  
-});
+
+
+    },
+
+  });
   return (
     <>
       <div className="row" style={{ maxWidth: '100%' }}>
@@ -188,11 +156,11 @@ const login =  useGoogleLogin({
                 className="submit_btn"
                 style={{ marginTop: 10 }}
 
-                // onClick={() => home()}
+              // onClick={() => home()}
               >
-              {logingIn ? <div className='w-100'>
-                    <div class="smallSpinner mx-auto"></div>
-                  </div> : "Sign In"}
+                {logingIn ? <div className='w-100'>
+                  <div class="smallSpinner mx-auto"></div>
+                </div> : "Sign In"}
               </Button>{' '}
             </Form>
             <br />
@@ -219,7 +187,7 @@ const login =  useGoogleLogin({
                 console.log('Login Failed');
               }}
             /> */}
-            
+
             <div className="d-flex align-items-center justify-content-center bottom_width mt-3">
               <p className="subheading">Don’t have an account?</p>
               <p
@@ -230,7 +198,7 @@ const login =  useGoogleLogin({
                   marginLeft: 5,
                   cursor: 'pointer',
                 }}
-                onClick={ signup}
+                onClick={signup}
               >
                 Sign up
               </p>

@@ -12,6 +12,7 @@ import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { GetsignUPData } from '../../API/userApi';
 import { GetSignInWithGoogleData } from '../../API/userApi';
+import Cookies from 'js-cookie'
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -52,22 +53,18 @@ const Signup = (props) => {
   ];
 
   useEffect(() => {
-   
-
     const signInWithGoogle = JSON.parse(
       localStorage.getItem('signInWithGoogle')
     );
     setSignInData(signInWithGoogle)
-
-
   }, [])
   const inputData1 = {
-    firstName: signInData?.data?.given_name,
-    lastName: signInData?.data?.family_name,
-    email: signInData?.data?.email,
+    firstName: signInData?.given_name,
+    lastName: signInData?.family_name,
+    email: signInData?.email,
 
   }
- 
+
   const handleOnChangeFunction = (e) => {
     const { name, value } = e.target;
     setInputData({ ...inputData, [name]: value });
@@ -128,30 +125,22 @@ const Signup = (props) => {
 
     }
   };
+
   const handleSignInwithGoogleFunction = async (e) => {
+    e.preventDefault()
     if (phone === '') {
       setError(true)
-    }
-    if (roll === "select") {
+    } else if (roll === "select") {
       setError(true)
-    }
-    else {
-      e.preventDefault()
+    } else {
       setError(false)
       await GetSignInWithGoogleData(RegisterData2, phone)
       const response = JSON.parse(localStorage.getItem('loginUser'));
       if (response.status === 200) {
-
-        localStorage.setItem(
-          'userEmail',
-          JSON.stringify(response?.data?.User._id)
-        );
-        const shooter = JSON.parse(localStorage.getItem('loginUser'));
-        if (shooter.data.User.rollSelect === 'Shooter') {
-          navigate('/photographer-CalenderView/View');
-        } else {
-          navigate('/MyProfile');
-        }
+        Cookies.set('currentUser', JSON.stringify(response.data.User))
+        localStorage.removeItem('loginUser')
+        localStorage.removeItem('signInWithGoogle')
+        navigate('/MyProfile');
       } else {
         toast.error('Invalid Credentials');
       }
@@ -207,7 +196,7 @@ const Signup = (props) => {
                           onChange={handleOnChangeFunction}
                           value={
                             props.signInWithGoogle
-                              ? signInData?.data.given_name
+                              ? signInData?.given_name
                               : firstName
                           }
                         ></input>
@@ -234,7 +223,7 @@ const Signup = (props) => {
                           onChange={handleOnChangeFunction}
                           value={
                             props.signInWithGoogle
-                              ? signInData.data.family_name
+                              ? signInData.family_name
                               : lastName
                           }
                         ></input>
@@ -263,7 +252,7 @@ const Signup = (props) => {
                             onChange={handleOnChangeFunction}
                             value={
                               props.signInWithGoogle
-                                ? signInData?.data?.email
+                                ? signInData?.email
                                 : email
                             }
                           ></input>

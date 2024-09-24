@@ -106,6 +106,8 @@ export const GetSignInWithGoogleData = async (data, phoneNo) => {
     phoneNo: phoneNo,
     rollSelect: rollSelect,
   });
+  console.log(res);
+  
   localStorage.setItem('loginUser', JSON.stringify(res));
   localStorage.setItem("res", JSON.stringify(res))
 };
@@ -117,8 +119,7 @@ export const checkExistEmail = async (data) => {
       },
       data
     })
-    localStorage.setItem('loginUser', JSON.stringify(res));
-    localStorage.setItem('res', JSON.stringify(res));
+    return res.data
 
   } catch (error) {
     console.log(error, "error")
