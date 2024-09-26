@@ -5,7 +5,7 @@ import "../../assets/css/Profile.css";
 import "../../assets/css/tableRoundHeader.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import dayjs from "dayjs";
-import { getClients } from "../../API/Client";
+import { getAllClients, getClients } from "../../API/Client";
 import { Overlay } from "react-bootstrap";
 import Calendar from "react-calendar";
 import Select from "react-select";
@@ -23,7 +23,7 @@ function ViewClient() {
   const onPress = (clientId) => {
     navigate("/MyProfile/Client/ParticularClient/ClientInfo/" + clientId);
   };
-  const [allClients, setAllClients] = useState();
+  const [allClients, setAllClients] = useState([]);
   const toggle = () => {
     setShow(!show);
   };
@@ -35,13 +35,26 @@ function ViewClient() {
   const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate)
   const [monthForData, setMonthForData] = useAtom(clientFilterMonth)
   const [yearForData, setYearForData] = useAtom(clientFilterYear)
+  const [appliedFilterBride, setAppliedFilterBride] = useState(null)
 
 
   const fetchData = async () => {
     try {
       const data = await getClients(1, monthForData, yearForData, dateForFilter);
       setClients(data.data);
-      setAllClients(data.data);
+      
+      const completeclients = await getAllClients()
+      const seenClients = new Set()
+      const uniqueClients = completeclients.filter(client => {
+        if (client.brideName && !seenClients?.has(client.brideName)) {
+          seenClients.add(client.brideName)
+          return true
+        } else {
+          return false
+        }
+      });
+
+      setAllClients(uniqueClients);
     } catch (error) {
       console.log(error);
     }
@@ -51,16 +64,20 @@ function ViewClient() {
     setHasMore(true)
     setPage(2)
     fetchData();
-  },[monthForData, yearForData, dateForFilter]);
+  }, [monthForData, yearForData, dateForFilter]);
 
   const fetchClients = async () => {
     if (hasMore) {
       setLoading(true);
       try {
         const data = await getClients(page, monthForData, yearForData, dateForFilter);
+        console.log(data);
+        
         if (data.data.length > 0) {
-          setAllClients([...allClients, ...data.data]);
+
           if (dateForFilter) {
+            console.log('apply8ing date filter');
+            
             const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
@@ -72,9 +89,12 @@ function ViewClient() {
             });
             setClients([...clients, ...clientsToAdd]);
           } else {
+            console.log(data.data);
+            
             setClients([...clients, ...data.data]);
           }
-        }  
+          filterByNameHanler(appliedFilterBride)
+        }
         if (data.hasMore) {
           setPage(page + 1);
         }
@@ -85,7 +105,8 @@ function ViewClient() {
       setLoading(false);
     }
   };
-
+  
+  
   useEffect(() => {
     if (clients?.length < 10 && hasMore && !loading) {
       fetchClients();
@@ -124,12 +145,22 @@ function ViewClient() {
   };
 
   const filterByNameHanler = (brideName) => {
-    if (brideName == "Reset") {
-      setClients(allClients);
+   
+    
+    if (brideName == "Reset" ) {
+      setAppliedFilterBride(null)
+      setMonthForData(months[new Date().getMonth()])
+      setYearForData(new Date().getFullYear())
+      setDateForFilter(null)
+      fetchData()
       return;
+    } else if(brideName === null || brideName === undefined){
+      
+      return
     }
     const seperator = "<";
-    brideName = brideName.split(seperator)[0];
+    brideName = brideName?.split(seperator)[0];
+    setAppliedFilterBride(brideName)
     setClients(
       allClients.filter((clientData) => {
         return clientData.brideName == brideName;
@@ -152,7 +183,7 @@ function ViewClient() {
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: "pointer" }}
                 >
-                 {dateForFilter
+                  {dateForFilter
                     ? dayjs(dateForFilter).format("DD-MMM-YYYY")
                     : "Date"}
                   <div className="d-flex align-items-center">
@@ -163,6 +194,7 @@ function ViewClient() {
                         setDateForFilter(null)
                         setMonthForData(months[new Date().getMonth()])
                         setYearForData(new Date().getFullYear())
+                       
                       }}
                     />
                   </div>
@@ -182,7 +214,7 @@ function ViewClient() {
                       </div>
                     ),
                   },
-                  ...allClients?.map((client) => {
+                  ...Array.from(allClients)?.map((client) => {
                     return {
                       value: client.brideName + "<" + client.groomName,
                       label: (
@@ -282,7 +314,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-            <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+              <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
             </div>
           </Overlay>
         </>
