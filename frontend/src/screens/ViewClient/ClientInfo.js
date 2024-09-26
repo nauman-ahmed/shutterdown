@@ -147,6 +147,8 @@ function ClientInfo() {
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId);
+      console.log(res);
+      
       setClientData(res);
     } catch (error) {
       console.log(error);
@@ -197,19 +199,7 @@ function ClientInfo() {
     }
   };
   const navigate = useNavigate()
-  const updateDeliverables = (e) => {
-    var updatedDeliverables = { ...editedClient?.deliverables } || {
-      photos: true,
-    };
-    updatedDeliverables = {
-      ...updatedDeliverables,
-      [e.target.name]: e.target.checked,
-    };
-    console.log(updatedDeliverables);
-    
-    setEditedClient({ ...editedClient, deliverables: updatedDeliverables })
 
-  };
   return (
     <div>
       <Table bordered hover responsive>
@@ -759,7 +749,7 @@ function ClientInfo() {
                   name="email"
                   placeholder="Email_Id"
                   className="ContactModel textPrimary"
-                  required
+                  required={false}
                 />
               </Col>
               <Col xl="6" sm="6" className="p-2">
@@ -996,7 +986,7 @@ function ClientInfo() {
                   name="suggestion"
                   placeholder="Client_Suggestions"
                   className="ContactModel h100 textPrimary"
-                  required
+                  required={false}
                 />
               </Col>
 

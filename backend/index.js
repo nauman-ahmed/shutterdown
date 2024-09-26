@@ -62,7 +62,7 @@ app.use(deliverableRouter);
 app.use(notificationRouter);
 app.use(DeadlineDaysRouter);
 app.use('/', AttendenceRouter);
-app.use('/', viewClientRouter);
+app.use(viewClientRouter);
 app.use('/', DailyTaskRouter);
 app.use('/eventOptions', EventOptionsRouter);
 app.use('/deliverableOptions', DeliverableOptionsRouter);

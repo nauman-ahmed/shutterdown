@@ -92,9 +92,9 @@ export const addAlbumsDeliverables = async (client) => {
   }
 };
 
-export const getClients = async (page) => {
+export const getClients = async (page, monthForData, yearForData, dateForFilter) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getAllClients?page=${page}`, {
+    const res = await axios.get(BASE_URL + `/Client/getAllClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`, {
       Headers: { "Content-Type": "application/json" },
     });
     return res.data;

@@ -12,6 +12,10 @@ import Select from "react-select";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
+import CalenderMultiListView from "../../components/CalendarFilterListView";
+import { useAtom } from "jotai";
+import { clientFilterDate, clientFilterMonth, clientFilterYear } from "../../redux/atoms";
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function ViewClient() {
   const navigate = useNavigate();
@@ -23,86 +27,58 @@ function ViewClient() {
   const toggle = () => {
     setShow(!show);
   };
-  const [filteringDay, setFilteringDay] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [filterStartDate, setFilterStartDate] = useState(null);
-  const [filterEndDate, setFilterEndDate] = useState(null);
-  const filterByDates = (
-    startDate = null,
-    endDate = null,
-    view = null,
-    reset = false
-  ) => {
-    if (reset) {
-      setShow(false);
-      setClients(allClients);
-      setFilterStartDate(null);
-      setFilterEndDate(null);
-      setFilteringDay(null);
-      return;
-    } else if (view !== "month" && view !== "year") {
-      setShow(false);
-    }
-    setFilteringDay(startDate);
-    setFilterStartDate(startDate);
-    setFilterEndDate(endDate);
-    setClients(
-      allClients.filter((clientData) => {
-        return clientData.events.some(
-          (eventData) =>
-            new Date(eventData.eventDate).setHours(0, 0, 0, 0) >=
-            new Date(startDate).setHours(0, 0, 0, 0) &&
-            new Date(eventData.eventDate).setHours(0, 0, 0, 0) <=
-            new Date(endDate).setHours(0, 0, 0, 0)
-        );
-      })
-    );
-  };
+  const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate)
+  const [monthForData, setMonthForData] = useAtom(clientFilterMonth)
+  const [yearForData, setYearForData] = useAtom(clientFilterYear)
+
 
   const fetchData = async () => {
     try {
-      const data = await getClients(1);
-      setClients(data);
-      setAllClients(data);
+      const data = await getClients(1, monthForData, yearForData, dateForFilter);
+      setClients(data.data);
+      setAllClients(data.data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
+    setHasMore(true)
+    setPage(2)
     fetchData();
-  }, []);
+  },[monthForData, yearForData, dateForFilter]);
 
   const fetchClients = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page);
-        if (data.length > 0) {
-          setAllClients([...allClients, ...data]);
-          if (filterStartDate && filterEndDate) {
-            const clientsToAdd = data.filter((clientData) => {
+        const data = await getClients(page, monthForData, yearForData, dateForFilter);
+        if (data.data.length > 0) {
+          setAllClients([...allClients, ...data.data]);
+          if (dateForFilter) {
+            const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
                   new Date(eventData.eventDate).getTime() >=
-                  new Date(filterStartDate).getTime() &&
+                  new Date(dateForFilter).getTime() &&
                   new Date(eventData.eventDate).getTime() <=
-                  new Date(filterEndDate).getTime()
+                  new Date(dateForFilter).getTime()
               );
             });
             setClients([...clients, ...clientsToAdd]);
           } else {
-            setClients([...clients, ...data]);
+            setClients([...clients, ...data.data]);
           }
-
+        }  
+        if (data.hasMore) {
           setPage(page + 1);
-        } else {
-          setHasMore(false);
         }
+        setHasMore(data.hasMore);
       } catch (error) {
         console.log(error);
       }
@@ -176,14 +152,18 @@ function ViewClient() {
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: "pointer" }}
                 >
-                  {filteringDay
-                    ? dayjs(filteringDay).format("DD-MMM-YYYY")
+                 {dateForFilter
+                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
                     : "Date"}
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
-                      onClick={() => filterByDates(null, null, null, true)}
+                      onClick={() => {
+                        setDateForFilter(null)
+                        setMonthForData(months[new Date().getMonth()])
+                        setYearForData(new Date().getFullYear())
+                      }}
                     />
                   </div>
                 </div>
@@ -302,7 +282,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMulti filterByDates={filterByDates} />
+            <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
             </div>
           </Overlay>
         </>

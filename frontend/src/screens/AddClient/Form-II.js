@@ -152,7 +152,7 @@ function FormII() {
   }, []);
 
   const handleAddDate = (date) => {
-    setEventValues({ ...eventValues, eventDate: date });
+    setEventValues({ ...eventValues, eventDate: new Date(date).setHours(0,0,0,0) });
     setShow(!show);
   };
 
@@ -637,6 +637,8 @@ function FormII() {
                 // minDate={new Date(Date.now())}
                 CalenderPress={toggle}
                 onClickDay={(date) => {
+                  console.log(date);
+                  
                   handleAddDate(date);
                 }}
                 tileClassName={({ date }) => {

@@ -17,6 +17,8 @@ function Deliverable(props) {
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId)
+      console.log(res);
+      
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
       const preWedDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName === 'Pre-Wedding Photos' || deliverable.deliverableName === 'Pre-Wedding Videos');
@@ -33,7 +35,7 @@ function Deliverable(props) {
 
   useEffect(() => {
     getIdData();
-  })
+  }, [])
 
   const getrelevantDeadline = (title) => {
     if (title == "Promo") {

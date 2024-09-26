@@ -3,12 +3,15 @@ const deadlineDaysModel = require("../models/DeadlineDays");
 const deliverableModel = require("../models/DeliverableModel");
 const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
+const moment = require('moment')
 
 const AddClientFunction = async (req, res) => {
   try {
 
     const deadlineDays = await deadlineDaysModel.find();
     let clientBody = req.body.data;
+    console.log(clientBody);
+
     clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos;
     clientBody.preWeddingVideos = req.body.data?.deliverables?.preWeddingVideos;
     const client = new ClientModel(clientBody);
@@ -100,9 +103,12 @@ const AddClientFunction = async (req, res) => {
       quantity: 1,
       photoDeadline,
     });
+
     await photosDeliverable.save().then(() => {
       deliverables.push(photosDeliverable._id);
     });
+    console.log(req.body.data);
+
     if (req.body.data.promos > 0) {
       const promoDeliverable = new deliverableModel({
         client: client._id,
@@ -110,6 +116,7 @@ const AddClientFunction = async (req, res) => {
         quantity: req.body.data.promos,
         promoDeadline,
       });
+
       await promoDeliverable.save().then(() => {
         deliverables.push(promoDeliverable._id);
       });
@@ -121,6 +128,7 @@ const AddClientFunction = async (req, res) => {
         quantity: req.body.data.longFilms,
         longFilmDeadline,
       });
+
       await longFilmDeliverable.save().then(() => {
         deliverables.push(longFilmDeliverable._id);
       });
@@ -132,6 +140,7 @@ const AddClientFunction = async (req, res) => {
         quantity: req.body.data.reels,
         reelDeadline,
       });
+
       await reelDeliverable.save().then(() => {
         deliverables.push(reelDeliverable._id);
       });
@@ -144,6 +153,7 @@ const AddClientFunction = async (req, res) => {
         quantity: req.body.data.reels,
         preWedPhotoDeadline,
       });
+
       await preWedPhotosDeliverable.save().then(() => {
         deliverables.push(preWedPhotosDeliverable._id);
       });
@@ -156,6 +166,8 @@ const AddClientFunction = async (req, res) => {
         quantity: req.body.data.reels,
         preWedVideoDeadline,
       });
+
+
       await preWedVideosDeliverable.save().then(() => {
         deliverables.push(preWedVideosDeliverable._id);
       });
@@ -163,7 +175,7 @@ const AddClientFunction = async (req, res) => {
 
     const albumsDeliverables = await Promise.all(
       req.body.data.albums.map(async (album) => {
-        if (album !== 'Not inlcuded') {
+        if (album !== 'Not included') {
 
           const newAlbum = new deliverableModel({
             client: client._id,
@@ -171,6 +183,7 @@ const AddClientFunction = async (req, res) => {
             quantity: 1,
             albumDeadline,
           });
+
           await newAlbum.save();
           return newAlbum._id;
         } else {
@@ -364,6 +377,21 @@ const getAllClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
+
+    // Get currentMonth, currentYear, and currentDate from the request query
+    let startDate, endDate;
+    const { currentMonth, currentYear, currentDate } = req.query;
+
+    // Date filter logic
+    if (currentDate !== 'null') {
+      // Parse currentDate as a specific day filter
+      startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
+      endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+    } else {
+      // If no specific date, use the month and year filter
+      startDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
+      endDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
+    }
     const clients = await ClientModel.find().skip(skip).limit(10).populate({
       path: 'events',
       model: 'Event',
@@ -386,9 +414,25 @@ const getAllClients = async (req, res) => {
       }
     }).populate('userID');
 
-    res.status(200).json(clients);
+    const filteredClients = clients.filter(client => {
+      if (client.events) {
+        const weddingEvent = client?.events?.find(event => event.isWedding);
+        const eventDate = weddingEvent?.eventDate || client.events?.[0]?.eventDate;
+        const weddingDate = moment(eventDate).startOf('day');
+        return weddingDate.isSameOrAfter(startDate) && weddingDate.isSameOrBefore(endDate);
+      }
+      return false;
+    });
+    console.log(filteredClients);
+    
+   // Determine if there are more objects to fetch
+    const hasMore = clients.length === 10;
+
+    res.status(200).json({hasMore, data : filteredClients});
   } catch (error) {
-    res.status(404).json(error);
+    console.log(error);
+    res.status(500).json(error);
+
   }
 };
 
@@ -456,11 +500,11 @@ const getClientById = async (req, res) => {
 const DeleteClient = async (req, res) => {
   try {
     const clientToDelete = await ClientModel.findById(req.params.clientId);
-    clientToDelete.events.forEach(async (client) => {
-      await eventModel.findByIdAndDelete(client)
+    clientToDelete.events.forEach(async (eventId) => {
+      await eventModel.findByIdAndDelete(eventId)
     })
-    clientToDelete.deliverables.forEach(async (client) => {
-      await deliverableModel.findByIdAndDelete(client)
+    clientToDelete.deliverables.forEach(async (deliverableId) => {
+      await deliverableModel.findByIdAndDelete(deliverableId)
     })
 
     await ClientModel.findByIdAndDelete(clientToDelete._id)

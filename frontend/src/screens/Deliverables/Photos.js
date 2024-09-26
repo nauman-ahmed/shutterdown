@@ -44,15 +44,16 @@ function Photos() {
   const fetchData = async () => {
     try {
       const data = await getPhotos(1, monthForData, yearForData, dateForFilter);
+
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
       setEditors(res.editors.filter(user => user.subRole.includes('Photo Editor')))
       if (currentUser?.rollSelect === 'Manager') {
-        setAllDeliverables(data)
-        setDeliverablesForShow(data)
+        setAllDeliverables(data.data)
+        setDeliverablesForShow(data.data)
       } else if (currentUser?.rollSelect === 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
+        const deliverablesToShow = data.data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -70,22 +71,24 @@ function Photos() {
       setLoading(true);
       try {
         const data = await getPhotos(page, monthForData, yearForData, dateForFilter);
-        if (data.length > 0) {
+        console.log(data);
+
+        if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data])
-            if(filterCondition){
-              dataToAdd = data.filter(deliverable => eval(filterCondition))
+            setAllDeliverables([...allDeliverables, ...data.data])
+            if (filterCondition) {
+              dataToAdd = data.data.filter(deliverable => eval(filterCondition))
             } else {
-              dataToAdd = data
+              dataToAdd = data.data
             }
             setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
           } else if (currentUser.rollSelect === "Editor") {
-            const deliverablesToShow = data.filter(
+            const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if(filterCondition){
+            if (filterCondition) {
               dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
             } else {
               dataToAdd = deliverablesToShow
@@ -95,11 +98,12 @@ function Photos() {
               ...dataToAdd,
             ]);
           }
-
-          setPage(page + 1);
-        } else {
-          setHasMore(false);
         }
+        if (data.hasMore) {
+          setPage(page + 1);
+        }
+        setHasMore(data.hasMore);
+
       } catch (error) {
         console.log(error);
       }
@@ -107,8 +111,8 @@ function Photos() {
     }
   };
 
-    useEffect(()=>{
-    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+  useEffect(() => {
+    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchPhotos()
     }
   }, [deliverablesForShow])
@@ -129,50 +133,50 @@ function Photos() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const applyFilterNew = (filterValue) => { 
-    if(filterValue.length){
+  const applyFilterNew = (filterValue) => {
+    if (filterValue.length) {
       let conditionDeliverable = null
       let conditionEditor = null
       let conditionStatus = null
       filterValue.map((obj) => {
-        if(obj.parentTitle == "Deliverable"){
+        if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable ? conditionDeliverable + " || deliverable.deliverableName === '" + obj.title + "'" : "deliverable.deliverableName === '" + obj.title + "'"
-        }else if(obj.parentTitle == "Assigned Editor"){
-          if(obj.title === 'Unassigned Editor'){
+        } else if (obj.parentTitle == "Assigned Editor") {
+          if (obj.title === 'Unassigned Editor') {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor ? false : true" : "deliverable.editor ? false : true"
-          }else{
+          } else {
             conditionEditor = conditionEditor ? conditionEditor + " || deliverable.editor?.firstName === '" + obj.title + "'" : " deliverable.editor?.firstName === '" + obj.title + "'"
           }
-        }else if(obj.parentTitle == "Current Status"){
+        } else if (obj.parentTitle == "Current Status") {
           conditionStatus = conditionStatus ? conditionStatus + " || deliverable.status === '" + obj.title + "'" : " deliverable.status === '" + obj.title + "'"
         }
       })
       let finalCond = null
-      if(conditionDeliverable){
-        if(conditionEditor){
-          if(conditionStatus){
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-          }else{
-            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor +")" 
+      if (conditionDeliverable) {
+        if (conditionEditor) {
+          if (conditionStatus) {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+          } else {
+            finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionEditor + ")"
           }
-        }else if(conditionStatus){
-          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus +")" 
-        }else{
-          finalCond = "(" + conditionDeliverable + ")" 
+        } else if (conditionStatus) {
+          finalCond = "(" + conditionDeliverable + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionDeliverable + ")"
         }
-      }else if(conditionEditor){
-        if(conditionStatus){
-          finalCond = "(" + conditionEditor +")" + " && " + "(" + conditionStatus + ")"
-        }else{
-          finalCond = "(" + conditionEditor +")" 
+      } else if (conditionEditor) {
+        if (conditionStatus) {
+          finalCond = "(" + conditionEditor + ")" + " && " + "(" + conditionStatus + ")"
+        } else {
+          finalCond = "(" + conditionEditor + ")"
         }
-      }else{
-        finalCond = "(" + conditionStatus +")" 
+      } else {
+        finalCond = "(" + conditionStatus + ")"
       }
       setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
       setDeliverablesForShow(newData)
-    }else{
+    } else {
       setDeliverablesForShow(allDeliverables)
     }
   }
@@ -232,18 +236,18 @@ function Photos() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-  const applySorting = (wedding = false)=>{
+  const applySorting = (wedding = false) => {
     try {
-      if(wedding){
+      if (wedding) {
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
-          const dateA = new Date(a.client.eventDate);
-          const dateB = new Date(b.client.eventDate);
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
         }));
         setAscendingWeding(!ascendingWeding)
       }
     } catch (error) {
-      console.log("applySorting ERROR",error)
+      console.log("applySorting ERROR", error)
     }
   }
 
@@ -253,7 +257,7 @@ function Photos() {
       id: 1,
       filters: editors && [...editors?.map((editor, i) => {
         return { title: editor.firstName, id: i + 2 }
-      }),{ title: 'Unassigned Editor', id: editors.length+3 }]
+      }), { title: 'Unassigned Editor', id: editors.length + 3 }]
     },
     {
       title: 'Current Status',
@@ -305,7 +309,7 @@ function Photos() {
       if (filterType === 'Unassigned Editor') {
         setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
       } else {
-        if(filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting'){
+        if (filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting') {
           setDeliverablesForShow(allDeliverables)
         }
       }
@@ -340,20 +344,20 @@ function Photos() {
   };
 
   const getrelevantDeadline = (title) => {
-    if(title == "Photos"){
+    if (title == "Photos") {
       return deadlineDays.photo
     }
 
     return 45
   }
 
-    
+
   return (
     <>
       <ClientHeader selectFilter={changeFilter} currentFilter={filterBy} priority={priority} applyFilter={applyFilterNew} options={filterOptions} filter title="Photos" />
       {deliverablesForShow ? (
         <>
-         <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
           }} ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
@@ -407,12 +411,12 @@ function Photos() {
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
                   </tr>
-                  :currentUser?.rollSelect === 'Manager' ?
+                  : currentUser?.rollSelect === 'Manager' ?
                     <tr className="logsHeader Text16N1">
                       <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody" style={{cursor:"pointer"}} onClick={(() => applySorting(true))}>Wedding <br/> Date {ascendingWeding ? <IoIosArrowRoundDown style={{color : '#666DFF'}}  className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{color : '#666DFF'}} className="fs-4 cursor-pointer" /> }</th>
+                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -422,8 +426,8 @@ function Photos() {
                       <th className="tableBody">Client Ratings</th>
                       <th className="tableBody">Save</th>
                     </tr>
-                  :
-                  null
+                    :
+                    null
                 }
               </thead>
               <tbody
@@ -488,8 +492,8 @@ function Photos() {
                             style={{
                               paddingTop: '15px',
                               paddingBottom: '15px',
-                            }}  > 
-                            {dayjs(deliverable?.client.eventDate).format('DD-MMM-YYYY')}
+                            }}  >
+                            {dayjs(deliverable?.date).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -498,7 +502,7 @@ function Photos() {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}
+                            {dayjs(new Date(deliverable?.date).setDate(new Date(deliverable?.date).getDate() + getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -517,7 +521,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -538,7 +542,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -558,7 +562,7 @@ function Photos() {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -576,7 +580,7 @@ function Photos() {
                               { value: 'In Progress', label: 'In Progress' },
                               { value: 'Completed', label: 'Completed' }]} required />
                           </td>
-                          
+
                           <td style={{
                             paddingTop: '15px',
                             paddingBottom: '15px',
@@ -593,7 +597,7 @@ function Photos() {
                               { value: 4, label: 4 },
                               { value: 5, label: 5 },
                               { value: 6, label: 6 },
-                              ]} required />
+                            ]} required />
                           </td>
                           <td style={{
                             paddingTop: '15px',

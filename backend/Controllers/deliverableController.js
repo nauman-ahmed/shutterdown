@@ -3,73 +3,85 @@ const ClientModel = require('../models/ClientModel');
 const eventModel = require('../models/EventModel');
 const DeliverableOptionsSchema = require('../models/DeliverableOptionsSchema');
 const moment = require('moment');
+const monthNumbers = {
+    January: 1,
+    February: 2,
+    March: 3,
+    April: 4,
+    May: 5,
+    June: 6,
+    July: 7,
+    August: 8,
+    September: 9,
+    October: 10,
+    November: 11,
+    December: 12
+}
 
 const getCinematography = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
 
-        // Get currentMonth, currentYear, and currentDate from the request query
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-        // Check if a specific date is provided and valid
-        if (currentDate !== 'null') {
-            // Single date filter
-            startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-            endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+
+        // Date filter logic
+        if (currentDate !== 'null' && currentDate) {
+            // Single day filter
+            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
+            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
         } else {
-            // If no specific date, use the month and year filter
-            startDate = new Date(`${currentYear}-${currentMonth}-01`);
-            endDate = new Date(startDate);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0); // Set to last day of the month
+            // Use month and year for range filtering
+            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
+            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
         }
 
-        // Fetch deliverables
+        // Fetch Cinematography deliverables
         const cinematographyDeliverables = await DeliverableModel
             .find({ deliverableName: { $in: ['Long Film', 'Reel', 'Promo'] } })
             .skip(skip)
             .limit(10)
-            .populate('client editor');
+            .populate([
+                {
+                    path: 'client',
+                    populate: {
+                        path: 'events',
+                        model: 'Event'
+                    }
+                },
+                { path: 'editor', model: 'user' }
+            ]);
 
-        const cinematographyDeliverablesWithEvents = [];
+        // Extract dates and assign them to deliverables
+        const deliverablesWithDates = cinematographyDeliverables.map(deliverable => {
+            const weddingEvent = deliverable?.client?.events?.find(event => event.isWedding);
+            const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
+            return {
+                ...deliverable.toObject(),
+                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+            };
+        });
 
-        // Iterate over deliverables and filter by event date
-        for (let index = 0; index < cinematographyDeliverables.length; index++) {
-            const clientId = cinematographyDeliverables[index].client.toObject()._id;
-
-            // Find events for the client within the specified date range
-            const events = await eventModel.find({
-                client: clientId,
-                eventDate: { $gte: startDate, $lte: endDate } // Date range filter
-            });
-
-            if (events.length > 0) {
-                // Only include if events exist in the date range
-                const weddingEvent = events.filter(event => event.isWedding);
-                let dummyObj = { ...cinematographyDeliverables[index].toObject() };
-
-                // Assign event date based on whether a wedding event exists
-                if (weddingEvent.length > 0) {
-                    dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = true;
-                } else {
-                    dummyObj["client"]["eventDate"] = events[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = false;
-                }
-
-                // Push to the result only if an event is found
-                cinematographyDeliverablesWithEvents.push(dummyObj);
+        // Filter deliverables based on date range
+        const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
+            if (deliverable.date) {
+                const deliverableDate = moment(deliverable.date).startOf('day');
+                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
-        }
+            return false;
+        });
 
-        // Send only deliverables where event dates exist
-        res.status(200).json(cinematographyDeliverablesWithEvents);
+        const hasMore = cinematographyDeliverables.length === 10 ? true : false;
+
+        // Send response with filtered deliverables and hasMore flag
+        res.status(200).json({ hasMore, data: filteredDeliverables });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Something went wrong.' });
     }
 };
+
 
 const getAlbums = async (req, res) => {
     try {
@@ -77,10 +89,12 @@ const getAlbums = async (req, res) => {
         const allDocument = await DeliverableOptionsSchema.find({}, { "albums": 1 });
         let albumValues = [];
 
+        // Extract album values
         for (let index = 0; index < allDocument[0].albums.values.length; index++) {
             albumValues.push(allDocument[0].albums.values[index]["value"]);
         }
 
+        // Pagination logic
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
 
@@ -89,16 +103,13 @@ const getAlbums = async (req, res) => {
         const { currentMonth, currentYear, currentDate } = req.query;
 
         // Date filter logic
-        if (currentDate !== 'null') {
-            // Parse currentDate as a specific day filter
-            startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-            endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+        if (currentDate !== 'null' && currentDate) {
+            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
+            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
         } else {
-            // If no specific date, use the month and year filter
-            startDate = new Date(`${currentYear}-${currentMonth}-01`);
-            endDate = new Date(startDate);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0); // Set to last day of the month
+            // Use the numeric month for parsing and monthNumbers object from the previous controller
+            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
+            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
         }
 
         // Fetch album deliverables based on album values
@@ -106,67 +117,66 @@ const getAlbums = async (req, res) => {
             .find({ deliverableName: { $in: albumValues } })
             .skip(skip)
             .limit(10)
-            .populate('client editor');
+            .populate([
+                {
+                    path: 'client',
+                    populate: {
+                        path: 'events',
+                        model: 'Event'
+                    }
+                },
+                { path: 'editor', model: 'user' }
+            ]);
 
-        const albumDeliverablesWithEvents = [];
+        // Extract dates and assign them to deliverables
+        const deliverablesWithDates = albumsDeliverables.map(deliverable => {
+            const weddingEvent = deliverable?.client?.events?.find(event => event.isWedding);
+            const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
+            return {
+                ...deliverable.toObject(),
+                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+            };
+        });
 
-        // Iterate over deliverables and filter by event date
-        for (let index = 0; index < albumsDeliverables.length; index++) {
-            const clientId = albumsDeliverables[index].client.toObject()._id;
-
-            // Find events for the client within the specified date range
-            const events = await eventModel.find({
-                client: clientId,
-                eventDate: { $gte: startDate, $lte: endDate } // Date range filter
-            });
-
-            if (events.length > 0) {
-                // Only include if events exist in the date range
-                const weddingEvent = events.filter(event => event.isWedding);
-                let dummyObj = { ...albumsDeliverables[index].toObject() };
-
-                // Assign event date based on whether a wedding event exists
-                if (weddingEvent.length > 0) {
-                    dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = true;
-                } else {
-                    dummyObj["client"]["eventDate"] = events[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = false;
-                }
-
-                // Push to the result only if an event is found
-                albumDeliverablesWithEvents.push(dummyObj);
+        // Filter deliverables by date
+        const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
+            if (deliverable.date) {
+                const deliverableDate = moment(deliverable.date).startOf('day');
+                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
-        }
+            return false;
+        });
 
-        // Send only deliverables where event dates exist
-        res.status(200).json(albumDeliverablesWithEvents);
+        // Determine if there are more albums to fetch
+        const hasMore = albumsDeliverables.length === 10;
+
+        // Respond with hasMore and filtered deliverables
+        res.status(200).json({ hasMore, data: filteredDeliverables });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Something went wrong.' });
     }
 };
 
+
 const getPhotos = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
 
-        // Get currentMonth, currentYear, and currentDate from the request query
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-
-        // Date filter logic
-        if (currentDate !== 'null') {
-            // Parse currentDate as a specific day filter
-            startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-            endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+       
+        
+        if (currentDate !== 'null' && currentDate) {
+            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
+            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
         } else {
-            // If no specific date, use the month and year filter
-            startDate = new Date(`${currentYear}-${currentMonth}-01`);
-            endDate = new Date(startDate);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0); // Set to last day of the month
+
+            // Use the numeric month for parsing
+            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
+            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
+
         }
 
         // Fetch photos deliverables
@@ -174,67 +184,64 @@ const getPhotos = async (req, res) => {
             .find({ deliverableName: 'Photos' })
             .skip(skip)
             .limit(10)
-            .populate('client editor');
+            .populate([
+                {
+                    path: 'client',
+                    populate: {
+                        path: 'events',
+                        model: 'Event'
+                    }
+                },
+                { path: 'editor', model: 'user' }
+            ]);
 
-        const photosDeliverablesWithEvents = [];
-
-        // Iterate over deliverables and filter by event date
-        for (let index = 0; index < photosDeliverables.length; index++) {
-            const clientId = photosDeliverables[index].client.toObject()._id;
-
-            // Find events for the client within the specified date range
-            const events = await eventModel.find({
-                client: clientId,
-                eventDate: { $gte: startDate, $lte: endDate } // Date range filter
-            });
-
-            if (events.length > 0) {
-                // Only include if events exist in the date range
-                const weddingEvent = events.filter(event => event.isWedding);
-                let dummyObj = { ...photosDeliverables[index].toObject() };
-
-                // Assign event date based on whether a wedding event exists
-                if (weddingEvent.length > 0) {
-                    dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = true;
-                } else {
-                    dummyObj["client"]["eventDate"] = events[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = false;
-                }
-
-                // Push to the result only if an event is found
-                photosDeliverablesWithEvents.push(dummyObj);
+        // Extract dates and assign them to deliverables
+        const deliverablesWithDates = photosDeliverables.map(deliverable => {
+            const weddingEvent = deliverable?.client?.events?.find(event => event.isWedding);
+            const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
+            return {
+                ...deliverable.toObject(),
+                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+            };
+        });
+        const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
+            if (deliverable.date) {
+                const deliverableDate = moment(deliverable.date).startOf('day');
+                console.log(deliverableDate);
+                
+                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
-        }
+            return false;
+        });
+       
+        // Determine if there are more albums to fetch
+        const hasMore = photosDeliverables.length === 10;
+        
 
-        // Send only deliverables where event dates exist
-        res.status(200).json(photosDeliverablesWithEvents);
+        res.status(200).json({hasMore, data : filteredDeliverables});
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Something went wrong.' });
     }
 };
 
+
 const getPreWeds = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * 10;
 
-        // Get currentMonth, currentYear, and currentDate from the request query
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
 
         // Date filter logic
-        if (currentDate !== 'null') {
-            // Parse currentDate as a specific day filter
-            startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-            endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+        if (currentDate !== 'null' && currentDate) {
+            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
+            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
         } else {
             // If no specific date, use the month and year filter
-            startDate = new Date(`${currentYear}-${currentMonth}-01`);
-            endDate = new Date(startDate);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0); // Set to last day of the month
+            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
+            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
         }
 
         // Fetch Pre-Wedding deliverables
@@ -242,46 +249,46 @@ const getPreWeds = async (req, res) => {
             .find({ deliverableName: { $in: ['Pre-Wedding Photos', 'Pre-Wedding Videos'] } })
             .skip(skip)
             .limit(10)
-            .populate('client editor');
+            .populate([
+                {
+                    path: 'client',
+                    populate: {
+                        path: 'events',
+                        model: 'Event'
+                    }
+                },
+                { path: 'editor', model: 'user' }
+            ]);
 
-        const preWedDeliverablesWithEvents = [];
+        // Extract dates and assign them to deliverables
+        const deliverablesWithDates = preWedDeliverables.map(deliverable => {
+            const weddingEvent = deliverable?.client?.events?.find(event => event.isWedding);
+            const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
+            return {
+                ...deliverable.toObject(),
+                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+            };
+        });
 
-        // Iterate over deliverables and filter by event date
-        for (let index = 0; index < preWedDeliverables.length; index++) {
-            const clientId = preWedDeliverables[index].client.toObject()._id;
-
-            // Find events for the client within the specified date range
-            const events = await eventModel.find({
-                client: clientId,
-                eventDate: { $gte: startDate, $lte: endDate } // Date range filter
-            });
-
-            if (events.length > 0) {
-                // Only include if events exist in the date range
-                const weddingEvent = events.filter(event => event.isWedding);
-                let dummyObj = { ...preWedDeliverables[index].toObject() };
-
-                // Assign event date based on whether a wedding event exists
-                if (weddingEvent.length > 0) {
-                    dummyObj["client"]["eventDate"] = weddingEvent[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = true;
-                } else {
-                    dummyObj["client"]["eventDate"] = events[0]?.eventDate;
-                    dummyObj["client"]["isWedding"] = false;
-                }
-
-                // Push to the result only if an event is found
-                preWedDeliverablesWithEvents.push(dummyObj);
+        // Filter deliverables based on date
+        const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
+            if (deliverable.date) {
+                const deliverableDate = moment(deliverable.date).startOf('day');
+                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
-        }
+            return false;
+        });
 
-        // Send only deliverables where event dates exist
-        res.status(200).json(preWedDeliverablesWithEvents);
+        const hasMore = preWedDeliverables.length === 10 ? true : false;
+
+        // Send response with filtered deliverables and hasMore flag
+        res.status(200).json({ hasMore, data: filteredDeliverables });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Something went wrong.' });
     }
 };
+
 
 const updateDeliverable = async (req, res) => {
     try {

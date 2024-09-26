@@ -100,8 +100,8 @@ function PreWedDeliverables(props) {
     try {
       if (wedding) {
         setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
-          const dateA = new Date(a.client.eventDate);
-          const dateB = new Date(b.client.eventDate);
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
         }));
         setAscendingWeding(!ascendingWeding)
@@ -135,10 +135,10 @@ function PreWedDeliverables(props) {
       setDeadlineDays(deadline[0])
       setEditors(res.editors.filter(user => user.subRole.includes('Video Editor') || user.subRole.includes('Photo Editor')));
       if (currentUser?.rollSelect === 'Manager') {
-        setAllDeliverables(data)
-        setDeliverablesForShow(data)
+        setAllDeliverables(data.data)
+        setDeliverablesForShow(data.data)
       } else if (currentUser?.rollSelect === 'Editor') {
-        const deliverablesToShow = data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
+        const deliverablesToShow = data.data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
@@ -157,18 +157,18 @@ function PreWedDeliverables(props) {
       setLoading(true);
       try {
         const data = await getPreWeds(page, monthForData, yearForData, dateForFilter);
-        if (data.length > 0) {
+        if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data])
+            setAllDeliverables([...allDeliverables, ...data.data])
             if (filterCondition) {
-              dataToAdd = data.filter(deliverable => eval(filterCondition))
+              dataToAdd = data.data.filter(deliverable => eval(filterCondition))
             } else {
-              dataToAdd = data
+              dataToAdd = data.data
             }
             setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
           } else if (currentUser.rollSelect === "Editor") {
-            const deliverablesToShow = data.filter(
+            const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
@@ -183,10 +183,12 @@ function PreWedDeliverables(props) {
             ]);
           }
 
+        } 
+        
+        if (data.hasMore) {
           setPage(page + 1);
-        } else {
-          setHasMore(false);
         }
+        setHasMore(data.hasMore);
       } catch (error) {
         console.log(error);
       }
@@ -498,7 +500,7 @@ function PreWedDeliverables(props) {
                               paddingTop: '15px',
                               paddingBottom: '15px',
                             }}  >
-                            {dayjs(deliverable?.client.eventDate).format('DD-MMM-YYYY')}
+                            {dayjs(deliverable?.date).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -507,7 +509,7 @@ function PreWedDeliverables(props) {
                               paddingBottom: '15px',
                             }}
                           >
-                            {dayjs(new Date(deliverable?.client.eventDate).setDate(new Date(deliverable?.client.eventDate).getDate() + getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}
+                            {dayjs(new Date(deliverable?.date).setDate(new Date(deliverable?.date).getDate() + getrelevantDeadline(deliverable.deliverableName))).format('DD-MMM-YYYY')}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -526,7 +528,7 @@ function PreWedDeliverables(props) {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -547,7 +549,7 @@ function PreWedDeliverables(props) {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
@@ -566,7 +568,7 @@ function PreWedDeliverables(props) {
                                 setAllDeliverables(updatedDeliverables);
                               }}
                               value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
-                              min={deliverable?.client.eventDate ? dayjs(deliverable?.client.eventDate).format('YYYY-MM-DD') : ''}
+                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
                           <td
