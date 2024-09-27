@@ -238,7 +238,7 @@ function Cinematography(props) {
     if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchCinemas()
     }
-  })
+  }, [deliverablesForShow, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =

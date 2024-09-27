@@ -201,7 +201,7 @@ function PreWedDeliverables(props) {
     if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchPreWeds()
     }
-  })
+  }, [deliverablesForShow, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =

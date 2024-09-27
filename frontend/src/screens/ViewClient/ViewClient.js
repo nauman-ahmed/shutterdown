@@ -110,7 +110,7 @@ function ViewClient() {
     if (clients?.length < 10 && hasMore && !loading) {
       fetchClients();
     }
-  });
+  }, [clients, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =
