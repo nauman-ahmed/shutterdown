@@ -45,7 +45,7 @@ function Cinematography(props) {
   };
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null)
   const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
@@ -238,7 +238,7 @@ function Cinematography(props) {
     if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchCinemas()
     }
-  }, [deliverablesForShow])
+  })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =

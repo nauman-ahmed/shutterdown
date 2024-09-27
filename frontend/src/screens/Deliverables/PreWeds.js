@@ -31,7 +31,7 @@ function PreWedDeliverables(props) {
 
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [dateForFilter, setDateForFilter] = useState(null)
   const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
   const [yearForData, setYearForData] = useState(new Date().getFullYear())
@@ -201,7 +201,7 @@ function PreWedDeliverables(props) {
     if (deliverablesForShow?.length < 10 && hasMore && !loading) {
       fetchPreWeds()
     }
-  }, [deliverablesForShow])
+  })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =

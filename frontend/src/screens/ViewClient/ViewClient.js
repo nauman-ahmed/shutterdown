@@ -31,7 +31,7 @@ function ViewClient() {
   const [show, setShow] = useState(false);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate)
   const [monthForData, setMonthForData] = useAtom(clientFilterMonth)
   const [yearForData, setYearForData] = useAtom(clientFilterYear)
@@ -71,8 +71,6 @@ function ViewClient() {
       setLoading(true);
       try {
         const data = await getClients(page, monthForData, yearForData, dateForFilter);
-        console.log(data);
-        
         if (data.data.length > 0) {
 
           if (dateForFilter) {
@@ -108,10 +106,11 @@ function ViewClient() {
   
   
   useEffect(() => {
+    
     if (clients?.length < 10 && hasMore && !loading) {
       fetchClients();
     }
-  }, [clients]);
+  });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =

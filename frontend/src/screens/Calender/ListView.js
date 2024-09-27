@@ -537,7 +537,7 @@ function ListView(props) {
     if (eventsForShow?.length < 10 && hasMore && !loading) {
       fetchEvents();
     }
-  }, [eventsForShow]);
+  });
 
   const handleScroll = () => {
     const bottomOfWindow =
