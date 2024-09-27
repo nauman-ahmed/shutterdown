@@ -91,6 +91,8 @@ export const getEvents = async (clientId, page, monthForData, yearForData) => {
                 }
             }
         );
+        console.log('month events', res.data);
+        
         return res;
     } catch (error) {
         console.log(error);
@@ -130,6 +132,8 @@ export const getAllEvents = async () => {
                 }
             },
         );
+        console.log('All Events', res.data);
+        
         return res;
     } catch (error) {
         console.log(error);

@@ -105,37 +105,43 @@ function CalenderBar(props) {
           <>
             <div className="Text20Semi">{getCurrentMonthAndYear()}</div>
             <div className="calendar-container">
-              <Calendar activeStartDate={activeStartDate} tileClassName={({ date }) => {
-                let count = 0
-                for (let index = 0; index < EventsList?.length; index++) {
-                  if (EventsList[index]) {
+            <Calendar 
+  activeStartDate={activeStartDate} 
+  tileClassName={({ date }) => {
+    let count = 0;
+    
+    for (let index = 0; index < EventsList?.length; index++) {
+      if (EventsList[index]) {
+        
+        const eventDate = new Date(EventsList[index].eventDate);
+        const calendarDate = new Date(date);
+        
+        // Adjust eventDate to local time for comparison
+        const eventDateLocal = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        const calendarDateLocal = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate());
+        
+        // Compare only the year, month, and date part
+        if (eventDateLocal.getTime() === calendarDateLocal.getTime()) {
+          count += 1;
+        }
+      }
+    }
 
-                    const initialDate = new Date(EventsList[index].eventDate)
-                    const targetDate = new Date(date);
+    if (count === 1) {
+      return "highlight5";
+    } else if (count === 2) {
+      return "highlight3";
+    } else if (count >= 3) {
+      return "highlight1";
+    }
+  }}
+  onChange={() => null}
+  onActiveStartDateChange={({ activeStartDate }) => {
+    setActiveStartDate(activeStartDate);
+    setCurrentMonth(moment(activeStartDate).format('MMMM'));
+  }}
+/>
 
-                    const initialDatePart = initialDate instanceof Date && !isNaN(initialDate) ? initialDate.toISOString().split("T")[0] : '';
-                    const targetDatePart = targetDate instanceof Date && !isNaN(targetDate) ? targetDate.toISOString().split("T")[0] : '';
-
-                    if (initialDatePart === targetDatePart) {
-                      count += 1
-                    }
-                  }
-                }
-                if (count === 1) {
-                  return "highlight5"
-                } else if (count === 2) {
-                  return "highlight3"
-                }
-                else if (count >= 3) {
-                  return "highlight1"
-                }
-              }}
-                onChange={() => null}
-                onActiveStartDateChange={({ activeStartDate }) => {
-                  setActiveStartDate(activeStartDate);
-                  setCurrentMonth(moment(activeStartDate).format('MMMM'));
-                }}
-              />
             </div>
             {props.Attendence && (
               <div className="summaryBox">
