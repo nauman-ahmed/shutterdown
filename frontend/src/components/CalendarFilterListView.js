@@ -7,8 +7,11 @@ import Calendar from "react-calendar";
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 
-function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFilter, setShow }) {
-
+function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFilter, setShow, dateForFilter, monthForData, yearForData }) {
+  console.log(dateForFilter);
+  console.log(monthForData);
+  console.log(yearForData);
+  
   const today = new Date();
 
   // Initialize selectedDate with today's date
@@ -19,20 +22,19 @@ function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFil
   const changeViewHandler = (props) => {
     setMonthForData(months[new Date(props.activeStartDate).getMonth()])
     setYearForData(new Date(props.activeStartDate).getFullYear())
-
   }
 
   const onDateClickHandler = (date) => {
     setShow(false)
    setDateForFilter(new Date(date))
-
   }
 
   return (
     <>
       <Calendar
-        value={selectedDate}
-        view={currentView}
+      
+        value={dateForFilter ? dateForFilter : new Date(yearForData, months.indexOf(monthForData), 1) }
+        view={'month'}
         onViewChange={changeViewHandler}
         onActiveStartDateChange={changeViewHandler}
         onChange={onDateClickHandler}

@@ -369,7 +369,7 @@ function Photos() {
 
                   {dateForFilter
                     ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    : "Date"}
+                    : <>{monthForData}  {yearForData}</>}
                   <div className="d-flex align-items-center" style={{ position: 'relative' }}>
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
@@ -384,7 +384,7 @@ function Photos() {
 
                       <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
                         <div >
-                          <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                          <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
                         </div>
                       </div>
                     )}

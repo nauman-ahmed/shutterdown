@@ -185,7 +185,7 @@ function ViewClient() {
                 >
                   {dateForFilter
                     ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    : "Date"}
+                    : <>{monthForData}  {yearForData}</>}
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
@@ -314,7 +314,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
             </div>
           </Overlay>
         </>
