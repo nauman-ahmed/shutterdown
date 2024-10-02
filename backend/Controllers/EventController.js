@@ -30,7 +30,7 @@ const AssignTeam = async (req, res) => {
         const assistantsIds = req.body.data.assistants?.map(user => user._id);
         const managerIds = req.body.data.manager?.map(user => user._id);
         const directorIds = req.body.data.shootDirectors?.map(user => user._id);
-        
+
         event.choosenCinematographers = cinematographersIds;
         event.choosenPhotographers = photographersIds;
         event.droneFlyers = droneFlyersIds;
@@ -40,10 +40,10 @@ const AssignTeam = async (req, res) => {
         event.manager = managerIds;
         event.shootDirectors = directorIds;
 
-        if(event.shootDirectors.length && event.choosenPhotographers.length && event.choosenCinematographers.length
+        if (event.shootDirectors.length && event.choosenPhotographers.length && event.choosenCinematographers.length
             && event.droneFlyers.length && event.manager.length && event.assistants.length && event.sameDayPhotoMakers.length
             && event.sameDayVideoMakers.length
-        ){
+        ) {
             event.allDataCompleted = true
         }
 
@@ -57,9 +57,9 @@ const AssignTeam = async (req, res) => {
 };
 const updateEvent = async (req, res) => {
     try {
-        const {_id, ...eventData } = req.body.data;
+        const { _id, ...eventData } = req.body.data;
         const event = await EventModel.findByIdAndUpdate(req.body.data._id, eventData);
-        
+
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {
         console.log(error, 'error');
@@ -75,7 +75,7 @@ const getEventsByMonth = async (req, res) => {
         // Ensure currentMonth is passed as a full month name (e.g., "January")
         let currentMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').toDate();
         let endOfMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
-        
+
         const query = {
             eventDate: {
                 $gte: currentMonth,
@@ -120,22 +120,22 @@ const getEvents = async (req, res) => {
         // Apply clientId filter if present
         if (req.body.clientId) {
             obj.client = req.body.clientId;
-        }
+        } else {
+            // Apply filtering for the specific month and year
+            if (req.body.currentMonth && req.body.currentYear) {
+                const year = req.body.currentYear;
+                const month = req.body.currentMonth;
 
-        // Apply filtering for the specific month and year
-        if (req.body.currentMonth && req.body.currentYear) {
-            const year = req.body.currentYear;
-            const month = req.body.currentMonth;
-            
-            // Generate the start and end date for the given month and year
-            let startOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
-            let endOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
+                // Generate the start and end date for the given month and year
+                let startOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
+                let endOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
 
-            // Add date filtering for the specified month and year
-            obj.eventDate = {
-                $gte: startOfMonth,
-                $lte: endOfMonth
-            };
+                // Add date filtering for the specified month and year
+                obj.eventDate = {
+                    $gte: startOfMonth,
+                    $lte: endOfMonth
+                };
+            }
         }
 
         // Fetch events based on the filters
@@ -182,12 +182,12 @@ const getEventsByDate = async (req, res) => {
             obj.client = req.body.clientId;
         }
         console.log(req.body.eventDate);
-        
+
         // Get specific date from frontend
         if (req.body.eventDate) {
             const date = moment(req.body.eventDate, "YYYY-MM-DD").startOf('day').toDate();
             const endOfDay = moment(req.body.eventDate, "YYYY-MM-DD").endOf('day').toDate();
-            
+
             // Filter by exact date
             obj.eventDate = {
                 $gte: date,
@@ -230,18 +230,18 @@ const getEventsByDate = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
     try {
-        
+
         const events = await EventModel.find().populate('client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers');
-        
+
         // Step 1: Sort by eventDate
         events.sort((a, b) => {
             const dateA = new Date(a.eventDate);
             const dateB = new Date(b.eventDate);
-            return dateA - dateB 
+            return dateA - dateB
         })
-        
-      
-        
+
+
+
         res.status(200).json(events);
     } catch (error) {
         console.log(error, 'error');
@@ -261,4 +261,4 @@ const DeleteEvent = async (req, res) => {
 };
 
 
-module.exports = { AddEvent, getEventsByDate, DeleteEvent,updateEvent, getEvents, AssignTeam, getEventsByMonth, getAllEvents }
+module.exports = { AddEvent, getEventsByDate, DeleteEvent, updateEvent, getEvents, AssignTeam, getEventsByMonth, getAllEvents }

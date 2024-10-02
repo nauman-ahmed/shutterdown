@@ -380,66 +380,92 @@ const getClients = async (req, res) => {
 
     // Get currentMonth, currentYear, and currentDate from the request query
     let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
-  
+    console.log(req.query);
     
-
-    // Date filter logic
-    if (currentDate !== 'null') {
-      // Parse currentDate as a specific day filter
-      startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-      endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
-    } else {
-      // If no specific date, use the month and year filter
-      startDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
-      endDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
-    }
-    console.log(startDate);
-    console.log(endDate);
+    const { currentMonth, currentYear, currentDate, filterClient } = req.query;
     
-    const clients = await ClientModel.find().skip(skip).limit(10).populate({
-      path: 'events',
-      model: 'Event',
-      populate: [
-        { path: 'choosenPhotographers', model: 'user' },
-        { path: 'choosenCinematographers', model: 'user' },
-        { path: 'droneFlyers', model: 'user' },
-        { path: 'manager', model: 'user' },
-        { path: 'assistants', model: 'user' },
-        { path: 'sameDayPhotoMakers', model: 'user' },
-        { path: 'sameDayVideoMakers', model: 'user' },
-        { path: 'shootDirectors', model: 'user' },
-      ],
-    }).populate({
-      path: 'deliverables',
-      model: 'Deliverable',
-      populate: {
-        path: 'editor',
-        model: 'user'
-      }
-    }).populate('userID');
-    console.log('clients',clients.length);
-    
-
-    const filteredClients = clients.filter(client => {
-      if (client.events && Array.isArray(client.events)) {
-        return client.events.some(event => {
-          console.log(event.eventDate);
-          
-         return moment(event.eventDate).startOf('day').isSameOrAfter(startDate) &&
-          moment(event.eventDate).startOf('day').isSameOrBefore(endDate)
+    if (filterClient !== 'null' && filterClient !== 'undefined' && filterClient !== 'Reset' && filterClient?.length > 0) {
+      console.log('client filter');
+      
+      const client = await ClientModel.findById(filterClient).populate({
+        path: 'events',
+        model: 'Event',
+        populate: [
+          { path: 'choosenPhotographers', model: 'user' },
+          { path: 'choosenCinematographers', model: 'user' },
+          { path: 'droneFlyers', model: 'user' },
+          { path: 'manager', model: 'user' },
+          { path: 'assistants', model: 'user' },
+          { path: 'sameDayPhotoMakers', model: 'user' },
+          { path: 'sameDayVideoMakers', model: 'user' },
+          { path: 'shootDirectors', model: 'user' },
+        ],
+      }).populate({
+        path: 'deliverables',
+        model: 'Deliverable',
+        populate: {
+          path: 'editor',
+          model: 'user'
         }
-        );
+      }).populate('userID');
+      console.log(client);
+      
+      res.status(200).json({ hasMore: false, data: [client] });
+    } else {
+      console.log('not client filter');
+      
+      // Date filter logic
+      if (currentDate !== 'null') {
+        // Parse currentDate as a specific day filter
+        startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
+        endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+      } else {
+        // If no specific date, use the month and year filter
+        startDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
+        endDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
       }
-      return false; // In case `client.events` is undefined or not an array
-    });
-console.log('fileterd', filteredClients.length);
 
 
-    // Determine if there are more objects to fetch
-    const hasMore = clients.length === 10;
+      const clients = await ClientModel.find().skip(skip).limit(10).populate({
+        path: 'events',
+        model: 'Event',
+        populate: [
+          { path: 'choosenPhotographers', model: 'user' },
+          { path: 'choosenCinematographers', model: 'user' },
+          { path: 'droneFlyers', model: 'user' },
+          { path: 'manager', model: 'user' },
+          { path: 'assistants', model: 'user' },
+          { path: 'sameDayPhotoMakers', model: 'user' },
+          { path: 'sameDayVideoMakers', model: 'user' },
+          { path: 'shootDirectors', model: 'user' },
+        ],
+      }).populate({
+        path: 'deliverables',
+        model: 'Deliverable',
+        populate: {
+          path: 'editor',
+          model: 'user'
+        }
+      }).populate('userID');
 
-    res.status(200).json({ hasMore, data: filteredClients });
+      const filteredClients = clients.filter(client => {
+        if (client.events && Array.isArray(client.events)) {
+          return client.events.some(event => {
+    
+
+            return moment(event.eventDate).startOf('day').isSameOrAfter(startDate) &&
+              moment(event.eventDate).startOf('day').isSameOrBefore(endDate)
+          }
+          );
+        }
+        return false; // In case `client.events` is undefined or not an array
+      });
+
+      // Determine if there are more objects to fetch
+      const hasMore = clients.length === 10;
+
+      res.status(200).json({ hasMore, data: filteredClients });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json(error);

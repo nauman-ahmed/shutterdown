@@ -22,7 +22,7 @@ import {
 import { useEffect } from 'react';
 import { addTask } from '../API/TaskApi';
 import Cookies from 'js-cookie'
-import { getClients } from '../API/Client';
+import { getAllClients, getClients } from '../API/Client';
 import Heart from '../assets/Profile/Heart.svg';
 import Select from 'react-select';
 import { getEditors } from '../API/userApi';
@@ -49,7 +49,7 @@ function ClientHeader(props) {
   const toggle = () => setModal(!modal);
 
   const fetchClientsData = async () => {
-    const clients = await getClients();
+    const clients = await getAllClients();
     const res = await getEditors();
     setEditors(res.editors);
     setAllClients(clients);

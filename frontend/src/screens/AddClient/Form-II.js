@@ -30,7 +30,8 @@ import {
 } from "../../API/FormDeliverableOptionsAPI";
 
 function FormII() {
-  const [allEvents, setAllEvents] = useState([]);
+  const storedEvents = useSelector((state) => state.allEvents);
+  const [allEvents, setAllEvents] = useState(storedEvents);
   const [weddingAssigned, setWeddingAssigned] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -63,7 +64,6 @@ function FormII() {
 
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const storedEvents = useSelector((state) => state.allEvents);
   const dispatch = useDispatch();
   const clientData = useSelector((state) => state.clientData);
   const [eventValues, setEventValues] = useState(null);
@@ -643,8 +643,8 @@ function FormII() {
                 }}
                 tileClassName={({ date }) => {
                   let count = 0;
-                  for (let index = 0; index < storedEvents?.length; index++) {
-                    const initialDate = new Date(storedEvents[index].eventDate);
+                  for (let index = 0; index < allEvents?.length; index++) {
+                    const initialDate = new Date(allEvents[index].eventDate);
                     const targetDate = new Date(date);
                     const initialDatePart = initialDate
                       .toISOString()

@@ -35,47 +35,44 @@ function ViewClient() {
   const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate)
   const [monthForData, setMonthForData] = useAtom(clientFilterMonth)
   const [yearForData, setYearForData] = useAtom(clientFilterYear)
-  const [appliedFilterBride, setAppliedFilterBride] = useState(null)
+  const [filterClient, setFilterClient] = useState(null)
 
 
   const fetchData = async () => {
     try {
-      const data = await getClients(1, monthForData, yearForData, dateForFilter);
-      setClients(data.data);
-      
-      const completeclients = await getAllClients()
-      const seenClients = new Set()
-      const uniqueClients = completeclients.filter(client => {
-        if (client.brideName && !seenClients?.has(client.brideName)) {
-          seenClients.add(client.brideName)
-          return true
-        } else {
-          return false
-        }
-      });
+      console.log('running get once');
 
-      setAllClients(uniqueClients);
+      const data = await getClients(1, monthForData, yearForData, dateForFilter, filterClient);
+      setHasMore(true)
+      setPage(2)
+      setClients(data.data);
+
+      const completeclients = await getAllClients()
+
+
+      setAllClients(completeclients);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    setHasMore(true)
-    setPage(2)
+
     fetchData();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [monthForData, yearForData, dateForFilter, filterClient]);
 
   const fetchClients = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page, monthForData, yearForData, dateForFilter);
+        console.log('running fatch more');
+
+        const data = await getClients(page, monthForData, yearForData, dateForFilter, filterClient);
         if (data.data.length > 0) {
 
           if (dateForFilter) {
             console.log('apply8ing date filter');
-            
+
             const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
@@ -87,11 +84,11 @@ function ViewClient() {
             });
             setClients([...clients, ...clientsToAdd]);
           } else {
-            console.log(data.data);
-            
+
+
             setClients([...clients, ...data.data]);
           }
-          filterByNameHanler(appliedFilterBride)
+
         }
         if (data.hasMore) {
           setPage(page + 1);
@@ -103,11 +100,11 @@ function ViewClient() {
       setLoading(false);
     }
   };
-  
-  
+
+
   useEffect(() => {
-    
-    if (clients?.length < 10 && hasMore && !loading) {
+
+    if (clients?.length < 10 && hasMore && !loading && !filterClient) {
       fetchClients();
     }
   }, [clients, hasMore, loading]);
@@ -143,29 +140,7 @@ function ViewClient() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-  const filterByNameHanler = (brideName) => {
-   
-    
-    if (brideName == "Reset" ) {
-      setAppliedFilterBride(null)
-      setMonthForData(months[new Date().getMonth()])
-      setYearForData(new Date().getFullYear())
-      setDateForFilter(null)
-      fetchData()
-      return;
-    } else if(brideName === null || brideName === undefined){
-      
-      return
-    }
-    const seperator = "<";
-    brideName = brideName?.split(seperator)[0];
-    setAppliedFilterBride(brideName)
-    setClients(
-      allClients.filter((clientData) => {
-        return clientData.brideName == brideName;
-      })
-    );
-  };
+
 
   return (
     <>
@@ -193,7 +168,7 @@ function ViewClient() {
                         setDateForFilter(null)
                         setMonthForData(months[new Date().getMonth()])
                         setYearForData(new Date().getFullYear())
-                       
+
                       }}
                     />
                   </div>
@@ -202,7 +177,7 @@ function ViewClient() {
               <Select
                 className="w-50 mx-3"
                 isSearchable={true}
-                onChange={(e) => filterByNameHanler(e.value)}
+                onChange={(e) => e.value !== 'Reset' ? setFilterClient(e.value) : setFilterClient(null)}
                 styles={customStyles}
                 options={[
                   {
@@ -215,7 +190,7 @@ function ViewClient() {
                   },
                   ...Array.from(allClients)?.map((client) => {
                     return {
-                      value: client.brideName + "<" + client.groomName,
+                      value: client._id,
                       label: (
                         <div className="d-flex justify-content-around">
                           <span>{client.brideName}</span>
@@ -313,7 +288,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
             </div>
           </Overlay>
         </>

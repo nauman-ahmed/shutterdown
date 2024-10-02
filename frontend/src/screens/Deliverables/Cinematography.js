@@ -162,11 +162,9 @@ function Cinematography(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
-
       const data = await getCinematography(1, monthForData, yearForData, dateForFilter);
-
-
-
+      setHasMore(true)
+      setPage(2)
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -186,8 +184,7 @@ function Cinematography(props) {
     }
   }
   useEffect(() => {
-    setHasMore(true)
-    setPage(2)
+
     fetchData()
   }, [monthForData, yearForData, dateForFilter])
   const fetchCinemas = async () => {

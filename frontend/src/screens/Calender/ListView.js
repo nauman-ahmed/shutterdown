@@ -37,7 +37,7 @@ import {
   Row,
 } from "reactstrap";
 import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
-import { getClients } from "../../API/Client";
+import { getAllClients, getClients } from "../../API/Client";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 import { all } from "axios";
@@ -79,6 +79,7 @@ function ListView(props) {
   const [yearForData, setYearForData] = useState(new Date().getFullYear())
   const [dateForFilter, setDateForFilter] = useState(null)
   const [clientId, setClientId] = useState(null)
+  const [allClients, setAllClients] = useState([])
 
   const toggle = () => {
     setShow(!show);
@@ -126,10 +127,10 @@ function ListView(props) {
 
   const getEventsData = async () => {
     try {
-      console.log('running first function to get data');
+
       
       const usersData = await getAllUsers();
-      console.log(usersData);
+
       
       setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
       setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
@@ -146,7 +147,7 @@ function ListView(props) {
         res = await getEvents(clientId, 1, monthForData, yearForData);
 
       }
-
+      
       if (currentUser.rollSelect === "Manager") {
         setEventsForShow(groupByBrideName(res.data?.sort((a, b) => {
           const dateA = new Date(a?.eventDate);
@@ -211,12 +212,13 @@ function ListView(props) {
         })));
  
       }
+      setHasMore(true)
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
-    setHasMore(true)
+    
     getEventsData()
   }, [monthForData, yearForData, dateForFilter, clientId])
 
@@ -377,23 +379,9 @@ function ListView(props) {
     }
   };
 
-  const getClientsForFilters = () => {
-    const seenClients = new Set();
-
-    
-    return allEvents
-      ?.map((eventObj, i) => ({
-        title: `${eventObj?.client?.brideName} Weds ${eventObj?.client?.groomName}`,
-        id: i,
-        clientId: eventObj?.client?._id,
-      }))
-      ?.filter((eventObj) => {
-        if (eventObj?.clientId && !seenClients?.has(eventObj.clientId)) {
-          seenClients?.add(eventObj?.clientId);
-          return true;
-        }
-        return false;
-      });
+  const getClientsForFilters = async () => {
+    const completeclients = await getAllClients()
+    setAllClients(completeclients)
   };
 
   const filterOptions = [
@@ -431,6 +419,7 @@ function ListView(props) {
     getEventsData();
     getStoredEvents();
     getAllFormOptionsHandler();
+    getClientsForFilters()
   }, []);
 
 
@@ -685,25 +674,18 @@ function ListView(props) {
                       </div>
                     ),
                   },
-                  ...Array.from(
-                    // Use a Map to filter out duplicate clients
-                    new Map(
-                      allEvents?.map((event) => [
-                        // Use a unique key based on both bride and groom names
-                        event?.client?.brideName + "<" + event?.client?.groomName,
-                        event,
-                      ])
-                    ).values() // Extract the unique events from the Map
-                  ).map((event) => ({
-                    value: event?.client?._id,
-                    label: (
-                      <div className="d-flex justify-content-around">
-                        <span>{event?.client?.brideName}</span>{" "}
-                        <img alt="" src={Heart} />{" "}
-                        <span>{event?.client?.groomName}</span>
-                      </div>
-                    ),
-                  })),
+                  ...Array.from(allClients)?.map((client) => {
+                    return {
+                      value: client._id,
+                      label: (
+                        <div className="d-flex justify-content-around">
+                          <span>{client.brideName}</span>
+                          <img className="mx-1" alt="" src={Heart} />
+                          <span>{client.groomName}</span>
+                        </div>
+                      ),
+                    };
+                  }),
                 ]}
 
                 required

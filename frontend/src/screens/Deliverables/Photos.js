@@ -44,7 +44,8 @@ function Photos() {
   const fetchData = async () => {
     try {
       const data = await getPhotos(1, monthForData, yearForData, dateForFilter);
-
+      setHasMore(true)
+      setPage(2)
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -62,8 +63,7 @@ function Photos() {
     }
   }
   useEffect(() => {
-    setHasMore(true)
-    setPage(2)
+  
     fetchData()
   }, [monthForData, yearForData, dateForFilter])
   const fetchPhotos = async () => {
@@ -71,7 +71,7 @@ function Photos() {
       setLoading(true);
       try {
         const data = await getPhotos(page, monthForData, yearForData, dateForFilter);
-        console.log(data);
+      
 
         if (data.data.length > 0) {
           let dataToAdd;
