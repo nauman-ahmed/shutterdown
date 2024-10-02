@@ -89,22 +89,22 @@ function ListView(props) {
     // Step 1: Group events by brideName
     const groupedByBrideName = events?.reduce((acc, event) => {
       const brideName = event?.client?.brideName;
-  
+
       // Check if the bride's group already exists in acc
       let found = acc?.find(group => group.brideName === brideName);
-  
+
       if (!found) {
         // Create a new group for this bride
         found = { brideName, events: [] };
         acc.push(found);
       }
-  
+
       // Add the current event to the bride's group
       found.events.push(event);
-  
+
       return acc;
     }, []);
-  
+
     // Step 2: Sort events within each bride's group
     groupedByBrideName.forEach(group => {
       group.events.sort((a, b) => {
@@ -113,25 +113,25 @@ function ListView(props) {
         return ascending ? dateA - dateB : dateB - dateA;
       });
     });
-  
+
     // Step 3: Flatten the groups back into a single array of events
     const sortedEvents = groupedByBrideName.reduce((acc, group) => {
       acc.push(...group.events);  // Append each group's sorted events
       return acc;
     }, []);
-  
+
     return sortedEvents;
   };
-  
+
 
 
   const getEventsData = async () => {
     try {
 
-      
+
       const usersData = await getAllUsers();
 
-      
+
       setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
       setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
       setCinematographer(usersData.users.filter(user => user.subRole.includes("Cinematographer")))
@@ -147,14 +147,14 @@ function ListView(props) {
         res = await getEvents(clientId, 1, monthForData, yearForData);
 
       }
-      
+
       if (currentUser.rollSelect === "Manager") {
         setEventsForShow(groupByBrideName(res.data?.sort((a, b) => {
           const dateA = new Date(a?.eventDate);
           const dateB = new Date(b?.eventDate);
           return ascending ? dateB - dateA : dateA - dateB;
         })));
-      
+
       } else if (currentUser.rollSelect === "Shooter") {
         const eventsToShow = res?.data?.map((event) => {
           if (
@@ -210,7 +210,7 @@ function ListView(props) {
           const dateB = new Date(b?.eventDate);
           return ascending ? dateB - dateA : dateA - dateB;
         })));
- 
+
       }
       setHasMore(true)
     } catch (error) {
@@ -218,7 +218,7 @@ function ListView(props) {
     }
   };
   useEffect(() => {
-    
+
     getEventsData()
   }, [monthForData, yearForData, dateForFilter, clientId])
 
@@ -238,7 +238,7 @@ function ListView(props) {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-  
+
   const onSubmitHandler = async (event, index) => {
     try {
       setUpdatingIndex(index);
@@ -403,7 +403,7 @@ function ListView(props) {
           })
         )
       );
-     
+
 
     } catch (error) {
       console.log("applySorting ERROR", error);
@@ -425,7 +425,7 @@ function ListView(props) {
 
   const fetchEvents = async () => {
     console.log('running scroll function');
-    
+
     if (hasMore) {
       setLoading(true);
       try {
@@ -441,7 +441,7 @@ function ListView(props) {
               const dateB = new Date(b?.eventDate);
               return ascending ? dateB - dateA : dateA - dateB;
             })));
-          
+
 
           } else if (currentUser.rollSelect === "Shooter") {
             const eventsToShow = res?.data?.map((event) => {
@@ -508,7 +508,7 @@ function ListView(props) {
               const dateB = new Date(b?.eventDate);
               return ascending ? dateB - dateA : dateA - dateB;
             })));
-           
+
 
           }
           setPage(page + 1);
@@ -714,7 +714,7 @@ function ListView(props) {
 
                     <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
                       <div >
-                        <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                        <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
                       </div>
                     </div>
                   )}
@@ -801,61 +801,69 @@ function ListView(props) {
                 }}
               >
                 {eventsForShow?.map((event, index) => {
+                  console.log(event);
+
                   let errorText = "";
-                  if (event?.sameDayVideoEditor !== "No") {
-                    if (
-                      !event?.sameDayVideoMakers ||
-                      event?.sameDayVideoMakers.length < 1
-                    ) {
-                      errorText += "Same Day Video Makers are not complete \n";
-                    }
+
+                  if (Number(event.sameDayVideoEditors) > 0 && (!event?.sameDayVideoMakers ||
+                    event?.sameDayVideoMakers.length != Number(event.sameDayVideoEditors)
+                  )) {
+                    errorText += "Same Day Video Makers are not complete, \n";
                   }
 
-                  if (event?.sameDayPhotoEditor !== "No") {
-                    if (
-                      !event?.sameDayPhotoMakers ||
-                      event?.sameDayPhotoMakers.length < 2
-                    ) {
-                      errorText += "Same Day Photo Makerasare not complete \n";
-                    }
+
+
+                  if (Number(event.sameDayPhotoEditors) > 0 && (
+                    !event?.sameDayPhotoMakers ||
+                    event?.sameDayPhotoMakers.length !== Number(event.sameDayPhotoEditors)
+                  )
+                  ) {
+                    errorText += "Same Day Photo Makers are not complete, \n";
                   }
 
-                  if (
+
+                  if (Number(event.cinematographers) > 0 && (
                     !event?.choosenCinematographers ||
                     event?.choosenCinematographers.length !==
-                    event?.cinematographers
+                    Number(event.cinematographers)
+                  )
                   ) {
-                    errorText += "Cinematographers are not complete \n";
+                    errorText += "Cinematographers are not complete, \n";
                   }
 
-                  if (
+                  if (Number(event.drones) > 0 && (
                     !event?.droneFlyers ||
-                    event?.droneFlyers.length !== event.drones
+                    event?.droneFlyers.length !== Number(event.drones)
+                  )
                   ) {
-                    errorText += "Drone Flyers are not complete \n";
+                    errorText += "Drone Flyers are not complete, \n";
                   }
 
                   if (!event?.manager || event?.manager.length !== 1) {
-                    errorText += "Manager not selected \n";
+                    errorText += "Manager not selected, \n";
                   }
 
                   if (!event?.assistants || event?.assistants.length !== 1) {
-                    errorText += "Assistants are not complete \n";
+                    errorText += "Assistants are not complete, \n";
                   }
 
-                  if (
+                  if (Number(event.photographers) > 0 && (
                     !event?.choosenPhotographers ||
-                    event?.choosenPhotographers.length !== event?.photographers
+                    event?.choosenPhotographers.length !== Number(event.photographers)
+                  )
                   ) {
-                    errorText += "Photographers are not complete \n";
+                    errorText += "Photographers are not complete, \n";
                   }
 
-                  if (
+                  if (Number(event.shootDirector) > 0 && (
                     !event?.shootDirectors ||
-                    event?.shootDirectors.length !== 1
+                    event?.shootDirectors.length !== Number(event.shootDirector)
+                  )
                   ) {
                     errorText += "Shoot Director not selected \n";
                   }
+
+
                   return (
                     <>
                       {returnOneRow(
