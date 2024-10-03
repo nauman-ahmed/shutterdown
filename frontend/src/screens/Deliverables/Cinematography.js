@@ -195,15 +195,15 @@ function Cinematography(props) {
         if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data])
+            setAllDeliverables([...allDeliverables, ...data.data])
             if (filterCondition) {
-              dataToAdd = data.filter(deliverable => eval(filterCondition))
+              dataToAdd = data.data.filter(deliverable => eval(filterCondition))
             } else {
-              dataToAdd = data
+              dataToAdd = data.data
             }
             setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
           } else if (currentUser.rollSelect === "Editor") {
-            const deliverablesToShow = data.filter(
+            const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
