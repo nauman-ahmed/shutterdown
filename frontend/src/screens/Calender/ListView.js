@@ -42,7 +42,10 @@ import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 import { all } from "axios";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
+
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
+const transport_icons = {"Cab": Car, "Personal Car": Car, "Flight": Plane, "Bus": Car}
+
 function ListView(props) {
   const allEvents = useSelector(state => state.allEvents);
   const [eventsForShow, setEventsForShow] = useState(null);
@@ -754,7 +757,7 @@ function ListView(props) {
                         />
                       )}
                     </th>
-                    <th className="tableBody">Event Type</th>
+                    {/* <th className="tableBody">Event Type</th> */}
                     {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Director</th>
                     <th className="tableBody mx-1">
@@ -786,7 +789,7 @@ function ListView(props) {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Date</th>
                     <th className="tableBody">Client</th>
-                    <th className="tableBody">Event Type</th>
+                    {/* <th className="tableBody">Event Type</th> */}
                     {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
@@ -801,7 +804,6 @@ function ListView(props) {
                 }}
               >
                 {eventsForShow?.map((event, index) => {
-                  console.log(event);
 
                   let errorText = "";
 
@@ -883,7 +885,7 @@ function ListView(props) {
                                     i={index}
                                   />
                                 )}
-                                <div className="d-flex flex-row ps-5">
+                                <div className={errorText.length > 0 ? "d-flex flex-row ps-5" : "d-flex flex-row"}>
 
                                   <div
                                     className={`${errorText.length === 0 && "ms-4"
@@ -901,6 +903,7 @@ function ListView(props) {
                                     >
                                       {event?.location}
                                     </div>
+                                    <img alt="" src={transport_icons[event.travelBy]} />
                                   </div>
                                 </div>
                               </td>
@@ -923,7 +926,6 @@ function ListView(props) {
                                     "DD-MMM-YYYY"
                                   )}
                                 </div>
-                                {event.travelBy ? "By " + event.travelBy : "N/A"}
                                 {/* {event?.travelBy === "By Car" ||
                                   event?.travelBy === "By Bus" ? (
                                   <img alt="" src={Car} />
@@ -933,7 +935,7 @@ function ListView(props) {
                                   "N/A"
                                 )} */}
                               </td>
-                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                              {/* <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <p
                                   style={{
                                     marginBottom: 0,
@@ -943,7 +945,7 @@ function ListView(props) {
                                 >
                                   {event?.eventType}
                                 </p>
-                              </td>
+                              </td> */}
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   role={"shootDirectors"}
@@ -1181,7 +1183,7 @@ function ListView(props) {
                                   teble={true}
                                   currentEvent={event}
                                   allEvents={allEvents}
-                                  allowedPersons={1}
+                                  allowedPersons={4}
                                   usersToShow={assistant}
                                   existedUsers={event?.assistants}
                                   userChecked={(userObj) => {
@@ -1380,10 +1382,11 @@ function ListView(props) {
                                 <br />
                                 {event?.client?.groomName}
                                 <br />
+                                <img alt="" src={transport_icons[event.travelBy]} />
                               </td>
-                              <td className="tableBody Text14Semi primary2">
+                              {/* <td className="tableBody Text14Semi primary2">
                                 {event?.eventType}
-                              </td>
+                              </td> */}
                               {/* <td
                                 style={{
                                   paddingTop: "15px",
@@ -1397,7 +1400,7 @@ function ListView(props) {
                                 {event?.userRole}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                {event.travelBy ? "By " + event.travelBy : "N/A"}
+                                {/* {event.travelBy ? "By " + event.travelBy : "N/A"} */}
                                 {/* {event?.travelBy === "Car" ||
                                   event?.travelBy === "Bus" ? (
                                   <img alt="" src={Car} />

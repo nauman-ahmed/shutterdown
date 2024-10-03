@@ -443,7 +443,7 @@ function ShootDetails(props) {
                   <th>Event</th>
                   <th>Date</th>
                   <th>Location</th>
-                  <th style={{ whiteSpace: "nowrap" }}>Team Leader</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Shoot Directors</th>
                   <th style={{ whiteSpace: "nowrap" }}>Photographers</th>
                   <th style={{ whiteSpace: "nowrap" }}>Cinematographers</th>
                   <th style={{ whiteSpace: "nowrap" }}>Drone Flyers</th>
@@ -476,11 +476,29 @@ function ShootDetails(props) {
                     <td className="tablePlaceContent  textPrimary fs-6">
                       {event.location}
                     </td>
-                    <td className="tablePlaceContent  textPrimary fs-6">
+                    {/* <td className="tablePlaceContent  textPrimary fs-6">
                       {clientData.userID &&
                         clientData.userID?.firstName +
                         " " +
                         clientData.userID?.lastName}
+                    </td> */}
+                    {console.log("Evemt", event)}
+                    <td className="tablePlaceContent  textPrimary fs-6">
+                      {event.shootDirectors?.length > 0 && (
+                        <div>
+                          {event.shootDirectors?.map((shootDirector, i) => {
+                            return (
+                              <>
+                                {i + 1}.{" "}
+                                {shootDirector.firstName +
+                                  " " +
+                                  shootDirector.lastName}
+                                <br />
+                              </>
+                            );
+                          })}
+                        </div>
+                      )}
                     </td>
                     <td className="tablePlaceContent  textPrimary fs-6">
                       {event.choosenPhotographers?.length > 0 && (

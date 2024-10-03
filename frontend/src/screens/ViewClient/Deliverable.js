@@ -61,8 +61,13 @@ function Deliverable(props) {
 
   }
 
-  const getWeddingDate = (obj) => {
-    return "2024-09-02T22:00:00.000+00:00"
+  const detectAlbum = (name) => {
+    const notAlbum = ["Photos", "Promo", "Long Film", "Reel"]
+    console.log("detectAlbum", name)
+    if(notAlbum.includes(name)){
+      return name
+    }
+    return "Album: " + name
   }
 
   
@@ -164,7 +169,7 @@ function Deliverable(props) {
               {otherDeliverables.map((deliverable, i) => {
                 return (
                   <tr>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.deliverableName}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{detectAlbum(deliverable?.deliverableName)}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.editor?.firstName || 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate?.eventDate).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate?.eventDate).setDate(new Date(weddingDate?.eventDate).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>

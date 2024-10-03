@@ -198,10 +198,22 @@ function ViewClient() {
                           <span>{client.groomName}</span>
                         </div>
                       ),
+                      brideName: client.brideName,
+                      groomName: client.groomName,
                     };
                   }),
                 ]}
                 required
+                filterOption={(option, searchInput) => {
+                  const { brideName, groomName } = option.data;
+                  const searchText = searchInput?.toLowerCase();
+              
+                  // Perform search on both brideName and groomName
+                  return (
+                    brideName?.toLowerCase().startsWith(searchText) ||
+                    groomName?.toLowerCase().startsWith(searchText)
+                  );
+                }}
               />
             </div>
           </div>

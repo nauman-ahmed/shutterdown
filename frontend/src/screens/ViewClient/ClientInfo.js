@@ -213,7 +213,7 @@ function ClientInfo() {
             <th>Albums</th>
             <th>Pre-Wedding Photos</th>
             <th>Pre-Wedding Videos</th>
-            <th>HDDs</th>
+            <th>Performance Films</th>
             <th>Long Films</th>
             <th>Reels</th>
             <th>Promo</th>
@@ -307,6 +307,7 @@ function ClientInfo() {
             <th>Event Type</th>
             <th>Location</th>
             <th>Travel By</th>
+            <th>Shoot Directors</th>
             <th>Photographers</th>
             <th>Cinematographers</th>
             <th>Drones</th>
@@ -334,6 +335,7 @@ function ClientInfo() {
                 <td className="textPrimary fs-6">{event?.eventType}</td>
                 <td className="textPrimary fs-6">{event.location}</td>
                 <td className="textPrimary fs-6">{event?.travelBy}</td>
+                <td className="textPrimary fs-6">{event?.shootDirector}</td>
                 <td className="textPrimary fs-6">{event?.photographers}</td>
                 <td className="textPrimary fs-6">{event?.cinematographers}</td>
                 <td className="textPrimary fs-6">{event?.drones}</td>
