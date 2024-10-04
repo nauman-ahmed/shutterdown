@@ -92,6 +92,7 @@ function ListView(props) {
   };
 
   const groupByBrideName = (events) => {
+    console.log("Events", events)
     // Step 1: Group events by brideName
     const groupedByBrideName = events?.reduce((acc, event) => {
       const brideName = event?.client?.brideName;
@@ -111,14 +112,14 @@ function ListView(props) {
       return acc;
     }, []);
 
-    // Step 2: Sort events within each bride's group
-    groupedByBrideName.forEach(group => {
-      group.events.sort((a, b) => {
-        const dateA = new Date(a?.eventDate);
-        const dateB = new Date(b?.eventDate);
-        return ascending ? dateA - dateB : dateB - dateA;
-      });
-    });
+    // // Step 2: Sort events within each bride's group
+    // groupedByBrideName.forEach(group => {
+    //   group.events.sort((a, b) => {
+    //     const dateA = new Date(a?.eventDate);
+    //     const dateB = new Date(b?.eventDate);
+    //     return ascending ? dateA - dateB : dateB - dateA;
+    //   });
+    // });
 
     // Step 3: Flatten the groups back into a single array of events
     const sortedEvents = groupedByBrideName.reduce((acc, group) => {
@@ -379,7 +380,6 @@ function ListView(props) {
         });
       });
     } catch (error) {
-      console.log(error);
       toast.error("It seems like nothing to update");
       return;
     }
@@ -430,7 +430,6 @@ function ListView(props) {
 
 
   const fetchEvents = async () => {
-    console.log('running scroll function');
 
     if (hasMore) {
       setLoading(true);

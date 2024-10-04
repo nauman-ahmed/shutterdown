@@ -40,7 +40,6 @@ function ViewClient() {
 
   const fetchData = async () => {
     try {
-      console.log('running get once');
 
       const data = await getClients(1, monthForData, yearForData, dateForFilter, filterClient);
       setHasMore(true)
@@ -57,7 +56,6 @@ function ViewClient() {
   };
 
   useEffect(() => {
-
     fetchData();
   }, [monthForData, yearForData, dateForFilter, filterClient]);
 
@@ -65,13 +63,11 @@ function ViewClient() {
     if (hasMore) {
       setLoading(true);
       try {
-        console.log('running fatch more');
 
         const data = await getClients(page, monthForData, yearForData, dateForFilter, filterClient);
         if (data.data.length > 0) {
 
           if (dateForFilter) {
-            console.log('apply8ing date filter');
 
             const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
@@ -84,8 +80,6 @@ function ViewClient() {
             });
             setClients([...clients, ...clientsToAdd]);
           } else {
-
-
             setClients([...clients, ...data.data]);
           }
 
@@ -108,7 +102,7 @@ function ViewClient() {
       fetchClients();
     }
   }, [clients, hasMore, loading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const handleScroll = () => {
     const bottomOfWindow =
       document.documentElement.scrollTop + window.innerHeight >=
@@ -123,6 +117,7 @@ function ViewClient() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
+
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,

@@ -385,7 +385,6 @@ const getClients = async (req, res) => {
     const { currentMonth, currentYear, currentDate, filterClient } = req.query;
     
     if (filterClient !== 'null' && filterClient !== 'undefined' && filterClient !== 'Reset' && filterClient?.length > 0) {
-      console.log('client filter');
       
       const client = await ClientModel.findById(filterClient).populate({
         path: 'events',
@@ -408,11 +407,9 @@ const getClients = async (req, res) => {
           model: 'user'
         }
       }).populate('userID');
-      console.log(client);
       
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
-      console.log('not client filter');
       
       // Date filter logic
       if (currentDate !== 'null') {
@@ -452,6 +449,7 @@ const getClients = async (req, res) => {
         if (client.events && Array.isArray(client.events)) {
           return client.events.some(event => {
     
+            console.log(startDate, endDate, event.eventDate);
 
             return moment(event.eventDate).startOf('day').isSameOrAfter(startDate) &&
               moment(event.eventDate).startOf('day').isSameOrBefore(endDate)
