@@ -40,15 +40,11 @@ function ViewClient() {
 
   const fetchData = async () => {
     try {
-
       const data = await getClients(1, monthForData, yearForData, dateForFilter, filterClient);
       setHasMore(true)
       setPage(2)
       setClients(data.data);
-
       const completeclients = await getAllClients()
-
-
       setAllClients(completeclients);
     } catch (error) {
       console.log(error);
@@ -63,12 +59,9 @@ function ViewClient() {
     if (hasMore) {
       setLoading(true);
       try {
-
         const data = await getClients(page, monthForData, yearForData, dateForFilter, filterClient);
         if (data.data.length > 0) {
-
           if (dateForFilter) {
-
             const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
@@ -82,7 +75,6 @@ function ViewClient() {
           } else {
             setClients([...clients, ...data.data]);
           }
-
         }
         if (data.hasMore) {
           setPage(page + 1);
@@ -97,7 +89,6 @@ function ViewClient() {
 
 
   useEffect(() => {
-
     if (clients?.length < 10 && hasMore && !loading && !filterClient) {
       fetchClients();
     }
@@ -107,7 +98,6 @@ function ViewClient() {
     const bottomOfWindow =
       document.documentElement.scrollTop + window.innerHeight >=
       document.documentElement.scrollHeight - 10;
-
     if (bottomOfWindow) {
       fetchClients();
     }

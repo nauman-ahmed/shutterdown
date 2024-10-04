@@ -10,47 +10,26 @@ import { Overlay } from 'react-bootstrap';
 import dayjs from "dayjs";
 import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
+import CalenderMultiListView from "../../components/CalendarFilterListView";
+
+
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
-  const [filterFor, setFilterFor] = useState('Day');
+  const [dateForFilter, setDateForFilter] = useState(null)
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
+  const [yearForData, setYearForData] = useState(new Date().getFullYear())
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [filterStartDate, setFilterStartDate] = useState(null);
-  const [filterEndDate, setFilterEndDate] = useState(null);
   const toggle = () => {
     setShow(!show);
   };
   const [clientsForShow, setClientsForShow] = useState(null);
-  const [filteringDay, setFilteringDay] = useState(null);
 
-  const filterByDates = (startDate = null,endDate = null, view = null, reset = false) => {
-    if(reset){
-      setShow(false)
-      setClientsForShow(allClients)
-      setFilteringDay(null)
-      setFilterStartDate(null);
-      setFilterEndDate(null);
-      return
-    }
-    else if(view !== "month" && view !== "year"){
-      setShow(false)
-    }
-    setFilteringDay(startDate)
-    setFilterStartDate(startDate);
-    setFilterEndDate(endDate);
-    setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => (new Date(eventData.eventDate)).getTime() >= (new Date(startDate)).getTime() && (new Date(eventData.eventDate)).getTime() <= (new Date(endDate)).getTime())
-    }))
-  }
-  
-  const filterByMonth = (date) => {
-    setClientsForShow(allClients.filter(clientData => {
-      return clientData.events.some(eventData => new Date(eventData.eventDate).getFullYear() === date.getFullYear() && new Date(eventData.eventDate).getMonth() === date.getMonth())
-    }))
-  }
+
   const target = useRef(null);
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -59,9 +38,10 @@ function CheckLists(props) {
 
   const fetchClients = async () => {
     try {
-      const clients = await getClients(1);
-      setClientsForShow(clients);
-      setAllClients(clients);
+      const clients = await getClients(1, monthForData, yearForData, dateForFilter, null);
+      setClientsForShow(clients.data);
+      setHasMore(true)
+      setPage(2)
     } catch (error) {
       console.log(error, "error")
     }
@@ -69,34 +49,33 @@ function CheckLists(props) {
 
   useEffect(() => {
     fetchClients()
-  }, [])
+  }, [monthForData, yearForData, dateForFilter])
 
   const fetchClientsAgain = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page);
-        if (data.length > 0) {
-          setAllClients([...allClients, ...data]);
-          if (filterStartDate && filterEndDate) {
-            const clientsToAdd = data.filter((clientData) => {
+        const data = await getClients(page, monthForData, yearForData, dateForFilter, null);
+        if (data.data.length > 0) {
+          if (dateForFilter) {
+            const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
                   new Date(eventData.eventDate).getTime() >=
-                    new Date(filterStartDate).getTime() &&
+                  new Date(dateForFilter).getTime() &&
                   new Date(eventData.eventDate).getTime() <=
-                    new Date(filterEndDate).getTime()
+                  new Date(dateForFilter).getTime()
               );
             });
             setClientsForShow([...clientsForShow, ...clientsToAdd]);
           } else {
-            setClientsForShow([...clientsForShow, ...data]);
+            setClientsForShow([...clientsForShow, ...data.data]);
           }
-
-          setPage(page + 1);
-        } else {
-          setHasMore(false);
         }
+        if (data.hasMore) {
+          setPage(page + 1);
+        }
+        setHasMore(data.hasMore);
       } catch (error) {
         console.log(error);
       }
@@ -108,7 +87,7 @@ function CheckLists(props) {
     if (clientsForShow?.length < 10 && hasMore && !loading) {
       fetchClientsAgain();
     }
-  }, [clientsForShow]);
+  }, [clientsForShow, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const bottomOfWindow =
@@ -164,7 +143,7 @@ function CheckLists(props) {
     <>
       {clientsForShow ? (
         <>
-          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center'  ref={target}>
+          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' ref={target}>
 
             <div className='w-100 d-flex flex-row align-items-center'>
               <div className='w-75'>
@@ -172,11 +151,22 @@ function CheckLists(props) {
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: 'pointer' }}
                 >
-                  {filteringDay ? dayjs(filteringDay).format('DD-MMM-YYYY') : 'Date'}
+                  {dateForFilter
+                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    : <>{monthForData}  {yearForData}</>}
                   <div className="d-flex align-items-center">
-                    <img alt="" src={CalenderImg} onClick={toggle}/>
-                    <GrPowerReset className="mx-1" onClick={() => filterByDates(null,null,null,true)} />
+                    <img alt="" src={CalenderImg} onClick={toggle} />
+                    <GrPowerReset
+                      className="mx-1"
+                      onClick={() => {
+                        setDateForFilter(null)
+                        setMonthForData(months[new Date().getMonth()])
+                        setYearForData(new Date().getFullYear())
+
+                      }}
+                    />
                   </div>
+
                 </div>
               </div>
             </div>
@@ -330,13 +320,15 @@ function CheckLists(props) {
               <div>No more data to load.</div>
             </div>
           )}
-          <Overlay rootClose={true}
+          <Overlay
+            rootClose={true}
             onHide={() => setShow(false)}
             target={target.current}
             show={show}
-            placement="bottom">
-            <div style={{ width: "300px", zIndex : '100' }} >
-              <CalenderMulti filterByDates={filterByDates}/>
+            placement="bottom"
+          >
+            <div style={{ width: "300px" }}>
+              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
             </div>
           </Overlay>
         </>
