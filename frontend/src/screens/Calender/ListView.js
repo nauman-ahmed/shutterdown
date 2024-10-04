@@ -47,6 +47,8 @@ const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 const transport_icons = {"Cab": Car, "Personal Car": Car, "Flight": Plane, "Bus": Car}
 
 function ListView(props) {
+  const { clientIdd } = useParams();
+
   const allEvents = useSelector(state => state.allEvents);
   const [eventsForShow, setEventsForShow] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
@@ -81,9 +83,10 @@ function ListView(props) {
   const [assistant, setAssistant] = useState([]);
   const [yearForData, setYearForData] = useState(new Date().getFullYear())
   const [dateForFilter, setDateForFilter] = useState(null)
-  const [clientId, setClientId] = useState(null)
+  const [clientId, setClientId] = useState(clientIdd)
   const [allClients, setAllClients] = useState([])
 
+  
   const toggle = () => {
     setShow(!show);
   };

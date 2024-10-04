@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { updateAllEvents } from '../../redux/eventsSlice';
 
 const Login = () => {
+  const signInButtonRef = useRef()
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
     email: '',
@@ -30,9 +31,20 @@ const Login = () => {
   };
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    const handleEnterKey = (event) => {
+      if (event.key === "Enter") {
+        handleSubmitForm()
+      }
+    };
+  
+    window.addEventListener("keydown", handleEnterKey);
+  
+    return () => window.removeEventListener("keydown", handleEnterKey);
+  }, []);
 
   const handleSubmitForm = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (inputData.email.length === 0) {
       setError(true);
     }
@@ -145,6 +157,7 @@ const Login = () => {
                   </Label>
                 </FormGroup> */}
                 <button
+                  type="button"
                   className="transparent_btn mt-1"
                   onClick={() => navigate('/emailVerify')}
                 >
