@@ -44,7 +44,7 @@ import { all } from "axios";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
-const transport_icons = {"Cab": Car, "Personal Car": Car, "Flight": Plane, "Bus": Car}
+const transport_icons = { "Cab": Car, "Personal Car": Car, "Flight": Plane, "Bus": Car }
 
 function ListView(props) {
   const { clientIdd } = useParams();
@@ -86,7 +86,7 @@ function ListView(props) {
   const [clientId, setClientId] = useState(clientIdd)
   const [allClients, setAllClients] = useState([])
 
-  
+
   const toggle = () => {
     setShow(!show);
   };
@@ -689,10 +689,21 @@ function ListView(props) {
                           <span>{client.groomName}</span>
                         </div>
                       ),
+                      brideName: client.brideName,
+                      groomName: client.groomName,
                     };
                   }),
                 ]}
+                filterOption={(option, searchInput) => {
+                  const { brideName, groomName } = option.data;
+                  const searchText = searchInput?.toLowerCase();
 
+                  // Perform search on both brideName and groomName
+                  return (
+                    brideName?.toLowerCase().startsWith(searchText) ||
+                    groomName?.toLowerCase().startsWith(searchText)
+                  );
+                }}
                 required
               />
             </div>
@@ -1505,9 +1516,23 @@ function ListView(props) {
                           <span>{event?.client?.groomName}</span>
                         </div>
                       ),
+                      brideName: event?.client?.brideName,
+                      groomName: event?.client?.groomName,
                     })),
+                    
+                    
                   ]}
                   required
+                  filterOption={(option, searchInput) => {
+                    const { brideName, groomName } = option.data;
+                    const searchText = searchInput?.toLowerCase();
+  
+                    // Perform search on both brideName and groomName
+                    return (
+                      brideName?.toLowerCase().startsWith(searchText) ||
+                      groomName?.toLowerCase().startsWith(searchText)
+                    );
+                  }}
                 />
               </Col>
               <Col xl="6" sm="6" className="p-2">

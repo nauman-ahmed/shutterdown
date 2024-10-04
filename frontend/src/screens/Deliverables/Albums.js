@@ -77,17 +77,18 @@ function Albums(props) {
 
   const fetchData = async () => {
     try {
+      setLoading(true)
       const data = await getAlbums(1, monthForData, yearForData, dateForFilter);
-      setHasMore(true)
-      setPage(2)
+
+      
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
       setEditors(res.editors.filter(user => user.subRole.includes('Photo Editor')));
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
-        setAllDeliverables(data.data);
-        setDeliverablesForShow(data.data);
+        setAllDeliverables(data?.data);
+        setDeliverablesForShow(data?.data);
       } else if (currentUser.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser._id
@@ -95,12 +96,15 @@ function Albums(props) {
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(deliverablesToShow);
       }
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };
   useEffect(() => {
-  
+    setHasMore(true)
+    setPage(2)
     fetchData()
   }, [monthForData, yearForData, dateForFilter])
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,10 +113,12 @@ function Albums(props) {
       setLoading(true);
       try {
         const data = await getAlbums(page, monthForData, yearForData, dateForFilter);
+  
+        
         if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data.data])
+            setAllDeliverables([...deliverablesForShow, ...data.data])
             if(filterCondition){
               dataToAdd = data.data.filter(deliverable => eval(filterCondition))
             } else {
@@ -136,7 +142,8 @@ function Albums(props) {
           }
 
           
-        } if (data.hasMore) {
+        }
+         if (data.hasMore) {
           setPage(page + 1);
         }
         setHasMore(data.hasMore);
@@ -147,7 +154,7 @@ function Albums(props) {
     }
   };
   useEffect(()=>{
-    if(deliverablesForShow?.length < 10 && hasMore && !loading){
+    if(deliverablesForShow?.length < 10 && hasMore && !loading ){
       fetchAlbums()
     }
   }, [deliverablesForShow, hasMore, loading]);

@@ -25,7 +25,7 @@ const AddClientFunction = async (req, res) => {
     let preWedVideoDeadline = null;
     const eventIds = await Promise.all(
       req.body?.data?.events.map(async (eventData) => {
-        const event = new EventModel({ ...eventData, client: client._id });
+        const event = new EventModel({ ...eventData, client: client._id, eventDate : moment(eventData.eventDate).format('YYYY-MM-DD') });
         if (event.isWedding) {
           longFilmDeadline = new Date(event.eventDate.getTime());
           promoDeadline = new Date(event.eventDate.getTime());

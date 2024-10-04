@@ -31,6 +31,8 @@ const getCinematography = async (req, res) => {
             // Single day filter
             startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
             endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
+            console.log('date for filetr', startDate, endDate);
+            
         } else {
             // Use month and year for range filtering
             startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
@@ -62,16 +64,18 @@ const getCinematography = async (req, res) => {
                 date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
             };
         });
-
+        console.log('with dates deliv',deliverablesWithDates);
+        
         // Filter deliverables based on date range
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day');
+                const deliverableDate =  moment(deliverable.date).startOf('day').add(1, 'days');
                 return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
             return false;
         });
-
+        console.log('filtered', filteredDeliverables);
+        
         const hasMore = cinematographyDeliverables.length === 10 ? true : false;
 
         // Send response with filtered deliverables and hasMore flag
@@ -84,6 +88,9 @@ const getCinematography = async (req, res) => {
 
 
 const getAlbums = async (req, res) => {
+    console.log('requested');
+
+    
     try {
         // Fetch album values from the schema
         const allDocument = await DeliverableOptionsSchema.find({}, { "albums": 1 });
@@ -101,7 +108,8 @@ const getAlbums = async (req, res) => {
         // Get currentMonth, currentYear, and currentDate from the request query
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-
+     console.log(currentDate);
+     console.log(page);
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
             startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
@@ -137,16 +145,31 @@ const getAlbums = async (req, res) => {
                 date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
             };
         });
-
+      
+   
+   
+      
         // Filter deliverables by date
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
+           
+            
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day');
+                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
+                console.log(deliverableDate);
+                console.log(startDate);
+              
+                
+                
+                console.log(deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate));
+                
                 return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+            } else {
+                return false;
             }
-            return false;
+          
         });
-
+   
+        console.log('filtered', filteredDeliverables?.length);
         // Determine if there are more albums to fetch
         const hasMore = albumsDeliverables.length === 10;
 
@@ -206,12 +229,13 @@ const getPhotos = async (req, res) => {
         });
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day');
-                console.log(deliverableDate);
+                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
+              
                 
                 return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+            } else {
+                return false;
             }
-            return false;
         });
        
         // Determine if there are more albums to fetch
@@ -273,7 +297,7 @@ const getPreWeds = async (req, res) => {
         // Filter deliverables based on date
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day');
+                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
                 return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
             }
             return false;

@@ -162,9 +162,9 @@ function Cinematography(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
+      setLoading(true)
       const data = await getCinematography(1, monthForData, yearForData, dateForFilter);
-      setHasMore(true)
-      setPage(2)
+     
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -179,12 +179,15 @@ function Cinematography(props) {
         setDeliverablesForShow(deliverablesToShow);
       }
       setEditors(res.editors.filter(user => user.subRole.includes("Video Editor")))
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       console.log(error)
     }
   }
   useEffect(() => {
-
+    setHasMore(true)
+    setPage(2)
     fetchData()
   }, [monthForData, yearForData, dateForFilter])
   const fetchCinemas = async () => {
@@ -491,6 +494,8 @@ function Cinematography(props) {
                 }}
               >
                 {deliverablesForShow?.map((deliverable, index) => {
+               
+                  
                   return (
                     <>
                       {index === 0 && <div style={{ marginTop: '15px' }} />}

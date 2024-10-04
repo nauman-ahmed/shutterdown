@@ -12,6 +12,8 @@ export const getCinematography = async (page, monthForData, yearForData, dateFor
                 headers: { 'Content-Type': 'application/json' },
             }
         );
+        
+        
         return res.data;
     } catch (error) {
         console.log(error);
