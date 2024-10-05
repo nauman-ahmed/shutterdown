@@ -1,10 +1,6 @@
 const DeliverableModel = require('../models/DeliverableModel');
-const ClientModel = require('../models/ClientModel');
-const eventModel = require('../models/EventModel');
 const DeliverableOptionsSchema = require('../models/DeliverableOptionsSchema');
-const moment = require('moment');
 const dayjs = require('dayjs')
-const customParseFormat = require('dayjs/plugin/customParseFormat');
 const monthNumbers = {
     January: 1,
     February: 2,
@@ -34,10 +30,8 @@ const getCinematography = async (req, res) => {
             // Single day filter
             startDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
             endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
-
-
         } else {
-            dayjs.extend(customParseFormat);
+            // dayjs.extend(customParseFormat);
 
             // Use month and year for range filtering
             startDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").format('YYYY-MM-DD'); // First day of the month
@@ -113,7 +107,7 @@ const getAlbums = async (req, res) => {
         const { currentMonth, currentYear, currentDate } = req.query;
 
         // Extend dayjs with customParseFormat to handle custom date formats
-        dayjs.extend(customParseFormat);
+        // dayjs.extend(customParseFormat);
 
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
@@ -183,7 +177,7 @@ const getPhotos = async (req, res) => {
         const { currentMonth, currentYear, currentDate } = req.query;
 
         // Extend dayjs with customParseFormat to handle custom date formats
-        dayjs.extend(customParseFormat);
+        // dayjs.extend(customParseFormat);
 
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
@@ -250,7 +244,7 @@ const getPreWeds = async (req, res) => {
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
         // Extend dayjs with customParseFormat to handle custom date formats
-        dayjs.extend(customParseFormat);
+        // dayjs.extend(customParseFormat);
 
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {

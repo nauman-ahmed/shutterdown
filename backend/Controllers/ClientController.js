@@ -4,9 +4,7 @@ const deliverableModel = require("../models/DeliverableModel");
 const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
 const TaskModel = require("../models/TaskSchema");
-const moment = require('moment')
 const dayjs = require('dayjs')
-const customParseFormat = require('dayjs/plugin/customParseFormat');
 
 
 const AddClientFunction = async (req, res) => {
@@ -418,15 +416,12 @@ const getClients = async (req, res) => {
         endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
       } else {
         // Extend dayjs with customParseFormat to handle custom date formats
-        dayjs.extend(customParseFormat);
+        // dayjs.extend(customParseFormat);
 
         // If no specific date, use the month and year filter
         startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').format('YYYY-MM-DD');
         endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').format('YYYY-MM-DD');
       }
-      console.log(startDate);
-      console.log(endDate);
-      
 
       const clients = await ClientModel.find().skip(skip).limit(10).populate({
         path: 'events',
@@ -449,8 +444,7 @@ const getClients = async (req, res) => {
           model: 'user'
         }
       }).populate('userID');
-      console.log(page);
-      
+
       const filteredClients = clients.filter(client => {
         if (client.events && Array.isArray(client.events)) {
           return client.events.some(event => {
