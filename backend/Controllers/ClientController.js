@@ -3,6 +3,7 @@ const deadlineDaysModel = require("../models/DeadlineDays");
 const deliverableModel = require("../models/DeliverableModel");
 const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
+const TaskModel = require("../models/TaskSchema");
 const moment = require('moment')
 const dayjs = require('dayjs')
 const customParseFormat = require('dayjs/plugin/customParseFormat');
@@ -572,6 +573,7 @@ const getClientById = async (req, res) => {
 
 const DeleteClient = async (req, res) => {
   try {
+    
     const clientToDelete = await ClientModel.findById(req.params.clientId);
     clientToDelete.events.forEach(async (eventId) => {
       await eventModel.findByIdAndDelete(eventId)
@@ -580,7 +582,10 @@ const DeleteClient = async (req, res) => {
       await deliverableModel.findByIdAndDelete(deliverableId)
     })
 
+    console.log("Deletion Nauman", clientToDelete._id)
     await ClientModel.findByIdAndDelete(clientToDelete._id)
+    await TaskModel.deleteMany({ client: clientToDelete._id });
+
     res.status(200).json('Client Deleted Succcessfully!');
   } catch (error) {
     console.log(error, 'error');

@@ -31,8 +31,10 @@ import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
 
 function ClientInfo() {
-  const [clientData, setClientData] = useState(null);
   const { clientId } = useParams();
+  const deleteClientDetails = useRef()
+  const [clientData, setClientData] = useState(null);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [newEventModel, setNewEventModel] = useState(false);
   const [editEventModel, setEditEventModel] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
@@ -276,9 +278,13 @@ function ClientInfo() {
                 }}
               /><MdDelete
                 onClick={async () => {
-                  await deleteClient(clientData._id)
-                  getStoredEvents()
-                  navigate('/MyProfile/Client/ViewClient')
+                  deleteClientDetails.current = {
+                    clientDelete : true,
+                    _id : clientData._id,
+                    message: "Are you sure you want to delete this client?"
+                  }
+                  setDeleteModal(true)
+                  
                 }}
                 className="text-danger cursor-pointer fs-3"
               /></td>
@@ -360,9 +366,15 @@ function ClientInfo() {
                     />
                     <MdDelete
                       onClick={async () => {
-                        await deleteEvent(event._id);
-                        getIdData();
-                        getStoredEvents();
+                        deleteClientDetails.current = {
+                          clientDelete : false,
+                          _id : event._id,
+                          message: "Are you sure you want to delete this event?"
+                        }
+                        setDeleteModal(true)
+                        // await deleteEvent(event._id);
+                        // getIdData();
+                        // getStoredEvents();
                       }}
                       className="text-danger cursor-pointer fs-3"
                     />
@@ -373,6 +385,46 @@ function ClientInfo() {
           })}
         </tbody>
       </Table>
+
+      <Modal isOpen={deleteModal} centered={true} size="md" >
+        <ModalHeader>Warning</ModalHeader>
+        <Form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if(deleteClientDetails.current?.clientDelete){
+              await deleteClient(deleteClientDetails.current?._id)
+              getStoredEvents()
+              navigate('/MyProfile/Client/ViewClient')
+            }else if(!deleteClientDetails.current?.clientDelete){
+              await deleteEvent(deleteClientDetails.current?._id);
+              getIdData();
+              getStoredEvents();
+            }
+            setDeleteModal(false);
+          }}
+        >
+          <ModalBody>
+            <Row >
+              <Col xl="12" sm="12" className="p-2">
+                {deleteClientDetails.current?.message}
+              </Col>
+            </Row>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" type="submit" className="Update_btn">
+              Delete
+            </Button>
+            <Button
+              onClick={() => {
+                setDeleteModal(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Form>
+      </Modal>
+
       <Modal isOpen={newEventModel} centered={true} size="lg" >
         <ModalHeader>Event Details</ModalHeader>
         <Form
