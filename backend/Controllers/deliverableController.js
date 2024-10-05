@@ -3,6 +3,8 @@ const ClientModel = require('../models/ClientModel');
 const eventModel = require('../models/EventModel');
 const DeliverableOptionsSchema = require('../models/DeliverableOptionsSchema');
 const moment = require('moment');
+const dayjs = require('dayjs')
+const customParseFormat = require('dayjs/plugin/customParseFormat');
 const monthNumbers = {
     January: 1,
     February: 2,
@@ -29,14 +31,16 @@ const getCinematography = async (req, res) => {
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
             // Single day filter
-            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
-            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
+            startDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
+            endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
             console.log('date for filetr', startDate, endDate);
-            
+
         } else {
+            dayjs.extend(customParseFormat);
+
             // Use month and year for range filtering
-            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
-            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
+            startDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").format('YYYY-MM-DD'); // First day of the month
+            endDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-${dayjs(`${currentYear}-${monthNumbers[currentMonth]}`).daysInMonth()}`, "YYYY-MM-DD").format('YYYY-MM-DD'); // Last day of the month
         }
 
         // Fetch Cinematography deliverables
@@ -61,21 +65,21 @@ const getCinematography = async (req, res) => {
             const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
             return {
                 ...deliverable.toObject(),
-                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+                date: eventDate ? dayjs(new Date(eventDate)).format('YYYY-MM-DD') : null,
             };
         });
-        console.log('with dates deliv',deliverablesWithDates);
-        
+
+
         // Filter deliverables based on date range
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate =  moment(deliverable.date).startOf('day').add(1, 'days');
-                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+                const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
+                return (deliverableDate >= startDate) && deliverableDate <= endDate;
             }
             return false;
         });
-        console.log('filtered', filteredDeliverables);
-        
+
+
         const hasMore = cinematographyDeliverables.length === 10 ? true : false;
 
         // Send response with filtered deliverables and hasMore flag
@@ -88,9 +92,6 @@ const getCinematography = async (req, res) => {
 
 
 const getAlbums = async (req, res) => {
-    console.log('requested');
-
-    
     try {
         // Fetch album values from the schema
         const allDocument = await DeliverableOptionsSchema.find({}, { "albums": 1 });
@@ -108,16 +109,19 @@ const getAlbums = async (req, res) => {
         // Get currentMonth, currentYear, and currentDate from the request query
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-     console.log(currentDate);
-     console.log(page);
+
+        // Extend dayjs with customParseFormat to handle custom date formats
+        dayjs.extend(customParseFormat);
+
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
-            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
-            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
+            // Use the date directly and format it to YYYY-MM-DD
+            startDate = dayjs(currentDate).format('YYYY-MM-DD');
+            endDate = dayjs(currentDate).format('YYYY-MM-DD'); // Both start and end will be the same day
         } else {
             // Use the numeric month for parsing and monthNumbers object from the previous controller
-            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
-            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
+            startDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").format('YYYY-MM-DD'); // First day of the month
+            endDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-${dayjs(`${currentYear}-${monthNumbers[currentMonth]}`).daysInMonth()}`, "YYYY-MM-DD").format('YYYY-MM-DD'); // Last day of the month
         }
 
         // Fetch album deliverables based on album values
@@ -142,34 +146,20 @@ const getAlbums = async (req, res) => {
             const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
             return {
                 ...deliverable.toObject(),
-                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+                date: eventDate ? dayjs(eventDate).format('YYYY-MM-DD') : null,
             };
         });
-      
-   
-   
-      
+
         // Filter deliverables by date
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
-           
-            
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
-                console.log(deliverableDate);
-                console.log(startDate);
-              
-                
-                
-                console.log(deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate));
-                
-                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+                const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
+                return (deliverableDate >= startDate) && deliverableDate <= endDate;
             } else {
                 return false;
             }
-          
         });
-   
-        console.log('filtered', filteredDeliverables?.length);
+
         // Determine if there are more albums to fetch
         const hasMore = albumsDeliverables.length === 10;
 
@@ -189,17 +179,19 @@ const getPhotos = async (req, res) => {
 
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-       
-        
+
+        // Extend dayjs with customParseFormat to handle custom date formats
+        dayjs.extend(customParseFormat);
+
+        // Date filter logic
         if (currentDate !== 'null' && currentDate) {
-            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
-            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
+            // Use the date directly and format it to YYYY-MM-DD
+            startDate = dayjs(currentDate).format('YYYY-MM-DD');
+            endDate = dayjs(currentDate).format('YYYY-MM-DD'); // Both start and end will be the same day
         } else {
-
-            // Use the numeric month for parsing
-            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
-            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
-
+            // Use the numeric month for parsing and monthNumbers object from the previous controller
+            startDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").format('YYYY-MM-DD'); // First day of the month
+            endDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-${dayjs(`${currentYear}-${monthNumbers[currentMonth]}`).daysInMonth()}`, "YYYY-MM-DD").format('YYYY-MM-DD'); // Last day of the month
         }
 
         // Fetch photos deliverables
@@ -224,25 +216,23 @@ const getPhotos = async (req, res) => {
             const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
             return {
                 ...deliverable.toObject(),
-                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+                date: eventDate ? dayjs(eventDate).format('YYYY-MM-DD') : null,
             };
         });
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
-              
-                
-                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+                const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
+                return (deliverableDate >= startDate) && deliverableDate <= endDate;
             } else {
                 return false;
             }
         });
-       
+
         // Determine if there are more albums to fetch
         const hasMore = photosDeliverables.length === 10;
-        
 
-        res.status(200).json({hasMore, data : filteredDeliverables});
+
+        res.status(200).json({ hasMore, data: filteredDeliverables });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Something went wrong.' });
@@ -257,15 +247,18 @@ const getPreWeds = async (req, res) => {
 
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
+        // Extend dayjs with customParseFormat to handle custom date formats
+        dayjs.extend(customParseFormat);
 
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
-            startDate = moment.utc(new Date(currentDate)).startOf('day').toDate();
-            endDate = moment.utc(new Date(currentDate)).endOf('day').toDate();
+            // Use the date directly and format it to YYYY-MM-DD
+            startDate = dayjs(currentDate).format('YYYY-MM-DD');
+            endDate = dayjs(currentDate).format('YYYY-MM-DD'); // Both start and end will be the same day
         } else {
-            // If no specific date, use the month and year filter
-            startDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").startOf('month').toDate();
-            endDate = moment.utc(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").endOf('month').toDate();
+            // Use the numeric month for parsing and monthNumbers object from the previous controller
+            startDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-01`, "YYYY-MM-DD").format('YYYY-MM-DD'); // First day of the month
+            endDate = dayjs(`${currentYear}-${monthNumbers[currentMonth]}-${dayjs(`${currentYear}-${monthNumbers[currentMonth]}`).daysInMonth()}`, "YYYY-MM-DD").format('YYYY-MM-DD'); // Last day of the month
         }
 
         // Fetch Pre-Wedding deliverables
@@ -290,15 +283,15 @@ const getPreWeds = async (req, res) => {
             const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
             return {
                 ...deliverable.toObject(),
-                date: eventDate ? moment(eventDate).startOf('day').toDate() : null,
+                date: eventDate ? dayjs(eventDate).format('YYYY-MM-DD') : null,
             };
         });
 
         // Filter deliverables based on date
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
-                const deliverableDate = moment(deliverable.date).startOf('day').add(1, 'days');
-                return deliverableDate.isSameOrAfter(startDate) && deliverableDate.isSameOrBefore(endDate);
+                const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
+                return (deliverableDate >= startDate) && deliverableDate <= endDate;
             }
             return false;
         });

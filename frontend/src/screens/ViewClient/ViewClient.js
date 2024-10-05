@@ -172,6 +172,8 @@ function ViewClient() {
                         <strong>Reset</strong>
                       </div>
                     ),
+                    brideName : 'Reset',
+                    groomName : 'Reset'
                   },
                   ...Array.from(allClients)?.map((client) => {
                     return {

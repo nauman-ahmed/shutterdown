@@ -64,24 +64,24 @@ function CalenderBar(props) {
   }, [])
   useEffect(() => {
     const eventsCopy = EventsList && [...EventsList];
-    
+
     // Get the current active year and month from the activeStartDate state
-    const currentYear = new Date(activeStartDate).getFullYear(); 
+    const currentYear = new Date(activeStartDate).getFullYear();
     const currentMonthIndex = new Date(activeStartDate).getMonth(); // Get the month as a number (0 - 11)
-  
+
     // Filter events by both month and year
     const filteredMonthEvents = eventsCopy?.filter((event) => {
       const eventDate = new Date(event?.eventDate);
       const eventYear = eventDate.getFullYear();
       const eventMonthIndex = eventDate.getMonth();
-  
+
       // Check if both year and month match the current active date
       return eventYear === currentYear && eventMonthIndex === currentMonthIndex;
     });
-  
+
     setMonthEvents(filteredMonthEvents);
   }, [activeStartDate, EventsList]); // Dependency on activeStartDate to detect month or year changes
-  
+
 
 
   const months = [
@@ -105,42 +105,42 @@ function CalenderBar(props) {
           <>
             <div className="Text20Semi">{getCurrentMonthAndYear()}</div>
             <div className="calendar-container">
-            <Calendar 
-  activeStartDate={activeStartDate} 
-  tileClassName={({ date }) => {
-    let count = 0;
-    
-    for (let index = 0; index < EventsList?.length; index++) {
-      if (EventsList[index]) {
-        
-        const eventDate = new Date(EventsList[index].eventDate);
-        const calendarDate = new Date(date);
-        
-        // Adjust eventDate to local time for comparison
-        const eventDateLocal = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-        const calendarDateLocal = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate());
-        
-        // Compare only the year, month, and date part
-        if (eventDateLocal.getTime() === calendarDateLocal.getTime()) {
-          count += 1;
-        }
-      }
-    }
+              <Calendar
+                activeStartDate={activeStartDate}
+                tileClassName={({ date }) => {
+                  let count = 0;
 
-    if (count === 1) {
-      return "highlight5";
-    } else if (count === 2) {
-      return "highlight3";
-    } else if (count >= 3) {
-      return "highlight1";
-    }
-  }}
-  onChange={() => null}
-  onActiveStartDateChange={({ activeStartDate }) => {
-    setActiveStartDate(activeStartDate);
-    setCurrentMonth(moment(activeStartDate).format('MMMM'));
-  }}
-/>
+                  for (let index = 0; index < EventsList?.length; index++) {
+                    if (EventsList[index]) {
+
+                      const eventDate = new Date(EventsList[index].eventDate);
+                      const calendarDate = new Date(date);
+
+                      // Adjust eventDate to local time for comparison
+                      const eventDateLocal = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                      const calendarDateLocal = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate());
+
+                      // Compare only the year, month, and date part
+                      if (eventDateLocal.getTime() === calendarDateLocal.getTime()) {
+                        count += 1;
+                      }
+                    }
+                  }
+
+                  if (count === 1) {
+                    return "highlight5";
+                  } else if (count === 2) {
+                    return "highlight3";
+                  } else if (count >= 3) {
+                    return "highlight1";
+                  }
+                }}
+                onChange={() => null}
+                onActiveStartDateChange={({ activeStartDate }) => {
+                  setActiveStartDate(activeStartDate);
+                  setCurrentMonth(moment(activeStartDate).format('MMMM'));
+                }}
+              />
 
             </div>
             {props.Attendence && (

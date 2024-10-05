@@ -4,14 +4,15 @@ const deliverableModel = require("../models/DeliverableModel");
 const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
 const moment = require('moment')
+const dayjs = require('dayjs')
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+
 
 const AddClientFunction = async (req, res) => {
   try {
 
     const deadlineDays = await deadlineDaysModel.find();
     let clientBody = req.body.data;
-    console.log(clientBody);
-
     clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos;
     clientBody.preWeddingVideos = req.body.data?.deliverables?.preWeddingVideos;
     const client = new ClientModel(clientBody);
@@ -25,7 +26,7 @@ const AddClientFunction = async (req, res) => {
     let preWedVideoDeadline = null;
     const eventIds = await Promise.all(
       req.body?.data?.events.map(async (eventData) => {
-        const event = new EventModel({ ...eventData, client: client._id, eventDate : moment(eventData.eventDate).format('YYYY-MM-DD') });
+        const event = new EventModel({ ...eventData, client: client._id });
         if (event.isWedding) {
           longFilmDeadline = new Date(event.eventDate.getTime());
           promoDeadline = new Date(event.eventDate.getTime());
@@ -107,8 +108,6 @@ const AddClientFunction = async (req, res) => {
     await photosDeliverable.save().then(() => {
       deliverables.push(photosDeliverable._id);
     });
-    console.log(req.body.data);
-
     if (req.body.data.promos > 0) {
       const promoDeliverable = new deliverableModel({
         client: client._id,
@@ -380,12 +379,11 @@ const getClients = async (req, res) => {
 
     // Get currentMonth, currentYear, and currentDate from the request query
     let startDate, endDate;
-    console.log(req.query);
-    
+
     const { currentMonth, currentYear, currentDate, filterClient } = req.query;
-    
+
     if (filterClient !== 'null' && filterClient !== 'undefined' && filterClient !== 'Reset' && filterClient?.length > 0) {
-      
+
       const client = await ClientModel.findById(filterClient).populate({
         path: 'events',
         model: 'Event',
@@ -407,21 +405,27 @@ const getClients = async (req, res) => {
           model: 'user'
         }
       }).populate('userID');
-      
+
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
-      
+
       // Date filter logic
       if (currentDate !== 'null') {
         // Parse currentDate as a specific day filter
-        startDate = moment(new Date(currentDate), "YYYY-MM-DD").startOf('day').toDate();
-        endDate = moment(new Date(currentDate), "YYYY-MM-DD").endOf('day').toDate();
+        // Convert current date to just the date (without time)
+        startDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
+        endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
       } else {
-        // If no specific date, use the month and year filter
-        startDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
-        endDate = moment.utc(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
-      }
+        // Extend dayjs with customParseFormat to handle custom date formats
+        dayjs.extend(customParseFormat);
 
+        // If no specific date, use the month and year filter
+        startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').format('YYYY-MM-DD');
+        endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').format('YYYY-MM-DD');
+      }
+      console.log(startDate);
+      console.log(endDate);
+      
 
       const clients = await ClientModel.find().skip(skip).limit(10).populate({
         path: 'events',
@@ -448,14 +452,16 @@ const getClients = async (req, res) => {
       const filteredClients = clients.filter(client => {
         if (client.events && Array.isArray(client.events)) {
           return client.events.some(event => {
-    
-            console.log(startDate, endDate, event.eventDate);
-
-            return moment(event.eventDate).startOf('day').isSameOrAfter(startDate) &&
-              moment(event.eventDate).startOf('day').isSameOrBefore(endDate)
-          }
-          );
-        }
+              // Ensure event.eventDate is parsed correctly as a dayjs object
+              const eventDate = dayjs(event.eventDate).format('YYYY-MM-DD');
+              console.log(eventDate);
+              console.log(eventDate >= startDate && eventDate <= endDate);
+              
+              
+              return eventDate >= startDate && eventDate <= endDate;
+          });
+      }
+      
         return false; // In case `client.events` is undefined or not an array
       });
 

@@ -1,15 +1,17 @@
 const EventModel = require('../models/EventModel');
 const ClientModel = require('../models/ClientModel');
 const eventModel = require('../models/EventModel');
-const moment = require('moment');
-
+const dayjs = require('dayjs');
+const customParseFormat = 'dayjs/plugin/customParseFormat';
 
 const AddEvent = async (req, res) => {
     try {
         const newEvent = new EventModel(req.body.data);
         const client = await ClientModel.findById(req.body.data.client)
         client.events.push(newEvent._id);
+
         await newEvent.save();
+        console.log(newEvent);
         await client.save();
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {
@@ -71,10 +73,12 @@ const getEventsByMonth = async (req, res) => {
         const page = parseInt(req.query.page) || 1; // Get the page from the query, default to 1
         const limit = 10; // Define how many events to return per page
         const skip = (page - 1) * limit; // Calculate how many records to skip
-
+        // Extend dayjs with the customParseFormat plugin
+        dayjs.extend(customParseFormat);
         // Ensure currentMonth is passed as a full month name (e.g., "January")
-        let currentMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').toDate();
-        let endOfMonth = moment.utc(`${moment().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
+        // Parse the current month and create start and end dates
+        let currentMonth = dayjs(`${dayjs().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").startOf('day').format('YYYY-MM-DD');
+        let endOfMonth = dayjs(`${dayjs().year()}-${req.body.currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').format('YYYY-MM-DD');
 
         const query = {
             eventDate: {
@@ -126,10 +130,12 @@ const getEvents = async (req, res) => {
                 const year = req.body.currentYear;
                 const month = req.body.currentMonth;
 
-                // Generate the start and end date for the given month and year
-                let startOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").startOf('month').toDate();
-                let endOfMonth = moment.utc(`${year}-${month}-01`, "YYYY-MMMM-DD").endOf('month').toDate();
+                // Extend dayjs with customParseFormat to handle custom date formats
+                // dayjs.extend(customParseFormat);
 
+                // Generate the start and end date for the given month and year
+                let startOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD").startOf('month').format('YYYY-MM-DD');
+                let endOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD").endOf('month').format('YYYY-MM-DD');
                 // Add date filtering for the specified month and year
                 obj.eventDate = {
                     $gte: startOfMonth,
@@ -181,12 +187,17 @@ const getEventsByDate = async (req, res) => {
         if (req.body.clientId) {
             obj.client = req.body.clientId;
         }
-        console.log(req.body.eventDate);
+
 
         // Get specific date from frontend
         if (req.body.eventDate) {
-            const date = moment(req.body.eventDate, "YYYY-MM-DD").startOf('day').toDate();
-            const endOfDay = moment(req.body.eventDate, "YYYY-MM-DD").endOf('day').toDate();
+            // Extend dayjs with customParseFormat for parsing custom date formats
+            // dayjs.extend(customParseFormat);
+
+            // Parse the date and get the start and end of the day
+            const date = dayjs(req.body.eventDate, "YYYY-MM-DD").startOf('day').format('YYYY-MM-DD');
+            const endOfDay = dayjs(req.body.eventDate, "YYYY-MM-DD").endOf('day').format('YYYY-MM-DD');
+
 
             // Filter by exact date
             obj.eventDate = {

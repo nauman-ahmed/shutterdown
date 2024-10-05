@@ -167,22 +167,7 @@ function Reports(props) {
     }
   }
 
-  const applyFilter = (filterValue) => {
-    // setTaksToShow(null);
-    if(filterValue == null){
-      setTasksToShow(allTasks)
-      return
-    }
-    if (filterBy === "Assign By") {
-      setTasksToShow(
-        allTasks.filter((task) => task.assignBy._id === filterValue.userId)
-      );
-    } else if (filterBy === "Assign To") {
-      setTasksToShow(
-        allTasks.filter((task) => task.assignTo._id === filterValue.userId)
-      );
-    }
-  };
+
 
   return (
     <>
@@ -243,11 +228,11 @@ function Reports(props) {
                       paddingBottom: "15px",
                     }}
                   >
-                    {task.client.brideName}
+                    {task?.client.brideName}
                     <br />
                     <img src={Heart} alt="" />
                     <br />
-                    {task.client.groomName}
+                    {task?.client?.groomName}
                   </td>
 
                   <td
