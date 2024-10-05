@@ -304,7 +304,7 @@ const getExistEmail = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userSchema.find({});
+    const users = await userSchema.find({ banAccount: false });
     res.json({ users })
   } catch (error) {
     console.log("error")
@@ -312,7 +312,7 @@ const getAllUsers = async (req, res) => {
 };
 const getEditors = async (req, res) => {
   try {
-    const editors = await userSchema.find({ rollSelect: 'Editor' });
+    const editors = await userSchema.find({ rollSelect: 'Editor', banAccount: false });
     res.json({ editors })
   } catch (error) {
     console.log("error")

@@ -164,7 +164,6 @@ function Cinematography(props) {
     try {
       setLoading(true)
       const data = await getCinematography(1, monthForData, yearForData, dateForFilter);
-     console.log(data);
      
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
