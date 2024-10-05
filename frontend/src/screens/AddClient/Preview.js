@@ -380,7 +380,7 @@ function Preview() {
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Cinematograpers
+                  Cinematographers
                 </div>
                 <Input
                   type="text"

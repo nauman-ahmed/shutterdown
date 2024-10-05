@@ -772,7 +772,7 @@ function ListView(props) {
                     </th>
                     {/* <th className="tableBody">Event Type</th> */}
                     {/* <th className="tableBody">Status</th> */}
-                    <th className="tableBody">Shoot Director</th>
+                    <th className="tableBody">Shoot Directors</th>
                     <th className="tableBody mx-1">
                       Photographers
                       <img alt="" src={Camera} />
@@ -823,7 +823,7 @@ function ListView(props) {
                   if (Number(event.sameDayVideoEditors) > 0 && (!event?.sameDayVideoMakers ||
                     event?.sameDayVideoMakers.length != Number(event.sameDayVideoEditors)
                   )) {
-                    errorText += "Same Day Video Makers are not complete, \n";
+                    errorText += "Same Day Video Maker(s) are incomplete, \n";
                   }
 
 
@@ -833,7 +833,7 @@ function ListView(props) {
                     event?.sameDayPhotoMakers.length !== Number(event.sameDayPhotoEditors)
                   )
                   ) {
-                    errorText += "Same Day Photo Makers are not complete, \n";
+                    errorText += "Same Day Photo Maker(s) are incomplete, \n";
                   }
 
 
@@ -843,7 +843,7 @@ function ListView(props) {
                     Number(event.cinematographers)
                   )
                   ) {
-                    errorText += "Cinematographers are not complete, \n";
+                    errorText += "Cinematographer(s) are incomplete, \n";
                   }
 
                   if (Number(event.drones) > 0 && (
@@ -851,15 +851,15 @@ function ListView(props) {
                     event?.droneFlyers.length !== Number(event.drones)
                   )
                   ) {
-                    errorText += "Drone Flyers are not complete, \n";
+                    errorText += "Drone Flyer(s) are not complete, \n";
                   }
 
                   if (!event?.manager || event?.manager.length !== 1) {
-                    errorText += "Manager not selected, \n";
+                    errorText += "Manager(s) are incomplete, \n";
                   }
 
                   if (!event?.assistants || event?.assistants.length !== 1) {
-                    errorText += "Assistants are not complete, \n";
+                    errorText += "Assistant(s) are incomplete, \n";
                   }
 
                   if (Number(event.photographers) > 0 && (
@@ -867,7 +867,7 @@ function ListView(props) {
                     event?.choosenPhotographers.length !== Number(event.photographers)
                   )
                   ) {
-                    errorText += "Photographers are not complete, \n";
+                    errorText += "Photographer(s) are incomplete, \n";
                   }
 
                   if (Number(event.shootDirector) > 0 && (
@@ -875,7 +875,7 @@ function ListView(props) {
                     event?.shootDirectors.length !== Number(event.shootDirector)
                   )
                   ) {
-                    errorText += "Shoot Director not selected \n";
+                    errorText += "Shoot Director(s) are incomplete. \n";
                   }
 
 
