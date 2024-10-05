@@ -41,8 +41,7 @@ function ViewClient() {
   const fetchData = async () => {
     try {
       const data = await getClients(1, monthForData, yearForData, dateForFilter, filterClient);
-      setHasMore(true)
-      setPage(2)
+     
       setClients(data.data);
       const completeclients = await getAllClients()
       setAllClients(completeclients);
@@ -52,6 +51,8 @@ function ViewClient() {
   };
 
   useEffect(() => {
+    setHasMore(true)
+    setPage(2)
     fetchData();
   }, [monthForData, yearForData, dateForFilter, filterClient]);
 
@@ -59,27 +60,18 @@ function ViewClient() {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page, monthForData, yearForData, dateForFilter, filterClient);
+        const data = await getClients(page, monthForData, yearForData, dateForFilter, null);
         if (data.data.length > 0) {
-          if (dateForFilter) {
-            const clientsToAdd = data.data.filter((clientData) => {
-              return clientData.events.some(
-                (eventData) =>
-                  new Date(eventData.eventDate).getTime() >=
-                  new Date(dateForFilter).getTime() &&
-                  new Date(eventData.eventDate).getTime() <=
-                  new Date(dateForFilter).getTime()
-              );
-            });
-            setClients([...clients, ...clientsToAdd]);
-          } else {
+         
             setClients([...clients, ...data.data]);
-          }
+          
         }
         if (data.hasMore) {
           setPage(page + 1);
         }
         setHasMore(data.hasMore);
+        console.log(data);
+        
       } catch (error) {
         console.log(error);
       }

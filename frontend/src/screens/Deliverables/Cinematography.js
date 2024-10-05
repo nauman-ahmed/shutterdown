@@ -164,11 +164,11 @@ function Cinematography(props) {
     try {
       setLoading(true)
       const data = await getCinematography(1, monthForData, yearForData, dateForFilter);
+     console.log(data);
      
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
-
       await getAllWhatsappTextHandler()
       if (currentUser.rollSelect === 'Manager') {
         setAllDeliverables(data.data);
@@ -220,9 +220,8 @@ function Cinematography(props) {
               ...dataToAdd,
             ]);
           }
-
-          
         } 
+        console.log(data);
         
         if (data.hasMore) {
           setPage(page + 1);

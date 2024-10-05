@@ -27,13 +27,14 @@ const getCinematography = async (req, res) => {
 
         let startDate, endDate;
         const { currentMonth, currentYear, currentDate } = req.query;
-
+        console.log('request cine with page', page);
+        
         // Date filter logic
         if (currentDate !== 'null' && currentDate) {
             // Single day filter
             startDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
             endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
-            console.log('date for filetr', startDate, endDate);
+
 
         } else {
             dayjs.extend(customParseFormat);
@@ -74,13 +75,14 @@ const getCinematography = async (req, res) => {
         const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
             if (deliverable.date) {
                 const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
+            
                 return (deliverableDate >= startDate) && deliverableDate <= endDate;
             }
             return false;
         });
 
 
-        const hasMore = cinematographyDeliverables.length === 10 ? true : false;
+        const hasMore = cinematographyDeliverables.length == 10;
 
         // Send response with filtered deliverables and hasMore flag
         res.status(200).json({ hasMore, data: filteredDeliverables });

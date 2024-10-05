@@ -51,7 +51,7 @@ const notifications = createSlice({
       }
 
       if (isToday) {
-        if (action.payload.forManager && currentUser.rollSelect === "Manager") {
+        if (action.payload.forManager && currentUser?.rollSelect === "Manager") {
           return {
             today: [...state.today, action.payload],
             previous: [...state.previous],

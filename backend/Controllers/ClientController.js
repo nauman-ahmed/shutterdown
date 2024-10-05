@@ -26,7 +26,7 @@ const AddClientFunction = async (req, res) => {
     let preWedVideoDeadline = null;
     const eventIds = await Promise.all(
       req.body?.data?.events.map(async (eventData) => {
-        const event = new EventModel({ ...eventData, client: client._id });
+        const event = new EventModel({ ...eventData, client: client._id, eventDate : dayjs(eventData.eventDate).format('YYYY-MM-DD') });
         if (event.isWedding) {
           longFilmDeadline = new Date(event.eventDate.getTime());
           promoDeadline = new Date(event.eventDate.getTime());
@@ -448,16 +448,15 @@ const getClients = async (req, res) => {
           model: 'user'
         }
       }).populate('userID');
-
+      console.log(page);
+      
       const filteredClients = clients.filter(client => {
         if (client.events && Array.isArray(client.events)) {
           return client.events.some(event => {
               // Ensure event.eventDate is parsed correctly as a dayjs object
               const eventDate = dayjs(event.eventDate).format('YYYY-MM-DD');
-              console.log(eventDate);
-              console.log(eventDate >= startDate && eventDate <= endDate);
-              
-              
+
+            
               return eventDate >= startDate && eventDate <= endDate;
           });
       }

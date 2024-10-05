@@ -6,7 +6,7 @@ const customParseFormat = 'dayjs/plugin/customParseFormat';
 
 const AddEvent = async (req, res) => {
     try {
-        const newEvent = new EventModel(req.body.data);
+        const newEvent = new EventModel({ ...req.body.data, eventDate: dayjs(req.body.data.eventDate).format('YYYY-MM-DD') });
         const client = await ClientModel.findById(req.body.data.client)
         client.events.push(newEvent._id);
 
@@ -60,7 +60,7 @@ const AssignTeam = async (req, res) => {
 const updateEvent = async (req, res) => {
     try {
         const { _id, ...eventData } = req.body.data;
-        const event = await EventModel.findByIdAndUpdate(req.body.data._id, eventData);
+        const event = await EventModel.findByIdAndUpdate(req.body.data._id, {...eventData, eventDate : dayjs(eventData.eventDate).format('YYYY-MM-DD')});
 
         res.status(200).json('Event Added SucccessFully');
     } catch (error) {

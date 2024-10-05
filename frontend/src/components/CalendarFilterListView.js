@@ -8,16 +8,6 @@ const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 
 
 function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFilter, setShow, dateForFilter, monthForData, yearForData }) {
-  console.log(dateForFilter);
-  console.log(monthForData);
-  console.log(yearForData);
-  
-  const today = new Date();
-
-  // Initialize selectedDate with today's date
-  const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
-  const [currentView, setCurrentView] = useState("month");
-
 
   const changeViewHandler = (props) => {
     setMonthForData(months[new Date(props.activeStartDate).getMonth()])
