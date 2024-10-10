@@ -1,11 +1,10 @@
 import axios from "axios";
 import BASE_URL from "./index";
 import Cookies from "js-cookie";
-const currentUser = Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+const currentUser =
+  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
 export const SaveClientForm = async (data) => {
-  console.log('saving client', data);
-  
   try {
     const dataToSend = { ...data, userID: currentUser?._id };
     const result = await axios
@@ -13,33 +12,17 @@ export const SaveClientForm = async (data) => {
         data: dataToSend,
       })
       .then((res) => {
-
-        return {result :true, data : res.data};
+        return { result: true, data: res.data };
       })
       .catch((err) => console.log(err));
-      return result
-
+    return result;
   } catch (error) {
     console.log(error, "error");
     return false;
   }
 };
-export const addCinematography = async (client) => {
-  try {
-    await axios
-      .post(BASE_URL + "/AddCinematography", {
-        Headers: {
-          "Content-Type": "application/json",
-        },
-        client,
-      })
-      .then(() => {
-        window.notify("Cinematography details added successfully!", "success");
-      });
-  } catch (error) {
-    console.log(error, "error");
-  }
-};
+
+
 export const updateClient = async (client) => {
   try {
     await axios
@@ -57,22 +40,6 @@ export const updateClient = async (client) => {
   }
 };
 
-export const addPhotosDeliverables = async (client) => {
-  try {
-   await axios
-      .post(BASE_URL + "/AddPhotosDeliverables", {
-        Headers: {
-          "Content-Type": "application/json",
-        },
-        client,
-      })
-      .then(() => {
-        window.notify("Photos Deliverables added successfully!", "success");
-      });
-  } catch (error) {
-    console.log(error, "error");
-  }
-};
 
 export const addAlbumsDeliverables = async (client) => {
   try {
@@ -92,16 +59,27 @@ export const addAlbumsDeliverables = async (client) => {
   }
 };
 
-export const getClients = async (page, monthForData, yearForData, dateForFilter, filterClient) => {
+export const getClients = async (
+  page,
+  monthForData,
+  yearForData,
+  dateForFilter,
+  filterClient
+) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}&filterClient=${filterClient}`, {
-      Headers: { "Content-Type": "application/json" },
-    });
+    const res = await axios.get(
+      BASE_URL +
+        `/Client/getClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}&filterClient=${filterClient}`,
+      {
+        Headers: { "Content-Type": "application/json" },
+      }
+    );
     return res.data;
   } catch (error) {
     console.log(error);
   }
 };
+
 export const getAllClients = async () => {
   try {
     const res = await axios.get(BASE_URL + `/Client/getAllClients`, {
@@ -112,17 +90,28 @@ export const getAllClients = async () => {
     console.log(error);
   }
 };
-export const getPreWedClients = async (page) => {
+
+export const getPreWedClients = async (
+  page,
+  monthForData,
+  yearForData,
+  dateForFilter
+) => {
   try {
-    const res = await axios.get(BASE_URL + `/Client/getPreWedClients?page=${page}`, {
-      Headers: { "Content-Type": "application/json" },
-    });
+    const res = await axios.get(
+      BASE_URL +
+        `/Client/getPreWedClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      {
+        Headers: { "Content-Type": "application/json" },
+      }
+    );
     return res.data;
   } catch (error) {
     console.log(error);
     return;
   }
 };
+
 export const getClientById = async (clientId) => {
   try {
     const res = await axios.get(
@@ -136,6 +125,7 @@ export const getClientById = async (clientId) => {
     console.log(error);
   }
 };
+
 export const addPreWedData = async (client) => {
   try {
     await axios.post(BASE_URL + "/add-PreWedData", {

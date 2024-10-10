@@ -4,12 +4,10 @@ const deliverableModel = require("../models/DeliverableModel");
 const eventModel = require("../models/EventModel");
 const EventModel = require("../models/EventModel");
 const TaskModel = require("../models/TaskSchema");
-const dayjs = require('dayjs')
-
+const dayjs = require("dayjs");
 
 const AddClientFunction = async (req, res) => {
   try {
-
     const deadlineDays = await deadlineDaysModel.find();
     let clientBody = req.body.data;
     clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos;
@@ -23,18 +21,23 @@ const AddClientFunction = async (req, res) => {
     let photoDeadline = null;
     let preWedPhotoDeadline = null;
     let preWedVideoDeadline = null;
+    let datesOfClient = [];
+    let dateforDeliverable = null;
     const eventIds = await Promise.all(
-      req.body?.data?.events.map(async (eventData) => {
-        const event = new EventModel({ ...eventData, client: client._id, eventDate : dayjs(eventData.eventDate).format('YYYY-MM-DD') });
+      req.body?.data?.events.map(async (eventData, i) => {
+        const event = new EventModel({
+          ...eventData,
+          client: client._id,
+          eventDate: dayjs(eventData.eventDate).format("YYYY-MM-DD"),
+        });
         if (event.isWedding) {
-          longFilmDeadline = new Date(event.eventDate.getTime());
-          promoDeadline = new Date(event.eventDate.getTime());
-          reelDeadline = new Date(event.eventDate.getTime());
-          photoDeadline = new Date(event.eventDate.getTime());
-          albumDeadline = new Date(event.eventDate.getTime());
-          preWedPhotoDeadline = new Date(event.eventDate.getTime());
-          preWedVideoDeadline = new Date(event.eventDate.getTime());
-
+          longFilmDeadline = new Date(event.eventDate);
+          promoDeadline = new Date(event.eventDate);
+          reelDeadline = new Date(event.eventDate);
+          photoDeadline = new Date(event.eventDate);
+          albumDeadline = new Date(event.eventDate);
+          preWedPhotoDeadline = new Date(event.eventDate);
+          preWedVideoDeadline = new Date(event.eventDate);
           longFilmDeadline.setDate(
             longFilmDeadline.getDate() + deadlineDays[0].longFilm
           );
@@ -53,6 +56,9 @@ const AddClientFunction = async (req, res) => {
           );
           preWedVideoDeadline.setDate(
             preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
+          );
+          dateforDeliverable = dayjs(new Date(event.eventDate)).format(
+            "YYYY-MM-DD"
           );
         }
         if (
@@ -64,14 +70,13 @@ const AddClientFunction = async (req, res) => {
           preWedVideoDeadline === null &&
           albumDeadline
         ) {
-          longFilmDeadline = new Date(event.eventDate.getTime());
-          promoDeadline = new Date(event.eventDate.getTime());
-          reelDeadline = new Date(event.eventDate.getTime());
-          photoDeadline = new Date(event.eventDate.getTime());
-          albumDeadline = new Date(event.eventDate.getTime());
-          preWedPhotoDeadline = new Date(event.eventDate.getTime());
-          preWedVideoDeadline = new Date(event.eventDate.getTime());
-
+          longFilmDeadline = new Date(event.eventDate);
+          promoDeadline = new Date(event.eventDate);
+          reelDeadline = new Date(event.eventDate);
+          photoDeadline = new Date(event.eventDate);
+          albumDeadline = new Date(event.eventDate);
+          preWedPhotoDeadline = new Date(event.eventDate);
+          preWedVideoDeadline = new Date(event.eventDate);
           longFilmDeadline.setDate(
             longFilmDeadline.getDate() + deadlineDays[0].longFilm
           );
@@ -92,7 +97,15 @@ const AddClientFunction = async (req, res) => {
             preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
           );
         }
+        if (dateforDeliverable == null && i == 0) {
+          dateforDeliverable = dayjs(new Date(event.eventDate)).format(
+            "YYYY-MM-DD"
+          );
+        }
         await event.save();
+        datesOfClient.push(
+          dayjs(new Date(event.eventDate)).format("YYYY-MM-DD")
+        );
         return event._id;
       })
     );
@@ -101,6 +114,7 @@ const AddClientFunction = async (req, res) => {
       client: client._id,
       deliverableName: "Photos",
       quantity: 1,
+      date: dateforDeliverable,
       photoDeadline,
     });
 
@@ -112,6 +126,7 @@ const AddClientFunction = async (req, res) => {
         client: client._id,
         deliverableName: "Promo",
         quantity: req.body.data.promos,
+        date: dateforDeliverable,
         promoDeadline,
       });
 
@@ -124,6 +139,7 @@ const AddClientFunction = async (req, res) => {
         client: client._id,
         deliverableName: "Long Film",
         quantity: req.body.data.longFilms,
+        date: dateforDeliverable,
         longFilmDeadline,
       });
 
@@ -136,6 +152,7 @@ const AddClientFunction = async (req, res) => {
         client: client._id,
         deliverableName: "Reel",
         quantity: req.body.data.reels,
+        date: dateforDeliverable,
         reelDeadline,
       });
 
@@ -149,6 +166,7 @@ const AddClientFunction = async (req, res) => {
         client: client._id,
         deliverableName: "Pre-Wedding Photos",
         quantity: req.body.data.reels,
+        date: dateforDeliverable,
         preWedPhotoDeadline,
       });
 
@@ -163,8 +181,8 @@ const AddClientFunction = async (req, res) => {
         deliverableName: "Pre-Wedding Videos",
         quantity: req.body.data.reels,
         preWedVideoDeadline,
+        date: dateforDeliverable,
       });
-
 
       await preWedVideosDeliverable.save().then(() => {
         deliverables.push(preWedVideosDeliverable._id);
@@ -173,26 +191,26 @@ const AddClientFunction = async (req, res) => {
 
     const albumsDeliverables = await Promise.all(
       req.body.data.albums.map(async (album) => {
-        if (album !== 'Not included') {
-
+        if (album !== "Not included") {
           const newAlbum = new deliverableModel({
             client: client._id,
             deliverableName: album,
             quantity: 1,
             albumDeadline,
+            date: dateforDeliverable,
           });
-
           await newAlbum.save();
           return newAlbum._id;
         } else {
-          return null
+          return null;
         }
       })
     );
 
     client.events = eventIds;
-    client.deliverables = [...deliverables, ...albumsDeliverables]
-    await client.save()
+    client.deliverables = [...deliverables, ...albumsDeliverables];
+    client.dates = datesOfClient;
+    await client.save();
     res.status(200).json(client);
   } catch (error) {
     console.log("Client Form Error", error);
@@ -231,102 +249,158 @@ const AddPreWedDetails = async (req, res) => {
 const updateClient = async (req, res) => {
   try {
     await ClientModel.findByIdAndUpdate(req.body.client._id, req.body.client);
-
     res.status(200).json("client Updated SucccessFully");
   } catch (error) {
     console.log(error, "error");
   }
 };
+
 const updateWholeClient = async (req, res) => {
   try {
-    console.log('from request');
-    console.log(req.body.data);
-
-    const reqClientData = { ...req.body.data }
+    const reqClientData = { ...req.body.data };
     const deadlineDays = await deadlineDaysModel.find();
-    const clientToEdit = await ClientModel.findById(req.body.data._id).populate('events')
+    const clientToEdit = await ClientModel.findById(req.body.data._id).populate(
+      "events"
+    );
     let preWedPhotoDeadline = null;
     let preWedVideoDeadline = null;
-    const weddingEvent = clientToEdit.events.find(event => event.isWedding === true)
+    const weddingEvent = clientToEdit.events.find(
+      (event) => event.isWedding === true
+    );
+    let updatedDate = null;
     if (weddingEvent) {
-      preWedPhotoDeadline = new Date(weddingEvent.eventDate.getTime());
-      preWedVideoDeadline = new Date(weddingEvent.eventDate.getTime());
+      preWedPhotoDeadline = new Date(weddingEvent.eventDate);
+      preWedVideoDeadline = new Date(weddingEvent.eventDate);
       preWedPhotoDeadline.setDate(
         preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
       );
       preWedVideoDeadline.setDate(
         preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
+      );
+      updatedDate = dayjs(new Date(weddingEvent.eventDate)).format(
+        "YYYY-MM-DD"
       );
     } else {
-      preWedPhotoDeadline = new Date(clientToEdit.events[clientToEdit.events.length - 1].eventDate.getTime());
-      preWedVideoDeadline = new Date(clientToEdit.events[clientToEdit.events.length - 1].eventDate.getTime());
+      preWedPhotoDeadline = new Date(clientToEdit.events[0]?.eventDate);
+      preWedVideoDeadline = new Date(clientToEdit.events[0]?.eventDate);
       preWedPhotoDeadline.setDate(
         preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
       );
       preWedVideoDeadline.setDate(
         preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
+      );
+      updatedDate = dayjs(new Date(clientToEdit.events[0]?.eventDate)).format(
+        "YYYY-MM-DD"
       );
     }
     await Promise.all(
       reqClientData.deliverables.map(async (deliverableData) => {
         if (deliverableData.quantity > 0) {
-          const updatedDeliverable = await deliverableModel.findById(deliverableData._id)
+          const updatedDeliverable = await deliverableModel.findById(
+            deliverableData._id
+          );
           updatedDeliverable.quantity = deliverableData.quantity;
-          await updatedDeliverable.save()
+          updatedDeliverable.date = updatedDate;
+          await updatedDeliverable.save();
         } else {
-          await deliverableModel.findByIdAndDelete(deliverableData._id)
-          clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableData._id))
+          await deliverableModel.findByIdAndDelete(deliverableData._id);
+          clientToEdit.deliverables = clientToEdit.deliverables.filter(
+            (deliverableId) => !deliverableId.equals(deliverableData._id)
+          );
         }
       })
-    )
+    );
 
-
-    if (reqClientData?.preWeddingPhotos === true && clientToEdit?.preWeddingPhotos === true) {
-      const updatedDeliverable = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Photos", client: clientToEdit._id })
+    if (
+      reqClientData?.preWeddingPhotos === true &&
+      clientToEdit?.preWeddingPhotos === true
+    ) {
+      const updatedDeliverable = await deliverableModel.findOne({
+        deliverableName: "Pre-Wedding Photos",
+        client: clientToEdit._id,
+      });
       updatedDeliverable.quantity = reqClientData.reels;
-      await updatedDeliverable.save()
-
-    } else if (reqClientData?.preWeddingPhotos === true && clientToEdit?.preWeddingPhotos === false) {
+      updatedDeliverable.date = updatedDate;
+      await updatedDeliverable.save();
+    } else if (
+      reqClientData?.preWeddingPhotos === true &&
+      clientToEdit?.preWeddingPhotos === false
+    ) {
       reqClientData.preWedding = true;
       const newPreWedPhotosDeliverable = new deliverableModel({
         client: clientToEdit._id,
         deliverableName: "Pre-Wedding Photos",
         quantity: reqClientData.reels,
+        date: updatedDate,
         preWedPhotoDeadline,
       });
       await newPreWedPhotosDeliverable.save().then(() => {
-        clientToEdit.deliverables = [...clientToEdit.deliverables, newPreWedPhotosDeliverable._id]
+        clientToEdit.deliverables = [
+          ...clientToEdit.deliverables,
+          newPreWedPhotosDeliverable._id,
+        ];
       });
-    } else if (reqClientData?.preWeddingPhotos === false && clientToEdit?.preWeddingPhotos === true) {
-      const deliverableToDelete = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Photos", client: clientToEdit._id })
+    } else if (
+      reqClientData?.preWeddingPhotos === false &&
+      clientToEdit?.preWeddingPhotos === true
+    ) {
+      const deliverableToDelete = await deliverableModel.findOne({
+        deliverableName: "Pre-Wedding Photos",
+        client: clientToEdit._id,
+      });
       await deliverableModel.findByIdAndDelete(deliverableToDelete._id);
-      clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableToDelete._id))
-
+      clientToEdit.deliverables = clientToEdit.deliverables.filter(
+        (deliverableId) => !deliverableId.equals(deliverableToDelete._id)
+      );
     }
 
-    if (reqClientData?.preWeddingVideos === true && clientToEdit?.preWeddingVideos === true) {
-      const updatedDeliverable = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Videos", client: clientToEdit._id })
+    if (
+      reqClientData?.preWeddingVideos === true &&
+      clientToEdit?.preWeddingVideos === true
+    ) {
+      const updatedDeliverable = await deliverableModel.findOne({
+        deliverableName: "Pre-Wedding Videos",
+        client: clientToEdit._id,
+      });
       updatedDeliverable.quantity = reqClientData.reels;
-      await updatedDeliverable.save()
-
-    } else if (reqClientData?.preWeddingVideos === true && clientToEdit?.preWeddingVideos === false) {
+      updatedDeliverable.date = updatedDate;
+      await updatedDeliverable.save();
+    } else if (
+      reqClientData?.preWeddingVideos === true &&
+      clientToEdit?.preWeddingVideos === false
+    ) {
       reqClientData.preWedding = true;
       const newPreWedVideosDeliverable = new deliverableModel({
         client: clientToEdit._id,
         deliverableName: "Pre-Wedding Videos",
         quantity: reqClientData.reels,
+        date: updatedDate,
         preWedPhotoDeadline,
       });
       await newPreWedVideosDeliverable.save().then(() => {
-        clientToEdit.deliverables = [...clientToEdit.deliverables, newPreWedVideosDeliverable._id]
+        clientToEdit.deliverables = [
+          ...clientToEdit.deliverables,
+          newPreWedVideosDeliverable._id,
+        ];
       });
-    } else if (reqClientData?.preWeddingVideos === false && clientToEdit?.preWeddingVideos === true) {
-      const deliverableToDelete = await deliverableModel.findOne({ deliverableName: "Pre-Wedding Videos", client: clientToEdit._id })
+    } else if (
+      reqClientData?.preWeddingVideos === false &&
+      clientToEdit?.preWeddingVideos === true
+    ) {
+      const deliverableToDelete = await deliverableModel.findOne({
+        deliverableName: "Pre-Wedding Videos",
+        client: clientToEdit._id,
+      });
       await deliverableModel.findByIdAndDelete(deliverableToDelete._id);
-      clientToEdit.deliverables = clientToEdit.deliverables.filter(deliverableId => !deliverableId.equals(deliverableToDelete._id))
+      clientToEdit.deliverables = clientToEdit.deliverables.filter(
+        (deliverableId) => !deliverableId.equals(deliverableToDelete._id)
+      );
     }
 
-    if (reqClientData.preWeddingPhotos === false && reqClientData.preWeddingVideos === false) {
+    if (
+      reqClientData.preWeddingPhotos === false &&
+      reqClientData.preWeddingVideos === false
+    ) {
       reqClientData.preWedding = false;
       reqClientData.preWeddingDetails = null;
       reqClientData.preWedphotographers = null;
@@ -337,32 +411,34 @@ const updateWholeClient = async (req, res) => {
 
     await Promise.all(
       reqClientData.albums.map(async (album) => {
-        if (album !== 'Not inlcuded') {
-
-
-          const existAlbum = await deliverableModel.findOne({ deliverableName: album, client: clientToEdit._id })
+        if (album !== "Not inlcuded") {
+          const existAlbum = await deliverableModel.findOne({
+            deliverableName: album,
+            client: clientToEdit._id,
+          });
           if (!existAlbum) {
             const newAlbum = new deliverableModel({
               client: client._id,
               deliverableName: album,
               quantity: 1,
+              date: updatedDate,
               albumDeadline,
             });
             await newAlbum.save();
-            clientToEdit.deliverables = [...clientToEdit.deliverables, newAlbum._id]
-
+            clientToEdit.deliverables = [
+              ...clientToEdit.deliverables,
+              newAlbum._id,
+            ];
           }
         }
       })
     );
 
-    reqClientData.events = clientToEdit.events.map(eventData => eventData._id)
+    reqClientData.events = clientToEdit.events.map(
+      (eventData) => eventData._id
+    );
     reqClientData.deliverables = clientToEdit.deliverables;
     reqClientData.userID = reqClientData.userID._id;
-
-    console.log('updated client');
-
-    console.log(reqClientData);
     await ClientModel.findByIdAndUpdate(reqClientData._id, reqClientData);
 
     res.status(200).json("client Updated SucccessFully");
@@ -375,132 +451,133 @@ const getClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
-
     // Get currentMonth, currentYear, and currentDate from the request query
     let startDate, endDate;
 
     const { currentMonth, currentYear, currentDate, filterClient } = req.query;
+    if (
+      filterClient !== "null" &&
+      filterClient !== "undefined" &&
+      filterClient !== "Reset" &&
+      filterClient?.length > 0
+    ) {
+      const client = await ClientModel.findById(filterClient)
+        .populate({
+          path: "events",
 
-    if (filterClient !== 'null' && filterClient !== 'undefined' && filterClient !== 'Reset' && filterClient?.length > 0) {
-
-      const client = await ClientModel.findById(filterClient).populate({
-        path: 'events',
-        model: 'Event',
-        populate: [
-          { path: 'choosenPhotographers', model: 'user' },
-          { path: 'choosenCinematographers', model: 'user' },
-          { path: 'droneFlyers', model: 'user' },
-          { path: 'manager', model: 'user' },
-          { path: 'assistants', model: 'user' },
-          { path: 'sameDayPhotoMakers', model: 'user' },
-          { path: 'sameDayVideoMakers', model: 'user' },
-          { path: 'shootDirectors', model: 'user' },
-        ],
-      }).populate({
-        path: 'deliverables',
-        model: 'Deliverable',
-        populate: {
-          path: 'editor',
-          model: 'user'
-        }
-      }).populate('userID');
+          model: "Event",
+          populate: [
+            { path: "choosenPhotographers", model: "user" },
+            { path: "choosenCinematographers", model: "user" },
+            { path: "droneFlyers", model: "user" },
+            { path: "manager", model: "user" },
+            { path: "assistants", model: "user" },
+            { path: "sameDayPhotoMakers", model: "user" },
+            { path: "sameDayVideoMakers", model: "user" },
+            { path: "shootDirectors", model: "user" },
+          ],
+        })
+        .populate({
+          path: "deliverables",
+          model: "Deliverable",
+          populate: {
+            path: "editor",
+            model: "user",
+          },
+        })
+        .populate("userID");
 
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
-
       // Date filter logic
-      if (currentDate !== 'null') {
-        // Parse currentDate as a specific day filter
+      if (currentDate !== "null") {
         // Convert current date to just the date (without time)
-        startDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
-        endDate = dayjs(new Date(currentDate)).format('YYYY-MM-DD');
+        startDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
+        endDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
       } else {
-        // Extend dayjs with customParseFormat to handle custom date formats
-        // dayjs.extend(customParseFormat);
-
         // If no specific date, use the month and year filter
-        startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").startOf('month').format('YYYY-MM-DD');
-        endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD").endOf('month').format('YYYY-MM-DD');
+        startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
+          .startOf("month")
+          .format("YYYY-MM-DD");
+        endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
+          .endOf("month")
+          .format("YYYY-MM-DD");
       }
 
-      const clients = await ClientModel.find().skip(skip).limit(10).populate({
-        path: 'events',
-        model: 'Event',
-        populate: [
-          { path: 'choosenPhotographers', model: 'user' },
-          { path: 'choosenCinematographers', model: 'user' },
-          { path: 'droneFlyers', model: 'user' },
-          { path: 'manager', model: 'user' },
-          { path: 'assistants', model: 'user' },
-          { path: 'sameDayPhotoMakers', model: 'user' },
-          { path: 'sameDayVideoMakers', model: 'user' },
-          { path: 'shootDirectors', model: 'user' },
-        ],
-      }).populate({
-        path: 'deliverables',
-        model: 'Deliverable',
-        populate: {
-          path: 'editor',
-          model: 'user'
-        }
-      }).populate('userID');
-
-      const filteredClients = clients.filter(client => {
-        if (client.events && Array.isArray(client.events)) {
-          return client.events.some(event => {
-              // Ensure event.eventDate is parsed correctly as a dayjs object
-              const eventDate = dayjs(event.eventDate).format('YYYY-MM-DD');
-
-            
-              return eventDate >= startDate && eventDate <= endDate;
-          });
-      }
-      
-        return false; // In case `client.events` is undefined or not an array
-      });
+      const clients = await ClientModel.find({
+        dates: {
+          $elemMatch: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      })
+        .skip(skip)
+        .limit(10)
+        .populate({
+          path: "events",
+          model: "Event",
+          populate: [
+            { path: "choosenPhotographers", model: "user" },
+            { path: "choosenCinematographers", model: "user" },
+            { path: "droneFlyers", model: "user" },
+            { path: "manager", model: "user" },
+            { path: "assistants", model: "user" },
+            { path: "sameDayPhotoMakers", model: "user" },
+            { path: "sameDayVideoMakers", model: "user" },
+            { path: "shootDirectors", model: "user" },
+          ],
+        })
+        .populate({
+          path: "deliverables",
+          model: "Deliverable",
+          populate: {
+            path: "editor",
+            model: "user",
+          },
+        })
+        .populate("userID");
 
       // Determine if there are more objects to fetch
       const hasMore = clients.length === 10;
-
-      res.status(200).json({ hasMore, data: filteredClients });
+      res.status(200).json({ hasMore, data: clients });
     }
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
-
   }
 };
+
 const getAllClients = async (req, res) => {
   try {
-
-    const clients = await ClientModel.find().populate({
-      path: 'events',
-      model: 'Event',
-      populate: [
-        { path: 'choosenPhotographers', model: 'user' },
-        { path: 'choosenCinematographers', model: 'user' },
-        { path: 'droneFlyers', model: 'user' },
-        { path: 'manager', model: 'user' },
-        { path: 'assistants', model: 'user' },
-        { path: 'sameDayPhotoMakers', model: 'user' },
-        { path: 'sameDayVideoMakers', model: 'user' },
-        { path: 'shootDirectors', model: 'user' },
-      ],
-    }).populate({
-      path: 'deliverables',
-      model: 'Deliverable',
-      populate: {
-        path: 'editor',
-        model: 'user'
-      }
-    }).populate('userID');
-
-
+    const clients = await ClientModel.find()
+      .populate({
+        path: "events",
+        model: "Event",
+        populate: [
+          { path: "choosenPhotographers", model: "user" },
+          { path: "choosenCinematographers", model: "user" },
+          { path: "droneFlyers", model: "user" },
+          { path: "manager", model: "user" },
+          { path: "assistants", model: "user" },
+          { path: "sameDayPhotoMakers", model: "user" },
+          { path: "sameDayVideoMakers", model: "user" },
+          { path: "shootDirectors", model: "user" },
+        ],
+      })
+      .populate({
+        path: "deliverables",
+        model: "Deliverable",
+        populate: {
+          path: "editor",
+          model: "user",
+        },
+      })
+      .populate("userID");
     res.status(200).json(clients);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
-
   }
 };
 
@@ -508,24 +585,59 @@ const getPreWedClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
-    const clients = await ClientModel.find({ preWedding: true }).skip(skip).limit(10).populate({
-      path: 'deliverables',
-      model: 'Deliverable',
-      populate: {
-        path: 'editor',
-        model: 'user'
-      }
-    }).populate({
-      path: 'preWeddingDetails',
-      populate: [
-        { path: 'photographers', model: 'user' },
-        { path: 'cinematographers', model: 'user' },
-        { path: 'droneFlyers', model: 'user' },
-        { path: 'assistants', model: 'user' },
-      ]
-    }).populate('userID').populate('events');
+    // Get currentMonth, currentYear, and currentDate from the request query
+    let startDate, endDate;
+    const { currentMonth, currentYear, currentDate } = req.query;
 
-    res.status(200).json(clients);
+    // Date filter logic
+    if (currentDate !== "null") {
+      // Convert current date to just the date (without time)
+      startDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
+      endDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
+    } else {
+      // If no specific date, use the month and year filter
+      startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
+        .endOf("month")
+        .format("YYYY-MM-DD");
+    }
+
+    const clients = await ClientModel.find({
+      preWedding: true,
+      dates: {
+        $elemMatch: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      },
+    })
+      .skip(skip)
+      .limit(10)
+      .populate({
+        path: "deliverables",
+        model: "Deliverable",
+        populate: {
+          path: "editor",
+          model: "user",
+        },
+      })
+      .populate({
+        path: "preWeddingDetails",
+        populate: [
+          { path: "photographers", model: "user" },
+          { path: "cinematographers", model: "user" },
+          { path: "droneFlyers", model: "user" },
+          { path: "assistants", model: "user" },
+        ],
+      })
+      .populate("userID")
+      .populate("events");
+
+    // Determine if there are more objects to fetch
+    const hasMore = clients.length === 10;
+    res.status(200).json({ hasMore, data: clients });
   } catch (error) {
     res.status(404).json(error);
   }
@@ -564,26 +676,35 @@ const getClientById = async (req, res) => {
   }
 };
 
-
 const DeleteClient = async (req, res) => {
   try {
-    
     const clientToDelete = await ClientModel.findById(req.params.clientId);
     clientToDelete.events.forEach(async (eventId) => {
-      await eventModel.findByIdAndDelete(eventId)
-    })
+      await eventModel.findByIdAndDelete(eventId);
+    });
     clientToDelete.deliverables.forEach(async (deliverableId) => {
-      await deliverableModel.findByIdAndDelete(deliverableId)
-    })
-
-    console.log("Deletion Nauman", clientToDelete._id)
-    await ClientModel.findByIdAndDelete(clientToDelete._id)
+      await deliverableModel.findByIdAndDelete(deliverableId);
+    });
+    await ClientModel.findByIdAndDelete(clientToDelete._id);
     await TaskModel.deleteMany({ client: clientToDelete._id });
 
-    res.status(200).json('Client Deleted Succcessfully!');
+    res.status(200).json("Client Deleted Succcessfully!");
   } catch (error) {
-    console.log(error, 'error');
+    console.log(error, "error");
   }
+};
+
+const adddatesinClients = async () => {
+  const allClients = await ClientModel.find().populate("events");
+  allClients.forEach(async (client) => {
+    let clientDates = [];
+    client.events.forEach((event) => {
+      clientDates.push(dayjs(event.eventDate).format("YYYY-MM-DD"));
+    });
+    client.dates = clientDates;
+    await ClientModel.findByIdAndUpdate(client._id, client);
+  });
+  console.log("added dates in clients");
 };
 
 module.exports = {
@@ -595,5 +716,6 @@ module.exports = {
   updateClient,
   AddPreWedDetails,
   DeleteClient,
-  updateWholeClient
+  updateWholeClient,
+  adddatesinClients,
 };

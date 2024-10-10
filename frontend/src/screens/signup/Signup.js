@@ -1,69 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import CommonDropText from '../../components/CommonDropText';
+import React, { useState, useEffect } from "react";
+import CommonDropText from "../../components/CommonDropText";
 
-import { FormGroup, Input, Label, Button, Form } from 'reactstrap';
-import '../../assets/css/common.css';
-import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { FormGroup, Input, Label, Button, Form } from "reactstrap";
+import "../../assets/css/common.css";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 
-import Logo from '../../components/Logo';
-import 'react-phone-number-input/style.css';
-import PhoneInput from 'react-phone-number-input';
-import { GetsignUPData } from '../../API/userApi';
-import { GetSignInWithGoogleData } from '../../API/userApi';
-import Cookies from 'js-cookie'
+import Logo from "../../components/Logo";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
+import { GetsignUPData } from "../../API/userApi";
+import { GetSignInWithGoogleData } from "../../API/userApi";
+import Cookies from "js-cookie";
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
 const Signup = (props) => {
   const navigate = useNavigate();
-  const [successToast, setSuccessToast] = useState(false)
+  const [successToast, setSuccessToast] = useState(false);
   const [phone, setPhone] = useState();
   const [error, setError] = useState(false);
   const [isMatch, setIsMatch] = useState(false);
-  const [rollSelect, setRollSelect] = useState("Select")
-  const [rollOpen, setRollOpen] = useState(false)
-  const [signInData, setSignInData] = useState()
+  const [rollSelect, setRollSelect] = useState("Select");
+  const [rollOpen, setRollOpen] = useState(false);
+  const [signInData, setSignInData] = useState();
 
   const [inputData, setInputData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     phoneNo: phone,
   });
   let Roll = [
     {
-      check: 'roll',
+      check: "roll",
       title: "Manager",
       id: 1,
     },
     {
-      check: 'roll',
+      check: "roll",
       title: "Editor",
       id: 2,
     },
     {
-      check: 'roll',
+      check: "roll",
       title: "Shooter",
       id: 3,
-    }
+    },
   ];
 
   useEffect(() => {
     const signInWithGoogle = JSON.parse(
-      localStorage.getItem('signInWithGoogle')
+      localStorage.getItem("signInWithGoogle")
     );
-    setSignInData(signInWithGoogle)
-  }, [])
+    setSignInData(signInWithGoogle);
+  }, []);
   const inputData1 = {
     firstName: signInData?.given_name,
     lastName: signInData?.family_name,
     email: signInData?.email,
-
-  }
+  };
 
   const handleOnChangeFunction = (e) => {
     const { name, value } = e.target;
@@ -71,84 +70,78 @@ const Signup = (props) => {
     setError(false);
     setIsMatch(false);
   };
-  const { firstName, lastName, email, password, confirmPassword, roll } = inputData;
+  const { firstName, lastName, email, password, confirmPassword, roll } =
+    inputData;
 
-  const RegisterData = { ...inputData, rollSelect }
-  const RegisterData2 = { ...inputData1, rollSelect }
+  const RegisterData = { ...inputData, rollSelect };
+  const RegisterData2 = { ...inputData1, rollSelect };
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
-    if (roll === 'Select') {
+    if (roll === "Select") {
       setError(true);
     }
-    if (firstName === '') {
+    if (firstName === "") {
       setError(true);
     }
-    if (lastName === '') {
+    if (lastName === "") {
       setError(true);
     }
-    if (email === '') {
+    if (email === "") {
       setError(true);
     }
-    if (phone === '') {
+    if (phone === "") {
       setError(true);
     }
-    if (password === '') {
+    if (password === "") {
       setError(true);
     }
-    if (confirmPassword === '') {
+    if (confirmPassword === "") {
       setError(true);
     } else if (password !== confirmPassword) {
       setError(true);
       setIsMatch(true);
     } else {
-
-
       try {
         setError(false);
         await GetsignUPData(RegisterData, phone);
-
-        const res = JSON.parse(localStorage.getItem("res"))
+        const res = JSON.parse(localStorage.getItem("res"));
         if (res.status === 200) {
-          setSuccessToast(true)
-          toast.success("You Are Registered Successfully")
-          navigate("/")
-        }
-        else {
-          toast.error("This Email is Already Exists")
+          setSuccessToast(true);
+          toast.success("You Are Registered Successfully");
+          navigate("/");
+        } else {
+          toast.error("This Email is Already Exists");
         }
       } catch (error) {
-        toast.error('This Email is Already Exists');
-
+        toast.error("This Email is Already Exists");
       }
-
     }
   };
 
   const handleSignInwithGoogleFunction = async (e) => {
-    e.preventDefault()
-    if (phone === '') {
-      setError(true)
+    e.preventDefault();
+    if (phone === "") {
+      setError(true);
     } else if (roll === "select") {
-      setError(true)
+      setError(true);
     } else {
-      setError(false)
-      await GetSignInWithGoogleData(RegisterData2, phone)
-      const response = JSON.parse(localStorage.getItem('loginUser'));
+      setError(false);
+      await GetSignInWithGoogleData(RegisterData2, phone);
+      const response = JSON.parse(localStorage.getItem("loginUser"));
       if (response.status === 200) {
-        Cookies.set('currentUser', JSON.stringify(response.data.User))
-        localStorage.removeItem('loginUser')
-        localStorage.removeItem('signInWithGoogle')
-        navigate('/MyProfile');
+        Cookies.set("currentUser", JSON.stringify(response.data.User));
+        localStorage.removeItem("loginUser");
+        localStorage.removeItem("signInWithGoogle");
+        navigate("/MyProfile");
       } else {
-        toast.error('Invalid Credentials');
+        toast.error("Invalid Credentials");
       }
-
     }
-  }
+  };
   const signin = () => {
-    navigate('/');
+    navigate("/");
   };
   const handlePhoneNo = (e) => {
     setPhone(e);
@@ -170,7 +163,7 @@ const Signup = (props) => {
               Register
             </h4>
             <p className="subheading" style={{ marginTop: -5 }}>
-              Welcome back! Please enter your details{' '}
+              Welcome back! Please enter your details{" "}
             </p>
             <Form>
               <div className="row">
@@ -183,8 +176,8 @@ const Signup = (props) => {
                       <div
                         className={
                           error && firstName.length < 1
-                            ? 'input_div_signup border border-danger'
-                            : 'input_div_signup'
+                            ? "input_div_signup border border-danger"
+                            : "input_div_signup"
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -210,8 +203,8 @@ const Signup = (props) => {
                       <div
                         className={
                           error && lastName.length < 1
-                            ? 'input_div_signup border border-danger '
-                            : 'input_div_signup '
+                            ? "input_div_signup border border-danger "
+                            : "input_div_signup "
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -238,8 +231,8 @@ const Signup = (props) => {
                         <div
                           className={
                             error && email.length < 1
-                              ? 'input_div_signup border border-danger'
-                              : 'input_div_signup'
+                              ? "input_div_signup border border-danger"
+                              : "input_div_signup"
                           }
                           style={{ marginTop: -10 }}
                         >
@@ -251,9 +244,7 @@ const Signup = (props) => {
                             pattern="[^ @]*@[^ @]*"
                             onChange={handleOnChangeFunction}
                             value={
-                              props.signInWithGoogle
-                                ? signInData?.email
-                                : email
+                              props.signInWithGoogle ? signInData?.email : email
                             }
                           ></input>
                         </div>
@@ -266,8 +257,8 @@ const Signup = (props) => {
                         <div
                           className={
                             error && !phone
-                              ? 'input_div_signup border border-danger '
-                              : 'input_div_signup '
+                              ? "input_div_signup border border-danger "
+                              : "input_div_signup "
                           }
                           style={{ marginTop: -10 }}
                         >
@@ -291,8 +282,8 @@ const Signup = (props) => {
                       <div
                         className={
                           error && firstName.length < 1
-                            ? 'input_div_signup border border-danger'
-                            : 'input_div_signup'
+                            ? "input_div_signup border border-danger"
+                            : "input_div_signup"
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -314,8 +305,8 @@ const Signup = (props) => {
                       <div
                         className={
                           error && lastName.length < 1
-                            ? 'input_div_signup border border-danger '
-                            : 'input_div_signup '
+                            ? "input_div_signup border border-danger "
+                            : "input_div_signup "
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -338,8 +329,8 @@ const Signup = (props) => {
                         <div
                           className={
                             error && email.length < 1
-                              ? 'input_div_signup border border-danger'
-                              : 'input_div_signup'
+                              ? "input_div_signup border border-danger"
+                              : "input_div_signup"
                           }
                           style={{ marginTop: -10 }}
                         >
@@ -362,8 +353,8 @@ const Signup = (props) => {
                         <div
                           className={
                             error && !phone
-                              ? 'input_div_signup border border-danger '
-                              : 'input_div_signup '
+                              ? "input_div_signup border border-danger "
+                              : "input_div_signup "
                           }
                           style={{ marginTop: -10 }}
                         >
@@ -381,7 +372,7 @@ const Signup = (props) => {
                 )}
 
                 {props.signInWithGoogle === true ? (
-                  ''
+                  ""
                 ) : (
                   <div className="row">
                     <div className="col-xl-5 col-lg-5 col-md-5 col-sm-12 ">
@@ -391,8 +382,8 @@ const Signup = (props) => {
                       <div
                         className={
                           isMatch || (error && password.length < 1)
-                            ? 'input_div_signup border border-danger'
-                            : 'input_div_signup'
+                            ? "input_div_signup border border-danger"
+                            : "input_div_signup"
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -414,8 +405,8 @@ const Signup = (props) => {
                       <div
                         className={
                           isMatch || (error && confirmPassword.length < 1)
-                            ? 'input_div_signup border border-danger'
-                            : 'input_div_signup'
+                            ? "input_div_signup border border-danger"
+                            : "input_div_signup"
                         }
                         style={{ marginTop: -10 }}
                       >
@@ -439,8 +430,8 @@ const Signup = (props) => {
                       name="Role"
                       className={
                         error && !rollSelect
-                          ? 'input_div_signup border border-danger '
-                          : 'input_div_signup '
+                          ? "input_div_signup border border-danger "
+                          : "input_div_signup "
                       }
                       data={Roll}
                       rollSelect={rollSelect}
@@ -455,9 +446,11 @@ const Signup = (props) => {
               </div>
               <FormGroup style={{ marginTop: 5 }}>
                 <Label>
-                  <Input type="checkbox" />{' '}
-                  <span className="grey_color">I agree with the </span> Terms &
-                  Privacy Policy
+                  {/* <Input type="checkbox" />{' '} */}
+                  <span className="grey_color">
+                    By Sign Up, You agree with the{" "}
+                  </span>{" "}
+                  Terms & Privacy Policy
                 </Label>
               </FormGroup>
               {props.signInWithGoogle === true ? (
@@ -468,7 +461,7 @@ const Signup = (props) => {
                     onClick={handleSignInwithGoogleFunction}
                   >
                     Sign Up
-                  </Button>{' '}
+                  </Button>{" "}
                 </>
               ) : (
                 <>
@@ -478,7 +471,7 @@ const Signup = (props) => {
                     onClick={handleSubmitForm}
                   >
                     Sign Up
-                  </Button>{' '}
+                  </Button>{" "}
                 </>
               )}
             </Form>
@@ -491,7 +484,7 @@ const Signup = (props) => {
                   fontSize: 13,
                   marginTop: 0,
                   marginLeft: 5,
-                  cursor: 'pointer',
+                  cursor: "pointer",
                 }}
                 onClick={() => signin()}
               >

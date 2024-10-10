@@ -12,12 +12,12 @@ import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { FaDirections } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs'
 
 function Calender() {
   const poperReferencd = useRef(null);
   const [allEvents, setAllEvents] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
-  
   const navigate = useNavigate();
 
   const getEventsData = async () => {
@@ -82,7 +82,7 @@ function Calender() {
         eventsToShow.map((eventInfo) => {
           if (eventInfo) {
             const eventType = eventInfo.eventType;
-            const date = eventInfo.eventDate;
+            const date = dayjs(new Date(eventInfo.eventDate)).format('YYYY-MM-DD');
             return {
               ...eventInfo,
               title: ` • ${eventType}`,
@@ -102,7 +102,7 @@ function Calender() {
   useEffect(() => {
     getEventsData();
   }, []);
-console.log(allEvents);
+
 
   return (
     <>

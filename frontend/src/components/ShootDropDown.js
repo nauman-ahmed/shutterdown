@@ -22,7 +22,8 @@ function ShootDropDown(props) {
     currentEvent,
     message,
     fromPreWed,
-    preWedDetails
+    preWedDetails,
+    eventsForShow
   } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const target = useRef(null);
@@ -31,34 +32,44 @@ function ShootDropDown(props) {
     setDropdownOpen((prevState) => !prevState);
   };
 
-  const shooterDatesHandler = (user, role = undefined) => {
+  const shooterDatesHandler = (user) => {
     let pushShooter = true;
     if (allEvents && currentEvent) {
-      let dummy = {};
       console.log("Current Event", currentEvent.eventDate)
-      allEvents?.map((event) => {
-        if (event.eventDate === currentEvent.eventDate) {
-          dummy[event.eventDate] = Array.isArray(dummy[event.eventDate])
-            ? [...dummy[event.eventDate], ...event[role]]
-            : [...event[role], user];
-        } else {
-          dummy[event.eventDate] = event[role];
-        }
-      });
-      for (const date in dummy) {
-        const events = dummy[date];
-        const seen = new Set();
-        if (events) {
-          for (const event of events) {
-            const eventString = JSON.stringify(event);
-            if (seen.has(eventString)) {
-              return false; // Duplicate found
-            }
-            seen.add(eventString);
+      const sameDateEvents = [...allEvents, ...eventsForShow].filter(event => event.eventDate === currentEvent.eventDate && event._id !== currentEvent._id)
+
+      if (sameDateEvents?.length > 0) {
+        sameDateEvents.forEach(event => {
+          if ([...event?.shootDirectors, ...event?.choosenPhotographers, ...event?.choosenCinematographers, ...event?.droneFlyers, ...event.manager, ...event.assistants, ...event.sameDayPhotoMakers, ...event.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
+            pushShooter = false
           }
-        }
+        })
       }
-      return true; // No duplicates found
+
+      return pushShooter
+      // allEvents?.map((event) => {
+      //   if (event.eventDate === currentEvent.eventDate) {
+      //     dummy[event.eventDate] = Array.isArray(dummy[event.eventDate])
+      //       ? [...dummy[event.eventDate], ...event[role]]
+      //       : [...event[role], user];
+      //   } else {
+      //     dummy[event.eventDate] = event[role];
+      //   }
+      // });
+      // for (const date in dummy) {
+      //   const events = dummy[date];
+      //   const seen = new Set();
+      //   if (events) {
+      //     for (const event of events) {
+      //       const eventString = JSON.stringify(event);
+      //       if (seen.has(eventString)) {
+      //         return false; // Duplicate found
+      //       }
+      //       seen.add(eventString);
+      //     }
+      //   }
+      // }
+      // return true; // No duplicates found
     }
     return pushShooter;
   };
@@ -66,7 +77,6 @@ function ShootDropDown(props) {
   return (
     <div className="d-flex">
       <ToastContainer />
-
       <ButtonDropdown>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle
@@ -97,11 +107,8 @@ function ShootDropDown(props) {
                   justifyContent: "space-between",
                 }}
                 onClick={() => {
-                 
-
+                  const add = shooterDatesHandler(user)
                   if (fromPreWed) {
-                    
-                    
                     if (
                       existedUsers?.length > 0 &&
                       existedUsers?.some(
@@ -117,9 +124,6 @@ function ShootDropDown(props) {
                         );
                         return;
                       } else {
-                       
-                       
-                        
                         if (
                           preWedDetails &&
                           [
@@ -134,18 +138,27 @@ function ShootDropDown(props) {
                             "error"
                           );
                         } else {
-                          userChecked(user);
+                          if (add) {
+                            userChecked(user);
+                          } else {
+                            window.notify(
+                              `This ${message} has already been assigned in some other event on the same date!`,
+                              "error"
+                            );
+                          }
                         }
-                        
                       }
                     }
                   } else {
+          
                     if (
                       existedUsers?.length > 0 &&
                       existedUsers?.some(
-                        (existingUser) => existingUser._id === user._id
+                        (existingUser) => existingUser._id == user._id
                       )
                     ) {
+                      console.log('unheck User');
+                      
                       userUnChecked(user);
                     } else {
                       if (existedUsers?.length >= allowedPersons) {
@@ -155,19 +168,27 @@ function ShootDropDown(props) {
                         );
                         return;
                       } else {
-                        // if (shooterDatesHandler(user, props.role)) {
-
                         if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
                           window.notify(
                             `This ${message} has already been assigned in some other role on the same event!`,
                             "error"
                           );
                         } else {
-                          userChecked(user);
+                          if (add) {
+                            userChecked(user);
+                          } else {
+                            window.notify(
+                              `This ${message} has already been assigned in some other event on the same date!`,
+                              "error"
+                            );
+                          }
+                          
                         }
                       }
                     }
                   }
+
+
 
                 }}
               >
@@ -176,30 +197,7 @@ function ShootDropDown(props) {
                   ref={target}
                   className="ml-2 mx-2"
                   type="checkbox"
-                  // onChange={(e) => {
-                  //   if (e.target.checked) {
-                  //     if (existedUsers?.length >= allowedPersons) {
-                  //       window.notify(
-                  //         `Maximum Limit is ${allowedPersons}, uncheck previous!`,
-                  //         "error"
-                  //       );
-                  //       return;
-                  //     } else {
-                  //      // if (shooterDatesHandler(user, props.role)) {
 
-                  //     if ([...currentEvent.shootDirectors, ...currentEvent?.choosenPhotographers, ...currentEvent?.choosenCinematographers, ...currentEvent.droneFlyers, ...currentEvent.manager, ...currentEvent.assistants, ...currentEvent.sameDayPhotoMakers, ...currentEvent.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
-                  //       window.notify(
-                  //         `This ${message} has already been assigned in some other role on the same event!`,
-                  //         "error"
-                  //       );
-                  //     } else {
-                  //       userChecked(user);
-                  //     }
-                  //     }
-                  //   } else {
-                  //     userUnChecked(user);
-                  //   }
-                  // }}
                   checked={
                     existedUsers?.length > 0 &&
                     existedUsers?.some(

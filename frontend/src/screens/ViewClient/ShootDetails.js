@@ -64,6 +64,7 @@ function ShootDetails(props) {
         console.error("Error generating PDF:", error);
       });
   };
+console.log(clientData);
 
 
   return (
@@ -78,7 +79,7 @@ function ShootDetails(props) {
               >
                 About Team
               </div>
-              <div className="shootCardBox">
+              {/* <div className="shootCardBox">
                 <div className="w-25">
                   {clientData?.userID?.photo ? (
                     <img
@@ -112,7 +113,7 @@ function ShootDetails(props) {
                     </h3>
                   </blockquote>
                 </div>
-              </div>
+              </div> */}
 
               {teamToShow?.shootDirectors?.length > 0 &&
                 teamToShow?.shootDirectors?.map((user, ind) => (
@@ -482,7 +483,7 @@ function ShootDetails(props) {
                         " " +
                         clientData.userID?.lastName}
                     </td> */}
-                    {console.log("Evemt", event)}
+                  
                     <td className="tablePlaceContent  textPrimary fs-6">
                       {event.shootDirectors?.length > 0 && (
                         <div>

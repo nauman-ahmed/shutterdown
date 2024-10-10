@@ -56,7 +56,7 @@ const notifications = createSlice({
             today: [...state.today, action.payload],
             previous: [...state.previous],
           };
-        } else if (!action.payload.forManager && currentUser._id === action.payload.forUser) {
+        } else if (!action.payload.forManager && currentUser?._id === action.payload.forUser) {
           return {
             today: [...state.today, action.payload],
             previous: [...state.previous],
@@ -68,7 +68,7 @@ const notifications = createSlice({
             today: [...state.today],
             previous: [...state.previous, action.payload],
           };
-        } else if (!action.payload.forManager && currentUser._id === action.payload.forUser) {
+        } else if (!action.payload.forManager && currentUser?._id === action.payload.forUser) {
           return {
             today: [...state.today],
             previous: [...state.previous, action.payload],

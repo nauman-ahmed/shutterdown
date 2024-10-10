@@ -20,6 +20,9 @@ const eventRouter = require('./Routes/EventRouter');
 const deliverableRouter = require('./Routes/deliverableRouter');
 dotenv.config({ path: './config.env' });
 const path = require('path');
+const { changeDateString } = require('./Controllers/EventController');
+const { adddatesinClients } = require('./Controllers/ClientController');
+const { addDateinDeliverales } = require('./Controllers/deliverableController');
 const PORT = 5002;
 
 app.use(cors());
@@ -78,6 +81,10 @@ app.use('/Whatsapp', WhatsappRouter);
 //     },
 //   );
 // });
+
+// changeDateString()
+// adddatesinClients()
+// addDateinDeliverales()
 
 server.listen(PORT, () => {
   try {

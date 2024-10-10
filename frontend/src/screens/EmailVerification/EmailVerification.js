@@ -3,20 +3,28 @@ import { Button, Form } from 'reactstrap';
 import '../../assets/css/common.css';
 import Logo from '../../components/Logo';
 import { verifyEmail } from '../../API/userApi';
+import { useNavigate } from 'react-router-dom';
 
 const EmailVerification = () => {
   const [inputData, setInputData] = useState();
+  const [sending, setSending] = useState(false)
   const [error, setError] = useState();
   const handleOnChangeFuntion = (e) => {
     setInputData(e.target.value);
     setError(false);
   };
+  const navigate = useNavigate()
   const handleSubmitFunction = async (e) => {
     e.preventDefault();
     if (!inputData) {
       setError(true);
     } else {
-      await verifyEmail(inputData);
+      setSending(true)
+      const sended = await verifyEmail(inputData);
+      if (sended) {
+        navigate('/')
+      }
+      setSending(false)
     }
   };
 
@@ -61,8 +69,8 @@ const EmailVerification = () => {
               type="submit"
               className="submit_btn"
               style={{ marginTop: 40 }}
-            >
-              Submit
+            > {sending ? 'Mail Sending...' : 'Submit'}
+
             </Button>{' '}
           </Form>
           <br />

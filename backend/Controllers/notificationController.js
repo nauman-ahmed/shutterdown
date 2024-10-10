@@ -7,20 +7,23 @@ const getNotifications = async (req, res) => {
       notificationsToSend = await Notification.find({
         forManager: true,
       }).populate({
-        path : 'data',
-        populate : {
-            path : 'events',
-            model : 'Event'
-        }
+        path: "data",
+        populate: {
+          path: "events",
+          model: "Event",
+        },
       });
       const individualNotifications = await Notification.find({
         forUser: req.query.user,
-      })
-      notificationsToSend = [...notificationsToSend, ...individualNotifications]
+      });
+      notificationsToSend = [
+        ...notificationsToSend,
+        ...individualNotifications,
+      ];
     } else {
       notificationsToSend = await Notification.find({
         forUser: req.query.user,
-      }).populate('data.events');
+      }).populate("data.events");
     }
     res.status(200).json(notificationsToSend);
   } catch (error) {

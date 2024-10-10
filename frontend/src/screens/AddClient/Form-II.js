@@ -17,8 +17,6 @@ import Select from "react-select";
 import { updateClintData } from "../../redux/clientBookingForm";
 import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
-import { getAllEvents, getEvents } from "../../API/Event";
-import { updateAllEvents } from "../../redux/eventsSlice";
 import { FaEdit } from "react-icons/fa";
 import {
   getAllEventOptions,
@@ -152,7 +150,8 @@ function FormII() {
   }, []);
 
   const handleAddDate = (date) => {
-    setEventValues({ ...eventValues, eventDate: new Date(date).setHours(0,0,0,0) });
+
+    setEventValues({ ...eventValues, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
     setShow(!show);
   };
 
@@ -634,25 +633,16 @@ function FormII() {
             <div style={{ width: "300px" }} className="tooltipBg">
               <Calendar
                 value={minDate}
-                // minDate={new Date(Date.now())}
                 CalenderPress={toggle}
                 onClickDay={(date) => {
-                  console.log(date);
-                  
                   handleAddDate(date);
                 }}
                 tileClassName={({ date }) => {
                   let count = 0;
                   for (let index = 0; index < allEvents?.length; index++) {
-                    const initialDate = new Date(allEvents[index].eventDate);
-                    const targetDate = new Date(date);
-                    const initialDatePart = initialDate
-                      .toISOString()
-                      .split("T")[0];
-                    const targetDatePart = targetDate
-                      .toISOString()
-                      .split("T")[0];
-                    if (initialDatePart === targetDatePart) {
+                    const initialDate = dayjs(new Date(allEvents[index].eventDate)).format('YYYY-MM-DD');
+                    const targetDate = dayjs(new Date(date)).format('YYYY-MM-DD');
+                    if (initialDate == targetDate) {
                       count += 1;
                     }
                   }

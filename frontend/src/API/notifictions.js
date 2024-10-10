@@ -8,8 +8,8 @@ export const getUserNotifications = async () => {
   try {
     const res = await axios.get(BASE_URL + `/get-notifications`, {
       params: {
-        manager: currentUser.rollSelect === "Manager" ? true : false,
-        user: currentUser._id,
+        manager: currentUser?.rollSelect === "Manager" ? true : false,
+        user: currentUser?._id,
       },
       Headers: { "Content-Type": "application/json" },
     });

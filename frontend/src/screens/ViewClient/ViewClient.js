@@ -7,10 +7,8 @@ import Heart from "../../assets/Profile/Heart.svg";
 import dayjs from "dayjs";
 import { getAllClients, getClients } from "../../API/Client";
 import { Overlay } from "react-bootstrap";
-import Calendar from "react-calendar";
 import Select from "react-select";
 import CalenderImg from "../../assets/Profile/Calender.svg";
-import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { useAtom } from "jotai";
@@ -62,16 +60,12 @@ function ViewClient() {
       try {
         const data = await getClients(page, monthForData, yearForData, dateForFilter, null);
         if (data.data.length > 0) {
-         
             setClients([...clients, ...data.data]);
-          
         }
         if (data.hasMore) {
           setPage(page + 1);
         }
         setHasMore(data.hasMore);
-        console.log(data);
-        
       } catch (error) {
         console.log(error);
       }
@@ -95,10 +89,10 @@ function ViewClient() {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -215,7 +209,7 @@ function ViewClient() {
             >
               {clients?.map((client, i) => (
                 <>
-                  <tr
+                  <tr key={i}
                     style={{
                       background: "#EFF0F5",
                       borderRadius: "8px",
@@ -271,6 +265,17 @@ function ViewClient() {
               <div>No more data to load.</div>
             </div>
           )}
+          {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchClients()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
+              </div>
+            )}
           <Overlay
             rootClose={true}
             onHide={() => setShow(false)}

@@ -19,7 +19,6 @@ import CalenderMultiListView from '../../components/CalendarFilterListView';
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
 
 function Photos() {
-
   const [editors, setEditors] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [filterBy, setFilterBy] = useState(null)
@@ -40,23 +39,29 @@ function Photos() {
     setShow(!show);
   };
   const target = useRef(null);
-
   const fetchData = async () => {
     try {
       setLoading(true)
       const data = await getPhotos(1, monthForData, yearForData, dateForFilter);
-     
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
       setEditors(res.editors.filter(user => user.subRole.includes('Photo Editor')))
       if (currentUser?.rollSelect === 'Manager') {
         setAllDeliverables(data.data)
-        setDeliverablesForShow(data.data)
+        setDeliverablesForShow(data.data.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }))
       } else if (currentUser?.rollSelect === 'Editor') {
         const deliverablesToShow = data.data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(deliverablesToShow);
+        setDeliverablesForShow(deliverablesToShow.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
       }
       setLoading(false)
     } catch (error) {
@@ -74,8 +79,6 @@ function Photos() {
       setLoading(true);
       try {
         const data = await getPhotos(page, monthForData, yearForData, dateForFilter);
-      
-
         if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
@@ -85,12 +88,20 @@ function Photos() {
             } else {
               dataToAdd = data.data
             }
-            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
+            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           } else if (currentUser.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
-            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
+            setAllDeliverables([...allDeliverables, ...deliverablesToShow].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
             if (filterCondition) {
               dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
             } else {
@@ -99,14 +110,17 @@ function Photos() {
             setDeliverablesForShow([
               ...deliverablesForShow,
               ...dataToAdd,
-            ]);
+            ].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           }
         }
         if (data.hasMore) {
           setPage(page + 1);
         }
         setHasMore(data.hasMore);
-
       } catch (error) {
         console.log(error);
       }
@@ -124,17 +138,15 @@ function Photos() {
     const bottomOfWindow =
       document.documentElement.scrollTop + window.innerHeight >=
       document.documentElement.scrollHeight - 10;
-
     if (bottomOfWindow) {
-      console.log("at bottom");
       fetchPhotos();
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
 
   const applyFilterNew = (filterValue) => {
     if (filterValue.length) {
@@ -178,52 +190,19 @@ function Photos() {
       }
       setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
-      setDeliverablesForShow(newData)
+      setDeliverablesForShow(newData.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
     } else {
-      setDeliverablesForShow(allDeliverables)
+      setDeliverablesForShow(allDeliverables?.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
     }
   }
-
-  // const applyFilter = (filterValue) => {
-  //   setDeliverablesForShow(null)
-  //   if(filterValue == null){
-  //     setDeliverablesForShow(allDeliverables)
-  //     return
-  //   }
-  //   if (filterBy === 'Assigned Editor') {
-  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false)) 
-  //     : filterValue === 'Unassigned Editor' ?
-  //     setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-  //     : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
-  //   } else if (filterBy === 'Current Status') {
-  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
-  //   } else if (filterBy === 'Deadline sorting') {
-  //     let sortedArray;
-  //     if (filterValue === 'No Sorting') {
-  //       sortedArray = [...deliverablesForShow]; // Create a new array
-  //     } else {
-  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
-  //         const dateA = new Date(a.clientDeadline);
-  //         const dateB = new Date(b.clientDeadline);
-  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-  //       });
-  //     }
-  //     setDeliverablesForShow([...sortedArray]);
-  //   }else if (filterBy === 'Wedding Date sorting') {
-  //     console.log(filterValue);
-  //     let sortedArray;
-  //     if (filterValue === 'No Sorting') {
-  //       sortedArray = [...deliverablesForShow]; // Create a new array
-  //     } else {
-  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
-  //         const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
-  //         const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
-  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-  //       });
-  //     }
-  //     setDeliverablesForShow([...sortedArray]);
-  //   }
-  // }
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -242,11 +221,12 @@ function Photos() {
   const applySorting = (wedding = false) => {
     try {
       if (wedding) {
-        setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
+        const sorted = deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        }));
+          return !ascendingWeding ? dateB - dateA : dateA - dateB;
+        })
+        setDeliverablesForShow(sorted);
         setAscendingWeding(!ascendingWeding)
       }
     } catch (error) {
@@ -310,10 +290,18 @@ function Photos() {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === 'Unassigned Editor') {
-        setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+        setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor).sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }))
       } else {
         if (filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting') {
-          setDeliverablesForShow(allDeliverables)
+          setDeliverablesForShow(allDeliverables?.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          }))
         }
       }
     }
@@ -323,7 +311,7 @@ function Photos() {
 
   const handleSaveData = async (index) => {
     try {
-      const deliverable = allDeliverables[index];
+      const deliverable = deliverablesForShow[index];
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
       setUpdatingIndex(null);
@@ -350,7 +338,6 @@ function Photos() {
     if (title == "Photos") {
       return deadlineDays.photo
     }
-
     return 45
   }
 
@@ -419,7 +406,7 @@ function Photos() {
                       <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
+                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {!ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -483,9 +470,9 @@ function Photos() {
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                               const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].editor = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={editors?.map(editor => {
                               return ({ value: editor, label: editor.firstName })
                             })} required />
@@ -519,11 +506,11 @@ function Photos() {
                               name="companyDeadline"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].companyDeadline = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
+                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : ''}
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
@@ -540,11 +527,11 @@ function Photos() {
                               name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].firstDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : ''}
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
@@ -560,11 +547,11 @@ function Photos() {
                               name="finalDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].finalDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : ''}
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
@@ -575,9 +562,9 @@ function Photos() {
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                             const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].status = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 'Yet to Start', label: 'Yet to Start' },
                               { value: 'In Progress', label: 'In Progress' },
@@ -590,9 +577,9 @@ function Photos() {
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                              const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].clientRevision = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
@@ -608,9 +595,9 @@ function Photos() {
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                             const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].clientRating = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
@@ -707,6 +694,17 @@ function Photos() {
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
+              </div>
+            )}
+            {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchPhotos()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
               </div>
             )}
           </div>

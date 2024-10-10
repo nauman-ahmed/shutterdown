@@ -10,12 +10,9 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { checkExistEmail } from '../../API/userApi';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { getEvents } from '../../API/Event';
 import { useDispatch } from 'react-redux';
-import { updateAllEvents } from '../../redux/eventsSlice';
 
 const Login = () => {
-  const signInButtonRef = useRef()
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
     email: '',
@@ -29,7 +26,6 @@ const Login = () => {
     setInputData({ ...inputData, [name]: value });
     setError(false);
   };
-  const dispatch = useDispatch()
 
   useEffect(() => {
     const handleEnterKey = (event) => {
@@ -168,8 +164,6 @@ const Login = () => {
                 type="submit"
                 className="submit_btn"
                 style={{ marginTop: 10 }}
-
-              // onClick={() => home()}
               >
                 {logingIn ? <div className='w-100'>
                   <div class="smallSpinner mx-auto"></div>

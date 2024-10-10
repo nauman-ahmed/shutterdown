@@ -52,7 +52,6 @@ function Albums(props) {
     const contentState = editorState.albumTextGetImmutable.getCurrentContent();
     return contentState.getPlainText("\u0001"); // Using a delimiter, if needed
   };
-
   const loadEditorContent = (rawContent) => {
     const contentState = convertFromRaw(JSON.parse(rawContent));
     return EditorState.createWithContent(contentState);
@@ -79,8 +78,6 @@ function Albums(props) {
     try {
       setLoading(true)
       const data = await getAlbums(1, monthForData, yearForData, dateForFilter);
-
-      
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
@@ -88,13 +85,21 @@ function Albums(props) {
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data?.data);
-        setDeliverablesForShow(data?.data);
+        setDeliverablesForShow(data?.data.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
       } else if (currentUser.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(deliverablesToShow);
+        setDeliverablesForShow(deliverablesToShow.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
       }
       setLoading(false)
     } catch (error) {
@@ -113,8 +118,6 @@ function Albums(props) {
       setLoading(true);
       try {
         const data = await getAlbums(page, monthForData, yearForData, dateForFilter);
-  
-        
         if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
@@ -124,7 +127,11 @@ function Albums(props) {
             } else {
               dataToAdd = data.data
             }
-            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
+            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           } else if (currentUser.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
@@ -138,10 +145,12 @@ function Albums(props) {
             setDeliverablesForShow([
               ...deliverablesForShow,
               ...dataToAdd,
-            ]);
+            ].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           }
-
-          
         }
          if (data.hasMore) {
           setPage(page + 1);
@@ -163,17 +172,16 @@ function Albums(props) {
     const bottomOfWindow =
       document.documentElement.scrollTop + window.innerHeight >=
       document.documentElement.scrollHeight - 10;
-
     if (bottomOfWindow) {
       console.log("at bottom");
       fetchAlbums();
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
 
   const filterOptions =
     currentUser?.rollSelect === "Manager"
@@ -237,13 +245,12 @@ function Albums(props) {
   const applySorting = (wedding = false) => {
     try {
       if (wedding) {
-        setDeliverablesForShow(
-          deliverablesForShow.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
-        );
+        const sorted = deliverablesForShow.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return !ascendingWeding ? dateB - dateA : dateA - dateB;
+        })
+        setDeliverablesForShow(sorted);
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -255,14 +262,22 @@ function Albums(props) {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
         setDeliverablesForShow(
-          allDeliverables.filter((deliverable) => !deliverable.editor)
+          allDeliverables.filter((deliverable) => !deliverable.editor).sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          })
         );
       } else {
         if (
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(allDeliverables);
+          setDeliverablesForShow(allDeliverables?.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          }));
         }
       }
     }
@@ -349,46 +364,6 @@ function Albums(props) {
     }
   };
 
-  // const applyFilter = (filterValue) => {
-  //   setDeliverablesForShow(null)
-  //   if(filterValue == null){
-  //     setDeliverablesForShow(allDeliverables)
-  //     return
-  //   }
-  //   if (filterBy === 'Assigned Editor') {
-  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor ? true : false))
-  //     : filterValue === 'Unassigned Editor' ?
-  //     setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
-  //     : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.editor?.firstName === filterValue))
-  //   } else if (filterBy === 'Current Status') {
-  //     filterValue === 'Any' ? setDeliverablesForShow(allDeliverables) : setDeliverablesForShow(allDeliverables.filter(deliverable => deliverable.status === filterValue))
-  //   } else if (filterBy === 'Deadline sorting') {
-  //     let sortedArray;
-  //     if (filterValue === 'No Sorting') {
-  //       sortedArray = [...deliverablesForShow]; // Create a new array
-  //     } else {
-  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
-  //         const dateA = new Date(a.clientDeadline);
-  //         const dateB = new Date(b.clientDeadline);
-  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-  //       });
-  //     }
-  //     setDeliverablesForShow([...sortedArray]);
-  //   }else if (filterBy === 'Wedding Date sorting') {
-  //     console.log(filterValue);
-  //     let sortedArray;
-  //     if (filterValue === 'No Sorting') {
-  //       sortedArray = [...deliverablesForShow]; // Create a new array
-  //     } else {
-  //       sortedArray = [...deliverablesForShow].sort((a, b) => {
-  //         const dateA = new Date(a.clientDeadline).setDate(new Date(a?.clientDeadline).getDate() - 45);
-  //         const dateB = new Date(b.clientDeadline).setDate(new Date(b?.clientDeadline).getDate() - 45);
-  //         return filterValue === 'Ascending' ? dateA - dateB : dateB - dateA;
-  //       });
-  //     }
-  //     setDeliverablesForShow([...sortedArray]);
-  //   }
-  // }
   const customStyles = {
     option: (defaultStyles, state) => ({
       ...defaultStyles,
@@ -405,10 +380,9 @@ function Albums(props) {
   };
 
   const dispatch = useDispatch();
-
   const handleSaveData = async (index) => {
     try {
-      const deliverable = allDeliverables[index];
+      const deliverable = deliverablesForShow[index];
       setUpdatingIndex(index);
       await updateDeliverable(deliverable);
       setUpdatingIndex(null);
@@ -527,7 +501,7 @@ function Albums(props) {
                       onClick={() => applySorting(true)}
                     >
                       Wedding <br /> Date{" "}
-                      {ascendingWeding ? (
+                      {!ascendingWeding ? (
                         <IoIosArrowRoundDown
                           style={{ color: "#666DFF" }}
                           className="fs-4 cursor-pointer"
@@ -606,16 +580,13 @@ function Albums(props) {
                                       value: deliverable?.editor?.firstName,
                                       label: deliverable?.editor?.firstName,
                                     }
-                                  : null
+                                  : ''
                               }
                               name="editor"
                               onChange={(selected) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].editor =
-                                  selected.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];
+                                updatedDeliverables[index].editor = selected.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
                               options={editors?.map((editor) => {
@@ -663,19 +634,16 @@ function Albums(props) {
                               name="companyDeadline"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].companyDeadline =
-                                  e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];
+                                updatedDeliverables[index].companyDeadline = e.target.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
                                 deliverable?.companyDeadline
                                   ? dayjs(deliverable?.companyDeadline).format(
                                       "YYYY-MM-DD"
                                     )
-                                  : null
+                                  : ''
                               }
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
@@ -692,19 +660,16 @@ function Albums(props) {
                               name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].firstDeliveryDate =
-                                  e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];;
+                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
                                 deliverable?.firstDeliveryDate
                                   ? dayjs(
                                       deliverable?.firstDeliveryDate
                                     ).format("YYYY-MM-DD")
-                                  : null
+                                  : ''
                               }
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
@@ -721,19 +686,16 @@ function Albums(props) {
                               name="finalDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].finalDeliveryDate =
-                                  e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];
+                                updatedDeliverables[index].finalDeliveryDate =  e.target.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
                                 deliverable?.finalDeliveryDate
                                   ? dayjs(
                                       deliverable?.finalDeliveryDate
                                     ).format("YYYY-MM-DD")
-                                  : null
+                                  : ''
                               }
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
@@ -756,12 +718,9 @@ function Albums(props) {
                               }
                               name="Status"
                               onChange={(selected) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].status =
-                                  selected.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];
+                                updatedDeliverables[index].status =  selected.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
                               options={[
@@ -809,12 +768,9 @@ function Albums(props) {
                               }
                               name="clientRating"
                               onChange={(selected) => {
-                                const updatedDeliverables = [
-                                  ...allDeliverables,
-                                ];
-                                updatedDeliverables[index].clientRating =
-                                  selected.value;
-                                setAllDeliverables(updatedDeliverables);
+                                const updatedDeliverables = [...deliverablesForShow];
+                                updatedDeliverables[index].clientRating =  selected.value;
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
                               options={[
@@ -842,7 +798,7 @@ function Albums(props) {
                             >
                               {updatingIndex === index ? (
                                 <div className="w-100">
-                                  <div class="smallSpinner mx-auto"></div>
+                                  <div className="smallSpinner mx-auto"></div>
                                 </div>
                               ) : (
                                 "Save"
@@ -920,12 +876,23 @@ function Albums(props) {
             </Table>
             {loading && (
               <div className="d-flex my-3 justify-content-center align-items-center">
-                <div class="spinner"></div>
+                <div className="spinner"></div>
               </div>
             )}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
+              </div>
+            )}
+            {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchAlbums()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
               </div>
             )}
           </div>
@@ -935,7 +902,7 @@ function Albums(props) {
           style={{ height: "400px" }}
           className="d-flex justify-content-center align-items-center"
         >
-          <div class="spinner"></div>
+          <div className="spinner"></div>
         </div>
       )}
     </>

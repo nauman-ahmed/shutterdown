@@ -10,6 +10,10 @@ const deliverableSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    date: {
+        type: String,
+        required: true
+    },
     quantity: {
         type: Number
     },
@@ -26,16 +30,16 @@ const deliverableSchema = mongoose.Schema({
         type: Date
     },
     editor: {
-        type : mongoose.Types.ObjectId,
-        ref : 'user'
+        type: mongoose.Types.ObjectId,
+        ref: 'user'
     },
-    status : {
-        type : String,
-        default : 'Yet to Start',
-        required : true
+    status: {
+        type: String,
+        default: 'Yet to Start',
+        required: true
     },
-    clientRevision : {
-        type : Number
+    clientRevision: {
+        type: Number
     },
     clientRating: {
         type: Number

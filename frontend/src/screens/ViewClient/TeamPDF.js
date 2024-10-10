@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     marginHorizontal: "auto",
-    borderRadius : 10
+    borderRadius: 10
   },
   memberImageBox: {
     width: "100%",
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
 const TeamPDF = ({ team, client }) => {
   // Combine all users into a single array
   const users = [
-    ...(client ? [{ ...client.userID, role: 'Team Leader' }] : []),
+    // ...(client ? [{ ...client.userID, role: 'Team Leader' }] : []),
     ...team.shootDirectors?.map(user => ({ ...user, role: 'Shoot Director' })) || [],
     ...team.choosenPhotographers?.map(user => ({ ...user, role: 'Photographer' })) || [],
     ...team.choosenCinematographers?.map(user => ({ ...user, role: 'Cinematographer' })) || [],
@@ -139,7 +139,7 @@ const TeamPDF = ({ team, client }) => {
           <Image style={styles.memberImage} src={BASE_URL + "/preview-file/" + user?.photo} />
         ) : (
           <Text style={styles.textCenter}>
-            {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+            {`${user?.firstName?.charAt(0).toUpperCase()}${user?.lastName?.charAt(0).toUpperCase()}`}
           </Text>
         )}
       </View>
@@ -154,17 +154,22 @@ const TeamPDF = ({ team, client }) => {
       </Text>
     </View>
   );
+  console.log(team);
 
-  
+
   return (
     <Document>
       {/* First Page */}
       <Page size="A4" style={styles.page}>
         <Image style={styles.logoImage} src={"/images/pdfLogo.png"} />
         <Text style={[styles.heading, styles.textCenter]}>MEET OUR TEAM</Text>
-        <View style={[styles.row, { flexWrap: "wrap" }]}>
-          {firstPageUsers.map((user, ind) => renderUser(user))}
-        </View>
+        {firstPageUsers?.length > 0 && (
+          <>
+            <View style={[styles.row, { flexWrap: "wrap" }]}>
+              {firstPageUsers.map((user, ind) => renderUser(user))}
+            </View>
+          </>
+        )}
       </Page>
 
       {/* Subsequent Pages */}

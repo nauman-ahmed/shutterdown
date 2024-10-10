@@ -93,10 +93,10 @@ function DailyTasks(props) {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
   const updateTask = async (index) => {
     const taskDataToUpdate = tasksToShow[index];
     if (!taskDataToUpdate.deadlineDate) {
@@ -493,6 +493,17 @@ function DailyTasks(props) {
             <div>No more data to load.</div>
           </div>
         )}
+        {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchTasks()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
+              </div>
+            )}
         </>
       ) : (
         <div

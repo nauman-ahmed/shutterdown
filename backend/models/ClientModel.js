@@ -68,6 +68,10 @@ const ClientSchema = mongoose.Schema({
   preWeddingDetails: {
     type: Object,
   },
+  dates : {
+    type : Array,
+    required : true
+  },
   checklistDetails: {
     type: Object,
   },

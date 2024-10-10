@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Table } from "reactstrap";
-// import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import Camera from "../../assets/Profile/Camera.svg";
 import Video from "../../assets/Profile/Video.svg";
@@ -10,7 +9,12 @@ import Assistant from "../../assets/Profile/Assistant.svg";
 import Car from "../../assets/Profile/Car.svg";
 import Plane from "../../assets/Profile/Plane.svg";
 import ShootDropDown from "../../components/ShootDropDown";
-import { addEvent, getAllEvents, getEventsByFixDate, getEventsByMonth } from "../../API/Event";
+import {
+  addEvent,
+  getAllEvents,
+  getEventsByFixDate,
+  getEventsByMonth,
+} from "../../API/Event";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import { assignEventTeam, getEvents } from "../../API/Event";
@@ -38,18 +42,33 @@ import {
 } from "reactstrap";
 import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
 import { getAllClients, getClients } from "../../API/Client";
-import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
-import { all } from "axios";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
-const transport_icons = { "Cab": Car, "Personal Car": Car, "Flight": Plane, "Bus": Car }
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "Decemeber",
+];
+const transport_icons = {
+  Cab: Car,
+  "Personal Car": Car,
+  Flight: Plane,
+  Bus: Car,
+};
 
 function ListView(props) {
   const { clientIdd } = useParams();
-
-  const allEvents = useSelector(state => state.allEvents);
+  const allEvents = useSelector((state) => state.allEvents);
   const [eventsForShow, setEventsForShow] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [updatingIndex, setUpdatingIndex] = useState(null);
@@ -69,46 +88,41 @@ function ListView(props) {
   ];
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const [rowOfWarning, setRowOfWarnig] = useState(null)
+  const [rowOfWarning, setRowOfWarnig] = useState(null);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const dispatch = useDispatch();
-  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
+  const [monthForData, setMonthForData] = useState(
+    months[new Date().getMonth()]
+  );
   const [directors, setDirectors] = useState([]);
   const [photographer, setPhotographer] = useState([]);
   const [cinematographer, setCinematographer] = useState([]);
   const [flyer, setFlyer] = useState([]);
   const [manager, setManager] = useState([]);
   const [assistant, setAssistant] = useState([]);
-  const [yearForData, setYearForData] = useState(new Date().getFullYear())
-  const [dateForFilter, setDateForFilter] = useState(null)
-  const [clientId, setClientId] = useState(clientIdd)
-  const [allClients, setAllClients] = useState([])
-
-
+  const [yearForData, setYearForData] = useState(new Date().getFullYear());
+  const [dateForFilter, setDateForFilter] = useState(null);
+  const [clientId, setClientId] = useState(clientIdd);
+  const [allClients, setAllClients] = useState([]);
   const toggle = () => {
     setShow(!show);
   };
 
   const groupByBrideName = (events) => {
-    console.log("Events", events)
     // Step 1: Group events by brideName
     const groupedByBrideName = events?.reduce((acc, event) => {
       const brideName = event?.client?.brideName;
-
       // Check if the bride's group already exists in acc
-      let found = acc?.find(group => group.brideName === brideName);
-
+      let found = acc?.find((group) => group.brideName === brideName);
       if (!found) {
         // Create a new group for this bride
         found = { brideName, events: [] };
         acc.push(found);
       }
-
       // Add the current event to the bride's group
       found.events.push(event);
-
       return acc;
     }, []);
 
@@ -123,111 +137,228 @@ function ListView(props) {
 
     // Step 3: Flatten the groups back into a single array of events
     const sortedEvents = groupedByBrideName.reduce((acc, group) => {
-      acc.push(...group.events);  // Append each group's sorted events
+      acc.push(...group.events); // Append each group's sorted events
       return acc;
     }, []);
 
     return sortedEvents;
   };
 
-
-
   const getEventsData = async () => {
+    setLoading(true);
     try {
-
-
       const usersData = await getAllUsers();
-
-
-      setDirectors(usersData.users.filter(user => user.subRole.includes("Shoot Director")))
-      setPhotographer(usersData.users.filter(user => user.subRole.includes("Photographer")))
-      setCinematographer(usersData.users.filter(user => user.subRole.includes("Cinematographer")))
-      setFlyer(usersData.users.filter(user => user.subRole.includes("Drone Flyer")))
-      setManager(usersData.users.filter(user => user.subRole.includes("Manager")))
-      setAssistant(usersData.users.filter(user => user.subRole.includes("Assistant")))
+      setDirectors(
+        usersData.users.filter((user) =>
+          user.subRole.includes("Shoot Director")
+        )
+      );
+      setPhotographer(
+        usersData.users.filter((user) => user.subRole.includes("Photographer"))
+      );
+      setCinematographer(
+        usersData.users.filter((user) =>
+          user.subRole.includes("Cinematographer")
+        )
+      );
+      setFlyer(
+        usersData.users.filter((user) => user.subRole.includes("Drone Flyer"))
+      );
+      setManager(
+        usersData.users.filter((user) => user.subRole.includes("Manager"))
+      );
+      setAssistant(
+        usersData.users.filter((user) => user.subRole.includes("Assistant"))
+      );
       // setEventsForShow(null)
       let res;
-      if (dateForFilter) {
-        res = await getEventsByFixDate(clientId, 1, dateForFilter);
 
-      } else {
-        res = await getEvents(clientId, 1, monthForData, yearForData);
-
-      }
-
+      res = await getEvents(
+        clientId,
+        1,
+        monthForData,
+        yearForData,
+        dateForFilter
+      );
       if (currentUser.rollSelect === "Manager") {
-        setEventsForShow(groupByBrideName(res.data?.sort((a, b) => {
-          const dateA = new Date(a?.eventDate);
-          const dateB = new Date(b?.eventDate);
-          return ascending ? dateB - dateA : dateA - dateB;
-        })));
-
+        setEventsForShow(
+          groupByBrideName(
+            res?.data?.sort((a, b) => {
+              const dateA = new Date(a?.eventDate);
+              const dateB = new Date(b?.eventDate);
+              return ascending ? dateB - dateA : dateA - dateB;
+            })
+          )
+        );
       } else if (currentUser.rollSelect === "Shooter") {
-        const eventsToShow = res?.data?.map((event) => {
+        let eventsToShow = [];
+        res?.data?.forEach((event) => {
           if (
             event?.shootDirectors?.some(
               (director) => director._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Shoot Directors" };
+            eventsToShow.push({ ...event, userRole: "Shoot Directors" });
           } else if (
             event?.choosenPhotographers?.some(
               (photographer) => photographer._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Photographer" };
+            eventsToShow.push({ ...event, userRole: "Photographer" });
           } else if (
             event?.choosenCinematographers?.some(
               (cinematographer) => cinematographer._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Cinematographer" };
+            eventsToShow.push({ ...event, userRole: "Cinematographer" });
           } else if (
             event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
           ) {
-            return { ...event, userRole: "Drone Flyer" };
+            eventsToShow.push({ ...event, userRole: "Drone Flyer" });
           } else if (
-            event?.manager?.some((manager) => manager._id === currentUser._id)
+            event.manager?.some((manager) => manager._id === currentUser._id)
           ) {
-            return { ...event, userRole: "Manager" };
+            eventsToShow.push({ ...event, userRole: "Manager" });
           } else if (
             event?.sameDayPhotoMakers?.some(
               (photoMaker) => photoMaker._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Same Day Photos Maker" };
+            eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
           } else if (
             event?.sameDayVideoMakers?.some(
               (videoMaker) => videoMaker._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Same Day Video Maker" };
+            eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
           } else if (
             event?.assistants?.some(
               (assistant) => assistant._id === currentUser._id
             )
           ) {
-            return { ...event, userRole: "Assistant" };
-          } else {
-            return null;
+            eventsToShow.push({ ...event, userRole: "Assistant" });
           }
         });
-        setEventsForShow(groupByBrideName(eventsToShow?.sort((a, b) => {
-          const dateA = new Date(a?.eventDate);
-          const dateB = new Date(b?.eventDate);
-          return ascending ? dateB - dateA : dateA - dateB;
-        })));
-
+        setEventsForShow(
+          groupByBrideName(
+            eventsToShow?.sort((a, b) => {
+              const dateA = new Date(a?.eventDate);
+              const dateB = new Date(b?.eventDate);
+              return ascending ? dateB - dateA : dateA - dateB;
+            })
+          )
+        );
       }
-      setHasMore(true)
     } catch (error) {
       console.log(error);
     }
+    setLoading(false);
   };
   useEffect(() => {
+    setHasMore(true);
+    setPage(2);
+    getEventsData();
+  }, [monthForData, yearForData, dateForFilter, clientId]);
 
-    getEventsData()
-  }, [monthForData, yearForData, dateForFilter, clientId])
+  const fetchEvents = async () => {
+    if (hasMore) {
+      setLoading(true);
+      try {
+        const res = await getEvents(
+          clientId,
+          page,
+          monthForData,
+          yearForData,
+          dateForFilter
+        );
+
+        if (currentUser.rollSelect === "Manager") {
+          setEventsForShow(
+            groupByBrideName(
+              [...eventsForShow, ...res.data]?.sort((a, b) => {
+                const dateA = new Date(a?.eventDate);
+                const dateB = new Date(b?.eventDate);
+                return ascending ? dateB - dateA : dateA - dateB;
+              })
+            )
+          );
+        } else if (currentUser.rollSelect === "Shooter") {
+          let eventsToShow = [];
+          res?.data?.forEach((event) => {
+            if (
+              event?.shootDirectors?.some(
+                (director) => director._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Shoot Directors" });
+            } else if (
+              event?.choosenPhotographers?.some(
+                (photographer) => photographer._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Photographer" });
+            } else if (
+              event?.choosenCinematographers?.some(
+                (cinematographer) => cinematographer._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Cinematographer" });
+            } else if (
+              event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
+            ) {
+              eventsToShow.push({ ...event, userRole: "Drone Flyer" });
+            } else if (
+              event.manager?.some((manager) => manager._id === currentUser._id)
+            ) {
+              eventsToShow.push({ ...event, userRole: "Manager" });
+            } else if (
+              event?.sameDayPhotoMakers?.some(
+                (photoMaker) => photoMaker._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
+            } else if (
+              event?.sameDayVideoMakers?.some(
+                (videoMaker) => videoMaker._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
+            } else if (
+              event?.assistants?.some(
+                (assistant) => assistant._id === currentUser._id
+              )
+            ) {
+              eventsToShow.push({ ...event, userRole: "Assistant" });
+            }
+          });
+
+          setEventsForShow(
+            groupByBrideName(
+              [...eventsForShow, ...eventsToShow]?.sort((a, b) => {
+                const dateA = new Date(a?.eventDate);
+                const dateB = new Date(b?.eventDate);
+                return ascending ? dateB - dateA : dateA - dateB;
+              })
+            )
+          );
+        }
+
+        if (res.hasMore) {
+          setPage(page + 1);
+        }
+        setHasMore(res.hasMore);
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (eventsForShow?.length < 10 && hasMore && !loading) {
+      fetchEvents();
+    }
+  }, [eventsForShow, hasMore, loading]);
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -244,7 +375,6 @@ function ListView(props) {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
-
 
   const onSubmitHandler = async (event, index) => {
     try {
@@ -386,8 +516,8 @@ function ListView(props) {
   };
 
   const getClientsForFilters = async () => {
-    const completeclients = await getAllClients()
-    setAllClients(completeclients)
+    const completeclients = await getAllClients();
+    setAllClients(completeclients);
   };
 
   const filterOptions = [
@@ -409,8 +539,6 @@ function ListView(props) {
           })
         )
       );
-
-
     } catch (error) {
       console.log("applySorting ERROR", error);
     }
@@ -425,113 +553,8 @@ function ListView(props) {
     getEventsData();
     getStoredEvents();
     getAllFormOptionsHandler();
-    getClientsForFilters()
+    getClientsForFilters();
   }, []);
-
-
-  const fetchEvents = async () => {
-
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const res = dateForFilter ? await getEventsByFixDate(clientId, page, dateForFilter) : await getEvents(clientId, page, monthForData, yearForData);
-        if (res.data.length > 0) {
-          if (currentUser.rollSelect === "Manager") {
-
-            setEventsForShow(groupByBrideName([
-              ...eventsForShow,
-              ...res.data
-            ]?.sort((a, b) => {
-              const dateA = new Date(a?.eventDate);
-              const dateB = new Date(b?.eventDate);
-              return ascending ? dateB - dateA : dateA - dateB;
-            })));
-
-
-          } else if (currentUser.rollSelect === "Shooter") {
-            const eventsToShow = res?.data?.map((event) => {
-              if (
-                event?.shootDirectors?.some(
-                  (director) => director._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Shoot Directors" };
-              } else if (
-                event?.choosenPhotographers?.some(
-                  (photographer) => photographer._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Photographer" };
-              } else if (
-                event?.choosenCinematographers?.some(
-                  (cinematographer) => cinematographer._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Cinematographer" };
-              } else if (
-                event?.droneFlyers?.some(
-                  (flyer) => flyer._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Drone Flyer" };
-              } else if (
-                event.manager?.some(
-                  (manager) => manager._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Manager" };
-              } else if (
-                event?.sameDayPhotoMakers?.some(
-                  (photoMaker) => photoMaker._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Same Day Photos Maker" };
-              } else if (
-                event?.sameDayVideoMakers?.some(
-                  (videoMaker) => videoMaker._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Same Day Video Maker" };
-              } else if (
-                event?.assistants?.some(
-                  (assistant) => assistant._id === currentUser._id
-                )
-              ) {
-                return { ...event, userRole: "Assistant" };
-              } else {
-                return null;
-              }
-            });
-
-
-
-            setEventsForShow(groupByBrideName([
-              ...eventsForShow,
-              ...eventsToShow
-            ]?.sort((a, b) => {
-              const dateA = new Date(a?.eventDate);
-              const dateB = new Date(b?.eventDate);
-              return ascending ? dateB - dateA : dateA - dateB;
-            })));
-
-
-          }
-          setPage(page + 1);
-        } else {
-          setHasMore(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (eventsForShow?.length < 10 && hasMore && !loading) {
-      fetchEvents();
-    }
-  }, [eventsForShow, hasMore, loading]);
 
   const handleScroll = () => {
     const bottomOfWindow =
@@ -543,38 +566,37 @@ function ListView(props) {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
   const getStoredEvents = async () => {
     const res = await getAllEvents();
-    if (currentUser.rollSelect === 'Manager') {
+    if (currentUser.rollSelect === "Manager") {
       dispatch(updateAllEvents(res?.data));
-    } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
-      const eventsToShow = res.data?.map(event => {
-
-        if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
-          return { ...event, userRole: 'Shoot Director' };
-        } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
-          return { ...event, userRole: 'Photographer' };
-        } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
-          return { ...event, userRole: 'Cinematographer' };
-        } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
-          return { ...event, userRole: 'Drone Flyer' };
-        } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
-          return { ...event, userRole: 'Manager' };
-        } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
-          return { ...event, userRole: 'Same Day Photos Maker' };
-        } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
-          return { ...event, userRole: 'Same Day Video Maker' };
-        } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
-          return { ...event, userRole: 'Assistant' };
-        } else {
-          return null;
-        }
-      });
+    } else if (
+      currentUser.rollSelect === "Shooter" ||
+      currentUser.rollSelect === "Editor"
+    ) {
+      const eventsToShow = res.data?.filter(
+        (event) =>
+          event?.shootDirectors?.some(
+            (director) => director._id === currentUser._id
+          ) ||
+          event?.choosenPhotographers.some(
+            (photographer) => photographer._id === currentUser._id
+          ) ||
+          event?.choosenCinematographers.some(
+            (cinematographer) => cinematographer._id === currentUser._id
+          ) ||
+          event?.droneFlyers.some((flyer) => flyer._id === currentUser._id) ||
+          event?.manager.some((manager) => manager._id === currentUser._id) ||
+          event?.sameDayPhotoMakers.some(
+            (photoMaker) => photoMaker._id === currentUser._id
+          ) ||
+          event?.sameDayVideoMakers.some(
+            (videoMaker) => videoMaker._id === currentUser._id
+          ) ||
+          event?.assistants.some(
+            (assistant) => assistant._id === currentUser._id
+          )
+      );
       dispatch(updateAllEvents(eventsToShow));
     }
   };
@@ -596,22 +618,18 @@ function ListView(props) {
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
 
-
-
   const filterByNameHanler = (idOfClient) => {
-
     if (idOfClient == "Reset") {
-      setClientId(null)
+      setClientId(null);
       return;
     }
-    setClientId(idOfClient)
+    setClientId(idOfClient);
   };
-
 
   const returnOneRow = (event, prevEvent) => {
     if (prevEvent && !clientId) {
-      if (event?.client._id !== prevEvent?.client._id) {
-        if (currentUser?.rollSelect === 'Manager') {
+      if (event?.client?._id !== prevEvent?.client?._id) {
+        if (currentUser?.rollSelect === "Manager") {
           return (
             <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
@@ -636,13 +654,24 @@ function ListView(props) {
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
-
             </tr>
           );
         }
-
       }
     }
+  };
+
+  const getClientsForFilterShooter = () => {
+    const set = new Set();
+    let clients = [];
+
+    allEvents.forEach((event) => {
+      if (!set.has(event.client._id)) {
+        clients.push(event.client);
+        set.add(event.client._id);
+      }
+    });
+    return clients;
   };
 
   return (
@@ -657,15 +686,18 @@ function ListView(props) {
             ref={target}
           >
             <div style={{ width: "120px" }}>
-              <button
-                onClick={() => setNewEventModel(true)}
-                className="btn btn-primary"
-                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-              >
-                Add Event
-              </button>
+              {currentUser?.rollSelect == "Manager" && (
+                <button
+                  onClick={() => setNewEventModel(true)}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Add Event
+                </button>
+              )}
             </div>
-            <div style={{ width: '200px' }}>
+
+            <div style={{ width: "200px" }}>
               <Select
                 isSearchable={true}
                 onChange={(e) => filterByNameHanler(e.value)}
@@ -679,7 +711,11 @@ function ListView(props) {
                       </div>
                     ),
                   },
-                  ...Array.from(allClients)?.map((client) => {
+                  ...Array.from(
+                    currentUser.rollSelect == "Manager"
+                      ? allClients
+                      : getClientsForFilterShooter()
+                  )?.map((client) => {
                     return {
                       value: client._id,
                       label: (
@@ -707,30 +743,54 @@ function ListView(props) {
                 required
               />
             </div>
-            <div className="addMarginForCalendar" style={{ width: "200px", position: 'relative' }}>
-
+            <div
+              className="addMarginForCalendar"
+              style={{ width: "200px", position: "relative" }}
+            >
               <div
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
               >
-                {dateForFilter
-                  ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                  : <>{monthForData}  {yearForData}</>}
-                <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                {dateForFilter ? (
+                  dayjs(dateForFilter).format("DD-MMM-YYYY")
+                ) : (
+                  <>
+                    {monthForData} {yearForData}
+                  </>
+                )}
+                <div
+                  className="d-flex align-items-center"
+                  style={{ position: "relative" }}
+                >
                   <img alt="" src={CalenderImg} onClick={toggle} />
                   <GrPowerReset
                     className="mx-1"
                     onClick={() => {
-                      setDateForFilter(null)
-                      setMonthForData(months[new Date().getMonth()])
-                      setYearForData(new Date().getFullYear())
+                      setDateForFilter(null);
+                      setMonthForData(months[new Date().getMonth()]);
+                      setYearForData(new Date().getFullYear());
                     }}
                   />
                   {show && (
-
-                    <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
-                      <div >
-                        <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+                    <div
+                      style={{
+                        width: "300px",
+                        position: "absolute",
+                        top: "30px",
+                        right: "-10px",
+                        zIndex: 1000,
+                      }}
+                    >
+                      <div>
+                        <CalenderMultiListView
+                          monthForData={monthForData}
+                          dateForFilter={dateForFilter}
+                          yearForData={yearForData}
+                          setShow={setShow}
+                          setMonthForData={setMonthForData}
+                          setYearForData={setYearForData}
+                          setDateForFilter={setDateForFilter}
+                        />
                       </div>
                     </div>
                   )}
@@ -742,7 +802,10 @@ function ListView(props) {
             <Table
               striped
               responsive
-              style={{ marginTop: "15px", width: currentUser?.rollSelect === 'Manager' ? "180%" : "100%" }}
+              style={{
+                marginTop: "15px",
+                width: currentUser?.rollSelect === "Manager" ? "180%" : "100%",
+              }}
             >
               <thead>
                 {currentUser.rollSelect === "Manager" && (
@@ -754,8 +817,8 @@ function ListView(props) {
                         <IoIosArrowRoundDown
                           style={{ color: "#666DFF" }}
                           onClick={() => {
-                            setAscending(false)
-                            applySorting(false)
+                            setAscending(false);
+                            applySorting(false);
                           }}
                           className="fs-4 cursor-pointer"
                         />
@@ -764,14 +827,12 @@ function ListView(props) {
                           style={{ color: "#666DFF" }}
                           className="fs-4 cursor-pointer"
                           onClick={() => {
-                            setAscending(true)
-                            applySorting(true)
+                            setAscending(true);
+                            applySorting(true);
                           }}
                         />
                       )}
                     </th>
-                    {/* <th className="tableBody">Event Type</th> */}
-                    {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Shoot Directors</th>
                     <th className="tableBody mx-1">
                       Photographers
@@ -802,8 +863,6 @@ function ListView(props) {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Date</th>
                     <th className="tableBody">Client</th>
-                    {/* <th className="tableBody">Event Type</th> */}
-                    {/* <th className="tableBody">Status</th> */}
                     <th className="tableBody">Role</th>
                     <th className="tableBody">Location</th>
                   </tr>
@@ -817,67 +876,65 @@ function ListView(props) {
                 }}
               >
                 {eventsForShow?.map((event, index) => {
-
                   let errorText = "";
+                  if (currentUser?.rollSelect === "Manager") {
+                    if (
+                      Number(event?.sameDayVideoEditors) > 0 &&
+                      (!event?.sameDayVideoMakers ||
+                        event?.sameDayVideoMakers.length !=
+                          Number(event.sameDayVideoEditors))
+                    ) {
+                      errorText += "Same Day Video Maker(s) are incomplete, \n";
+                    }
 
-                  if (Number(event.sameDayVideoEditors) > 0 && (!event?.sameDayVideoMakers ||
-                    event?.sameDayVideoMakers.length != Number(event.sameDayVideoEditors)
-                  )) {
-                    errorText += "Same Day Video Maker(s) are incomplete, \n";
+                    if (
+                      Number(event?.sameDayPhotoEditors) > 0 &&
+                      (!event?.sameDayPhotoMakers ||
+                        event?.sameDayPhotoMakers.length !==
+                          Number(event.sameDayPhotoEditors))
+                    ) {
+                      errorText += "Same Day Photo Maker(s) are incomplete, \n";
+                    }
+
+                    if (
+                      Number(event?.cinematographers) > 0 &&
+                      (!event?.choosenCinematographers ||
+                        event?.choosenCinematographers?.length !==
+                          Number(event?.cinematographers))
+                    ) {
+                      errorText += "Cinematographer(s) are incomplete, \n";
+                    }
+
+                    if (
+                      Number(event?.drones) > 0 &&
+                      (!event?.droneFlyers ||
+                        event?.droneFlyers.length !== Number(event.drones))
+                    ) {
+                      errorText += "Drone Flyer(s) are not complete, \n";
+                    }
+
+                    if (!event?.manager || event?.manager.length !== 1) {
+                      errorText += "Manager(s) are incomplete, \n";
+                    }
+
+                    if (
+                      Number(event?.photographers) > 0 &&
+                      (!event?.choosenPhotographers ||
+                        event?.choosenPhotographers.length !==
+                          Number(event?.photographers))
+                    ) {
+                      errorText += "Photographer(s) are incomplete, \n";
+                    }
+
+                    if (
+                      Number(event?.shootDirector) > 0 &&
+                      (!event?.shootDirectors ||
+                        event?.shootDirectors.length !==
+                          Number(event?.shootDirector))
+                    ) {
+                      errorText += "Shoot Director(s) are incomplete. \n";
+                    }
                   }
-
-
-
-                  if (Number(event.sameDayPhotoEditors) > 0 && (
-                    !event?.sameDayPhotoMakers ||
-                    event?.sameDayPhotoMakers.length !== Number(event.sameDayPhotoEditors)
-                  )
-                  ) {
-                    errorText += "Same Day Photo Maker(s) are incomplete, \n";
-                  }
-
-
-                  if (Number(event.cinematographers) > 0 && (
-                    !event?.choosenCinematographers ||
-                    event?.choosenCinematographers.length !==
-                    Number(event.cinematographers)
-                  )
-                  ) {
-                    errorText += "Cinematographer(s) are incomplete, \n";
-                  }
-
-                  if (Number(event.drones) > 0 && (
-                    !event?.droneFlyers ||
-                    event?.droneFlyers.length !== Number(event.drones)
-                  )
-                  ) {
-                    errorText += "Drone Flyer(s) are not complete, \n";
-                  }
-
-                  if (!event?.manager || event?.manager.length !== 1) {
-                    errorText += "Manager(s) are incomplete, \n";
-                  }
-
-                  if (!event?.assistants || event?.assistants.length !== 1) {
-                    errorText += "Assistant(s) are incomplete, \n";
-                  }
-
-                  if (Number(event.photographers) > 0 && (
-                    !event?.choosenPhotographers ||
-                    event?.choosenPhotographers.length !== Number(event.photographers)
-                  )
-                  ) {
-                    errorText += "Photographer(s) are incomplete, \n";
-                  }
-
-                  if (Number(event.shootDirector) > 0 && (
-                    !event?.shootDirectors ||
-                    event?.shootDirectors.length !== Number(event.shootDirector)
-                  )
-                  ) {
-                    errorText += "Shoot Director(s) are incomplete. \n";
-                  }
-
 
                   return (
                     <>
@@ -888,8 +945,16 @@ function ListView(props) {
                       {event && event !== null && (
                         <>
                           {currentUser.rollSelect === "Manager" && (
-                            <tr className="relative">
-                              <td className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index - 1 && errorText?.length > 150)) ? " " : " sticky-column "} tablePlaceContent`}>
+                            <tr className="relative" key={index}>
+                              <td
+                                className={`tableBody Text14Semi primary2 ${
+                                  rowOfWarning === index ||
+                                  (rowOfWarning === index - 1 &&
+                                    errorText?.length > 150)
+                                    ? " "
+                                    : " sticky-column "
+                                } tablePlaceContent`}
+                              >
                                 {errorText.length > 0 && (
                                   <ButtonWithHoverBox
                                     buttonText="error"
@@ -898,11 +963,17 @@ function ListView(props) {
                                     i={index}
                                   />
                                 )}
-                                <div className={errorText.length > 0 ? "d-flex flex-row ps-5" : "d-flex flex-row"}>
-
+                                <div
+                                  className={
+                                    errorText.length > 0
+                                      ? "d-flex flex-row ps-5"
+                                      : "d-flex flex-row"
+                                  }
+                                >
                                   <div
-                                    className={`${errorText.length === 0 && "ms-4"
-                                      }`}
+                                    className={`${
+                                      errorText.length === 0 && "ms-4"
+                                    }`}
                                   >
                                     {event?.client?.brideName}
                                     <br />
@@ -916,7 +987,10 @@ function ListView(props) {
                                     >
                                       {event?.location}
                                     </div>
-                                    <img alt="" src={transport_icons[event.travelBy]} />
+                                    <img
+                                      alt=""
+                                      src={transport_icons[event.travelBy]}
+                                    />
                                   </div>
                                 </div>
                               </td>
@@ -924,9 +998,14 @@ function ListView(props) {
                                 style={{
                                   width: "90px",
                                   marginLeft: 10,
-
                                 }}
-                                className={`tableBody Text14Semi primary2 ${(rowOfWarning === index || (rowOfWarning === index - 1 && errorText?.length > 90)) ? " " : " sticky-column "}  tablePlaceContent`}
+                                className={`tableBody Text14Semi primary2 ${
+                                  rowOfWarning === index ||
+                                  (rowOfWarning === index - 1 &&
+                                    errorText?.length > 150)
+                                    ? " "
+                                    : " sticky-column "
+                                }  tablePlaceContent`}
                               >
                                 <div
                                   style={{
@@ -939,26 +1018,7 @@ function ListView(props) {
                                     "DD-MMM-YYYY"
                                   )}
                                 </div>
-                                {/* {event?.travelBy === "By Car" ||
-                                  event?.travelBy === "By Bus" ? (
-                                  <img alt="" src={Car} />
-                                ) : event?.travelBy === "By Air" ? (
-                                  <img alt="" src={Plane} />
-                                ) : (
-                                  "N/A"
-                                )} */}
                               </td>
-                              {/* <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                                <p
-                                  style={{
-                                    marginBottom: 0,
-                                    fontFamily: "Roboto Regular",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {event?.eventType}
-                                </p>
-                              </td> */}
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
                                 <ShootDropDown
                                   role={"shootDirectors"}
@@ -968,6 +1028,7 @@ function ListView(props) {
                                   usersToShow={directors}
                                   currentEvent={event}
                                   allEvents={allEvents}
+                                  eventsForShow={eventsForShow}
                                   existedUsers={event?.shootDirectors}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -976,16 +1037,16 @@ function ListView(props) {
                                         ? [...event?.shootDirectors, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
                                     updatedEvents[index].shootDirectors =
                                       event?.shootDirectors?.filter(
-                                        (director) => director !== userObj
+                                        (director) =>
+                                          director._id !== userObj._id
                                       );
-                                    setEventsForShow(updatedEvents);
 
+                                    setEventsForShow(updatedEvents);
                                   }}
                                 />
                                 {Array.isArray(event?.shootDirectors) &&
@@ -1009,6 +1070,7 @@ function ListView(props) {
                                   allowedPersons={event?.photographers}
                                   currentEvent={event}
                                   allEvents={allEvents}
+                                  eventsForShow={eventsForShow}
                                   usersToShow={photographer}
                                   existedUsers={event?.choosenPhotographers}
                                   userChecked={(userObj) => {
@@ -1016,12 +1078,11 @@ function ListView(props) {
                                     updatedEvents[index].choosenPhotographers =
                                       Array.isArray(event?.choosenPhotographers)
                                         ? [
-                                          ...event?.choosenPhotographers,
-                                          userObj,
-                                        ]
+                                            ...event?.choosenPhotographers,
+                                            userObj,
+                                          ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1031,7 +1092,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.choosenPhotographers) &&
@@ -1053,7 +1113,8 @@ function ListView(props) {
                                   message={"Cinematographers"}
                                   teble={true}
                                   currentEvent={event}
-                                  allEvents={cinematographer}
+                                  eventsForShow={eventsForShow}
+                                  allEvents={allEvents}
                                   allowedPersons={event?.cinematographers}
                                   usersToShow={cinematographer}
                                   existedUsers={event?.choosenCinematographers}
@@ -1064,13 +1125,12 @@ function ListView(props) {
                                     ].choosenCinematographers = Array.isArray(
                                       event?.choosenCinematographers
                                     )
-                                        ? [
+                                      ? [
                                           ...event?.choosenCinematographers,
                                           userObj,
                                         ]
-                                        : [userObj];
+                                      : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1082,7 +1142,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(
@@ -1110,6 +1169,7 @@ function ListView(props) {
                                   teble={true}
                                   currentEvent={event}
                                   allEvents={allEvents}
+                                  eventsForShow={eventsForShow}
                                   allowedPersons={event?.drones}
                                   usersToShow={flyer}
                                   existedUsers={event?.droneFlyers}
@@ -1120,7 +1180,6 @@ function ListView(props) {
                                         ? [...event?.droneFlyers, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1130,7 +1189,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.droneFlyers) &&
@@ -1155,6 +1213,7 @@ function ListView(props) {
                                   allEvents={allEvents}
                                   allowedPersons={1}
                                   usersToShow={manager}
+                                  eventsForShow={eventsForShow}
                                   existedUsers={event?.manager}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1163,7 +1222,6 @@ function ListView(props) {
                                         ? [...event?.manager, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1173,7 +1231,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.manager) &&
@@ -1198,6 +1255,7 @@ function ListView(props) {
                                   allEvents={allEvents}
                                   allowedPersons={4}
                                   usersToShow={assistant}
+                                  eventsForShow={eventsForShow}
                                   existedUsers={event?.assistants}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1206,7 +1264,6 @@ function ListView(props) {
                                         ? [...event?.assistants, userObj]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1216,7 +1273,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.assistants) &&
@@ -1248,6 +1304,7 @@ function ListView(props) {
                                   teble={true}
                                   currentEvent={event}
                                   allEvents={allEvents}
+                                  eventsForShow={eventsForShow}
                                   allowedPersons={event?.sameDayPhotoEditors}
                                   usersToShow={photographer}
                                   existedUsers={event?.sameDayPhotoMakers}
@@ -1256,12 +1313,11 @@ function ListView(props) {
                                     updatedEvents[index].sameDayPhotoMakers =
                                       Array.isArray(event?.sameDayPhotoMakers)
                                         ? [
-                                          ...event?.sameDayPhotoMakers,
-                                          userObj,
-                                        ]
+                                            ...event?.sameDayPhotoMakers,
+                                            userObj,
+                                          ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1271,7 +1327,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.sameDayPhotoMakers) &&
@@ -1304,6 +1359,7 @@ function ListView(props) {
                                   allowedPersons={event?.sameDayVideoEditors}
                                   currentEvent={event}
                                   allEvents={allEvents}
+                                  eventsForShow={eventsForShow}
                                   usersToShow={cinematographer}
                                   existedUsers={event?.sameDayVideoMakers}
                                   userChecked={(userObj) => {
@@ -1311,12 +1367,11 @@ function ListView(props) {
                                     updatedEvents[index].sameDayVideoMakers =
                                       Array.isArray(event?.sameDayVideoMakers)
                                         ? [
-                                          ...event?.sameDayVideoMakers,
-                                          userObj,
-                                        ]
+                                            ...event?.sameDayVideoMakers,
+                                            userObj,
+                                          ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                   userUnChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1326,7 +1381,6 @@ function ListView(props) {
                                           existingUser !== userObj
                                       );
                                     setEventsForShow(updatedEvents);
-
                                   }}
                                 />
                                 {Array.isArray(event?.sameDayVideoMakers) &&
@@ -1354,7 +1408,7 @@ function ListView(props) {
                                 >
                                   {updatingIndex === index ? (
                                     <div className="w-100">
-                                      <div class="smallSpinner mx-auto"></div>
+                                      <div className="smallSpinner mx-auto"></div>
                                     </div>
                                   ) : (
                                     "Save"
@@ -1395,33 +1449,15 @@ function ListView(props) {
                                 <br />
                                 {event?.client?.groomName}
                                 <br />
-                                <img alt="" src={transport_icons[event.travelBy]} />
+                                <img
+                                  alt=""
+                                  src={transport_icons[event.travelBy]}
+                                />
                               </td>
-                              {/* <td className="tableBody Text14Semi primary2">
-                                {event?.eventType}
-                              </td> */}
-                              {/* <td
-                                style={{
-                                  paddingTop: "15px",
-                                  paddingBottom: "15px",
-                                }}
-                                className="tableBody Text14Semi primary2"
-                              >
-                                {event?.eventStatus}
-                              </td> */}
                               <td className="tableBody Text14Semi primary2">
                                 {event?.userRole}
                               </td>
                               <td className="tableBody Text14Semi primary2">
-                                {/* {event.travelBy ? "By " + event.travelBy : "N/A"} */}
-                                {/* {event?.travelBy === "Car" ||
-                                  event?.travelBy === "Bus" ? (
-                                  <img alt="" src={Car} />
-                                ) : event?.travelBy === "By Air" ? (
-                                  <img alt="" src={Plane} />
-                                ) : (
-                                  "N/A"
-                                )} */}
                                 <div
                                   className="mt-2"
                                   style={{ color: "green" }}
@@ -1440,7 +1476,7 @@ function ListView(props) {
             </Table>
             {loading && (
               <div className="d-flex my-3 justify-content-center align-items-center">
-                <div class="spinner"></div>
+                <div className="spinner"></div>
               </div>
             )}
             {!hasMore && (
@@ -1448,25 +1484,34 @@ function ListView(props) {
                 <div>No more data to load.</div>
               </div>
             )}
+            {!loading && hasMore && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchEvents()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
+              </div>
+            )}
           </div>
-
         </>
       ) : (
         <div
           style={{ height: "400px" }}
           className="d-flex justify-content-center align-items-center"
         >
-          <div class="spinner"></div>
+          <div className="spinner"></div>
         </div>
       )}
 
       <Modal
         className="bg-white"
-        style={{ borderRadius: '10px' }}
+        style={{ borderRadius: "10px" }}
         isOpen={newEventModel}
         centered={true}
         size="lg"
-
       >
         <ModalHeader>Event Details</ModalHeader>
         <Form
@@ -1503,7 +1548,9 @@ function ListView(props) {
                       new Map(
                         allEvents?.map((event) => [
                           // Use a unique key based on both bride and groom names
-                          event?.client?.brideName + "<" + event?.client?.groomName,
+                          event?.client?.brideName +
+                            "<" +
+                            event?.client?.groomName,
                           event,
                         ])
                       ).values() // Extract the unique events from the Map
@@ -1519,14 +1566,12 @@ function ListView(props) {
                       brideName: event?.client?.brideName,
                       groomName: event?.client?.groomName,
                     })),
-                    
-                    
                   ]}
                   required
                   filterOption={(option, searchInput) => {
                     const { brideName, groomName } = option.data;
                     const searchText = searchInput?.toLowerCase();
-  
+
                     // Perform search on both brideName and groomName
                     return (
                       brideName?.toLowerCase().startsWith(searchText) ||
@@ -1552,16 +1597,18 @@ function ListView(props) {
                     style={{
                       zIndex: "5",
                       width: "300px",
-                      right: '5px'
+                      right: "5px",
                     }}
                     className="position-absolute top-5 right-5"
                   >
                     <Calendar
-                      minDate={new Date(Date.now())}
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setNewEvent({ ...newEvent, eventDate: date });
+                        setNewEvent({
+                          ...newEvent,
+                          eventDate: dayjs(new Date(date)).format("YYYY-MM-DD"),
+                        });
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -1570,17 +1617,14 @@ function ListView(props) {
                           index < allEvents?.length;
                           index++
                         ) {
-                          const initialDate = new Date(
-                            allEvents[index].eventDate
+                          const initialDate = dayjs(
+                            new Date(allEvents[index].eventDate)
+                          ).format("YYYY-MM-DD");
+                          const targetDate = dayjs(new Date(date)).format(
+                            "YYYY-MM-DD"
                           );
-                          const targetDate = new Date(date);
-                          const initialDatePart = initialDate
-                            .toISOString()
-                            .split("T")[0];
-                          const targetDatePart = targetDate
-                            .toISOString()
-                            .split("T")[0];
-                          if (initialDatePart === targetDatePart) {
+
+                          if (initialDate === targetDate) {
                             count += 1;
                           }
                         }
@@ -1628,11 +1672,10 @@ function ListView(props) {
                   }}
                   type="checkbox"
                   name="isWedding"
-                  style={{ width: '16px', height: '16px' }}
+                  style={{ width: "16px", height: "16px" }}
                   checked={newEvent?.isWedding}
-                // disabled={weddingAssigned}
+                  // disabled={weddingAssigned}
                 />
-
               </Col>
               {eventOptionObjectKeys?.map((Objkey) => (
                 <Col xl="6" sm="6" className="p-2">
@@ -1645,9 +1688,9 @@ function ListView(props) {
                       value={
                         newEvent?.[Objkey]
                           ? {
-                            value: newEvent?.[Objkey],
-                            label: newEvent?.[Objkey],
-                          }
+                              value: newEvent?.[Objkey],
+                              label: newEvent?.[Objkey],
+                            }
                           : null
                       }
                       name={Objkey}
@@ -1690,13 +1733,13 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   const handleMouseEnter = (e) => {
     setTimeout(() => {
       setIsHovered(true);
-      setRowOfWarnig(i)
+      setRowOfWarnig(i);
     }, 200);
   };
   const handleMouseLeave = () => {
     setTimeout(() => {
       setIsHovered(false);
-      setRowOfWarnig(null)
+      setRowOfWarnig(null);
     }, 200);
   };
 
@@ -1726,7 +1769,6 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
         </div>
       )}
     </div>
-
   );
 };
 

@@ -5,10 +5,8 @@ import Heart from "../../assets/Profile/Heart.svg";
 import { getClients, updateClient } from "../../API/Client";
 import Select from "react-select";
 import CalenderImg from '../../assets/Profile/Calender.svg';
-import Calendar from 'react-calendar';
 import { Overlay } from 'react-bootstrap';
 import dayjs from "dayjs";
-import CalenderMulti from "../../components/Calendar";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 
@@ -99,10 +97,10 @@ function CheckLists(props) {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
   const yesNoOptions = [{
     label: 'Yes',
     value: 'Yes'
@@ -320,6 +318,17 @@ function CheckLists(props) {
               <div>No more data to load.</div>
             </div>
           )}
+          {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchClientsAgain()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
+              </div>
+            )}
           <Overlay
             rootClose={true}
             onHide={() => setShow(false)}

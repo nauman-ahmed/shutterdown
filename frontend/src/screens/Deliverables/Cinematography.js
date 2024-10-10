@@ -171,11 +171,19 @@ function Cinematography(props) {
       await getAllWhatsappTextHandler()
       if (currentUser.rollSelect === 'Manager') {
         setAllDeliverables(data.data);
-        setDeliverablesForShow(data.data);
+        setDeliverablesForShow(data.data.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
       } else if (currentUser.rollSelect === 'Editor') {
         const deliverablesToShow = data.data.filter(deliverable => deliverable?.editor?._id === currentUser._id);
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(deliverablesToShow);
+        setDeliverablesForShow(deliverablesToShow.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }));
       }
       setEditors(res.editors.filter(user => user.subRole.includes("Video Editor")))
       setLoading(false)
@@ -203,12 +211,20 @@ function Cinematography(props) {
             } else {
               dataToAdd = data.data
             }
-            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd]);
+            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           } else if (currentUser.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
-            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
+            setAllDeliverables([...allDeliverables, ...deliverablesToShow].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
             if (filterCondition) {
               dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
             } else {
@@ -217,11 +233,13 @@ function Cinematography(props) {
             setDeliverablesForShow([
               ...deliverablesForShow,
               ...dataToAdd,
-            ]);
+            ].sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            }));
           }
         } 
-        console.log(data);
-        
         if (data.hasMore) {
           setPage(page + 1);
         }
@@ -249,19 +267,20 @@ function Cinematography(props) {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
+ 
   const applySorting = (wedding = false) => {
     try {
       if (wedding) {
-        setDeliverablesForShow(deliverablesForShow.sort((a, b) => {
+        const sorted = deliverablesForShow.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        }));
+          return !ascendingWeding ? dateB - dateA : dateA - dateB;
+        })
+        setDeliverablesForShow(sorted);
         setAscendingWeding(!ascendingWeding)
       }
     } catch (error) {
@@ -311,9 +330,17 @@ function Cinematography(props) {
       }
       setFilterCondition(finalCond)
       const newData = allDeliverables.filter(deliverable => eval(finalCond))
-      setDeliverablesForShow(newData)
+      setDeliverablesForShow(newData?.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
     } else {
-      setDeliverablesForShow(allDeliverables)
+      setDeliverablesForShow(allDeliverables?.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
     }
   }
 
@@ -321,10 +348,18 @@ function Cinematography(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === 'Unassigned Editor') {
-        setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor))
+        setDeliverablesForShow(allDeliverables.filter(deliverable => !deliverable.editor).sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }))
       } else {
         if (filterType !== 'Wedding Date sorting' && filterType !== 'Deadline sorting') {
-          setDeliverablesForShow(allDeliverables)
+          setDeliverablesForShow(allDeliverables.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          }))
         }
       }
     }
@@ -351,7 +386,7 @@ function Cinematography(props) {
 
   const handleSaveData = async (index) => {
     try {
-      const deliverable = allDeliverables[index];
+      const deliverable = deliverablesForShow[index];
       setUpdatingIndex(index);
       await updateDeliverable(deliverable)
 
@@ -468,7 +503,7 @@ function Cinematography(props) {
                       <th className="tableBody sticky-column">Client</th>
                       <th className="tableBody">Deliverables</th>
                       <th className="tableBody">Editor</th>
-                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
+                      <th className="tableBody" style={{ cursor: "pointer" }} onClick={(() => applySorting(true))}>Wedding <br /> Date {!ascendingWeding ? <IoIosArrowRoundDown style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" /> : <IoIosArrowRoundUp style={{ color: '#666DFF' }} className="fs-4 cursor-pointer" />}</th>
                       <th className="tableBody">Client Deadline</th>
                       <th className="tableBody">Editor Deadline</th>
                       <th className="tableBody">First Delivery Date</th>
@@ -492,8 +527,7 @@ function Cinematography(props) {
                 }}
               >
                 {deliverablesForShow?.map((deliverable, index) => {
-               
-                  
+
                   return (
                     <>
                       {index === 0 && <div style={{ marginTop: '15px' }} />}
@@ -534,9 +568,9 @@ function Cinematography(props) {
                             }} >
 
                             <Select value={deliverable?.editor ? { value: deliverable?.editor?.firstName, label: deliverable?.editor?.firstName } : null} name='editor' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                              const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].editor = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={editors?.map(editor => {
                               return ({ value: editor, label: editor.firstName })
                             })} required />
@@ -570,12 +604,20 @@ function Cinematography(props) {
                               name="companyDeadline"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                               
+                                
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].companyDeadline = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.companyDeadline ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') : null}
-                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
+                              value={deliverable?.companyDeadline 
+                                ? dayjs(deliverable?.companyDeadline).format('YYYY-MM-DD') 
+                                : ''
+                              }
+                              min={deliverable?.date 
+                                ? dayjs(deliverable?.date).format('YYYY-MM-DD') 
+                                : ''
+                              }
                             />
                           </td>
                           <td
@@ -590,11 +632,11 @@ function Cinematography(props) {
                               name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].firstDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : null}
+                              value={deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('YYYY-MM-DD') : ''}
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
@@ -610,11 +652,11 @@ function Cinematography(props) {
                               name="finalDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...allDeliverables]
+                                const updatedDeliverables = [...deliverablesForShow];
                                 updatedDeliverables[index].finalDeliveryDate = e.target.value;
-                                setAllDeliverables(updatedDeliverables);
+                                setDeliverablesForShow(updatedDeliverables);
                               }}
-                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : null}
+                              value={deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('YYYY-MM-DD') : ''}
                               min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
                             />
                           </td>
@@ -625,9 +667,9 @@ function Cinematography(props) {
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"   >
                             <Select value={deliverable?.status ? { value: deliverable?.status, label: deliverable?.status } : null} name='Status' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                              const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].status = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 'Yet to Start', label: 'Yet to Start' },
                               { value: 'In Progress', label: 'In Progress' },
@@ -649,9 +691,9 @@ function Cinematography(props) {
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRevision ? { value: deliverable?.clientRevision, label: deliverable?.clientRevision } : null} name='clientRevision' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                              const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].clientRevision = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
@@ -667,9 +709,9 @@ function Cinematography(props) {
                           }} className="tableBody tablePlaceContent">
                             {' '}
                             <Select value={deliverable?.clientRating ? { value: deliverable?.clientRating, label: deliverable?.clientRating } : null} name='clientRating' onChange={(selected) => {
-                              const updatedDeliverables = [...allDeliverables];
+                             const updatedDeliverables = [...deliverablesForShow];
                               updatedDeliverables[index].clientRating = selected.value;
-                              setAllDeliverables(updatedDeliverables)
+                              setDeliverablesForShow(updatedDeliverables)
                             }} styles={customStyles} options={[
                               { value: 1, label: 1 },
                               { value: 2, label: 2 },
@@ -768,6 +810,17 @@ function Cinematography(props) {
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
+              </div>
+            )}
+            {(!loading && hasMore) && (
+              <div className="d-flex my-3 justify-content-center align-items-center">
+                <button
+                  onClick={() => fetchCinemas()}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                >
+                  Load More
+                </button>
               </div>
             )}
           </div>

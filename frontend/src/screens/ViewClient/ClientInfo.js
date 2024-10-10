@@ -50,33 +50,35 @@ function ClientInfo() {
   const dispatch = useDispatch();
   const getStoredEvents = async () => {
     const res = await getAllEvents();
-    if (currentUser.rollSelect === 'Manager') {
+    if (currentUser.rollSelect === "Manager") {
       dispatch(updateAllEvents(res?.data));
-      setAllEvents(res?.data);
-    } else if (currentUser.rollSelect === 'Shooter' || currentUser.rollSelect === 'Editor') {
-      const eventsToShow = res.data?.map(event => {
-
-        if (event?.shootDirectors?.some(director => director._id === currentUser._id)) {
-          return { ...event, userRole: 'Shoot Director' };
-        } else if (event?.choosenPhotographers.some(photographer => photographer._id === currentUser._id)) {
-          return { ...event, userRole: 'Photographer' };
-        } else if (event?.choosenCinematographers.some(cinematographer => cinematographer._id === currentUser._id)) {
-          return { ...event, userRole: 'Cinematographer' };
-        } else if (event?.droneFlyers.some(flyer => flyer._id === currentUser._id)) {
-          return { ...event, userRole: 'Drone Flyer' };
-        } else if (event?.manager.some(manager => manager._id === currentUser._id)) {
-          return { ...event, userRole: 'Manager' };
-        } else if (event?.sameDayPhotoMakers.some(photoMaker => photoMaker._id === currentUser._id)) {
-          return { ...event, userRole: 'Same Day Photos Maker' };
-        } else if (event?.sameDayVideoMakers.some(videoMaker => videoMaker._id === currentUser._id)) {
-          return { ...event, userRole: 'Same Day Video Maker' };
-        } else if (event?.assistants.some(assistant => assistant._id === currentUser._id)) {
-          return { ...event, userRole: 'Assistant' };
-        } else {
-          return null;
-        }
-      });
-      setAllEvents(eventsToShow)
+    } else if (
+      currentUser.rollSelect === "Shooter" ||
+      currentUser.rollSelect === "Editor"
+    ) {
+      const eventsToShow = res.data?.filter(
+        (event) =>
+          event?.shootDirectors?.some(
+            (director) => director._id === currentUser._id
+          ) ||
+          event?.choosenPhotographers.some(
+            (photographer) => photographer._id === currentUser._id
+          ) ||
+          event?.choosenCinematographers.some(
+            (cinematographer) => cinematographer._id === currentUser._id
+          ) ||
+          event?.droneFlyers.some((flyer) => flyer._id === currentUser._id) ||
+          event?.manager.some((manager) => manager._id === currentUser._id) ||
+          event?.sameDayPhotoMakers.some(
+            (photoMaker) => photoMaker._id === currentUser._id
+          ) ||
+          event?.sameDayVideoMakers.some(
+            (videoMaker) => videoMaker._id === currentUser._id
+          ) ||
+          event?.assistants.some(
+            (assistant) => assistant._id === currentUser._id
+          )
+      );
       dispatch(updateAllEvents(eventsToShow));
     }
 
@@ -92,7 +94,6 @@ function ClientInfo() {
   const getAllFormOptionsHandler = async () => {
     const eventOptions = await getAllEventOptions();
     const deliverableOptions = await getAllDeliverableOptions();
-
     setEventOptionsKeyValues(eventOptions);
     setDeliverableOptionsKeyValues(deliverableOptions);
   };
@@ -149,8 +150,6 @@ function ClientInfo() {
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId);
-      console.log(res);
-      
       setClientData(res);
     } catch (error) {
       console.log(error);
@@ -190,8 +189,6 @@ function ClientInfo() {
   };
   const updateClient = async () => {
     try {
-      console.log(editedClient);
-      
       await updateClientData(editedClient);
       setEditedClient(null)
       setEditClientModal(false);
@@ -464,7 +461,7 @@ function ClientInfo() {
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setNewEvent({ ...newEvent, eventDate: date });
+                        setNewEvent({ ...newEvent, eventDate: dayjs(new Date(date)).format('YYYY-MM-DDD')});
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -473,17 +470,17 @@ function ClientInfo() {
                           index < allEvents?.length;
                           index++
                         ) {
-                          const initialDate = new Date(
+                          const initialDate = dayjs(new Date(
                             allEvents[index].eventDate
-                          );
-                          const targetDate = new Date(date);
-                          const initialDatePart = initialDate
-                            .toISOString()
-                            .split("T")[0];
-                          const targetDatePart = targetDate
-                            .toISOString()
-                            .split("T")[0];
-                          if (initialDatePart === targetDatePart) {
+                          )).format('YYYY-MM-DD');
+                          const targetDate = dayjs(new Date(date)).format('YYYY-MM-DD');
+                          // const initialDatePart = initialDate
+                          //   .toISOString()
+                          //   .split("T")[0];
+                          // const targetDatePart = targetDate
+                          //   .toISOString()
+                          //   .split("T")[0];
+                          if (initialDate === targetDate) {
                             count += 1;
                           }
                         }
@@ -618,7 +615,7 @@ function ClientInfo() {
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setEventToEdit({ ...eventToEdit, eventDate: date });
+                        setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -627,17 +624,17 @@ function ClientInfo() {
                           index < allEvents?.length;
                           index++
                         ) {
-                          const initialDate = new Date(
+                          const initialDate = dayjs(new Date(
                             allEvents[index].eventDate
-                          );
-                          const targetDate = new Date(date);
-                          const initialDatePart = initialDate
-                            .toISOString()
-                            .split("T")[0];
-                          const targetDatePart = targetDate
-                            .toISOString()
-                            .split("T")[0];
-                          if (initialDatePart === targetDatePart) {
+                          )).format('YYYY-MM-DD');
+                          const targetDate = dayjs(new Date(date)).format('YYYY-MM-DD');
+                          // const initialDatePart = initialDate
+                          //   .toISOString()
+                          //   .split("T")[0];
+                          // const targetDatePart = targetDate
+                          //   .toISOString()
+                          //   .split("T")[0];
+                          if (initialDate === targetDate) {
                             count += 1;
                           }
                         }
