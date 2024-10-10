@@ -19,10 +19,7 @@ const bodyParser = require('body-parser');
 const eventRouter = require('./Routes/EventRouter');
 const deliverableRouter = require('./Routes/deliverableRouter');
 dotenv.config({ path: './config.env' });
-const path = require('path');
-const { changeDateString } = require('./Controllers/EventController');
-const { adddatesinClients } = require('./Controllers/ClientController');
-const { addDateinDeliverales } = require('./Controllers/deliverableController');
+
 const PORT = 5002;
 
 app.use(cors());
@@ -71,20 +68,6 @@ app.use('/eventOptions', EventOptionsRouter);
 app.use('/deliverableOptions', DeliverableOptionsRouter);
 app.use('/Whatsapp', WhatsappRouter);
 
-// app.use(express.static(path.join(__dirname, "frontend/build")));
-// app.get("*", function (_, res) {
-//   res.setHeader("Content-Type", "text/html");
-//   res.sendFile(
-//     path.join(__dirname, "frontend/build/index.html"),
-//     function (err) {
-//       res.status(500).send(err);
-//     },
-//   );
-// });
-
-changeDateString()
-adddatesinClients()
-addDateinDeliverales()
 
 server.listen(PORT, () => {
   try {
