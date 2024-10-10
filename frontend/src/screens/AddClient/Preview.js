@@ -14,6 +14,7 @@ import { updateClintData } from "../../redux/clientBookingForm";
 import { getAllEvents, getEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
 
 function Preview() {
   const navigate = useNavigate();
@@ -35,11 +36,11 @@ function Preview() {
   const currentUser =
     Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [eventIndex, setEventIndex] = useState(0);
+
   const submitClient = async () => {
     if (requesting === false) {
       setRequesting(true);
       const saveResult = await SaveClientForm(clientData);
-      setRequesting(false);
       dispatch({
         type: "SOCKET_EMIT_EVENT",
         payload: {
@@ -86,7 +87,9 @@ function Preview() {
         dispatch(updateAllEvents(eventsToShow));
       }
       dispatch(updateClintData({ albums: [""] }));
+      setRequesting(false);
       if (saveResult.result) {
+        toast.success("Successfully added client")
         navigate("/MyProfile/AddClient/Form-I");
       }
     }
@@ -95,6 +98,7 @@ function Preview() {
 
   return (
     <>
+      <ToastContainer />
       <div className="mt18">
         <Row>
           <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">

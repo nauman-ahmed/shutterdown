@@ -40,7 +40,7 @@ function ClientInfo() {
   const [eventToEdit, setEventToEdit] = useState(null);
   const [newEvent, setNewEvent] = useState({ client: clientId });
   const [showCalender, setShowCalender] = useState(false);
-  const [allEvents, setAllEvents] = useState(null);
+  const [allEvents, setAllEvents] = useState();
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
@@ -52,6 +52,8 @@ function ClientInfo() {
     const res = await getAllEvents();
     if (currentUser.rollSelect === "Manager") {
       dispatch(updateAllEvents(res?.data));
+      console.log("Events", res.data)
+      setAllEvents(res.data)
     } else if (
       currentUser.rollSelect === "Shooter" ||
       currentUser.rollSelect === "Editor"
@@ -80,6 +82,7 @@ function ClientInfo() {
           )
       );
       dispatch(updateAllEvents(eventsToShow));
+      
     }
 
   };
@@ -452,7 +455,7 @@ function ClientInfo() {
                   <div
                     style={{
                       zIndex: "5",
-                      width: "300px"
+                      width: "280px"
                     }}
                     className="position-absolute"
                   >
@@ -608,6 +611,7 @@ function ClientInfo() {
                   <div
                     style={{
                       zIndex: "5",
+                      width: "280px"
                     }}
                     className="position-absolute"
                   >

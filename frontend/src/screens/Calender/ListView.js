@@ -1089,7 +1089,7 @@ function ListView(props) {
                                     updatedEvents[index].choosenPhotographers =
                                       event?.choosenPhotographers?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1139,7 +1139,7 @@ function ListView(props) {
                                     ].choosenCinematographers =
                                       event?.choosenCinematographers?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1186,7 +1186,7 @@ function ListView(props) {
                                     updatedEvents[index].droneFlyers =
                                       event?.droneFlyers?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1228,7 +1228,7 @@ function ListView(props) {
                                     updatedEvents[index].manager =
                                       event?.manager?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1270,7 +1270,7 @@ function ListView(props) {
                                     updatedEvents[index].assistants =
                                       event?.assistants?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1324,7 +1324,7 @@ function ListView(props) {
                                     updatedEvents[index].sameDayPhotoMakers =
                                       event?.sameDayPhotoMakers?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1378,7 +1378,7 @@ function ListView(props) {
                                     updatedEvents[index].sameDayVideoMakers =
                                       event?.sameDayVideoMakers?.filter(
                                         (existingUser) =>
-                                          existingUser !== userObj
+                                          existingUser._id !== userObj._id
                                       );
                                     setEventsForShow(updatedEvents);
                                   }}
