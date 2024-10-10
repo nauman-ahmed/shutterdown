@@ -82,9 +82,9 @@ app.use('/Whatsapp', WhatsappRouter);
 //   );
 // });
 
-// changeDateString()
-// adddatesinClients()
-// addDateinDeliverales()
+changeDateString()
+adddatesinClients()
+addDateinDeliverales()
 
 server.listen(PORT, () => {
   try {
