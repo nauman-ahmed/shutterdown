@@ -235,7 +235,7 @@ function ClientInfo() {
                 paddingTop: "15px",
                 paddingBottom: "15px",
               }}
-              className="tableBody Text14Semi primary2 fs-6"
+              className="tableBody Text14Semi primary2 fs-6 tablePlaceContent"
             >
               {clientData?.brideName}
               <br />
