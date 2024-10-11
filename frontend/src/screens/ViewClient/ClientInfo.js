@@ -34,6 +34,7 @@ function ClientInfo() {
   const { clientId } = useParams();
   const deleteClientDetails = useRef()
   const [clientData, setClientData] = useState(null);
+  const [groupedAlbums, setGroupedAlbums] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [newEventModel, setNewEventModel] = useState(false);
   const [editEventModel, setEditEventModel] = useState(false);
@@ -149,9 +150,17 @@ function ClientInfo() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+  const groupAndCount = (array) => {
+    return array.reduce((acc, item) => {
+      acc[item] = (acc[item] || 0) + 1;
+      return acc;
+    }, {});
+  };
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId);
+      const result = groupAndCount(res.albums);
+      setGroupedAlbums(result)
       setClientData(res);
     } catch (error) {
       console.log(error);
@@ -205,6 +214,7 @@ function ClientInfo() {
 
   return (
     <div>
+      {console.log("Results", groupedAlbums)}
       <Table bordered hover responsive>
         <thead>
           <tr
@@ -250,12 +260,13 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">+{clientData?.phoneNumber}</td>
 
             <td className="textPrimary fs-6 tablePlaceContent">
-              {clientData?.albums?.map((val, i) => (
-                <div>
-                  {i + 1} : {val}
-                  <br />
-                </div>
-              ))}
+              <>
+                {Object.entries(groupedAlbums).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </>
             </td>
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.preWeddingPhotos ? "Yes" : "No"}
