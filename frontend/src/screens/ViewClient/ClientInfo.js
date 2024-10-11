@@ -52,7 +52,6 @@ function ClientInfo() {
     const res = await getAllEvents();
     if (currentUser.rollSelect === "Manager") {
       dispatch(updateAllEvents(res?.data));
-      console.log("Events", res.data)
       setAllEvents(res.data)
     } else if (
       currentUser.rollSelect === "Shooter" ||
@@ -192,7 +191,9 @@ function ClientInfo() {
   };
   const updateClient = async () => {
     try {
+      console.log("Start")
       await updateClientData(editedClient);
+      console.log("End")
       setEditedClient(null)
       setEditClientModal(false);
       getIdData();
@@ -272,8 +273,6 @@ function ClientInfo() {
               <FaEdit className="fs-5 cursor-pointer"
                 onClick={() => {
                   setEditedClient(clientData)
-                  console.log(clientData);
-
                   setEditClientModal(true);
                 }}
               /><MdDelete
@@ -621,6 +620,8 @@ function ClientInfo() {
                         setShowCalender(!showCalender);
                         setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
                       }}
+                      
+                      value={eventToEdit?.eventDate ? new Date(eventToEdit?.eventDate) : new Date()}
                       tileClassName={({ date }) => {
                         let count = 0;
                         for (
@@ -898,7 +899,7 @@ function ClientInfo() {
                           </div>
                           <Select
                             value={
-                              editedClient?.["preWed" + Objkey]
+                              editedClient?.["preWed" + Objkey] !== null
                                 ? {
                                   value: editedClient?.["preWed" + Objkey],
                                   label: editedClient?.["preWed" + Objkey],
@@ -1009,7 +1010,7 @@ function ClientInfo() {
                     </div>
                     <Select
                       value={
-                        editedClient?.[Objkey]
+                        editedClient?.[Objkey] !== null
                           ? {
                             value: editedClient?.[Objkey],
                             label: editedClient?.[Objkey],
