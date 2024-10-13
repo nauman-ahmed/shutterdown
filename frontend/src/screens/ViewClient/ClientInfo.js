@@ -214,7 +214,6 @@ function ClientInfo() {
 
   return (
     <div>
-      {console.log("Results", groupedAlbums)}
       <Table bordered hover responsive>
         <thead>
           <tr
