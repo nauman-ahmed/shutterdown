@@ -103,6 +103,8 @@ function ListView(props) {
   const [flyer, setFlyer] = useState([]);
   const [manager, setManager] = useState([]);
   const [assistant, setAssistant] = useState([]);
+  const [photoEditor, setPhotoEditor] = useState([]);
+  const [videoEditor, setVideoEditor] = useState([]);
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [dateForFilter, setDateForFilter] = useState(null);
   const [clientId, setClientId] = useState(clientIdd);
@@ -170,6 +172,12 @@ function ListView(props) {
       );
       setAssistant(
         usersData.users.filter((user) => user.subRole.includes("Assistant"))
+      );
+      setPhotoEditor(
+        usersData.users.filter((user) => user.subRole.includes("Video Editor"))
+      );
+      setVideoEditor(
+        usersData.users.filter((user) => user.subRole.includes("Video Editor"))
       );
       // setEventsForShow(null)
       let res;
@@ -1287,7 +1295,7 @@ function ListView(props) {
                                   allEvents={allEvents}
                                   eventsForShow={eventsForShow}
                                   allowedPersons={event?.sameDayPhotoEditors}
-                                  usersToShow={photographer}
+                                  usersToShow={photoEditor}
                                   existedUsers={event?.sameDayPhotoMakers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];
@@ -1341,7 +1349,7 @@ function ListView(props) {
                                   currentEvent={event}
                                   allEvents={allEvents}
                                   eventsForShow={eventsForShow}
-                                  usersToShow={cinematographer}
+                                  usersToShow={videoEditor}
                                   existedUsers={event?.sameDayVideoMakers}
                                   userChecked={(userObj) => {
                                     const updatedEvents = [...eventsForShow];

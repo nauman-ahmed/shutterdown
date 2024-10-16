@@ -420,11 +420,11 @@ const updateWholeClient = async (req, res) => {
           });
           if (!existAlbum) {
             const newAlbum = new deliverableModel({
-              client: client._id,
+              client: clientToEdit._id,
               deliverableName: album,
               quantity: 1,
               date: updatedDate,
-              albumDeadline,
+              // albumDeadline,
             });
             await newAlbum.save();
             clientToEdit.deliverables = [

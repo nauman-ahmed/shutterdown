@@ -299,11 +299,11 @@ function ViewClient() {
               ))}
             </tbody>
           </Table>
-          {loading && (
+          {/* {loading && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div class="spinner"></div>
             </div>
-          )}
+          )} */}
           {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>

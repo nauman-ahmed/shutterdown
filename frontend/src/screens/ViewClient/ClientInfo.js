@@ -34,6 +34,7 @@ function ClientInfo() {
   const { clientId } = useParams();
   const deleteClientDetails = useRef()
   const [clientData, setClientData] = useState(null);
+  const [groupedAlbums, setGroupedAlbums] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [newEventModel, setNewEventModel] = useState(false);
   const [editEventModel, setEditEventModel] = useState(false);
@@ -52,7 +53,6 @@ function ClientInfo() {
     const res = await getAllEvents();
     if (currentUser.rollSelect === "Manager") {
       dispatch(updateAllEvents(res?.data));
-      console.log("Events", res.data)
       setAllEvents(res.data)
     } else if (
       currentUser.rollSelect === "Shooter" ||
@@ -150,9 +150,17 @@ function ClientInfo() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+  const groupAndCount = (array) => {
+    return array.reduce((acc, item) => {
+      acc[item] = (acc[item] || 0) + 1;
+      return acc;
+    }, {});
+  };
   const getIdData = async () => {
     try {
       const res = await getClientById(clientId);
+      const result = groupAndCount(res.albums);
+      setGroupedAlbums(result)
       setClientData(res);
     } catch (error) {
       console.log(error);
@@ -192,7 +200,9 @@ function ClientInfo() {
   };
   const updateClient = async () => {
     try {
+      console.log("Start")
       await updateClientData(editedClient);
+      console.log("End")
       setEditedClient(null)
       setEditClientModal(false);
       getIdData();
@@ -249,12 +259,13 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">+{clientData?.phoneNumber}</td>
 
             <td className="textPrimary fs-6 tablePlaceContent">
-              {clientData?.albums?.map((val, i) => (
-                <div>
-                  {i + 1} : {val}
-                  <br />
-                </div>
-              ))}
+              <>
+                {Object.entries(groupedAlbums).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </>
             </td>
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.preWeddingPhotos ? "Yes" : "No"}
@@ -272,8 +283,6 @@ function ClientInfo() {
               <FaEdit className="fs-5 cursor-pointer"
                 onClick={() => {
                   setEditedClient(clientData)
-                  console.log(clientData);
-
                   setEditClientModal(true);
                 }}
               /><MdDelete
@@ -621,6 +630,8 @@ function ClientInfo() {
                         setShowCalender(!showCalender);
                         setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
                       }}
+                      
+                      value={eventToEdit?.eventDate ? new Date(eventToEdit?.eventDate) : new Date()}
                       tileClassName={({ date }) => {
                         let count = 0;
                         for (
@@ -898,7 +909,7 @@ function ClientInfo() {
                           </div>
                           <Select
                             value={
-                              editedClient?.["preWed" + Objkey]
+                              editedClient?.["preWed" + Objkey] !== null
                                 ? {
                                   value: editedClient?.["preWed" + Objkey],
                                   label: editedClient?.["preWed" + Objkey],
@@ -1009,7 +1020,7 @@ function ClientInfo() {
                     </div>
                     <Select
                       value={
-                        editedClient?.[Objkey]
+                        editedClient?.[Objkey] !== null
                           ? {
                             value: editedClient?.[Objkey],
                             label: editedClient?.[Objkey],

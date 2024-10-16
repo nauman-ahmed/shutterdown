@@ -52,6 +52,7 @@ export const updateEventData = async (data) => {
 
 export const updateClientData = async (data) => {
   try {
+    console.log("Sending request", BASE_URL)
     await axios
       .patch(BASE_URL + "/updateClient", {
         Headers: {
