@@ -44,6 +44,7 @@ import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
 import { getAllClients, getClients } from "../../API/Client";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
+import { Overlay } from "react-bootstrap";
 
 const months = [
   "January",
@@ -683,7 +684,7 @@ function ListView(props) {
           <div
             className=" d-flex mx-auto align-items-center justify-content-between flex-wrap gap-3"
             style={{ width: "100%" }}
-            ref={target}
+            
           >
             <div style={{ width: "120px" }}>
               {currentUser?.rollSelect == "Manager" && (
@@ -748,16 +749,19 @@ function ListView(props) {
               style={{ width: "200px", position: "relative" }}
             >
               <div
+              ref={target}
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
               >
-                {dateForFilter ? (
-                  dayjs(dateForFilter).format("DD-MMM-YYYY")
-                ) : (
-                  <>
-                    {monthForData} {yearForData}
-                  </>
-                )}
+                <div onClick={toggle}>
+                  {dateForFilter ? (
+                    dayjs(dateForFilter).format("DD-MMM-YYYY")
+                  ) : (
+                    <>
+                      {monthForData} {yearForData}
+                    </>
+                  )}
+                </div>
                 <div
                   className="d-flex align-items-center"
                   style={{ position: "relative" }}
@@ -771,29 +775,6 @@ function ListView(props) {
                       setYearForData(new Date().getFullYear());
                     }}
                   />
-                  {show && (
-                    <div
-                      style={{
-                        width: "300px",
-                        position: "absolute",
-                        top: "30px",
-                        right: "-10px",
-                        zIndex: 1000,
-                      }}
-                    >
-                      <div>
-                        <CalenderMultiListView
-                          monthForData={monthForData}
-                          dateForFilter={dateForFilter}
-                          yearForData={yearForData}
-                          setShow={setShow}
-                          setMonthForData={setMonthForData}
-                          setYearForData={setYearForData}
-                          setDateForFilter={setDateForFilter}
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -1496,6 +1477,25 @@ function ListView(props) {
               </div>
             )}
           </div>
+          <Overlay
+            rootClose={true}
+            onHide={() => setShow(false)}
+            target={target.current}
+            show={show}
+            placement="bottom"
+          >
+            <div style={{ width: "300px" }}>
+              <CalenderMultiListView
+                monthForData={monthForData}
+                dateForFilter={dateForFilter}
+                yearForData={yearForData}
+                setShow={setShow}
+                setMonthForData={setMonthForData}
+                setYearForData={setYearForData}
+                setDateForFilter={setDateForFilter}
+              />
+            </div>
+          </Overlay>
         </>
       ) : (
         <div

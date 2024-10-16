@@ -4,20 +4,34 @@ import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import { getClients, updateClient } from "../../API/Client";
 import Select from "react-select";
-import CalenderImg from '../../assets/Profile/Calender.svg';
-import { Overlay } from 'react-bootstrap';
+import CalenderImg from "../../assets/Profile/Calender.svg";
+import { Overlay } from "react-bootstrap";
 import dayjs from "dayjs";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 
-
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "Decemeber",
+];
 
 function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
-  const [dateForFilter, setDateForFilter] = useState(null)
-  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
-  const [yearForData, setYearForData] = useState(new Date().getFullYear())
+  const [dateForFilter, setDateForFilter] = useState(null);
+  const [monthForData, setMonthForData] = useState(
+    months[new Date().getMonth()]
+  );
+  const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
@@ -27,42 +41,53 @@ function CheckLists(props) {
   };
   const [clientsForShow, setClientsForShow] = useState(null);
 
-
   const target = useRef(null);
   const [show, setShow] = useState(false);
   useEffect(() => {
-    setClientsForShow(allClients)
-  }, [allClients])
+    setClientsForShow(allClients);
+  }, [allClients]);
 
   const fetchClients = async () => {
     try {
-      const clients = await getClients(1, monthForData, yearForData, dateForFilter, null);
+      const clients = await getClients(
+        1,
+        monthForData,
+        yearForData,
+        dateForFilter,
+        null
+      );
       setClientsForShow(clients.data);
-      setHasMore(true)
-      setPage(2)
+      setHasMore(true);
+      setPage(2);
     } catch (error) {
-      console.log(error, "error")
+      console.log(error, "error");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchClients()
-  }, [monthForData, yearForData, dateForFilter])
+    fetchClients();
+  }, [monthForData, yearForData, dateForFilter]);
 
   const fetchClientsAgain = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page, monthForData, yearForData, dateForFilter, null);
+        const data = await getClients(
+          page,
+          monthForData,
+          yearForData,
+          dateForFilter,
+          null
+        );
         if (data.data.length > 0) {
           if (dateForFilter) {
             const clientsToAdd = data.data.filter((clientData) => {
               return clientData.events.some(
                 (eventData) =>
                   new Date(eventData.eventDate).getTime() >=
-                  new Date(dateForFilter).getTime() &&
+                    new Date(dateForFilter).getTime() &&
                   new Date(eventData.eventDate).getTime() <=
-                  new Date(dateForFilter).getTime()
+                    new Date(dateForFilter).getTime()
               );
             });
             setClientsForShow([...clientsForShow, ...clientsToAdd]);
@@ -101,14 +126,16 @@ function CheckLists(props) {
   //   window.addEventListener("scroll", handleScroll);
   //   return () => window.removeEventListener("scroll", handleScroll);
   // }, [handleScroll]);
-  const yesNoOptions = [{
-    label: 'Yes',
-    value: 'Yes'
-  },
-  {
-    label: 'No',
-    value: 'No'
-  }]
+  const yesNoOptions = [
+    {
+      label: "Yes",
+      value: "Yes",
+    },
+    {
+      label: "No",
+      value: "No",
+    },
+  ];
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -121,7 +148,6 @@ function CheckLists(props) {
       backgroundColor: "#EFF0F5",
       padding: "2px",
       border: "none",
-
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
@@ -130,7 +156,7 @@ function CheckLists(props) {
     try {
       const client = allClients[index];
       setUpdatingIndex(index);
-      await updateClient(client)
+      await updateClient(client);
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
@@ -141,41 +167,46 @@ function CheckLists(props) {
     <>
       {clientsForShow ? (
         <>
-          <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' ref={target}>
-
-            <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-75'>
+          <div
+            className="widthForFilters d-flex flex-row  mx-auto align-items-center"
+            ref={target}
+          >
+            <div className="w-100 d-flex flex-row align-items-center">
+              <div className="w-75">
                 <div
                   className={`forminput R_A_Justify1`}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
-                  {dateForFilter
-                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    : <>{monthForData}  {yearForData}</>}
+                  <div onClick={toggle}>
+                    {dateForFilter ? (
+                      dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    ) : (
+                      <>
+                        {monthForData} {yearForData}
+                      </>
+                    )}
+                  </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null)
-                        setMonthForData(months[new Date().getMonth()])
-                        setYearForData(new Date().getFullYear())
-
+                        setDateForFilter(null);
+                        setMonthForData(months[new Date().getMonth()]);
+                        setYearForData(new Date().getFullYear());
                       }}
                     />
                   </div>
-
                 </div>
               </div>
             </div>
-
           </div>
           <Table
             bordered
             hover
             // borderless
             responsive
-            style={{ width: '120%', marginTop: '15px' }}
+            style={{ width: "120%", marginTop: "15px" }}
           >
             <thead>
               <tr className="logsHeader Text16N1">
@@ -190,8 +221,8 @@ function CheckLists(props) {
             <tbody
               className="Text12"
               style={{
-                textAlign: 'center',
-                borderWidth: '1px 1px 1px 1px',
+                textAlign: "center",
+                borderWidth: "1px 1px 1px 1px",
                 // background: "#EFF0F5",
               }}
             >
@@ -200,14 +231,14 @@ function CheckLists(props) {
                   <>
                     <tr
                       style={{
-                        borderRadius: '8px',
+                        borderRadius: "8px",
                       }}
                     >
                       <td
                         className="tableBody sticky-column Text14Semi primary2"
                         style={{
-                          paddingTop: '15px',
-                          paddingBottom: '15px',
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
                         }}
                       >
                         {client.brideName}
@@ -219,82 +250,131 @@ function CheckLists(props) {
                       <td
                         className="tableBody Text14Semi primary2"
                         style={{
-                          paddingTop: '15px',
-                          paddingBottom: '15px',
-                          width: '170px'
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                          width: "170px",
                         }}
                       >
-                        <Select value={client.checklistDetails?.whatsAppGroup ? { value: client?.checklistDetails?.whatsAppGroup, label: client?.checklistDetails?.whatsAppGroup } : null} onChange={(selected) => {
-                          const updatedClients = [...allClients];
-                          updatedClients[index].checklistDetails = client.checklistDetails || {};
-                          updatedClients[index].checklistDetails.whatsAppGroup = selected.value;
-                          setAllClients(updatedClients)
-                        }} styles={customStyles} options={yesNoOptions} required />
+                        <Select
+                          value={
+                            client.checklistDetails?.whatsAppGroup
+                              ? {
+                                  value:
+                                    client?.checklistDetails?.whatsAppGroup,
+                                  label:
+                                    client?.checklistDetails?.whatsAppGroup,
+                                }
+                              : null
+                          }
+                          onChange={(selected) => {
+                            const updatedClients = [...allClients];
+                            updatedClients[index].checklistDetails =
+                              client.checklistDetails || {};
+                            updatedClients[
+                              index
+                            ].checklistDetails.whatsAppGroup = selected.value;
+                            setAllClients(updatedClients);
+                          }}
+                          styles={customStyles}
+                          options={yesNoOptions}
+                          required
+                        />
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
                         style={{
-                          paddingTop: '15px',
-                          paddingBottom: '15px',
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
                         }}
                       >
                         <input
                           type="Date"
                           onChange={(e) => {
                             const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails = client.checklistDetails || {};
-                            updatedClients[index].checklistDetails.sopSentDate = e.target.value;
+                            updatedClients[index].checklistDetails =
+                              client.checklistDetails || {};
+                            updatedClients[index].checklistDetails.sopSentDate =
+                              e.target.value;
                             setAllClients(updatedClients);
                           }}
-                          style={{ border: 'none', BackgroundColor: 'transparent' }}
+                          style={{
+                            border: "none",
+                            BackgroundColor: "transparent",
+                          }}
                           value={client?.checklistDetails?.sopSentDate}
                         />
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
                         style={{
-                          paddingTop: '15px',
-                          paddingBottom: '15px',
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
                         }}
                       >
                         <input
                           type="Date"
                           onChange={(e) => {
                             const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails = client.checklistDetails || {};
-                            updatedClients[index].checklistDetails.questionsSentDate = e.target.value;
+                            updatedClients[index].checklistDetails =
+                              client.checklistDetails || {};
+                            updatedClients[
+                              index
+                            ].checklistDetails.questionsSentDate =
+                              e.target.value;
                             setAllClients(updatedClients);
                           }}
-                          style={{ border: 'none' }}
+                          style={{ border: "none" }}
                           value={client?.checklistDetails?.questionsSentDate}
                         />
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
                         style={{
-                          paddingTop: '15px',
-                          paddingBottom: '15px',
-                          width: '170px'
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                          width: "170px",
                         }}
                       >
-                        <Select value={client.checklistDetails?.iternaryCollection ? { value: client?.checklistDetails?.iternaryCollection, label: client?.checklistDetails?.iternaryCollection } : null} onChange={(selected) => {
-                          const updatedClients = [...allClients];
-                          updatedClients[index].checklistDetails = client.checklistDetails || {};
-                          updatedClients[index].checklistDetails.iternaryCollection = selected.value;
-                          setAllClients(updatedClients)
-                        }} styles={customStyles} options={yesNoOptions} required />
+                        <Select
+                          value={
+                            client.checklistDetails?.iternaryCollection
+                              ? {
+                                  value:
+                                    client?.checklistDetails
+                                      ?.iternaryCollection,
+                                  label:
+                                    client?.checklistDetails
+                                      ?.iternaryCollection,
+                                }
+                              : null
+                          }
+                          onChange={(selected) => {
+                            const updatedClients = [...allClients];
+                            updatedClients[index].checklistDetails =
+                              client.checklistDetails || {};
+                            updatedClients[
+                              index
+                            ].checklistDetails.iternaryCollection =
+                              selected.value;
+                            setAllClients(updatedClients);
+                          }}
+                          styles={customStyles}
+                          options={yesNoOptions}
+                          required
+                        />
                       </td>
                       <td className="tableBody Text14Semi Primary2">
                         <button
                           style={{
-                            backgroundColor: '#FFDADA',
-                            borderRadius: '5px',
-                            border: 'none',
-                            height: '30px',
+                            backgroundColor: "#FFDADA",
+                            borderRadius: "5px",
+                            border: "none",
+                            height: "30px",
                           }}
-                          onClick={() => handleSaveData(index)} >
+                          onClick={() => handleSaveData(index)}
+                        >
                           {updatingIndex === index ? (
-                            <div className='w-100'>
+                            <div className="w-100">
                               <div class="smallSpinner mx-auto"></div>
                             </div>
                           ) : (
@@ -318,17 +398,17 @@ function CheckLists(props) {
               <div>No more data to load.</div>
             </div>
           )}
-          {(!loading && hasMore) && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchClientsAgain()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+          {!loading && hasMore && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <button
+                onClick={() => fetchClientsAgain()}
+                className="btn btn-primary"
+                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+              >
+                Load More
+              </button>
+            </div>
+          )}
           <Overlay
             rootClose={true}
             onHide={() => setShow(false)}
@@ -337,17 +417,26 @@ function CheckLists(props) {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+              <CalenderMultiListView
+                monthForData={monthForData}
+                dateForFilter={dateForFilter}
+                yearForData={yearForData}
+                setShow={setShow}
+                setMonthForData={setMonthForData}
+                setYearForData={setYearForData}
+                setDateForFilter={setDateForFilter}
+              />
             </div>
           </Overlay>
         </>
       ) : (
-        <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
+        <div
+          style={{ height: "400px" }}
+          className="d-flex justify-content-center align-items-center"
+        >
           <div class="spinner"></div>
         </div>
       )}
-
-
     </>
   );
 }

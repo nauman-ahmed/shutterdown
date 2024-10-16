@@ -12,8 +12,25 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { useAtom } from "jotai";
-import { clientFilterDate, clientFilterMonth, clientFilterYear } from "../../redux/atoms";
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
+import {
+  clientFilterDate,
+  clientFilterMonth,
+  clientFilterYear,
+} from "../../redux/atoms";
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "Decemeber",
+];
 
 function ViewClient() {
   const navigate = useNavigate();
@@ -30,18 +47,23 @@ function ViewClient() {
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate)
-  const [monthForData, setMonthForData] = useAtom(clientFilterMonth)
-  const [yearForData, setYearForData] = useAtom(clientFilterYear)
-  const [filterClient, setFilterClient] = useState(null)
-
+  const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate);
+  const [monthForData, setMonthForData] = useAtom(clientFilterMonth);
+  const [yearForData, setYearForData] = useAtom(clientFilterYear);
+  const [filterClient, setFilterClient] = useState(null);
 
   const fetchData = async () => {
     try {
-      const data = await getClients(1, monthForData, yearForData, dateForFilter, filterClient);
-     
+      const data = await getClients(
+        1,
+        monthForData,
+        yearForData,
+        dateForFilter,
+        filterClient
+      );
+
       setClients(data.data);
-      const completeclients = await getAllClients()
+      const completeclients = await getAllClients();
       setAllClients(completeclients);
     } catch (error) {
       console.log(error);
@@ -49,8 +71,8 @@ function ViewClient() {
   };
 
   useEffect(() => {
-    setHasMore(true)
-    setPage(2)
+    setHasMore(true);
+    setPage(2);
     fetchData();
   }, [monthForData, yearForData, dateForFilter, filterClient]);
 
@@ -58,9 +80,15 @@ function ViewClient() {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getClients(page, monthForData, yearForData, dateForFilter, null);
+        const data = await getClients(
+          page,
+          monthForData,
+          yearForData,
+          dateForFilter,
+          null
+        );
         if (data.data.length > 0) {
-            setClients([...clients, ...data.data]);
+          setClients([...clients, ...data.data]);
         }
         if (data.hasMore) {
           setPage(page + 1);
@@ -72,7 +100,6 @@ function ViewClient() {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     if (clients?.length < 10 && hasMore && !loading && !filterClient) {
@@ -111,8 +138,6 @@ function ViewClient() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-
-
   return (
     <>
       {clients ? (
@@ -128,18 +153,23 @@ function ViewClient() {
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: "pointer" }}
                 >
-                  {dateForFilter
-                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    : <>{monthForData}  {yearForData}</>}
+                  <div onClick={toggle}>
+                    {dateForFilter ? (
+                      dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    ) : (
+                      <>
+                        {monthForData} {yearForData}
+                      </>
+                    )}
+                  </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null)
-                        setMonthForData(months[new Date().getMonth()])
-                        setYearForData(new Date().getFullYear())
-
+                        setDateForFilter(null);
+                        setMonthForData(months[new Date().getMonth()]);
+                        setYearForData(new Date().getFullYear());
                       }}
                     />
                   </div>
@@ -148,7 +178,11 @@ function ViewClient() {
               <Select
                 className="w-50 mx-3"
                 isSearchable={true}
-                onChange={(e) => e.value !== 'Reset' ? setFilterClient(e.value) : setFilterClient(null)}
+                onChange={(e) =>
+                  e.value !== "Reset"
+                    ? setFilterClient(e.value)
+                    : setFilterClient(null)
+                }
                 styles={customStyles}
                 options={[
                   {
@@ -158,8 +192,8 @@ function ViewClient() {
                         <strong>Reset</strong>
                       </div>
                     ),
-                    brideName : 'Reset',
-                    groomName : 'Reset'
+                    brideName: "Reset",
+                    groomName: "Reset",
                   },
                   ...Array.from(allClients)?.map((client) => {
                     return {
@@ -180,7 +214,7 @@ function ViewClient() {
                 filterOption={(option, searchInput) => {
                   const { brideName, groomName } = option.data;
                   const searchText = searchInput?.toLowerCase();
-              
+
                   // Perform search on both brideName and groomName
                   return (
                     brideName?.toLowerCase().startsWith(searchText) ||
@@ -209,7 +243,8 @@ function ViewClient() {
             >
               {clients?.map((client, i) => (
                 <>
-                  <tr key={i}
+                  <tr
+                    key={i}
                     style={{
                       background: "#EFF0F5",
                       borderRadius: "8px",
@@ -237,17 +272,26 @@ function ViewClient() {
                         paddingBottom: "15px",
                         width: "33%",
                       }}
-                    > {(client.events?.filter(event => event.isWedding))?.length !== 0 ? (
-                      <>
-                        {client.events.find(eventData => eventData.isWedding) && (
-                          <p className="mb-0">
-                            {dayjs(client.events.find(eventData => eventData.isWedding).eventDate).format("DD-MMM-YYYY")}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      'Not Defined'
-                    )}
+                    >
+                      {" "}
+                      {client.events?.filter((event) => event.isWedding)
+                        ?.length !== 0 ? (
+                        <>
+                          {client.events.find(
+                            (eventData) => eventData.isWedding
+                          ) && (
+                            <p className="mb-0">
+                              {dayjs(
+                                client.events.find(
+                                  (eventData) => eventData.isWedding
+                                ).eventDate
+                              ).format("DD-MMM-YYYY")}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        "Not Defined"
+                      )}
                     </td>
                   </tr>
                   <div style={{ marginTop: "15px" }} />
@@ -265,17 +309,17 @@ function ViewClient() {
               <div>No more data to load.</div>
             </div>
           )}
-          {(!loading && hasMore) && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchClients()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+          {!loading && hasMore && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <button
+                onClick={() => fetchClients()}
+                className="btn btn-primary"
+                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+              >
+                Load More
+              </button>
+            </div>
+          )}
           <Overlay
             rootClose={true}
             onHide={() => setShow(false)}
@@ -284,7 +328,15 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter} yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
+              <CalenderMultiListView
+                monthForData={monthForData}
+                dateForFilter={dateForFilter}
+                yearForData={yearForData}
+                setShow={setShow}
+                setMonthForData={setMonthForData}
+                setYearForData={setYearForData}
+                setDateForFilter={setDateForFilter}
+              />
             </div>
           </Overlay>
         </>

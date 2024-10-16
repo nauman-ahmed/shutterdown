@@ -109,6 +109,7 @@ const AddClientFunction = async (req, res) => {
         return event._id;
       })
     );
+    
 
     const photosDeliverable = new deliverableModel({
       client: client._id,
@@ -119,6 +120,7 @@ const AddClientFunction = async (req, res) => {
     });
 
     await photosDeliverable.save().then(() => {
+      
       deliverables.push(photosDeliverable._id);
     });
     if (req.body.data.promos > 0) {

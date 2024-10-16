@@ -6,11 +6,15 @@ import "../../assets/css/tableRoundHeader.css";
 import { useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-import { getEditors } from "../../API/userApi"; 
+import { getEditors } from "../../API/userApi";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
-import { getAlbums, updateDeliverable, getAllTheDeadline } from "../../API/Deliverables";
+import {
+  getAlbums,
+  updateDeliverable,
+  getAllTheDeadline,
+} from "../../API/Deliverables";
 import { getAllWhatsappText } from "../../API/Whatsapp";
 import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
@@ -18,9 +22,23 @@ import { Editor } from "react-draft-wysiwyg";
 import { useDispatch } from "react-redux";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderImg from "../../assets/Profile/Calender.svg";
-import CalenderMultiListView from '../../components/CalendarFilterListView';
+import CalenderMultiListView from "../../components/CalendarFilterListView";
+import { Overlay } from "react-bootstrap";
 
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "Decemeber",
+];
 
 function Albums(props) {
   const [editors, setEditors] = useState(null);
@@ -40,9 +58,11 @@ function Albums(props) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [deadlineDays, setDeadlineDays] = useState([]);
-  const [dateForFilter, setDateForFilter] = useState(null)
-  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()])
-  const [yearForData, setYearForData] = useState(new Date().getFullYear())
+  const [dateForFilter, setDateForFilter] = useState(null);
+  const [monthForData, setMonthForData] = useState(
+    months[new Date().getMonth()]
+  );
+  const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
   const toggle = () => {
     setShow(!show);
@@ -76,83 +96,99 @@ function Albums(props) {
 
   const fetchData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const data = await getAlbums(1, monthForData, yearForData, dateForFilter);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
-      setDeadlineDays(deadline[0])
-      setEditors(res.editors.filter(user => user.subRole.includes('Photo Editor')));
+      setDeadlineDays(deadline[0]);
+      setEditors(
+        res.editors.filter((user) => user.subRole.includes("Photo Editor"))
+      );
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data?.data);
-        setDeliverablesForShow(data?.data.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        }));
+        setDeliverablesForShow(
+          data?.data.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          })
+        );
       } else if (currentUser.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(deliverablesToShow.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        }));
+        setDeliverablesForShow(
+          deliverablesToShow.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          })
+        );
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
     }
   };
   useEffect(() => {
-    setHasMore(true)
-    setPage(2)
-    fetchData()
-  }, [monthForData, yearForData, dateForFilter])
+    setHasMore(true);
+    setPage(2);
+    fetchData();
+  }, [monthForData, yearForData, dateForFilter]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchAlbums = async () => {
     if (hasMore) {
       setLoading(true);
       try {
-        const data = await getAlbums(page, monthForData, yearForData, dateForFilter);
+        const data = await getAlbums(
+          page,
+          monthForData,
+          yearForData,
+          dateForFilter
+        );
         if (data.data.length > 0) {
           let dataToAdd;
           if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...deliverablesForShow, ...data.data])
-            if(filterCondition){
-              dataToAdd = data.data.filter(deliverable => eval(filterCondition))
+            setAllDeliverables([...deliverablesForShow, ...data.data]);
+            if (filterCondition) {
+              dataToAdd = data.data.filter((deliverable) =>
+                eval(filterCondition)
+              );
             } else {
-              dataToAdd = data.data
+              dataToAdd = data.data;
             }
-            setDeliverablesForShow([...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              return ascendingWeding ? dateB - dateA : dateA - dateB;
-            }));
+            setDeliverablesForShow(
+              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                return ascendingWeding ? dateB - dateA : dateA - dateB;
+              })
+            );
           } else if (currentUser.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
               (deliverable) => deliverable?.editor?._id === currentUser._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if(filterCondition){
-              dataToAdd = deliverablesForShow.filter(deliverable => eval(filterCondition))
+            if (filterCondition) {
+              dataToAdd = deliverablesForShow.filter((deliverable) =>
+                eval(filterCondition)
+              );
             } else {
-              dataToAdd = deliverablesToShow
+              dataToAdd = deliverablesToShow;
             }
-            setDeliverablesForShow([
-              ...deliverablesForShow,
-              ...dataToAdd,
-            ].sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              return ascendingWeding ? dateB - dateA : dateA - dateB;
-            }));
+            setDeliverablesForShow(
+              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                return ascendingWeding ? dateB - dateA : dateA - dateB;
+              })
+            );
           }
         }
-         if (data.hasMore) {
+        if (data.hasMore) {
           setPage(page + 1);
         }
         setHasMore(data.hasMore);
@@ -162,9 +198,9 @@ function Albums(props) {
       setLoading(false);
     }
   };
-  useEffect(()=>{
-    if(deliverablesForShow?.length < 10 && hasMore && !loading ){
-      fetchAlbums()
+  useEffect(() => {
+    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
+      fetchAlbums();
     }
   }, [deliverablesForShow, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -249,7 +285,7 @@ function Albums(props) {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
-        })
+        });
         setDeliverablesForShow(sorted);
         setAscendingWeding(!ascendingWeding);
       }
@@ -262,22 +298,26 @@ function Albums(props) {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
         setDeliverablesForShow(
-          allDeliverables.filter((deliverable) => !deliverable.editor).sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+          allDeliverables
+            .filter((deliverable) => !deliverable.editor)
+            .sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            })
         );
       } else {
         if (
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(allDeliverables?.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          }));
+          setDeliverablesForShow(
+            allDeliverables?.sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              return ascendingWeding ? dateB - dateA : dateA - dateB;
+            })
+          );
         }
       }
     }
@@ -356,7 +396,7 @@ function Albums(props) {
       } else {
         finalCond = "(" + conditionStatus + ")";
       }
-      setFilterCondition(finalCond)
+      setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
       setDeliverablesForShow(newData);
     } else {
@@ -416,8 +456,8 @@ function Albums(props) {
   };
 
   const getrelevantDeadline = (title) => {
-    return deadlineDays.album 
-  }
+    return deadlineDays.album;
+  };
 
   return (
     <>
@@ -432,42 +472,45 @@ function Albums(props) {
       />
       {deliverablesForShow ? (
         <>
-         <div className='widthForFilters d-flex flex-row  mx-auto align-items-center' style={{
-          }} ref={target}>
-
-            <div className='w-100 d-flex flex-row align-items-center'>
-              <div className='w-75 '>
+          <div
+            className="widthForFilters d-flex flex-row  mx-auto align-items-center"
+            style={{}}
+            ref={target}
+          >
+            <div className="w-100 d-flex flex-row align-items-center">
+              <div className="w-75 ">
                 <div
                   className={`forminput R_A_Justify1`}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
+                  <div onClick={toggle}>
+                    {dateForFilter ? (
+                      dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    ) : (
+                      <>
+                        {monthForData} {yearForData}
+                      </>
+                    )}
+                  </div>
 
-                  {dateForFilter
-                    ? dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    : <>{monthForData}  {yearForData}</>}
-                  <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                  <div
+                    className="d-flex align-items-center"
+                    style={{ position: "relative" }}
+                  >
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null)
-                        setMonthForData(months[new Date().getMonth()])
-                        setYearForData(new Date().getFullYear())
+                        setDateForFilter(null);
+                        setMonthForData(months[new Date().getMonth()]);
+                        setYearForData(new Date().getFullYear());
                       }}
                     />
-                    {show && (
-
-                      <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
-                        <div >
-                          <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
-                        </div>
-                      </div>
-                    )}
+                   
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
           <div style={{ overflowX: "hidden", width: "100%" }}>
             <Table
@@ -477,7 +520,7 @@ function Albums(props) {
               className="tableViewClient"
               style={
                 currentUser.rollSelect === "Manager"
-                  ? { width: "150%", marginTop: "15px"}
+                  ? { width: "150%", marginTop: "15px" }
                   : { width: "100%", marginTop: "15px" }
               }
             >
@@ -580,12 +623,15 @@ function Albums(props) {
                                       value: deliverable?.editor?.firstName,
                                       label: deliverable?.editor?.firstName,
                                     }
-                                  : ''
+                                  : ""
                               }
                               name="editor"
                               onChange={(selected) => {
-                                const updatedDeliverables = [...deliverablesForShow];
-                                updatedDeliverables[index].editor = selected.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].editor =
+                                  selected.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
@@ -605,7 +651,7 @@ function Albums(props) {
                               paddingBottom: "15px",
                             }}
                           >
-                            {dayjs(deliverable?.date).format('DD-MMM-YYYY')}
+                            {dayjs(deliverable?.date).format("DD-MMM-YYYY")}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -616,9 +662,10 @@ function Albums(props) {
                           >
                             {dayjs(
                               new Date(deliverable?.date).setDate(
-                                new Date(
-                                  deliverable?.date
-                                ).getDate() + getrelevantDeadline(deliverable.deliverableName)
+                                new Date(deliverable?.date).getDate() +
+                                  getrelevantDeadline(
+                                    deliverable.deliverableName
+                                  )
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -634,8 +681,11 @@ function Albums(props) {
                               name="companyDeadline"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...deliverablesForShow];
-                                updatedDeliverables[index].companyDeadline = e.target.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].companyDeadline =
+                                  e.target.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
@@ -643,9 +693,15 @@ function Albums(props) {
                                   ? dayjs(deliverable?.companyDeadline).format(
                                       "YYYY-MM-DD"
                                     )
-                                  : ''
+                                  : ""
                               }
-                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
+                              min={
+                                deliverable?.date
+                                  ? dayjs(deliverable?.date).format(
+                                      "YYYY-MM-DD"
+                                    )
+                                  : ""
+                              }
                             />
                           </td>
                           <td
@@ -660,8 +716,11 @@ function Albums(props) {
                               name="firstDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...deliverablesForShow];;
-                                updatedDeliverables[index].firstDeliveryDate = e.target.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].firstDeliveryDate =
+                                  e.target.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
@@ -669,9 +728,15 @@ function Albums(props) {
                                   ? dayjs(
                                       deliverable?.firstDeliveryDate
                                     ).format("YYYY-MM-DD")
-                                  : ''
+                                  : ""
                               }
-                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
+                              min={
+                                deliverable?.date
+                                  ? dayjs(deliverable?.date).format(
+                                      "YYYY-MM-DD"
+                                    )
+                                  : ""
+                              }
                             />
                           </td>
                           <td
@@ -686,8 +751,11 @@ function Albums(props) {
                               name="finalDeliveryDate"
                               className="dateInput"
                               onChange={(e) => {
-                                const updatedDeliverables = [...deliverablesForShow];
-                                updatedDeliverables[index].finalDeliveryDate =  e.target.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].finalDeliveryDate =
+                                  e.target.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               value={
@@ -695,9 +763,15 @@ function Albums(props) {
                                   ? dayjs(
                                       deliverable?.finalDeliveryDate
                                     ).format("YYYY-MM-DD")
-                                  : ''
+                                  : ""
                               }
-                              min={deliverable?.date ? dayjs(deliverable?.date).format('YYYY-MM-DD') : ''}
+                              min={
+                                deliverable?.date
+                                  ? dayjs(deliverable?.date).format(
+                                      "YYYY-MM-DD"
+                                    )
+                                  : ""
+                              }
                             />
                           </td>
                           <td
@@ -718,8 +792,11 @@ function Albums(props) {
                               }
                               name="Status"
                               onChange={(selected) => {
-                                const updatedDeliverables = [...deliverablesForShow];
-                                updatedDeliverables[index].status =  selected.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].status =
+                                  selected.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
@@ -768,8 +845,11 @@ function Albums(props) {
                               }
                               name="clientRating"
                               onChange={(selected) => {
-                                const updatedDeliverables = [...deliverablesForShow];
-                                updatedDeliverables[index].clientRating =  selected.value;
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].clientRating =
+                                  selected.value;
                                 setDeliverablesForShow(updatedDeliverables);
                               }}
                               styles={customStyles}
@@ -884,7 +964,7 @@ function Albums(props) {
                 <div>No more data to load.</div>
               </div>
             )}
-            {(!loading && hasMore) && (
+            {!loading && hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <button
                   onClick={() => fetchAlbums()}
@@ -896,6 +976,25 @@ function Albums(props) {
               </div>
             )}
           </div>
+          <Overlay
+            rootClose={true}
+            onHide={() => setShow(false)}
+            target={target.current}
+            show={show}
+            placement="bottom"
+          >
+            <div style={{ width: "300px" }}>
+              <CalenderMultiListView
+                monthForData={monthForData}
+                dateForFilter={dateForFilter}
+                yearForData={yearForData}
+                setShow={setShow}
+                setMonthForData={setMonthForData}
+                setYearForData={setYearForData}
+                setDateForFilter={setDateForFilter}
+              />
+            </div>
+          </Overlay>
         </>
       ) : (
         <div

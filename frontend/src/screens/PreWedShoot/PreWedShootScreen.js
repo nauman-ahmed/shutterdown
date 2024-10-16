@@ -137,7 +137,6 @@ function PreWedShootScreen() {
             )
           );
         });
- 
 
         for (
           let client_index = 0;
@@ -443,7 +442,7 @@ function PreWedShootScreen() {
         priority={priority}
         applyFilter={applyFilterNew}
         options={filterOptions}
-        filter={currentUser?.rollSelect == 'Manager'}
+        filter={currentUser?.rollSelect == "Manager"}
         title="Pre-Wedding"
       />
       {clientsForShow ? (
@@ -459,13 +458,15 @@ function PreWedShootScreen() {
                   className={`forminput R_A_Justify1`}
                   style={{ cursor: "pointer" }}
                 >
-                  {dateForFilter ? (
-                    dayjs(dateForFilter).format("DD-MMM-YYYY")
-                  ) : (
-                    <>
-                      {monthForData} {yearForData}
-                    </>
-                  )}
+                  <div onClick={toggle}>
+                    {dateForFilter ? (
+                      dayjs(dateForFilter).format("DD-MMM-YYYY")
+                    ) : (
+                      <>
+                        {monthForData} {yearForData}
+                      </>
+                    )}
+                  </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset

@@ -79,29 +79,37 @@ const Signup = (props) => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
-    if (roll === "Select") {
+    if (rollSelect === "Select") {
       setError(true);
+      return
     }
     if (firstName === "") {
       setError(true);
+      return
     }
     if (lastName === "") {
       setError(true);
+      return
     }
     if (email === "") {
       setError(true);
+      return
     }
     if (phone === "") {
       setError(true);
+      return
     }
     if (password === "") {
       setError(true);
+      return
     }
     if (confirmPassword === "") {
       setError(true);
+      return
     } else if (password !== confirmPassword) {
       setError(true);
       setIsMatch(true);
+      return
     } else {
       try {
         setError(false);
@@ -122,10 +130,16 @@ const Signup = (props) => {
 
   const handleSignInwithGoogleFunction = async (e) => {
     e.preventDefault();
+    if(rollSelect === ""){
+      setError(true)
+      return
+    }
     if (phone === "") {
       setError(true);
-    } else if (roll === "select") {
+      return
+    } else if (rollSelect === "select") {
       setError(true);
+      return
     } else {
       setError(false);
       await GetSignInWithGoogleData(RegisterData2, phone);

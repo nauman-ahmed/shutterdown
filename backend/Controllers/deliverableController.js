@@ -24,8 +24,6 @@ const getCinematography = async (req, res) => {
 
     let startDate, endDate;
     const { currentMonth, currentYear, currentDate } = req.query;
-    console.log("request cine with page", page);
-
     // Date filter logic
     if (currentDate !== "null" && currentDate) {
       // Single day filter
@@ -44,7 +42,7 @@ const getCinematography = async (req, res) => {
         "YYYY-MM-DD"
       ).format("YYYY-MM-DD"); // Last day of the month
     }
-
+    
     // Fetch Cinematography deliverables
     const cinematographyDeliverables = await DeliverableModel.find({
       deliverableName: { $in: ["Long Film", "Reel", "Promo"] },
@@ -65,7 +63,8 @@ const getCinematography = async (req, res) => {
         },
         { path: "editor", model: "user" },
       ]);
-
+      console.log(cinematographyDeliverables);
+      
     const hasMore = cinematographyDeliverables.length == 10;
     // Send response with filtered deliverables and hasMore flag
     res.status(200).json({ hasMore, data: cinematographyDeliverables });

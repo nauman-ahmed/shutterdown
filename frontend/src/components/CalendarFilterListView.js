@@ -4,7 +4,7 @@ import "../assets/css/common.css";
 import "../assets/css/Profile.css";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decemeber']
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 
 function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFilter, setShow, dateForFilter, monthForData, yearForData }) {
@@ -12,6 +12,7 @@ function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFil
   const changeViewHandler = (props) => {
     setMonthForData(months[new Date(props.activeStartDate).getMonth()])
     setYearForData(new Date(props.activeStartDate).getFullYear())
+    setShow(false)
   }
 
   const onDateClickHandler = (date) => {
