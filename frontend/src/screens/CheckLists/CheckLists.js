@@ -9,6 +9,7 @@ import { Overlay } from "react-bootstrap";
 import dayjs from "dayjs";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -36,6 +37,7 @@ function CheckLists(props) {
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [updateData, setUpdateData] = useState(false);
   const toggle = () => {
     setShow(!show);
   };
@@ -49,6 +51,7 @@ function CheckLists(props) {
 
   const fetchClients = async () => {
     try {
+      setLoading(true);
       const clients = await getClients(
         1,
         monthForData,
@@ -59,14 +62,16 @@ function CheckLists(props) {
       setClientsForShow(clients.data);
       setHasMore(true);
       setPage(2);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error, "error");
     }
   };
 
   useEffect(() => {
     fetchClients();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [updateData]);
 
   const fetchClientsAgain = async () => {
     if (hasMore) {
@@ -194,6 +199,7 @@ function CheckLists(props) {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData)
                       }}
                     />
                   </div>
@@ -388,11 +394,7 @@ function CheckLists(props) {
               })}
             </tbody>
           </Table>
-          {loading && (
-            <div className="d-flex my-3 justify-content-center align-items-center">
-              <div class="spinner"></div>
-            </div>
-          )}
+          {loading && <Spinner/>}
           {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
@@ -411,7 +413,7 @@ function CheckLists(props) {
           )}
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData)}}
             target={target.current}
             show={show}
             placement="bottom"

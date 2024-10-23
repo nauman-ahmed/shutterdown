@@ -15,10 +15,10 @@ import {
   getEventsByFixDate,
   getEventsByMonth,
 } from "../../API/Event";
-import dayjs from "dayjs";
-import { ToastContainer, toast } from "react-toastify";
 import { assignEventTeam, getEvents } from "../../API/Event";
 import { getAllUsers } from "../../API/userApi";
+import dayjs from "dayjs";
+import { ToastContainer, toast } from "react-toastify";
 import Cookies from "js-cookie";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import Select from "react-select";
@@ -45,6 +45,7 @@ import { getAllClients, getClients } from "../../API/Client";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -109,6 +110,7 @@ function ListView(props) {
   const [dateForFilter, setDateForFilter] = useState(null);
   const [clientId, setClientId] = useState(clientIdd);
   const [allClients, setAllClients] = useState([]);
+  const [updateData, setUpdateData] = useState(false);
   const toggle = () => {
     setShow(!show);
   };
@@ -180,9 +182,8 @@ function ListView(props) {
         usersData.users.filter((user) => user.subRole.includes("Video Editor"))
       );
       // setEventsForShow(null)
-      let res;
 
-      res = await getEvents(
+      let res = await getEvents(
         clientId,
         1,
         monthForData,
@@ -263,11 +264,12 @@ function ListView(props) {
     }
     setLoading(false);
   };
+
   useEffect(() => {
     setHasMore(true);
     setPage(2);
     getEventsData();
-  }, [monthForData, yearForData, dateForFilter, clientId]);
+  }, [updateData, clientId]);
 
   const fetchEvents = async () => {
     if (hasMore) {
@@ -560,7 +562,7 @@ function ListView(props) {
 
   useEffect(() => {
     getEventsData();
-    getStoredEvents();
+    // getStoredEvents();
     getAllFormOptionsHandler();
     getClientsForFilters();
   }, []);
@@ -617,7 +619,7 @@ function ListView(props) {
       setNewEventModel(false);
       window.notify("Event added successfully!", "success");
       getEventsData();
-      getStoredEvents();
+      // getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -781,7 +783,8 @@ function ListView(props) {
                       setDateForFilter(null);
                       setMonthForData(months[new Date().getMonth()]);
                       setYearForData(new Date().getFullYear());
-                    }}
+                      setUpdateData(!updateData)
+                  }}
                   />
                 </div>
               </div>
@@ -1463,11 +1466,7 @@ function ListView(props) {
                 })}
               </tbody>
             </Table>
-            {loading && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div className="spinner"></div>
-              </div>
-            )}
+            {loading && <Spinner/>}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -1487,7 +1486,7 @@ function ListView(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData)}}
             target={target.current}
             show={show}
             placement="bottom"

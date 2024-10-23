@@ -78,7 +78,6 @@ const Signup = (props) => {
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-
     if (rollSelect === "Select") {
       setError(true);
       return
@@ -130,14 +129,10 @@ const Signup = (props) => {
 
   const handleSignInwithGoogleFunction = async (e) => {
     e.preventDefault();
-    if(rollSelect === ""){
-      setError(true)
-      return
-    }
     if (phone === "") {
       setError(true);
       return
-    } else if (rollSelect === "select") {
+    } else if (roll === "select") {
       setError(true);
       return
     } else {

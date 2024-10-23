@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import "react-calendar/dist/Calendar.css";
 import Edit from "../../assets/Profile/Edit.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -44,6 +45,7 @@ function PreWedShootScreen() {
   const [filterCondition, setFilterCondition] = useState(null);
   const target = useRef(null);
   const [show, setShow] = useState(false);
+  const [updateData, setUpdateData] = useState(false);
   const [shooters, setShooters] = useState([]);
   const dispatch = useDispatch();
   const toggle = () => {
@@ -187,7 +189,7 @@ function PreWedShootScreen() {
     setPage(2);
     setHasMore(true);
     getClients();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [updateData]);
 
   const fetchClients = async () => {
     if (hasMore) {
@@ -475,6 +477,7 @@ function PreWedShootScreen() {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
                   </div>
@@ -1038,11 +1041,7 @@ function PreWedShootScreen() {
                 })}
               </tbody>
             </Table>
-            {loading && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div class="spinner"></div>
-              </div>
-            )}
+            {loading && <Spinner/>}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -1061,12 +1060,12 @@ function PreWedShootScreen() {
             )}
             <Overlay
               rootClose={true}
-              onHide={() => setShow(false)}
+              onHide={() => {setShow(false); setUpdateData(!updateData);}}
               target={target.current}
               show={show}
               placement="bottom"
             >
-              <div>
+              <div style={{ width: "300px" }}>
                 <CalenderMultiListView
                   monthForData={monthForData}
                   dateForFilter={dateForFilter}
@@ -1080,14 +1079,7 @@ function PreWedShootScreen() {
             </Overlay>
           </div>
         </>
-      ) : (
-        <div
-          style={{ height: "400px" }}
-          className="d-flex justify-content-center align-items-center"
-        >
-          <div class="spinner"></div>
-        </div>
-      )}
+      ) : <Spinner/>}
     </>
   );
 }

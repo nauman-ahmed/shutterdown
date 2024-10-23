@@ -23,6 +23,7 @@ import { GrPowerReset } from "react-icons/gr";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -48,6 +49,7 @@ function Cinematography(props) {
   const [ascendingWeding, setAscendingWeding] = useState(true);
   const [filterCondition, setFilterCondition] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const [updateData, setUpdateData] = useState(false);
   const [editorState, setEditorState] = useState({
     albumTextGetImmutable: EditorState.createEmpty(),
     cinematographyTextGetImmutable: EditorState.createEmpty(),
@@ -241,7 +243,7 @@ function Cinematography(props) {
     setHasMore(true);
     setPage(2);
     fetchData();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [updateData]);
   const fetchCinemas = async () => {
     if (hasMore) {
       setLoading(true);
@@ -585,16 +587,9 @@ function Cinematography(props) {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData)
                       }}
                     />
-                    {/* {show && (
-
-                      <div style={{ width: "300px", position: 'absolute', top: '30px', right: '-10px', zIndex: 1000 }}>
-                        <div >
-                          <CalenderMultiListView monthForData={monthForData} dateForFilter={dateForFilter}  yearForData={yearForData} setShow={setShow} setMonthForData={setMonthForData} setYearForData={setYearForData} setDateForFilter={setDateForFilter} />
-                        </div>
-                      </div>
-                    )} */}
                   </div>
                 </div>
               </div>
@@ -1086,11 +1081,7 @@ function Cinematography(props) {
                 })}
               </tbody>
             </Table>
-            {loading && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div class="spinner"></div>
-              </div>
-            )}
+            {loading && <Spinner/>}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -1110,7 +1101,7 @@ function Cinematography(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData);}}
             target={target.current}
             show={show}
             placement="bottom"

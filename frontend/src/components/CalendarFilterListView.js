@@ -12,11 +12,11 @@ function CalenderMultiListView({  setMonthForData, setYearForData, setDateForFil
   const changeViewHandler = (props) => {
     setMonthForData(months[new Date(props.activeStartDate).getMonth()])
     setYearForData(new Date(props.activeStartDate).getFullYear())
-    setShow(false)
+    // setShow(false)
   }
 
   const onDateClickHandler = (date) => {
-    setShow(false)
+    // setShow(false)
    setDateForFilter(new Date(date))
   }
 

@@ -29,15 +29,17 @@ function AccountCreated() {
     <>
       <div
         style={{
-          width:"250px",
-          height:"150px",
-          backgroundColor:"orange",
-          margin:"auto",
-          borderRadius:"20px",
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center",
-          cursor:"pointer"
+          width: "270px",
+          height: "150px",
+          backgroundColor: "#666dff",
+          margin: "auto",
+          borderRadius: "20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          color: "white",
+          padding: "0px 12px",
         }}
         onClick={navigationHandler}
       >
@@ -54,7 +56,7 @@ function AccountCreated() {
           </div>
           <div
             style={{
-              backgroundColor:"red",
+              backgroundColor:"#9499f4",
               paddingRight:"15px",
               paddingLeft:"15px",
               paddingTop:"7px",
@@ -72,3 +74,4 @@ function AccountCreated() {
 }
 
 export default AccountCreated;
+

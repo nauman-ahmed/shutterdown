@@ -105,7 +105,7 @@ function ClientInfo() {
 
   useEffect(() => {
     getIdData();
-    getStoredEvents();
+    // getStoredEvents();
     getAllFormOptionsHandler()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -161,6 +161,11 @@ function ClientInfo() {
       const res = await getClientById(clientId);
       const result = groupAndCount(res.albums);
       setGroupedAlbums(result)
+      res.events = res.events?.sort((a, b) => {
+        const dateA = new Date(a?.eventDate);
+        const dateB = new Date(b?.eventDate);
+        return dateA - dateB 
+      })
       setClientData(res);
     } catch (error) {
       console.log(error);
@@ -182,7 +187,7 @@ function ClientInfo() {
       setNewEventModel(false);
       window.notify("Event added successfully!", "success");
       getIdData();
-      getStoredEvents();
+      // getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -193,7 +198,7 @@ function ClientInfo() {
       setEventToEdit(null)
       setEditEventModel(false);
       getIdData();
-      getStoredEvents();
+      // getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -402,12 +407,12 @@ function ClientInfo() {
             e.preventDefault();
             if(deleteClientDetails.current?.clientDelete){
               await deleteClient(deleteClientDetails.current?._id)
-              getStoredEvents()
+              // getStoredEvents()
               navigate('/MyProfile/Client/ViewClient')
             }else if(!deleteClientDetails.current?.clientDelete){
               await deleteEvent(deleteClientDetails.current?._id);
               getIdData();
-              getStoredEvents();
+              // getStoredEvents();
             }
             setDeleteModal(false);
           }}

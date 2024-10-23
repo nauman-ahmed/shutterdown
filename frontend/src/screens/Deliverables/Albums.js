@@ -24,6 +24,7 @@ import { GrPowerReset } from "react-icons/gr";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -59,6 +60,7 @@ function Albums(props) {
   const [hasMore, setHasMore] = useState(false);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
+  const [updateData, setUpdateData] = useState(false);
   const [monthForData, setMonthForData] = useState(
     months[new Date().getMonth()]
   );
@@ -137,7 +139,7 @@ function Albums(props) {
     setHasMore(true);
     setPage(2);
     fetchData();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [updateData]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchAlbums = async () => {
     if (hasMore) {
@@ -504,6 +506,7 @@ function Albums(props) {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData)
                       }}
                     />
                    
@@ -954,11 +957,7 @@ function Albums(props) {
                 })}
               </tbody>
             </Table>
-            {loading && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div className="spinner"></div>
-              </div>
-            )}
+            {loading && <Spinner/>}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -978,7 +977,7 @@ function Albums(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData);}}
             target={target.current}
             show={show}
             placement="bottom"

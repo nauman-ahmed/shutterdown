@@ -16,7 +16,8 @@ import { CgMathMinus } from "react-icons/cg";
 import { updateUserData } from "../../API/userApi"
 
 function UpdateUser(props) {
-    const customStyles = {
+    
+  const customStyles = {
         option: (defaultStyles, state) => ({
           ...defaultStyles,
           color: state.isSelected ? "white" : "black",
@@ -31,7 +32,24 @@ function UpdateUser(props) {
         }),
         singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
     };
-
+  
+    let roleOptions = [
+      {
+        value: 'Manager',
+        label: 'Manager',
+        index: 0
+      },
+      {
+          value: 'Shooter',
+          label: 'Shooter',
+          index: 1
+      },
+      {
+          value: 'Editor',
+          label: 'Editor',
+          index: 2
+      }
+    ]
     let subRoleOptions = [
         {
           value: 'Shoot Director',
@@ -91,6 +109,7 @@ function UpdateUser(props) {
 
   return (
     <>
+      {console.log("Data",currentUserDetails)}
       <Modal
         isOpen={props.modal}
         toggle={toggle}
@@ -130,6 +149,17 @@ function UpdateUser(props) {
                   }}
                   required
                 />
+              </Col>
+              <Col xl="4" sm="4" lg="4" className="p-2 mb-2">
+                <div className="label">User Role</div>
+                <Select 
+                  value={{ value: currentUserDetails.rollSelect, label: currentUserDetails.rollSelect }} 
+                  styles={customStyles} 
+                  options={roleOptions} 
+                  onChange={(selected) => {
+                      setCurrentUserDetails({ ...currentUserDetails, rollSelect: selected?.value })
+                  }}
+              required />
               </Col>
               <Row >
                   <div className="label">Sub Roles </div>

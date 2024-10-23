@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ButtonDropdown,
   DropdownItem,
@@ -9,7 +9,6 @@ import {
 import ShootStar from "../assets/Profile/ShootStar.svg";
 import { ToastContainer } from "react-toastify";
 import Edit from "../assets/Profile/Edit.svg";
-import { all } from "axios";
 
 function ShootDropDown(props) {
   const {
@@ -25,58 +24,48 @@ function ShootDropDown(props) {
     preWedDetails,
     eventsForShow
   } = props;
+  
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const target = useRef(null);
+  const dropdownRef = useRef(null); // Ref to track the dropdown
 
-  const toggle = async () => {
-    setDropdownOpen((prevState) => !prevState);
+  const toggle = () => {
+    setDropdownOpen(true);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false); // Close dropdown if clicked outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const shooterDatesHandler = (user) => {
     let pushShooter = true;
     if (allEvents && currentEvent) {
-      console.log("Current Event", currentEvent.eventDate)
-      const sameDateEvents = [...allEvents, ...eventsForShow].filter(event => event.eventDate === currentEvent.eventDate && event._id !== currentEvent._id)
+      const sameDateEvents = [...allEvents, ...eventsForShow].filter(event => event.eventDate === currentEvent.eventDate && event._id !== currentEvent._id);
 
       if (sameDateEvents?.length > 0) {
         sameDateEvents.forEach(event => {
           if ([...event?.shootDirectors, ...event?.choosenPhotographers, ...event?.choosenCinematographers, ...event?.droneFlyers, ...event.manager, ...event.assistants, ...event.sameDayPhotoMakers, ...event.sameDayVideoMakers]?.some(preUser => preUser.email === user.email)) {
-            pushShooter = false
+            pushShooter = false;
           }
-        })
+        });
       }
 
-      return pushShooter
-      // allEvents?.map((event) => {
-      //   if (event.eventDate === currentEvent.eventDate) {
-      //     dummy[event.eventDate] = Array.isArray(dummy[event.eventDate])
-      //       ? [...dummy[event.eventDate], ...event[role]]
-      //       : [...event[role], user];
-      //   } else {
-      //     dummy[event.eventDate] = event[role];
-      //   }
-      // });
-      // for (const date in dummy) {
-      //   const events = dummy[date];
-      //   const seen = new Set();
-      //   if (events) {
-      //     for (const event of events) {
-      //       const eventString = JSON.stringify(event);
-      //       if (seen.has(eventString)) {
-      //         return false; // Duplicate found
-      //       }
-      //       seen.add(eventString);
-      //     }
-      //   }
-      // }
-      // return true; // No duplicates found
+      return pushShooter;
     }
     return pushShooter;
   };
 
   return (
-    <div className="d-flex">
-      <ToastContainer />
+    <div className="d-flex" ref={dropdownRef}> {/* Apply ref to dropdown wrapper */}
       <ButtonDropdown>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle
@@ -98,7 +87,7 @@ function ShootDropDown(props) {
             )}
           </DropdownToggle>
           <DropdownMenu className="dropOpenBox">
-            {usersToShow?.map((user, index) => (
+            {usersToShow?.map((user) => (
               <DropdownItem
                 key={user._id}
                 style={{
@@ -107,7 +96,7 @@ function ShootDropDown(props) {
                   justifyContent: "space-between",
                 }}
                 onClick={() => {
-                  const add = shooterDatesHandler(user)
+                  const add = shooterDatesHandler(user);
                   if (fromPreWed) {
                     if (
                       existedUsers?.length > 0 &&
@@ -150,15 +139,12 @@ function ShootDropDown(props) {
                       }
                     }
                   } else {
-          
                     if (
                       existedUsers?.length > 0 &&
                       existedUsers?.some(
                         (existingUser) => existingUser._id == user._id
                       )
                     ) {
-                      console.log('unheck User');
-                      
                       userUnChecked(user);
                     } else {
                       if (existedUsers?.length >= allowedPersons) {
@@ -182,22 +168,16 @@ function ShootDropDown(props) {
                               "error"
                             );
                           }
-                          
                         }
                       }
                     }
                   }
-
-
-
                 }}
               >
                 {user.firstName} {user.lastName}
                 <input
-                  ref={target}
                   className="ml-2 mx-2"
                   type="checkbox"
-
                   checked={
                     existedUsers?.length > 0 &&
                     existedUsers?.some(

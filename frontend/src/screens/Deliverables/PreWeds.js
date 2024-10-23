@@ -20,6 +20,7 @@ import { GrPowerReset } from "react-icons/gr";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
+import Spinner from "../../components/Spinner";
 
 const months = [
   "January",
@@ -45,7 +46,7 @@ function PreWedDeliverables(props) {
   const [ascendingWeding, setAscendingWeding] = useState(true);
   const [filterCondition, setFilterCondition] = useState(null);
   const [deadlineDays, setDeadlineDays] = useState([]);
-
+  const [updateData, setUpdateData] = useState(false);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -216,7 +217,7 @@ function PreWedDeliverables(props) {
     setHasMore(true);
     setPage(2);
     fetchData();
-  }, [monthForData, yearForData, dateForFilter]);
+  }, [updateData]);
 
   const fetchPreWeds = async () => {
     if (hasMore) {
@@ -493,6 +494,7 @@ function PreWedDeliverables(props) {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
                    
@@ -970,11 +972,7 @@ function PreWedDeliverables(props) {
                 })}
               </tbody>
             </Table>
-            {loading && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div className="spinner"></div>
-              </div>
-            )}
+            {loading && <Spinner/>}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -994,7 +992,7 @@ function PreWedDeliverables(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData);}}
             target={target.current}
             show={show}
             placement="bottom"

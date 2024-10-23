@@ -17,6 +17,8 @@ import {
   clientFilterMonth,
   clientFilterYear,
 } from "../../redux/atoms";
+import Spinner from "../../components/Spinner";
+
 const months = [
   "January",
   "February",
@@ -51,6 +53,7 @@ function ViewClient() {
   const [monthForData, setMonthForData] = useAtom(clientFilterMonth);
   const [yearForData, setYearForData] = useAtom(clientFilterYear);
   const [filterClient, setFilterClient] = useState(null);
+  const [updateData, setUpdateData] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -74,7 +77,7 @@ function ViewClient() {
     setHasMore(true);
     setPage(2);
     fetchData();
-  }, [monthForData, yearForData, dateForFilter, filterClient]);
+  }, [updateData, filterClient]);
 
   const fetchClients = async () => {
     if (hasMore) {
@@ -170,6 +173,7 @@ function ViewClient() {
                         setDateForFilter(null);
                         setMonthForData(months[new Date().getMonth()]);
                         setYearForData(new Date().getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
                   </div>
@@ -299,11 +303,7 @@ function ViewClient() {
               ))}
             </tbody>
           </Table>
-          {/* {loading && (
-            <div className="d-flex my-3 justify-content-center align-items-center">
-              <div class="spinner"></div>
-            </div>
-          )} */}
+          {loading && <Spinner/>}
           {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
@@ -322,7 +322,7 @@ function ViewClient() {
           )}
           <Overlay
             rootClose={true}
-            onHide={() => setShow(false)}
+            onHide={() => {setShow(false); setUpdateData(!updateData);}}
             target={target.current}
             show={show}
             placement="bottom"
@@ -340,14 +340,7 @@ function ViewClient() {
             </div>
           </Overlay>
         </>
-      ) : (
-        <div
-          style={{ height: "400px" }}
-          className="d-flex justify-content-center align-items-center"
-        >
-          <div class="spinner"></div>
-        </div>
-      )}
+      ) : <Spinner/>}
     </>
   );
 }
