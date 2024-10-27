@@ -18,6 +18,7 @@ import {
   Form,
   Row,
   Col,
+  Input
 } from 'reactstrap';
 import { useEffect } from 'react';
 import { addTask } from '../API/TaskApi';
@@ -41,6 +42,7 @@ function ClientHeader(props) {
   const [show, setShow] = useState(false);
   const [parentFilterNauman, setParentFilterNauman] = useState(null)
   const [childFilterNauman, setChildFilterNauman] = useState([])
+  const [selfAssigned, setSelfAssigned] = useState(false);
 
   const currentUser = JSON.parse(Cookies.get('currentUser'))
 
@@ -468,6 +470,7 @@ function ClientHeader(props) {
               <Col xl="4" sm="6" lg="4" className="p-2">
                 <div className="label">Assign To</div>
                 <Select
+                  isDisabled={selfAssigned}
                   value={taskData?.assignTo ? { 
                     value: taskData?.assignTo, 
                     label: <div>{taskData?.assignTo.firstName} {taskData?.assignTo?.lastName}</div> } : null} onChange={(selected) => {
@@ -477,9 +480,9 @@ function ClientHeader(props) {
                     options={editors?.map(editor => {
                     return { 
                       value: editor,
-                       label: <div>{editor.firstName} {editor.lastName}</div>,
-                       firstName: editor.firstName,
-                       lastName: editor.lastName
+                       label: <div>{editor?.firstName} {editor?.lastName}</div>,
+                       firstName: editor?.firstName,
+                       lastName: editor?.lastName
                        }
                   })} 
                   required 
@@ -495,7 +498,14 @@ function ClientHeader(props) {
                   }}
                   />
               </Col>
-
+              <Col xl="4" sm="6" lg="4" className="p-2">
+                <div className="label">Self Assign</div>
+                <Input
+                  type="checkbox"
+                  checked={selfAssigned}
+                  onChange={() => {setSelfAssigned(!selfAssigned); setTaskData({ ...taskData, assignTo: currentUser })}}
+                />
+              </Col>
             </Row>
             <Row className="p-3">
               <Col xl="4" sm="6" lg="4" className="p-2">

@@ -176,7 +176,7 @@ function ListView(props) {
         usersData.users.filter((user) => user.subRole.includes("Assistant"))
       );
       setPhotoEditor(
-        usersData.users.filter((user) => user.subRole.includes("Video Editor"))
+        usersData.users.filter((user) => user.subRole.includes("Photo Editor"))
       );
       setVideoEditor(
         usersData.users.filter((user) => user.subRole.includes("Video Editor"))
