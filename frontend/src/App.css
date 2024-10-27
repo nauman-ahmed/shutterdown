@@ -105,6 +105,9 @@
     margin-top: 0px;
     margin-bottom: 0px;
   }
+  .sticky-column + .sticky-column {
+    left: 90px; /*This needs to be adjusted based on the actual width of the first column*/
+  }
   
 }
 
