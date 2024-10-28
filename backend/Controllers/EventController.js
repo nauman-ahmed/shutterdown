@@ -15,7 +15,7 @@ const AddEvent = async (req, res) => {
     await newEvent.save();
     client.dates = [
       ...client.dates,
-      dayjs(newEvent.eventDate).format("YYYY-MM-DD"),
+      dayjs(new Date(newEvent.eventDate)).format("YYYY-MM-DD"),
     ];
     await client.save();
     const clientWithEvents = await ClientModel.findById(client._id).populate(
@@ -114,7 +114,7 @@ const updateEvent = async (req, res) => {
     );
     client.dates = [
       ...updatedDates,
-      dayjs(event.eventDate).format("YYYY-MM-DD"),
+      dayjs(new Date(event.eventDate)).format("YYYY-MM-DD"),
     ];
     await client.save();
     const clientWithEvents = await ClientModel.findById(client._id).populate(
@@ -150,7 +150,7 @@ const getEvents = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
     let obj = {};
-    console.log("req.body.dateForFilter", req.body.dateForFilter)
+
     if (req.body.clientId) {
       obj.client = req.body.clientId;
     } 
@@ -173,10 +173,10 @@ const getEvents = async (req, res) => {
           };
         }
       } else {
-        let startDate = dayjs(req.body.dateForFilter).format(
+        let startDate = dayjs(new Date(req.body.dateForFilter)).format(
           "YYYY-MM-DD"
         );
-        let endDate = dayjs(req.body.dateForFilter).format(
+        let endDate = dayjs(new Date(req.body.dateForFilter)).format(
           "YYYY-MM-DD"
         );
         obj.eventDate = {
@@ -185,13 +185,14 @@ const getEvents = async (req, res) => {
         };
       }
     }
-    console.log("Object", obj)
+
     const events = await EventModel.find(obj)
       .skip(skip)
       .limit(10)
       .populate(
         "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
       );
+
 
     const hasMore = events.length === 10;
     res.status(200).json({ hasMore, data: events });
@@ -238,7 +239,7 @@ const DeleteEvent = async (req, res) => {
 const changeDateString = async () => {
   const allEvents = await eventModel.find();
   allEvents.forEach(async (event) => {
-    event.eventDate = dayjs(event.eventDate).format("YYYY-MM-DD");
+    event.eventDate = dayjs(new Date(event.eventDate)).format("YYYY-MM-DD");
     await event.save();
   });
   console.log("changed");
