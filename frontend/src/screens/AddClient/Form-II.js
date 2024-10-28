@@ -96,7 +96,6 @@ function FormII() {
           : curr;
       }, clientData.events[0]);
       setMinDate(earliest.eventDate);
-      console.log("USE EFFECT", clientData, earliest);
       return;
     }
     setMinDate(new Date(Date.now()));
