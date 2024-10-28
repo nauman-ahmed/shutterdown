@@ -29,6 +29,10 @@ function Logs(props) {
     }
   }
 
+  useEffect(() => {
+    getUserAttendaces();
+  }, [])
+
   // Function to calculate distance between two points using Haversine formula
   const  calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the Earth in kilometers
@@ -47,16 +51,12 @@ function Logs(props) {
     return deg * (Math.PI/180)
   }
 
-  useEffect(() => {
-    getUserAttendaces();
-  }, [])
-
   const fetchGeolocation = async () => {
     try {
 
       const response = await axios.get('https://ipapi.co/json/');
-      const org_lat = 52.5167; // Latitude of point 1
-      const org_lng = 13.3833; // Longitude of point 1
+      const org_lat = 48.5759; // Latitude of point 1
+      const org_lng = 13.4497; // Longitude of point 1
       const lat2 = response.data.latitude; // Latitude of point 2
       const lon2 = response.data.longitude; // Longitude of point 2
       const distance = calculateDistance(org_lat, org_lng, lat2, lon2);
@@ -70,9 +70,12 @@ function Logs(props) {
   const checkInHandler = async (data=null) => {
     if(data == null){
       const distance = await fetchGeolocation();
-      if(distance >430){
+      console.log("Distance", distance)
+      if(distance >1){
         setModal(true)
       }
+      await checkInUser();
+      getUserAttendaces();
       return
     }
     await checkInUser(data);
@@ -96,17 +99,17 @@ function Logs(props) {
 
                 <div className="plt12" style={{ paddingTop: '15px' }}>
                   <Row>
-                    <Col xs={12} sm={12} className="px-1 gap-2">
-                      <Button style={{ width : '150px'}} className="submit_btn submit m-1" onClick={() => checkInHandler()}>
+                    <Col xs={12} sm={12} className="px-1 d-flex justify-content-center gap-2">
+                      <Button style={{ width : '150px', fontSize: "0.8rem"}} className="submit_btn submit m-1" onClick={() => checkInHandler()}>
                         Check In
                       </Button>
-                      <Button style={{ width : '150px'}} type="submit" className="submit_btn submit m-1"  onClick={async () => {
+                      <Button style={{ width : '150px', fontSize: "0.8rem"}} type="submit" className="submit_btn submit m-1"  onClick={async () => {
                         await checkOutUser();
                         getUserAttendaces();
                       }}>
                         Check Out
                       </Button>
-                      <Button style={{ width : '150px'}} className="submit submit_btn ms-sm-4 m-1"   onClick={() => checkInHandler({home:"yes"})}>
+                      <Button style={{ width : '150px', fontSize: "0.7rem"}} className="submit submit_btn ms-sm-4 m-1"   onClick={() => checkInHandler({home:"yes"})}>
                         Check In (Home)
                       </Button>
                     </Col>

@@ -164,27 +164,22 @@ export const GetUserData = async () => {
 
 export const verifyEmail = async (email) => {
   try {
-    await axios
-      .post(BASE_URL + "/emailVerify", {
-        Headers: {
-          "Content-Type": "application/json",
-        },
-        email: email,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          window.notify("Email sent for further action!", "success");
-        } else if (res.status === 203) {
-          window.notify("Email not Exist!", "error");
-        }
-        return true;
-      })
-      .catch((err) => {
-        window.notify("Server Error", "error");
-        return false;
-      });
+    const res = await axios.post(BASE_URL + "/emailVerify", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      email: email,
+    });
+
+    if (res.status === 200) {
+      window.notify("Email sent for further action!", "success");
+      return true;
+    } else if (res.status === 203) {
+      window.notify("Email not Exist!", "error");
+      return false;
+    }
   } catch (error) {
-    console.log(error, "error");
+    console.error("Error:", error);
     window.notify("Server Error", "error");
     return false;
   }

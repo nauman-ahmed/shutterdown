@@ -14,6 +14,7 @@ const EmailVerification = () => {
     setError(false);
   };
   const navigate = useNavigate()
+  
   const handleSubmitFunction = async (e) => {
     e.preventDefault();
     if (!inputData) {

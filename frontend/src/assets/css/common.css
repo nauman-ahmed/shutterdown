@@ -1060,7 +1060,7 @@ Label {
     }
 
     .reset_input_div {
-        width: 90%;
+        width: 90% !important;
     }
 
     .reset_input_field {
