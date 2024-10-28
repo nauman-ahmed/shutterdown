@@ -57,6 +57,7 @@ function ViewClient() {
 
   const fetchData = async () => {
     try {
+      console.log("Date", monthForData, yearForData, dateForFilter,filterClient)
       const data = await getClients(
         1,
         monthForData,
@@ -109,20 +110,6 @@ function ViewClient() {
       fetchClients();
     }
   }, [clients, hasMore, loading]);
-
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
-    if (bottomOfWindow) {
-      fetchClients();
-    }
-  };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
 
   const customStyles = {
     option: (defaultStyles, state) => ({

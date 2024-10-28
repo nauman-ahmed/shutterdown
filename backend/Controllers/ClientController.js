@@ -451,6 +451,7 @@ const updateWholeClient = async (req, res) => {
 
 const getClients = async (req, res) => {
   try {
+    console.log("Get Client", req.body)
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
     // Get currentMonth, currentYear, and currentDate from the request query

@@ -15,7 +15,7 @@ const AddEvent = async (req, res) => {
     await newEvent.save();
     client.dates = [
       ...client.dates,
-      dayjs(new Date(newEvent.eventDate)).format("YYYY-MM-DD"),
+      dayjs(newEvent.eventDate).format("YYYY-MM-DD"),
     ];
     await client.save();
     const clientWithEvents = await ClientModel.findById(client._id).populate(
@@ -114,7 +114,7 @@ const updateEvent = async (req, res) => {
     );
     client.dates = [
       ...updatedDates,
-      dayjs(new Date(event.eventDate)).format("YYYY-MM-DD"),
+      dayjs(event.eventDate).format("YYYY-MM-DD"),
     ];
     await client.save();
     const clientWithEvents = await ClientModel.findById(client._id).populate(
@@ -239,7 +239,7 @@ const DeleteEvent = async (req, res) => {
 const changeDateString = async () => {
   const allEvents = await eventModel.find();
   allEvents.forEach(async (event) => {
-    event.eventDate = dayjs(new Date(event.eventDate)).format("YYYY-MM-DD");
+    event.eventDate = dayjs(event.eventDate).format("YYYY-MM-DD");
     await event.save();
   });
   console.log("changed");
