@@ -82,7 +82,7 @@ export const getEvents = async (
         clientId,
         currentMonth: monthForData, // Month name like 'January', 'February', etc.
         currentYear: yearForData, // Year like '2023', '2024', etc.
-        dateForFilter: dateForFilter.toString(),
+        dateForFilter: dateForFilter?.toString(),
       },
       {
         headers: {
