@@ -186,7 +186,7 @@ function ListView(props) {
         1,
         monthForData,
         yearForData,
-        dateForFilter
+        dateForFilter ? dayjs(dateForFilter).format("YYYY-MM-DD").toString() : null
       );
       if (currentUser.rollSelect === "Manager") {
         setEventsForShow(

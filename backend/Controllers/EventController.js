@@ -174,8 +174,8 @@ const getEvents = async (req, res) => {
         }
       } else {
         
-        let startDate = dayjs(req.body.dateForFilter).format("YYYY-MM-DD");
-        let endDate = dayjs(req.body.dateForFilter).format("YYYY-MM-DD");
+        let startDate = req.body.dateForFilter
+        let endDate = req.body.dateForFilter;
 
         obj.eventDate = {
           $gte: startDate,
