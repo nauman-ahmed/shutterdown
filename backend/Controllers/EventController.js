@@ -185,6 +185,7 @@ const getEvents = async (req, res) => {
         };
       }
     }
+    console.log("req.body.dateForFilter", req.body.dateForFilter)
     console.log("Object", obj)
     const events = await EventModel.find(obj)
       .skip(skip)
