@@ -76,6 +76,7 @@ export const getEvents = async (
   dateForFilter
 ) => {
   try {
+    console.log("Date", monthForData, yearForData, dateForFilter)
     const res = await axios.post(
       `${BASE_URL}/getAllEvents?page=${page}`,
       {
