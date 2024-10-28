@@ -630,7 +630,7 @@ function ListView(props) {
     const set = new Set();
     let clients = [];
 
-    allEvents.forEach((event) => {
+    allEvents?.forEach((event) => {
       if (!set.has(event.client._id)) {
         clients.push(event.client);
         set.add(event.client._id);
