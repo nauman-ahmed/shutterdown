@@ -15,21 +15,17 @@ import Tooltip from "react-bootstrap/Tooltip";
 import Overlay from "react-bootstrap/Overlay";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import CalenderNoti from "../assets/Profile/CalenderNoti.svg";
 import NotiSelect from "../assets/Profile/NotiSelect.svg";
 import Cookies from "js-cookie";
 import { updateUserData } from "../API/userApi";
 import { toast } from "react-toastify";
 import "../assets/css/Profile.css";
-import io from "socket.io-client";
-import BASE_URL from "../API";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserNotifications } from "../API/notifictions";
 import { store } from "../redux/configureStore";
 import { updateNotifications } from "../redux/notificationsSlice";
 import dayjs from "dayjs";
 import { updateAllEvents } from "../redux/eventsSlice";
-import { getEvents } from "../API/Event";
 
 const Header = (args) => {
   const navigate = useNavigate();

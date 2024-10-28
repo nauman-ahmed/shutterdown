@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SaveClientForm } from "../../API/Client";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import { updateClintData } from "../../redux/clientBookingForm";
-import { getAllEvents, getEvents } from "../../API/Event";
+import { getAllEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";

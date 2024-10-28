@@ -181,8 +181,7 @@ function ListView(props) {
       setVideoEditor(
         usersData.users.filter((user) => user.subRole.includes("Video Editor"))
       );
-      // setEventsForShow(null)
-
+      
       let res = await getEvents(
         clientId,
         1,
@@ -566,51 +565,6 @@ function ListView(props) {
     getAllFormOptionsHandler();
     getClientsForFilters();
   }, []);
-
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
-
-    if (bottomOfWindow) {
-      fetchEvents();
-    }
-  };
-
-  const getStoredEvents = async () => {
-    const res = await getAllEvents();
-    if (currentUser.rollSelect === "Manager") {
-      dispatch(updateAllEvents(res?.data));
-    } else if (
-      currentUser.rollSelect === "Shooter" ||
-      currentUser.rollSelect === "Editor"
-    ) {
-      const eventsToShow = res.data?.filter(
-        (event) =>
-          event?.shootDirectors?.some(
-            (director) => director._id === currentUser._id
-          ) ||
-          event?.choosenPhotographers.some(
-            (photographer) => photographer._id === currentUser._id
-          ) ||
-          event?.choosenCinematographers.some(
-            (cinematographer) => cinematographer._id === currentUser._id
-          ) ||
-          event?.droneFlyers.some((flyer) => flyer._id === currentUser._id) ||
-          event?.manager.some((manager) => manager._id === currentUser._id) ||
-          event?.sameDayPhotoMakers.some(
-            (photoMaker) => photoMaker._id === currentUser._id
-          ) ||
-          event?.sameDayVideoMakers.some(
-            (videoMaker) => videoMaker._id === currentUser._id
-          ) ||
-          event?.assistants.some(
-            (assistant) => assistant._id === currentUser._id
-          )
-      );
-      dispatch(updateAllEvents(eventsToShow));
-    }
-  };
 
   const addNewEvent = async () => {
     try {

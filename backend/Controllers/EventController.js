@@ -151,24 +151,21 @@ const getEvents = async (req, res) => {
     const skip = (page - 1) * 10;
     let obj = {};
 
-    // Apply clientId filter if present
     if (req.body.clientId) {
       obj.client = req.body.clientId;
-    } else {
+    } 
+    else {
       if (req.body.dateForFilter == null) {
-        // Apply filtering for the specific month and year
         if (req.body.currentMonth && req.body.currentYear) {
           const year = req.body.currentYear;
           const month = req.body.currentMonth;
 
-          // Generate the start and end date for the given month and year
           let startOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
             .startOf("month")
             .format("YYYY-MM-DD");
           let endOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
             .endOf("month")
             .format("YYYY-MM-DD");
-          // Add date filtering for the specified month and year
 
           obj.eventDate = {
             $gte: startOfMonth,
@@ -188,8 +185,7 @@ const getEvents = async (req, res) => {
         };
       }
     }
-
-    // Fetch events based on the filters
+    console.log("Object", obj)
     const events = await EventModel.find(obj)
       .skip(skip)
       .limit(10)
@@ -197,29 +193,8 @@ const getEvents = async (req, res) => {
         "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
       );
 
-    // Step 1: Sort by eventDate
-    events.sort((a, b) => {
-      const dateA = new Date(a.eventDate);
-      const dateB = new Date(b.eventDate);
-      return dateA - dateB;
-    });
-
-    // Step 2: Group by brideName, but store the result as an array of objects
-    const groupedByBrideName = events.reduce((acc, event) => {
-      const brideName = event.client?.brideName;
-      const found = acc.find((item) => item.client?.brideName === brideName);
-      const index = acc.findIndex(
-        (item) => item.client?.brideName === brideName
-      );
-      if (!found) {
-        acc.push(event);
-      } else {
-        acc.splice(index + 1, 0, event);
-      }
-      return acc;
-    }, []);
     const hasMore = events.length === 10;
-    res.status(200).json({ hasMore, data: groupedByBrideName });
+    res.status(200).json({ hasMore, data: events });
   } catch (error) {
     console.log(error, "error");
     res.status(500).json({ message: "Internal server error" });

@@ -26,8 +26,6 @@ import { store } from "../redux/configureStore";
 import { updateNotifications } from "../redux/notificationsSlice";
 import { getUserNotifications } from "../API/notifictions";
 import dayjs from "dayjs";
-import { Overlay } from "react-bootstrap";
-import { getEvents } from "../API/Event";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { LuFormInput } from "react-icons/lu";
 import { BsCalendar4Range } from "react-icons/bs";

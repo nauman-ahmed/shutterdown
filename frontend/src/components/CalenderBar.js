@@ -8,7 +8,7 @@ import "../App.css";
 import { Button, Table } from "reactstrap";
 import Chat from "../assets/Profile/Chat.svg";
 import Heart from "../assets/Profile/Heart.svg";
-import { getAllEvents, getEvents, getEventsByMonths } from "../API/Event";
+import { getAllEvents, getEventsByMonths } from "../API/Event";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { updateAllEvents } from "../redux/eventsSlice";

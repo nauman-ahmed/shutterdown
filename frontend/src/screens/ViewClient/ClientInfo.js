@@ -18,7 +18,7 @@ import { getClientById } from "../../API/Client";
 import Calendar from "react-calendar";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import Select from "react-select";
-import { addEvent, deleteClient, deleteEvent, getAllEvents, getEvents, updateClientData, updateEventData } from "../../API/Event";
+import { addEvent, deleteClient, deleteEvent, getAllEvents, updateClientData, updateEventData } from "../../API/Event";
 import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { updateAllEvents } from "../../redux/eventsSlice";
@@ -352,24 +352,24 @@ function ClientInfo() {
                 <td className="textPrimary fs-6">
                   {dayjs(event.eventDate).format("DD-MMM-YYYY")}
                 </td>
-                <td className="textPrimary fs-6">{event?.eventType}</td>
-                <td className="textPrimary fs-6">{event.location}</td>
-                <td className="textPrimary fs-6">{event?.travelBy}</td>
-                <td className="textPrimary fs-6">{event?.shootDirector}</td>
-                <td className="textPrimary fs-6">{event?.photographers}</td>
-                <td className="textPrimary fs-6">{event?.cinematographers}</td>
-                <td className="textPrimary fs-6">{event?.drones}</td>
-                <td className="textPrimary fs-6">
+                <td className="textPrimary tablePlaceContent fs-6">{event?.eventType}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event.location}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event?.travelBy}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event?.shootDirector}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event?.photographers}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event?.cinematographers}</td>
+                <td className="textPrimary tablePlaceContent fs-6">{event?.drones}</td>
+                <td className="textPrimary tablePlaceContent fs-6">
                   {event?.sameDayPhotoEditors}
                 </td>
-                <td className="textPrimary fs-6">
+                <td className="textPrimary tablePlaceContent fs-6">
                   {event?.sameDayVideoEditors}
                 </td>
-                <td className="textPrimary fs-6">
+                <td className="textPrimary tablePlaceContent fs-6">
                   {event?.isWedding ? "Yes" : "No"}
                 </td>
-                {/* <td className="textPrimary fs-6">{event?.tentative}</td> */}
-                <td className=" textPrimary fs-6">
+                {/* <td className="textPrimary tablePlaceContent fs-6">{event?.tentative}</td> */}
+                <td className=" textPrimary tablePlaceContent fs-6">
                   <div className="d-flex flex-row align-items-center gap-2">
 
                     <FaEdit className="fs-5 cursor-pointer" 

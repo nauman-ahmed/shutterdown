@@ -7,7 +7,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "../../assets/css/Calender.css";
 import "../../assets/css/Calender.css";
 import * as bootstrap from "bootstrap";
-import { getAllEvents, getEvents } from "../../API/Event";
+import { getAllEvents } from "../../API/Event";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { FaDirections } from "react-icons/fa";
