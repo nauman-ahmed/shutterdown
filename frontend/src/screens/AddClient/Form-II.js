@@ -150,7 +150,7 @@ function FormII() {
 
   const handleAddDate = (date) => {
 
-    setEventValues({ ...eventValues, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
+    setEventValues({ ...eventValues, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD').toString() });
     setShow(!show);
   };
 

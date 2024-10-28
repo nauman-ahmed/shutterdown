@@ -478,7 +478,7 @@ function ClientInfo() {
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setNewEvent({ ...newEvent, eventDate: dayjs(new Date(date)).format('YYYY-MM-DDD')});
+                        setNewEvent({ ...newEvent, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD')});
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -633,7 +633,7 @@ function ClientInfo() {
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
+                        setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD').toString() });
                       }}
                       
                       value={eventToEdit?.eventDate ? new Date(eventToEdit?.eventDate) : new Date()}
