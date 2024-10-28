@@ -173,6 +173,7 @@ const getEvents = async (req, res) => {
           };
         }
       } else {
+        console.log("req.body.dateForFilter", req.body.dateForFilter)
         let startDate = dayjs(new Date(req.body.dateForFilter)).format(
           "YYYY-MM-DD"
         );
