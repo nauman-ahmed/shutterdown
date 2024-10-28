@@ -52,7 +52,6 @@ export const updateEventData = async (data) => {
 
 export const updateClientData = async (data) => {
   try {
-    console.log("Sending request", BASE_URL)
     await axios
       .patch(BASE_URL + "/updateClient", {
         Headers: {
@@ -83,7 +82,7 @@ export const getEvents = async (
         clientId,
         currentMonth: monthForData, // Month name like 'January', 'February', etc.
         currentYear: yearForData, // Year like '2023', '2024', etc.
-        dateForFilter: dateForFilter,
+        dateForFilter: dateForFilter.toString(),
       },
       {
         headers: {

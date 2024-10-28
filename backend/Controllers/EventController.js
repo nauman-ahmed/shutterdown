@@ -150,27 +150,27 @@ const getEvents = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
     let obj = {};
-    console.log("req.body.dateForFilter", req.body)
+    console.log("req.body.dateForFilter", req.body.dateForFilter)
     if (req.body.clientId) {
       obj.client = req.body.clientId;
     } 
     else {
       if (req.body.dateForFilter == null) {
         if (req.body.currentMonth && req.body.currentYear) {
-          // const year = req.body.currentYear;
-          // const month = req.body.currentMonth;
+          const year = req.body.currentYear;
+          const month = req.body.currentMonth;
 
-          // let startOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
-          //   .startOf("month")
-          //   .format("YYYY-MM-DD");
-          // let endOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
-          //   .endOf("month")
-          //   .format("YYYY-MM-DD");
+          let startOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
+            .startOf("month")
+            .format("YYYY-MM-DD");
+          let endOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
+            .endOf("month")
+            .format("YYYY-MM-DD");
 
-          // obj.eventDate = {
-          //   $gte: startOfMonth,
-          //   $lte: endOfMonth,
-          // };
+          obj.eventDate = {
+            $gte: startOfMonth,
+            $lte: endOfMonth,
+          };
         }
       } else {
         let startDate = dayjs(req.body.dateForFilter).format(
