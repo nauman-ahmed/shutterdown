@@ -59,9 +59,30 @@ import DeliverablesDeadline from "./screens/Deadlines";
 function App() {
   const location = useLocation();
   const currentUser =  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+  const Version = "1.0"
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
+
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+       
+        const currentVersion = localStorage.getItem('appVersion');
+        
+        if (currentVersion !== Version) {
+          localStorage.setItem('appVersion', Version);
+          window.location.reload(true);
+        }
+      } catch (error) {
+        console.error('Error checking version:', error);
+      }
+    };
+
+    checkVersion();
+  }, []);
+
   return (
     <AuthContextProvider>
       <>
