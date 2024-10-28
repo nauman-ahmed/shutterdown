@@ -185,7 +185,7 @@ const getEvents = async (req, res) => {
         };
       }
     }
-
+    console.log("Object", obj)
     const events = await EventModel.find(obj)
       .skip(skip)
       .limit(10)
