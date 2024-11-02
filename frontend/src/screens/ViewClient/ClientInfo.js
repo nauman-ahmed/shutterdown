@@ -269,7 +269,7 @@ function ClientInfo() {
                 {
                   Object.entries(groupedAlbums).length == 0 ? 
                     <ul style={{ padding: 0 }} key={0}>
-                      Not included
+                      Not Included
                     </ul>
                 : 
                   Object.entries(groupedAlbums).map(([key, value]) => (
