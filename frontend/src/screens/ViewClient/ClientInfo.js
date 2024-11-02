@@ -152,7 +152,9 @@ function ClientInfo() {
   };
   const groupAndCount = (array) => {
     return array.reduce((acc, item) => {
-      acc[item] = (acc[item] || 0) + 1;
+      if("Not included" !== item){
+        acc[item] = (acc[item] || 0) + 1;  
+      }
       return acc;
     }, {});
   };
@@ -205,9 +207,7 @@ function ClientInfo() {
   };
   const updateClient = async () => {
     try {
-      console.log("Start")
       await updateClientData(editedClient);
-      console.log("End")
       setEditedClient(null)
       setEditClientModal(false);
       getIdData();
@@ -219,6 +219,7 @@ function ClientInfo() {
 
   return (
     <div>
+      {console.log("Ret", Object.entries(groupedAlbums).length)}
       <Table bordered hover responsive>
         <thead>
           <tr
@@ -265,11 +266,18 @@ function ClientInfo() {
 
             <td className="textPrimary fs-6 tablePlaceContent">
               <>
-                {Object.entries(groupedAlbums).map(([key, value]) => (
-                  <li key={key}>
-                    {key}: {value}
-                  </li>
-                ))}
+                {
+                  Object.entries(groupedAlbums).length == 0 ? 
+                    <ul style={{ padding: 0 }} key={0}>
+                      Not included
+                    </ul>
+                : 
+                  Object.entries(groupedAlbums).map(([key, value]) => (
+                    <li key={key}>
+                      {key}: {value}
+                    </li>
+                  ))
+                }
               </>
             </td>
             <td className="textPrimary fs-6 tablePlaceContent">

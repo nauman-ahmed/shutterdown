@@ -59,7 +59,7 @@ import DeliverablesDeadline from "./screens/Deadlines";
 function App() {
   const location = useLocation();
   const currentUser =  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
-  const Version = "1.0.5"
+  const Version = "1.0.6"
 
   useEffect(() => {
     window.scrollTo(0, 0);
