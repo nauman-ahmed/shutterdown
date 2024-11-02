@@ -28,8 +28,6 @@ import ClientHeader from "../../components/ClientHeader";
 import { IoIosArrowRoundDown } from "react-icons/io";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { updateAllEvents } from "../../redux/eventsSlice";
-
 import {
   Button,
   Col,
@@ -41,7 +39,7 @@ import {
   Row,
 } from "reactstrap";
 import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
-import { getAllClients, getClients } from "../../API/Client";
+import { getAllClients } from "../../API/Client";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
@@ -565,6 +563,24 @@ function ListView(props) {
     getClientsForFilters();
   }, []);
 
+  useEffect(() => {
+    // Select the .table-responsive element
+    const tableResponsiveElement = document.querySelector(".table-responsive");
+    // Apply the max-height style
+    if (tableResponsiveElement) {
+      tableResponsiveElement.style.maxHeight = "75vh";
+      tableResponsiveElement.style.overflowY = "auto";
+    }
+
+    // Clean up style when the component unmounts
+    return () => {
+      if (tableResponsiveElement) {
+        tableResponsiveElement.style.maxHeight = "";
+        tableResponsiveElement.style.overflowY = "";
+      }
+    };
+  }, [document.querySelector(".table-responsive")]);
+
   const addNewEvent = async () => {
     try {
       await addEvent(newEvent);
@@ -752,11 +768,11 @@ function ListView(props) {
                 width: currentUser?.rollSelect === "Manager" ? "180%" : "100%",
               }}
             >
-              <thead>
+              <thead style={{ position: "sticky", top: 0, zIndex: 101 }}>
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
-                    <th className="tableBody sticky-column">Couple Location</th>
-                    <th className="tableBody sticky-column">
+                    <th className="tableBody">Couple Location</th>
+                    <th className="tableBody">
                       Date{" "}
                       {!ascending ? (
                         <IoIosArrowRoundDown
@@ -1382,9 +1398,7 @@ function ListView(props) {
                                     justifyContent: "center",
                                   }}
                                 >
-                                  {dayjs(event?.eventDate).format(
-                                    "DD-MMM-YYYY"
-                                  )}
+                                  {dayjs(event?.eventDate).format("DD-MMM-YYYY")}
                                 </div>
                               </td>
                               <td className="tableBody Text14Semi primary2">
