@@ -74,7 +74,7 @@ function ListView(props) {
   const [eventsForShow, setEventsForShow] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const [ascending, setAscending] = useState(true);
+  const [ascending, setAscending] = useState(false);
   const [newEventModel, setNewEventModel] = useState(false);
   const [newEvent, setNewEvent] = useState({});
   const [showCalender, setShowCalender] = useState(false);
@@ -758,7 +758,7 @@ function ListView(props) {
                     <th className="tableBody sticky-column">Couple Location</th>
                     <th className="tableBody sticky-column">
                       Date{" "}
-                      {ascending ? (
+                      {!ascending ? (
                         <IoIosArrowRoundDown
                           style={{ color: "#666DFF" }}
                           onClick={() => {

@@ -46,7 +46,7 @@ function Cinematography(props) {
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [filterBy, setFilterBy] = useState(null);
-  const [ascendingWeding, setAscendingWeding] = useState(true);
+  const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [updateData, setUpdateData] = useState(false);

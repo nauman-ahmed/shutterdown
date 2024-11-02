@@ -106,7 +106,7 @@ function Calender() {
 
   return (
     <>
-      <ClientHeader title="Calender View" calender />
+      <ClientHeader title="Calendar View" calender />
       <div style={{ width : '100%', overflowX : 'scroll'}}>
 
         {allEvents ? (

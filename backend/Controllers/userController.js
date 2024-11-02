@@ -268,7 +268,7 @@ const RegisterPostRequest = async (req, res) => {
       req.body;
     const existEmail = await userSchema.findOne({ email: email });
     if (existEmail) {
-      res.status(200).json({
+      res.status(400).json({
         message: "user already exists",
         existEmail: { existEmail },
         User: {

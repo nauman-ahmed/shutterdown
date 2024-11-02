@@ -7,7 +7,6 @@ import {
   Dropdown,
 } from "reactstrap";
 import ShootStar from "../assets/Profile/ShootStar.svg";
-import { ToastContainer } from "react-toastify";
 import Edit from "../assets/Profile/Edit.svg";
 
 function ShootDropDown(props) {
@@ -29,7 +28,11 @@ function ShootDropDown(props) {
   const dropdownRef = useRef(null); // Ref to track the dropdown
 
   const toggle = () => {
-    setDropdownOpen(true);
+  };
+
+  const iconClickedToggle = () => {
+    console.log("iconClickedToggle")
+    setDropdownOpen(!dropdownOpen);
   };
 
   // Close dropdown when clicking outside
@@ -81,12 +84,12 @@ function ShootDropDown(props) {
                 Select ({allowedPersons})
               </div>
             ) : (
-              <div style={{ whiteSpace: "nowrap" }}>
-                <img alt="" src={Edit} /> ({allowedPersons})
+              <div style={{ whiteSpace: "nowrap" }} onClick={iconClickedToggle}>
+                <img alt="" src={Edit} onClick={iconClickedToggle} /> ({allowedPersons})
               </div>
             )}
           </DropdownToggle>
-          <DropdownMenu className="dropOpenBox">
+          <DropdownMenu className="dropOpenBox" style={{maxHeight: "35vh", overflow: "scroll"}}>
             {usersToShow?.map((user) => (
               <DropdownItem
                 key={user._id}

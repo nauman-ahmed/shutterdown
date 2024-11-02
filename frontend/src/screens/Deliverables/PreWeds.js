@@ -43,7 +43,7 @@ function PreWedDeliverables(props) {
   const [filterBy, setFilterBy] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
-  const [ascendingWeding, setAscendingWeding] = useState(true);
+  const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [updateData, setUpdateData] = useState(false);

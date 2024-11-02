@@ -44,7 +44,7 @@ function Photos() {
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const [ascendingWeding, setAscendingWeding] = useState(true);
+  const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);

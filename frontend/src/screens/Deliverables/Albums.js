@@ -48,7 +48,7 @@ function Albums(props) {
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const currentUser = JSON.parse(Cookies.get("currentUser"));
   const [deliverablesForShow, setDeliverablesForShow] = useState([]);
-  const [ascendingWeding, setAscendingWeding] = useState(true);
+  const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
   const [editorState, setEditorState] = useState({
     albumTextGetImmutable: EditorState.createEmpty(),
