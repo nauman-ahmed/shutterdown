@@ -10,7 +10,7 @@ import ShootStar from "../assets/Profile/ShootStar.svg";
 import Edit from "../assets/Profile/Edit.svg";
 
 function ShootDropDown(props) {
-  const {
+  const { 
     existedUsers,
     userChecked,
     userUnChecked,
@@ -31,7 +31,6 @@ function ShootDropDown(props) {
   };
 
   const iconClickedToggle = () => {
-    console.log("iconClickedToggle")
     setDropdownOpen(!dropdownOpen);
   };
 

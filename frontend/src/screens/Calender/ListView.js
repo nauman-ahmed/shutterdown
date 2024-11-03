@@ -87,6 +87,7 @@ function ListView(props) {
     "sameDayVideoEditors",
   ];
   const target = useRef(null);
+  const checkToUpdate = useRef({clientId: null, monthForData: null, yearForData: null, dateForFilter: null});
   const [show, setShow] = useState(false);
   const [rowOfWarning, setRowOfWarnig] = useState(null);
   const [page, setPage] = useState(2);
@@ -262,9 +263,22 @@ function ListView(props) {
   };
 
   useEffect(() => {
-    setHasMore(true);
-    setPage(2);
-    getEventsData();
+    // if(
+    //   checkToUpdate.current.clientId !== clientId || 
+    //   checkToUpdate.current.monthForData !== monthForData ||
+    //   checkToUpdate.current.dateForFilter !== dateForFilter ||
+    //   checkToUpdate.current.yearForData !== yearForData 
+    //   ){
+    //     checkToUpdate.current.clientId = clientId
+    //     checkToUpdate.current.monthForData = monthForData
+    //     checkToUpdate.current.dateForFilter = dateForFilter
+    //     checkToUpdate.current.yearForData = yearForData
+        
+    
+    //   }
+      setHasMore(true);
+        setPage(2);
+        getEventsData();
   }, [updateData, clientId]);
 
   const fetchEvents = async () => {
@@ -677,7 +691,7 @@ function ListView(props) {
               )}
             </div>
 
-            <div style={{ width: "200px" }}>
+            <div style={{ width: "200px", zIndex: 102 }}>
               <Select
                 isSearchable={true}
                 onChange={(e) => filterByNameHanler(e.value)}
@@ -1458,7 +1472,7 @@ function ListView(props) {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102 }}>
               <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
