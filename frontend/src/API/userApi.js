@@ -134,7 +134,7 @@ export const GetSignInApi = async (data) => {
       password: password,
     })
     .then((res) => {
-      Cookies.set("currentUser", JSON.stringify(res.data.User));
+      Cookies.set("currentUser", JSON.stringify(res.data.User), { expires: 7 });
       toast.success("Logged in successfully!");
     })
     .catch((err) => {
@@ -158,7 +158,7 @@ export const GetUserData = async () => {
     })
     .then((res) => {
       Cookies.remove("currentUser");
-      Cookies.set("currentUser", JSON.stringify(res.data.User));
+      Cookies.set("currentUser", JSON.stringify(res.data.User), { expires: 7 });
     });
 };
 

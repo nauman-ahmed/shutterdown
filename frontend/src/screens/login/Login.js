@@ -82,7 +82,7 @@ const Login = () => {
 
       if (res.status === 200) {
         if (accountExist?.email) {
-          Cookies.set('currentUser', JSON.stringify(accountExist));
+          Cookies.set('currentUser', JSON.stringify(accountExist), { expires: 7 });
           toast.success('Logged in successfully!')
           navigate('/MyProfile');
         } else {

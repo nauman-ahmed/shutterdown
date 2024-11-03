@@ -140,7 +140,7 @@ const Signup = (props) => {
       await GetSignInWithGoogleData(RegisterData2, phone);
       const response = JSON.parse(localStorage.getItem("loginUser"));
       if (response.status === 200) {
-        Cookies.set("currentUser", JSON.stringify(response.data.User));
+        Cookies.set("currentUser", JSON.stringify(response.data.User), { expires: 7 });
         localStorage.removeItem("loginUser");
         localStorage.removeItem("signInWithGoogle");
         navigate("/MyProfile");
