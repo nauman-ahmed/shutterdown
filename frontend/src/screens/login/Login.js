@@ -75,12 +75,14 @@ const Login = () => {
           "Authorization": `Bearer ${tokenResponse.access_token}`
         }
       })
-      console.log(res);
 
       const accountExist = await checkExistEmail(res.data.email)
-      console.log(accountExist);
 
       if (res.status === 200) {
+        if(accountExist.error){
+          toast.error('User does not exist')
+          return
+        }
         if (accountExist?.email) {
           Cookies.set('currentUser', JSON.stringify(accountExist), { expires: 7 });
           toast.success('Logged in successfully!')
@@ -89,10 +91,7 @@ const Login = () => {
           localStorage.setItem("signInWithGoogle", JSON.stringify(res.data))
           navigate("/signInWithGoogle")
         }
-       
       }
-
-
     },
 
   });

@@ -399,8 +399,11 @@ const newPassword = async (req, res) => {
 
 const getExistEmail = async (req, res) => {
   try {
-    const user = await userSchema.findOne({ email: req.body.data });
-    res.status(200).json(user);
+    const user = await userSchema.findOne({ email: req.body.data, banAccount: false });
+    if(user){
+      res.status(200).json(user);
+    }
+    res.status(201).json({error: true});
   } catch (error) {
     console.log(error);
   }
