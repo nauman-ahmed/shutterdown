@@ -22,27 +22,8 @@ const getCinematography = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
 
-    let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
-    // Date filter logic
-    if (currentDate !== "null" && currentDate) {
-      // Single day filter
-      startDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-      endDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-    } else {
-      // Use month and year for range filtering
-      startDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-01`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // First day of the month
-      endDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-${dayjs(
-          `${currentYear}-${monthNumbers[currentMonth]}`
-        ).daysInMonth()}`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // Last day of the month
-    }
-    
+
+    const { startDate, endDate } = req.query;
     // Fetch Cinematography deliverables
     const cinematographyDeliverables = await DeliverableModel.find({
       deliverableName: { $in: ["Long Film", "Reel", "Promo"] },
@@ -63,7 +44,6 @@ const getCinematography = async (req, res) => {
         },
         { path: "editor", model: "user" },
       ]);
-      console.log(cinematographyDeliverables);
       
     const hasMore = cinematographyDeliverables.length == 10;
     // Send response with filtered deliverables and hasMore flag
@@ -89,28 +69,9 @@ const getAlbums = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
 
-    // Get currentMonth, currentYear, and currentDate from the request query
-    let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
+    const { startDate, endDate } = req.query;
 
-    // Date filter logic
-    if (currentDate !== "null" && currentDate) {
-      // Use the date directly and format it to YYYY-MM-DD
-      startDate = dayjs(currentDate).format("YYYY-MM-DD");
-      endDate = dayjs(currentDate).format("YYYY-MM-DD"); // Both start and end will be the same day
-    } else {
-      // Use the numeric month for parsing and monthNumbers object from the previous controller
-      startDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-01`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // First day of the month
-      endDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-${dayjs(
-          `${currentYear}-${monthNumbers[currentMonth]}`
-        ).daysInMonth()}`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // Last day of the month
-    }
+   
 
     // Fetch album deliverables based on album values
     const albumsDeliverables = await DeliverableModel.find({
@@ -148,27 +109,8 @@ const getPhotos = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
 
-    let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
+    const { startDate, endDate } = req.query;
 
-    // Date filter logic
-    if (currentDate !== "null" && currentDate) {
-      // Use the date directly and format it to YYYY-MM-DD
-      startDate = dayjs(currentDate).format("YYYY-MM-DD");
-      endDate = dayjs(currentDate).format("YYYY-MM-DD"); // Both start and end will be the same day
-    } else {
-      // Use the numeric month for parsing and monthNumbers object from the previous controller
-      startDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-01`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // First day of the month
-      endDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-${dayjs(
-          `${currentYear}-${monthNumbers[currentMonth]}`
-        ).daysInMonth()}`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // Last day of the month
-    }
 
     // Fetch photos deliverables
     const photosDeliverables = await DeliverableModel.find({
@@ -204,30 +146,8 @@ const getPreWeds = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
-
-    let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
-    // Extend dayjs with customParseFormat to handle custom date formats
-    // dayjs.extend(customParseFormat);
-
-    // Date filter logic
-    if (currentDate !== "null" && currentDate) {
-      // Use the date directly and format it to YYYY-MM-DD
-      startDate = dayjs(currentDate).format("YYYY-MM-DD");
-      endDate = dayjs(currentDate).format("YYYY-MM-DD"); // Both start and end will be the same day
-    } else {
-      // Use the numeric month for parsing and monthNumbers object from the previous controller
-      startDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-01`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // First day of the month
-      endDate = dayjs(
-        `${currentYear}-${monthNumbers[currentMonth]}-${dayjs(
-          `${currentYear}-${monthNumbers[currentMonth]}`
-        ).daysInMonth()}`,
-        "YYYY-MM-DD"
-      ).format("YYYY-MM-DD"); // Last day of the month
-    }
+    const {startDate, endDate} = req.query;
+   
 
     // Fetch Pre-Wedding deliverables
     const preWedDeliverables = await DeliverableModel.find({

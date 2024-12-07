@@ -5,26 +5,30 @@ import { Outlet, useLocation } from "react-router-dom";
 
 const Client = () => {
   const location = useLocation();
-  const [inViewClient, setViewClient] = useState(false)
+  const [inViewClient, setViewClient] = useState(false);
 
-  useEffect(()=>{
-    if(location.pathname.startsWith('/MyProfile/Client/ViewClient')){
-      setViewClient(true)
+  useEffect(() => {
+    if (location.pathname === "/clients/view-client/all-clients") {
+      setViewClient(true);
     } else {
-      setViewClient(false)
+      setViewClient(false);
     }
-  }, [location])
+  }, [location]);
   return (
     <>
       <div className="main_content">
-        {/* <div style={location.pathname === "/MyProfile/Client/ViewClient" ? { width: "70%", paddingRight: "20px" }: { width: "100%", paddingRight: "20px" }}> */}
-        <div className={`${inViewClient && 'widthViewClient'}`} style={{ paddingRight: "20px", width : !inViewClient && '100%' }}>
-          <ClientHeader  title="View Clients"  />
+        <div
+          className={`${inViewClient && "widthViewClient"}`}
+          style={{ paddingRight: "20px", width: !inViewClient && "100%" }}
+        >
+          <ClientHeader title="View Clients" />
           <div>
             <Outlet />
           </div>
         </div>
-        {location.pathname === "/MyProfile/Client/ViewClient" && <CalenderBar />}
+        {location.pathname === "/clients/view-client/all-clients" && (
+          <CalenderBar />
+        )}
       </div>
     </>
   );

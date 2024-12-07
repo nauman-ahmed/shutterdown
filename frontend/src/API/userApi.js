@@ -72,9 +72,16 @@ export const getAllUserAccountRequestCount = async () => {
   }
 };
 
-export const GetsignUPData = async (data, phoneNo) => {
-  const { firstName, lastName, email, password, confirmPassword, rollSelect } =
-    data;
+export const SignUpAPI = async (data) => {
+  const {
+    firstName,
+    lastName,
+    email,
+    phoneNo,
+    password,
+    confirmPassword,
+    rollSelect,
+  } = data;
 
   const res = await axios.post(BASE_URL + "/Signup", {
     Headers: {
@@ -89,11 +96,11 @@ export const GetsignUPData = async (data, phoneNo) => {
     confirmPassword: confirmPassword,
     rollSelect: rollSelect,
   });
-
-  localStorage.setItem("res", JSON.stringify(res));
+  return res
+  // localStorage.setItem("res", JSON.stringify(res));
 };
-export const GetSignInWithGoogleData = async (data, phoneNo) => {
-  const { firstName, lastName, email, rollSelect } = data;
+export const SignInWithGoogleDataAPI = async (data) => {
+  const { firstName, lastName, email, rollSelect, phoneNo } = data;
 
   const res = await axios.post(BASE_URL + "/signInWithGoogle", {
     Headers: {
@@ -105,8 +112,7 @@ export const GetSignInWithGoogleData = async (data, phoneNo) => {
     phoneNo: phoneNo,
     rollSelect: rollSelect,
   });
-  localStorage.setItem("loginUser", JSON.stringify(res));
-  localStorage.setItem("res", JSON.stringify(res));
+  return res
 };
 
 export const checkExistEmail = async (data) => {
@@ -192,7 +198,6 @@ export const newPass = async (data) => {
       Headers: {
         "Content-Type": "application/json",
       },
-
       password: password,
     });
     if (res.status === 200) {
@@ -203,13 +208,26 @@ export const newPass = async (data) => {
   }
 };
 
+export const updateUserDataAPI = async (userData) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/update-userInfo`, userData);
+    toast.success("Details Updated Successfully!");
+    return res.data.updatedUser; // Return the response data
+  } catch (error) {
+    toast.error("Error in updating Details");
+    throw error; // Ensure the error is propagated to the mutation's `onError` handler
+  }
+};
+
+
 export const updateUserData = async (userData) => {
   try {
     await axios
       .post(BASE_URL + "/update-userInfo", userData)
       .then(async (res) => {
-        await GetUserData();
+        
         toast.success("Details Updated Successfully!");
+        return res.data.updatedUser
       })
       .catch((err) => {
         console.log(err);

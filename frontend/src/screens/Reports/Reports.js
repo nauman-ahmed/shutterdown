@@ -8,13 +8,13 @@ import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
+import { useLoggedInUser } from "../../config/zStore";
 
 function Reports(props) {
   const navigate = useNavigate();
   const [allTasks, setAllTasks] = useState(null);
   const [tasksToShow, setTasksToShow] = useState(null);
-  const currentUser =
-    Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
+  const {userData : currentUser} = useLoggedInUser()
   const [filterBy, setFilterBy] = useState(null);
 
   const [page, setPage] = useState(2);
@@ -34,8 +34,8 @@ function Reports(props) {
 
   useEffect(() => {
     if (
-      currentUser.rollSelect === "Editor" ||
-      currentUser.rollSelect === "Shooter"
+      currentUser?.rollSelect === "Editor" ||
+      currentUser?.rollSelect === "Shooter"
     ) {
       navigate("/MyProfile/Tasks/DailyTasks");
     }

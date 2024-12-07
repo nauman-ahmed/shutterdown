@@ -1,34 +1,38 @@
-import React, { useState } from 'react';
-import { Button, Form } from 'reactstrap';
-import '../../assets/css/common.css';
-import Logo from '../../components/Logo';
-import { verifyEmail } from '../../API/userApi';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Button, Form } from "reactstrap";
+import Logo from "../../components/Logo";
+import { useNavigate } from "react-router-dom";
+import { useForgotPasswordQuery } from "../../hooks/authQueries";
+import ButtonLoader from "../../components/common/buttonLoader";
 
 const EmailVerification = () => {
-  const [inputData, setInputData] = useState();
-  const [sending, setSending] = useState(false)
+  const [userMail, setUserMail] = useState("");
   const [error, setError] = useState();
   const handleOnChangeFuntion = (e) => {
-    setInputData(e.target.value);
-    setError(false);
+    setUserMail(e.target.value);
   };
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+  const {
+    data: success,
+    mutate,
+    isLoading,
+    error: queryError,
+  } = useForgotPasswordQuery();
+
   const handleSubmitFunction = async (e) => {
     e.preventDefault();
-    if (!inputData) {
+    if (!userMail) {
       setError(true);
     } else {
-      setSending(true)
-      const sended = await verifyEmail(inputData);
-      if (sended) {
-        navigate('/')
-      }
-      setSending(false)
+      mutate(userMail, {
+        onSuccess: () => {
+          if (success) {
+            navigate("/");
+          }
+        },
+      });
     }
   };
-
 
   return (
     <div className="row signup_mobile_container full_view_container">
@@ -52,16 +56,16 @@ const EmailVerification = () => {
             </p>
             <div
               className={
-                error
-                  ? 'reset_input_div border border-danger'
-                  : 'reset_input_div'
+                error && userMail?.length < 1
+                  ? "reset_input_div border border-danger"
+                  : "reset_input_div"
               }
               style={{ marginTop: -10 }}
             >
               <input
                 className="reset_input_field"
                 type="email"
-                placeholder="**********"
+                placeholder="Enter You rEmail"
                 name=""
                 onChange={handleOnChangeFuntion}
               ></input>
@@ -70,9 +74,9 @@ const EmailVerification = () => {
               type="submit"
               className="submit_btn"
               style={{ marginTop: 40 }}
-            > {sending ? 'Mail Sending...' : 'Submit'}
-
-            </Button>{' '}
+            >
+              {isLoading ? <ButtonLoader /> : "Submit"}
+            </Button>
           </Form>
           <br />
         </div>

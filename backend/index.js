@@ -18,7 +18,8 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const eventRouter = require('./Routes/EventRouter');
 const deliverableRouter = require('./Routes/deliverableRouter');
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: './.env' });
+
 
 const PORT = 5002;
 

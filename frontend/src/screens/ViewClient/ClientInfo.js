@@ -45,47 +45,9 @@ function ClientInfo() {
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
-  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'));
   const [editClientModal, setEditClientModal] = useState(false)
   const [editedClient, setEditedClient] = useState(null)
-  const dispatch = useDispatch();
-  const getStoredEvents = async () => {
-    const res = await getAllEvents();
-    if (currentUser.rollSelect === "Manager") {
-      dispatch(updateAllEvents(res?.data));
-      setAllEvents(res.data)
-    } else if (
-      currentUser.rollSelect === "Shooter" ||
-      currentUser.rollSelect === "Editor"
-    ) {
-      const eventsToShow = res.data?.filter(
-        (event) =>
-          event?.shootDirectors?.some(
-            (director) => director._id === currentUser._id
-          ) ||
-          event?.choosenPhotographers.some(
-            (photographer) => photographer._id === currentUser._id
-          ) ||
-          event?.choosenCinematographers.some(
-            (cinematographer) => cinematographer._id === currentUser._id
-          ) ||
-          event?.droneFlyers.some((flyer) => flyer._id === currentUser._id) ||
-          event?.manager.some((manager) => manager._id === currentUser._id) ||
-          event?.sameDayPhotoMakers.some(
-            (photoMaker) => photoMaker._id === currentUser._id
-          ) ||
-          event?.sameDayVideoMakers.some(
-            (videoMaker) => videoMaker._id === currentUser._id
-          ) ||
-          event?.assistants.some(
-            (assistant) => assistant._id === currentUser._id
-          )
-      );
-      dispatch(updateAllEvents(eventsToShow));
-      
-    }
 
-  };
   const deliverableOptionObjectKeys = [
     "promos",
     "longFilms",
@@ -125,8 +87,34 @@ function ClientInfo() {
       label: 'Advance',
     },
     {
-      value: 'Full Payment',
-      label: 'Full Payment',
+      value: 'Recieved',
+      label: 'Recieved',
+    },
+    {
+      value: 'Cleared',
+      label: 'Cleared',
+    },
+    {
+      value: 'Pending',
+      label: 'Pending',
+    },
+  ];
+  let projectOptions = [
+    {
+      value: 'Open',
+      label: 'Open',
+    },
+    {
+      value: 'Closed',
+      label: 'Closed',
+    },
+    {
+      value: 'Closed & Cleared',
+      label: 'Closed & Cleared',
+    },
+    {
+      value: 'Pending',
+      label: 'Pending',
     },
   ];
   const deliverablePreWeddingOptionObjectKeys = [
@@ -152,8 +140,8 @@ function ClientInfo() {
   };
   const groupAndCount = (array) => {
     return array.reduce((acc, item) => {
-      if("Not included" !== item){
-        acc[item] = (acc[item] || 0) + 1;  
+      if ("Not included" !== item) {
+        acc[item] = (acc[item] || 0) + 1;
       }
       return acc;
     }, {});
@@ -166,7 +154,7 @@ function ClientInfo() {
       res.events = res.events?.sort((a, b) => {
         const dateA = new Date(a?.eventDate);
         const dateB = new Date(b?.eventDate);
-        return dateA - dateB 
+        return dateA - dateB
       })
       setClientData(res);
     } catch (error) {
@@ -189,7 +177,6 @@ function ClientInfo() {
       setNewEventModel(false);
       window.notify("Event added successfully!", "success");
       getIdData();
-      // getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -200,7 +187,6 @@ function ClientInfo() {
       setEventToEdit(null)
       setEditEventModel(false);
       getIdData();
-      // getStoredEvents();
     } catch (error) {
       console.log(error);
     }
@@ -219,7 +205,6 @@ function ClientInfo() {
 
   return (
     <div>
-      {console.log("Ret", Object.entries(groupedAlbums).length)}
       <Table bordered hover responsive>
         <thead>
           <tr
@@ -236,6 +221,11 @@ function ClientInfo() {
             <th>Reels</th>
             <th>Promo</th>
             <th>Payment Status</th>
+            {clientData?.paymentStatus === 'Pending' && (
+              <th>Pending Amount</th>
+            )}
+
+            <th>Project Status</th>
             <th>Client Suggestion</th>
             <th>Action</th>
           </tr>
@@ -267,16 +257,16 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">
               <>
                 {
-                  Object.entries(groupedAlbums).length == 0 ? 
+                  Object.entries(groupedAlbums).length == 0 ?
                     <ul style={{ padding: 0 }} key={0}>
                       Not Included
                     </ul>
-                : 
-                  Object.entries(groupedAlbums).map(([key, value]) => (
-                    <li key={key}>
-                      {key}: {value}
-                    </li>
-                  ))
+                    :
+                    Object.entries(groupedAlbums).map(([key, value]) => (
+                      <li key={key}>
+                        {key}: {value}
+                      </li>
+                    ))
                 }
               </>
             </td>
@@ -291,6 +281,10 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.reels}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.promos}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
+            {clientData?.paymentStatus === 'Pending' && (
+              <td className="textPrimary fs-6 tablePlaceContent">{clientData?.pendingAmount}</td>
+            )}
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.projectStatus}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.suggestion}</td>
             <td className="textPrimary fs-6 tablePlaceContent">
               <FaEdit className="fs-5 cursor-pointer"
@@ -301,12 +295,12 @@ function ClientInfo() {
               /><MdDelete
                 onClick={async () => {
                   deleteClientDetails.current = {
-                    clientDelete : true,
-                    _id : clientData._id,
+                    clientDelete: true,
+                    _id: clientData._id,
                     message: "Are you sure you want to delete this client?"
                   }
                   setDeleteModal(true)
-                  
+
                 }}
                 className="text-danger cursor-pointer fs-3"
               /></td>
@@ -342,7 +336,6 @@ function ClientInfo() {
             <th>Same Day Photo Editors</th>
             <th>Same Day Video Editors</th>
             <th>Is Wedding</th>
-            {/* <th>Tentative</th> */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -351,7 +344,6 @@ function ClientInfo() {
           style={{
             textAlign: "center",
             borderWidth: "0px 1px 0px 1px",
-            // background: "#EFF0F5",
           }}
         >
           {clientData?.events?.map((event, i) => {
@@ -380,7 +372,7 @@ function ClientInfo() {
                 <td className=" textPrimary tablePlaceContent fs-6">
                   <div className="d-flex flex-row align-items-center gap-2">
 
-                    <FaEdit className="fs-5 cursor-pointer" 
+                    <FaEdit className="fs-5 cursor-pointer"
                       onClick={() => {
                         setEventToEdit(event);
                         setEditEventModel(true);
@@ -389,8 +381,8 @@ function ClientInfo() {
                     <MdDelete
                       onClick={async () => {
                         deleteClientDetails.current = {
-                          clientDelete : false,
-                          _id : event._id,
+                          clientDelete: false,
+                          _id: event._id,
                           message: "Are you sure you want to delete this event?"
                         }
                         setDeleteModal(true)
@@ -413,11 +405,11 @@ function ClientInfo() {
         <Form
           onSubmit={async (e) => {
             e.preventDefault();
-            if(deleteClientDetails.current?.clientDelete){
+            if (deleteClientDetails.current?.clientDelete) {
               await deleteClient(deleteClientDetails.current?._id)
               // getStoredEvents()
-              navigate('/MyProfile/Client/ViewClient')
-            }else if(!deleteClientDetails.current?.clientDelete){
+              navigate('/clients/view-client/all-clients')
+            } else if (!deleteClientDetails.current?.clientDelete) {
               await deleteEvent(deleteClientDetails.current?._id);
               getIdData();
               // getStoredEvents();
@@ -482,11 +474,11 @@ function ClientInfo() {
                     className="position-absolute"
                   >
                     <Calendar
-                      
+
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
-                        setNewEvent({ ...newEvent, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD')});
+                        setNewEvent({ ...newEvent, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD') });
                       }}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -637,13 +629,13 @@ function ClientInfo() {
                     }}
                     className="position-absolute"
                   >
-                    <Calendar                    
+                    <Calendar
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
                         setShowCalender(!showCalender);
                         setEventToEdit({ ...eventToEdit, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD').toString() });
                       }}
-                      
+
                       value={eventToEdit?.eventDate ? new Date(eventToEdit?.eventDate) : new Date()}
                       tileClassName={({ date }) => {
                         let count = 0;
@@ -772,7 +764,6 @@ function ClientInfo() {
         <Form
           onSubmit={(e) => {
             e.preventDefault();
-          
             updateClient();
           }}
         >
@@ -876,13 +867,48 @@ function ClientInfo() {
               <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Project Status
+                  </div>
+                  <Select
+                    value={
+                      editedClient?.projectStatus
+                        ? { value: editedClient?.projectStatus, label: editedClient?.projectStatus } : null
+                    }
+                    name='paymentStatus'
+                    className="w-100"
+                    onChange={(selected) => {
+                      setEditedClient({ ...editedClient, projectStatus: selected.value })
+                    }}
+                    styles={customStyles}
+                    options={projectOptions}
+                    required
+                  />
+                </div>
+              </Col>
+              {editedClient?.paymentStatus === 'Pending' && (
+                <Col xl="6" sm="6" className="p-2">
+                  <div className="label mt25">Pending Amount</div>
+                  <input
+                    value={editedClient?.pendingAmount}
+                    onChange={(e) => updateEditedClient(e)}
+                    type="name"
+                    name="pendingAmount"
+                    placeholder="Pending_Amount"
+                    className="ContactModel textPrimary"
+                    required
+                  />
+                </Col>
+              )}
+              <Col xl="6" sm="6" className="p-2">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Pre Wedding Photos
                   </div>
                   <input
                     type="checkbox"
-                    onChange={(e)=>{
-                      
-                      setEditedClient({...editedClient, preWeddingPhotos : e.target.checked})
+                    onChange={(e) => {
+
+                      setEditedClient({ ...editedClient, preWeddingPhotos: e.target.checked })
                     }}
                     name="preWeddingPhotos"
                     style={{ width: '16px', height: '16px' }}
@@ -898,9 +924,9 @@ function ClientInfo() {
                   </div>
                   <input
                     type="checkbox"
-                    onChange={(e)=>{
-                    
-                      setEditedClient({...editedClient, preWeddingVideos : e.target.checked})
+                    onChange={(e) => {
+
+                      setEditedClient({ ...editedClient, preWeddingVideos: e.target.checked })
                     }}
                     name="preWeddingVideos"
                     style={{ width: '16px', height: '16px' }}

@@ -1,51 +1,49 @@
-import React, { useState,useEffect } from "react";
-import { Button,Form } from "reactstrap";
+import React, { useState, useEffect } from "react";
+import { Button, Form } from "reactstrap";
 import "../../assets/css/common.css";
 import Logo from "../../components/Logo";
 import { newPass } from "../../API/userApi";
 const ResetPassword = () => {
-  const [emailData,setEmailData]=useState('')
+  const [emailData, setEmailData] = useState("");
 
-useEffect(()=>{
-  const data=JSON.parse(localStorage.getItem("email"))
-  setEmailData(data)
-}, [])
-const [inputData, setInputData] = useState({
-  newpassword: '',
-  newConfirmPassword: '',
-  email:emailData
-});
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("email"));
+    setEmailData(data);
+  }, []);
+  const [inputData, setInputData] = useState({
+    newpassword: "",
+    newConfirmPassword: "",
+    email: emailData,
+  });
 
-const [isMatch,setIsMatch]=useState(false)
-const [error,setError]=useState(false)
-const handleOnChangeFuntion=(e)=>{
-const {name,value}=e.target
-setInputData({...inputData,[name]:value})
-setError(false)
-}
-const {newpassword,newConfirmPassword}=inputData
-const handleSubmitFunction=(e)=>{
-  e.preventDefault()
-  if (!newpassword) {
-    setError(true)
-  }
-  if (!newConfirmPassword) {
- 
-    setError(true)
-  }
-  else if (newpassword!==newConfirmPassword) {
-    setError(true)
-    setIsMatch(true)
-  }
-  else{
-  newPass(inputData).then(()=>{
-alert("successFully Updated")
-  }).catch(()=>{
-    alert("fail")
-  })
-  }
-}
-
+  const [isMatch, setIsMatch] = useState(false);
+  const [error, setError] = useState(false);
+  const handleOnChangeFuntion = (e) => {
+    const { name, value } = e.target;
+    setInputData({ ...inputData, [name]: value });
+    setError(false);
+  };
+  const { newpassword, newConfirmPassword } = inputData;
+  const handleSubmitFunction = (e) => {
+    e.preventDefault();
+    if (!newpassword) {
+      setError(true);
+    }
+    if (!newConfirmPassword) {
+      setError(true);
+    } else if (newpassword !== newConfirmPassword) {
+      setError(true);
+      setIsMatch(true);
+    } else {
+      newPass(inputData)
+        .then(() => {
+          alert("successFully Updated");
+        })
+        .catch(() => {
+          alert("fail");
+        });
+    }
+  };
 
   return (
     <div className="row signup_mobile_container full_view_container">
@@ -70,16 +68,15 @@ alert("successFully Updated")
             <div
               className={
                 error && newpassword.length < 1
-                  ? 'reset_input_div border border-danger'
+                  ? "reset_input_div border border-danger"
                   : error && isMatch
-                  ? 'reset_input_div border border-danger'
-                  : 'reset_input_div '
+                  ? "reset_input_div border border-danger"
+                  : "reset_input_div "
               }
               style={{ marginTop: -10 }}
             >
               <input
-                className=
-                'reset_input_field'
+                className="reset_input_field"
                 type="password"
                 placeholder="**********"
                 name="newpassword"
@@ -93,15 +90,15 @@ alert("successFully Updated")
             <div
               className={
                 error && newpassword.length < 1
-                  ? 'reset_input_div border border-danger'
+                  ? "reset_input_div border border-danger"
                   : error && isMatch
-                  ? 'reset_input_div border border-danger'
-                  : 'reset_input_div'
+                  ? "reset_input_div border border-danger"
+                  : "reset_input_div"
               }
               style={{ marginTop: -10 }}
             >
               <input
-                className='reset_input_field'
+                className="reset_input_field"
                 type="password"
                 placeholder="**********"
                 name="newConfirmPassword"
@@ -115,7 +112,7 @@ alert("successFully Updated")
               style={{ marginTop: 40 }}
             >
               Submit
-            </Button>{' '}
+            </Button>{" "}
           </Form>
           <br />
         </div>

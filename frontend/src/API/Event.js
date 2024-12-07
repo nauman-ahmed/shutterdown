@@ -69,19 +69,16 @@ export const updateClientData = async (data) => {
 
 export const getEvents = async (
   clientId,
-  page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate,
 ) => {
   try {
     const res = await axios.post(
-      `${BASE_URL}/getAllEvents?page=${page}`,
+      `${BASE_URL}/getAllEvents`,
       {
         clientId,
-        currentMonth: monthForData, 
-        currentYear: yearForData,
-        dateForFilter: dateForFilter,
+        startDate, 
+        endDate,
       },
       {
         headers: {

@@ -13,12 +13,13 @@ import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { updateAllEvents } from "../redux/eventsSlice";
 import moment from "moment";
+import { useLoggedInUser } from "../config/zStore";
 
 function CalenderBar(props) {
   const [currentMonth, setCurrentMonth] = useState(moment().format("MMMM"));
   const EventsList = useSelector((state) => state.allEvents);
   const dispatch = useDispatch();
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const {userData : currentUser} = useLoggedInUser();
   const [activeStartDate, setActiveStartDate] = useState(new Date());
   const [monthEvents, setMonthEvents] = useState();
 
@@ -27,11 +28,11 @@ function CalenderBar(props) {
       // const res = await getEvents();
 
       const res = await getAllEvents();
-      if (currentUser.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager") {
         dispatch(updateAllEvents(res?.data));
       } else if (
-        currentUser.rollSelect === "Shooter" ||
-        currentUser.rollSelect === "Editor"
+        currentUser?.rollSelect === "Shooter" ||
+        currentUser?.rollSelect === "Editor"
       ) {
         const eventsToShow = res.data?.filter(
           (event) =>

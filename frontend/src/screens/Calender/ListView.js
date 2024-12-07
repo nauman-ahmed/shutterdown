@@ -44,6 +44,8 @@ import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -70,7 +72,7 @@ function ListView(props) {
   const { clientIdd } = useParams();
   const allEvents = useSelector((state) => state.allEvents);
   const [eventsForShow, setEventsForShow] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascending, setAscending] = useState(false);
   const [newEventModel, setNewEventModel] = useState(false);
@@ -87,15 +89,16 @@ function ListView(props) {
     "sameDayVideoEditors",
   ];
   const target = useRef(null);
-  const checkToUpdate = useRef({clientId: null, monthForData: null, yearForData: null, dateForFilter: null});
+  const currentDate = new Date();
   const [show, setShow] = useState(false);
   const [rowOfWarning, setRowOfWarnig] = useState(null);
-  const [page, setPage] = useState(2);
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const dispatch = useDispatch();
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
   const [directors, setDirectors] = useState([]);
   const [photographer, setPhotographer] = useState([]);
@@ -129,15 +132,6 @@ function ListView(props) {
       found.events.push(event);
       return acc;
     }, []);
-
-    // // Step 2: Sort events within each bride's group
-    // groupedByBrideName.forEach(group => {
-    //   group.events.sort((a, b) => {
-    //     const dateA = new Date(a?.eventDate);
-    //     const dateB = new Date(b?.eventDate);
-    //     return ascending ? dateA - dateB : dateB - dateA;
-    //   });
-    // });
 
     // Step 3: Flatten the groups back into a single array of events
     const sortedEvents = groupedByBrideName.reduce((acc, group) => {
@@ -180,12 +174,12 @@ function ListView(props) {
       setVideoEditor(
         usersData.users.filter((user) => user.subRole.includes("Video Editor"))
       );
+      console.log('getting events');
+
       let res = await getEvents(
         clientId,
-        1,
-        monthForData,
-        yearForData,
-        dateForFilter ? dayjs(dateForFilter).format("YYYY-MM-DD").toString() : null
+        startDate,
+        endDate,
       );
       if (currentUser.rollSelect === "Manager") {
         setEventsForShow(
@@ -263,123 +257,10 @@ function ListView(props) {
   };
 
   useEffect(() => {
-    // if(
-    //   checkToUpdate.current.clientId !== clientId || 
-    //   checkToUpdate.current.monthForData !== monthForData ||
-    //   checkToUpdate.current.dateForFilter !== dateForFilter ||
-    //   checkToUpdate.current.yearForData !== yearForData 
-    //   ){
-    //     checkToUpdate.current.clientId = clientId
-    //     checkToUpdate.current.monthForData = monthForData
-    //     checkToUpdate.current.dateForFilter = dateForFilter
-    //     checkToUpdate.current.yearForData = yearForData
-        
-    
-    //   }
-      setHasMore(true);
-        setPage(2);
-        getEventsData();
-  }, [updateData, clientId]);
+    getEventsData();
+  }, [updateData]);
 
-  const fetchEvents = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const res = await getEvents(
-          clientId,
-          page,
-          monthForData,
-          yearForData,
-          dateForFilter
-        );
 
-        if (currentUser.rollSelect === "Manager") {
-          setEventsForShow(
-            groupByBrideName(
-              [...eventsForShow, ...res.data]?.sort((a, b) => {
-                const dateA = new Date(a?.eventDate);
-                const dateB = new Date(b?.eventDate);
-                return ascending ? dateB - dateA : dateA - dateB;
-              })
-            )
-          );
-        } else if (currentUser.rollSelect === "Shooter") {
-          let eventsToShow = [];
-          res?.data?.forEach((event) => {
-            if (
-              event?.shootDirectors?.some(
-                (director) => director._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Shoot Directors" });
-            } else if (
-              event?.choosenPhotographers?.some(
-                (photographer) => photographer._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Photographer" });
-            } else if (
-              event?.choosenCinematographers?.some(
-                (cinematographer) => cinematographer._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Cinematographer" });
-            } else if (
-              event?.droneFlyers?.some((flyer) => flyer._id === currentUser._id)
-            ) {
-              eventsToShow.push({ ...event, userRole: "Drone Flyer" });
-            } else if (
-              event.manager?.some((manager) => manager._id === currentUser._id)
-            ) {
-              eventsToShow.push({ ...event, userRole: "Manager" });
-            } else if (
-              event?.sameDayPhotoMakers?.some(
-                (photoMaker) => photoMaker._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
-            } else if (
-              event?.sameDayVideoMakers?.some(
-                (videoMaker) => videoMaker._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Same Day Video Maker" });
-            } else if (
-              event?.assistants?.some(
-                (assistant) => assistant._id === currentUser._id
-              )
-            ) {
-              eventsToShow.push({ ...event, userRole: "Assistant" });
-            }
-          });
-
-          setEventsForShow(
-            groupByBrideName(
-              [...eventsForShow, ...eventsToShow]?.sort((a, b) => {
-                const dateA = new Date(a?.eventDate);
-                const dateB = new Date(b?.eventDate);
-                return ascending ? dateB - dateA : dateA - dateB;
-              })
-            )
-          );
-        }
-
-        if (res.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(res.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (eventsForShow?.length < 10 && hasMore && !loading) {
-      fetchEvents();
-    }
-  }, [eventsForShow, hasMore, loading]);
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -667,6 +548,7 @@ function ListView(props) {
     });
     return clients;
   };
+  // console.log('events ', eventsForShow);
 
   return (
     <>
@@ -677,7 +559,6 @@ function ListView(props) {
           <div
             className=" d-flex mx-auto align-items-center justify-content-between flex-wrap gap-3"
             style={{ width: "100%" }}
-            
           >
             <div style={{ width: "120px" }}>
               {currentUser?.rollSelect == "Manager" && (
@@ -742,18 +623,15 @@ function ListView(props) {
               style={{ width: "200px", position: "relative" }}
             >
               <div
-              ref={target}
+                ref={target}
                 className={`forminput R_A_Justify1`}
                 style={{ cursor: "pointer" }}
               >
                 <div onClick={toggle}>
-                  {dateForFilter ? (
-                    dayjs(dateForFilter).format("DD-MMM-YYYY")
-                  ) : (
-                    <>
-                      {monthForData} {yearForData}
-                    </>
-                  )}
+                  <>
+                    {monthForData}
+                  </>
+
                 </div>
                 <div
                   className="d-flex align-items-center"
@@ -763,11 +641,11 @@ function ListView(props) {
                   <GrPowerReset
                     className="mx-1"
                     onClick={() => {
-                      setDateForFilter(null);
-                      setMonthForData(months[new Date().getMonth()]);
-                      setYearForData(new Date().getFullYear());
-                      setUpdateData(!updateData)
-                  }}
+                      setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+                      setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+                      setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
+                      setUpdateData(!updateData);
+                    }}
                   />
                 </div>
               </div>
@@ -857,7 +735,7 @@ function ListView(props) {
                       Number(event?.sameDayVideoEditors) > 0 &&
                       (!event?.sameDayVideoMakers ||
                         event?.sameDayVideoMakers.length !=
-                          Number(event.sameDayVideoEditors))
+                        Number(event.sameDayVideoEditors))
                     ) {
                       errorText += "Same Day Video Maker(s) are incomplete, \n";
                     }
@@ -866,7 +744,7 @@ function ListView(props) {
                       Number(event?.sameDayPhotoEditors) > 0 &&
                       (!event?.sameDayPhotoMakers ||
                         event?.sameDayPhotoMakers.length !==
-                          Number(event.sameDayPhotoEditors))
+                        Number(event.sameDayPhotoEditors))
                     ) {
                       errorText += "Same Day Photo Maker(s) are incomplete, \n";
                     }
@@ -875,7 +753,7 @@ function ListView(props) {
                       Number(event?.cinematographers) > 0 &&
                       (!event?.choosenCinematographers ||
                         event?.choosenCinematographers?.length !==
-                          Number(event?.cinematographers))
+                        Number(event?.cinematographers))
                     ) {
                       errorText += "Cinematographer(s) are incomplete, \n";
                     }
@@ -896,7 +774,7 @@ function ListView(props) {
                       Number(event?.photographers) > 0 &&
                       (!event?.choosenPhotographers ||
                         event?.choosenPhotographers.length !==
-                          Number(event?.photographers))
+                        Number(event?.photographers))
                     ) {
                       errorText += "Photographer(s) are incomplete, \n";
                     }
@@ -905,7 +783,7 @@ function ListView(props) {
                       Number(event?.shootDirector) > 0 &&
                       (!event?.shootDirectors ||
                         event?.shootDirectors.length !==
-                          Number(event?.shootDirector))
+                        Number(event?.shootDirector))
                     ) {
                       errorText += "Shoot Director(s) are incomplete. \n";
                     }
@@ -922,13 +800,12 @@ function ListView(props) {
                           {currentUser.rollSelect === "Manager" && (
                             <tr className="relative" key={index}>
                               <td
-                                className={`tableBody Text14Semi primary2 ${
-                                  rowOfWarning === index ||
+                                className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
                                   (rowOfWarning === index - 1 &&
                                     errorText?.length > 150)
-                                    ? " "
-                                    : " sticky-column "
-                                } tablePlaceContent`}
+                                  ? " "
+                                  : " sticky-column "
+                                  } tablePlaceContent`}
                               >
                                 {errorText.length > 0 && (
                                   <ButtonWithHoverBox
@@ -946,9 +823,8 @@ function ListView(props) {
                                   }
                                 >
                                   <div
-                                    className={`${
-                                      errorText.length === 0 && "ms-4"
-                                    }`}
+                                    className={`${errorText.length === 0 && "ms-4"
+                                      }`}
                                   >
                                     {event?.client?.brideName}
                                     <br />
@@ -974,13 +850,12 @@ function ListView(props) {
                                   width: "90px",
                                   marginLeft: 10,
                                 }}
-                                className={`tableBody Text14Semi primary2 ${
-                                  rowOfWarning === index ||
+                                className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
                                   (rowOfWarning === index - 1 &&
                                     errorText?.length > 150)
-                                    ? " "
-                                    : " sticky-column "
-                                }  tablePlaceContent`}
+                                  ? " "
+                                  : " sticky-column "
+                                  }  tablePlaceContent`}
                               >
                                 <div
                                   style={{
@@ -1053,9 +928,9 @@ function ListView(props) {
                                     updatedEvents[index].choosenPhotographers =
                                       Array.isArray(event?.choosenPhotographers)
                                         ? [
-                                            ...event?.choosenPhotographers,
-                                            userObj,
-                                          ]
+                                          ...event?.choosenPhotographers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1100,11 +975,11 @@ function ListView(props) {
                                     ].choosenCinematographers = Array.isArray(
                                       event?.choosenCinematographers
                                     )
-                                      ? [
+                                        ? [
                                           ...event?.choosenCinematographers,
                                           userObj,
                                         ]
-                                      : [userObj];
+                                        : [userObj];
                                     setEventsForShow(updatedEvents);
                                   }}
                                   userUnChecked={(userObj) => {
@@ -1288,9 +1163,9 @@ function ListView(props) {
                                     updatedEvents[index].sameDayPhotoMakers =
                                       Array.isArray(event?.sameDayPhotoMakers)
                                         ? [
-                                            ...event?.sameDayPhotoMakers,
-                                            userObj,
-                                          ]
+                                          ...event?.sameDayPhotoMakers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1342,9 +1217,9 @@ function ListView(props) {
                                     updatedEvents[index].sameDayVideoMakers =
                                       Array.isArray(event?.sameDayVideoMakers)
                                         ? [
-                                            ...event?.sameDayVideoMakers,
-                                            userObj,
-                                          ]
+                                          ...event?.sameDayVideoMakers,
+                                          userObj,
+                                        ]
                                         : [userObj];
                                     setEventsForShow(updatedEvents);
                                   }}
@@ -1412,7 +1287,9 @@ function ListView(props) {
                                     justifyContent: "center",
                                   }}
                                 >
-                                  {dayjs(event?.eventDate).format("DD-MMM-YYYY")}
+                                  {dayjs(event?.eventDate).format(
+                                    "DD-MMM-YYYY"
+                                  )}
                                 </div>
                               </td>
                               <td className="tableBody Text14Semi primary2">
@@ -1447,13 +1324,13 @@ function ListView(props) {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
               </div>
             )}
-            {!loading && hasMore && (
+            {/* {!loading && hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <button
                   onClick={() => fetchEvents()}
@@ -1463,17 +1340,21 @@ function ListView(props) {
                   Load More
                 </button>
               </div>
-            )}
+            )} */}
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData)}}
+            onHide={() => {
+              setShow(false);
+              setUpdateData(!updateData);
+            }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px", zIndex: 102 }}>
-              <CalenderMultiListView
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -1481,7 +1362,7 @@ function ListView(props) {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>
@@ -1537,8 +1418,8 @@ function ListView(props) {
                         allEvents?.map((event) => [
                           // Use a unique key based on both bride and groom names
                           event?.client?.brideName +
-                            "<" +
-                            event?.client?.groomName,
+                          "<" +
+                          event?.client?.groomName,
                           event,
                         ])
                       ).values() // Extract the unique events from the Map
@@ -1662,7 +1543,7 @@ function ListView(props) {
                   name="isWedding"
                   style={{ width: "16px", height: "16px" }}
                   checked={newEvent?.isWedding}
-                  // disabled={weddingAssigned}
+                // disabled={weddingAssigned}
                 />
               </Col>
               {eventOptionObjectKeys?.map((Objkey) => (
@@ -1676,9 +1557,9 @@ function ListView(props) {
                       value={
                         newEvent?.[Objkey]
                           ? {
-                              value: newEvent?.[Objkey],
-                              label: newEvent?.[Objkey],
-                            }
+                            value: newEvent?.[Objkey],
+                            label: newEvent?.[Objkey],
+                          }
                           : null
                       }
                       name={Objkey}

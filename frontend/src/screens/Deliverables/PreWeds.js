@@ -21,6 +21,8 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -41,7 +43,7 @@ function PreWedDeliverables(props) {
   const [editors, setEditors] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [filterBy, setFilterBy] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
@@ -52,8 +54,11 @@ function PreWedDeliverables(props) {
   const [hasMore, setHasMore] = useState(false);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
   const toggle = () => {
@@ -171,10 +176,11 @@ function PreWedDeliverables(props) {
       setLoading(true);
       const data = await getPreWeds(
         1,
-        monthForData,
-        yearForData,
-        dateForFilter
+       startDate,
+       endDate
       );
+      console.log(data);
+      
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
@@ -185,8 +191,11 @@ function PreWedDeliverables(props) {
             user.subRole.includes("Photo Editor")
         )
       );
+      
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data.data);
+       
+        
         setDeliverablesForShow(
           data.data.sort((a, b) => {
             const dateA = new Date(a.date);
@@ -225,9 +234,8 @@ function PreWedDeliverables(props) {
       try {
         const data = await getPreWeds(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter
+          startDate,
+          endDate
         );
         if (data.data.length > 0) {
           let dataToAdd;
@@ -475,13 +483,11 @@ function PreWedDeliverables(props) {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
+                   
                       <>
-                        {monthForData} {yearForData}
+                        {monthForData}
                       </>
-                    )}
+                 
                   </div>
                   <div
                     className="d-flex align-items-center"
@@ -491,13 +497,12 @@ function PreWedDeliverables(props) {
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
                       }}
                     />
-                   
                   </div>
                 </div>
               </div>
@@ -972,7 +977,7 @@ function PreWedDeliverables(props) {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -992,13 +997,17 @@ function PreWedDeliverables(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData);}}
+            onHide={() => {
+              setShow(false);
+              setUpdateData(!updateData);
+            }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+            <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -1006,7 +1015,7 @@ function PreWedDeliverables(props) {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>

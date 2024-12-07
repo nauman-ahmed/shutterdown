@@ -4,19 +4,14 @@ import "../../assets/css/Profile.css";
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from "js-cookie";
 import { updateUserData } from "../../API/userApi";
+import { useLoggedInUser } from "../../config/zStore";
 
 
 function About() {
-  const [userData, setUserData] = useState(null);
+  const {userData : stateUser} = useLoggedInUser()
+  const [userData, setUserData] = useState(stateUser);
   const [updating, setUpdating] = useState(false);
-  useEffect(() => {
-    GetUserData();
-  }, [])
-
-  const GetUserData = async () => {
-    const currentUser = JSON.parse(Cookies.get('currentUser'));
-    setUserData(currentUser);
-  }
+ 
 
   const handleChange = e => {
     setUserData({ ...userData, [e.target.name]: e.target.value })

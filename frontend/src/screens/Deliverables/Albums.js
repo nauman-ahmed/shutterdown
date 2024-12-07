@@ -25,6 +25,8 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -46,7 +48,7 @@ function Albums(props) {
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [filterBy, setFilterBy] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [deliverablesForShow, setDeliverablesForShow] = useState([]);
   const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
@@ -55,6 +57,9 @@ function Albums(props) {
     cinematographyTextGetImmutable: EditorState.createEmpty(),
     _id: null,
   });
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -62,7 +67,7 @@ function Albums(props) {
   const [dateForFilter, setDateForFilter] = useState(null);
   const [updateData, setUpdateData] = useState(false);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
@@ -99,7 +104,7 @@ function Albums(props) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await getAlbums(1, monthForData, yearForData, dateForFilter);
+      const data = await getAlbums(1, startDate, endDate);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
@@ -116,9 +121,9 @@ function Albums(props) {
             return ascendingWeding ? dateB - dateA : dateA - dateB;
           })
         );
-      } else if (currentUser.rollSelect === "Editor") {
+      } else if (currentUser?.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
-          (deliverable) => deliverable?.editor?._id === currentUser._id
+          (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(
@@ -147,9 +152,8 @@ function Albums(props) {
       try {
         const data = await getAlbums(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter
+          startDate,
+          endDate
         );
         if (data.data.length > 0) {
           let dataToAdd;
@@ -169,9 +173,9 @@ function Albums(props) {
                 return ascendingWeding ? dateB - dateA : dateA - dateB;
               })
             );
-          } else if (currentUser.rollSelect === "Editor") {
+          } else if (currentUser?.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
-              (deliverable) => deliverable?.editor?._id === currentUser._id
+              (deliverable) => deliverable?.editor?._id === currentUser?._id
             );
             setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
             if (filterCondition) {
@@ -224,55 +228,55 @@ function Albums(props) {
   const filterOptions =
     currentUser?.rollSelect === "Manager"
       ? [
-          {
-            title: "Assigned Editor",
-            id: 1,
-            filters: editors && [
-              ...editors?.map((editor, i) => {
-                return { title: editor.firstName, id: i + 2 };
-              }),
-              { title: "Unassigned Editor", id: editors.length + 3 },
-            ],
-          },
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ]
+        {
+          title: "Assigned Editor",
+          id: 1,
+          filters: editors && [
+            ...editors?.map((editor, i) => {
+              return { title: editor.firstName, id: i + 2 };
+            }),
+            { title: "Unassigned Editor", id: editors.length + 3 },
+          ],
+        },
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ]
       : [
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ];
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ];
 
   // Define priority for parentTitle
   const priority = {
@@ -335,9 +339,9 @@ function Albums(props) {
         if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable
             ? conditionDeliverable +
-              " || deliverable.deliverableName === '" +
-              obj.title +
-              "'"
+            " || deliverable.deliverableName === '" +
+            obj.title +
+            "'"
             : "deliverable.deliverableName === '" + obj.title + "'";
         } else if (obj.parentTitle == "Assigned Editor") {
           if (obj.title === "Unassigned Editor") {
@@ -347,9 +351,9 @@ function Albums(props) {
           } else {
             conditionEditor = conditionEditor
               ? conditionEditor +
-                " || deliverable.firstName === '" +
-                obj.title +
-                "'"
+              " || deliverable.firstName === '" +
+              obj.title +
+              "'"
               : " deliverable.firstName === '" + obj.title + "'";
           }
         } else if (obj.parentTitle == "Current Status") {
@@ -486,13 +490,11 @@ function Albums(props) {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+
+                    <>
+                      {monthForData}
+                    </>
+
                   </div>
 
                   <div
@@ -503,13 +505,12 @@ function Albums(props) {
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
-                        setUpdateData(!updateData)
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
-                   
                   </div>
                 </div>
               </div>
@@ -522,7 +523,7 @@ function Albums(props) {
               responsive
               className="tableViewClient"
               style={
-                currentUser.rollSelect === "Manager"
+                currentUser?.rollSelect === "Manager"
                   ? { width: "150%", marginTop: "15px" }
                   : { width: "100%", marginTop: "15px" }
               }
@@ -623,9 +624,9 @@ function Albums(props) {
                               value={
                                 deliverable?.editor
                                   ? {
-                                      value: deliverable?.editor?.firstName,
-                                      label: deliverable?.editor?.firstName,
-                                    }
+                                    value: deliverable?.editor?.firstName,
+                                    label: deliverable?.editor?.firstName,
+                                  }
                                   : ""
                               }
                               name="editor"
@@ -666,9 +667,9 @@ function Albums(props) {
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
-                                  getrelevantDeadline(
-                                    deliverable.deliverableName
-                                  )
+                                getrelevantDeadline(
+                                  deliverable.deliverableName
+                                )
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -694,15 +695,15 @@ function Albums(props) {
                               value={
                                 deliverable?.companyDeadline
                                   ? dayjs(deliverable?.companyDeadline).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -729,15 +730,15 @@ function Albums(props) {
                               value={
                                 deliverable?.firstDeliveryDate
                                   ? dayjs(
-                                      deliverable?.firstDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.firstDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -764,15 +765,15 @@ function Albums(props) {
                               value={
                                 deliverable?.finalDeliveryDate
                                   ? dayjs(
-                                      deliverable?.finalDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.finalDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -788,9 +789,9 @@ function Albums(props) {
                               value={
                                 deliverable?.status
                                   ? {
-                                      value: deliverable?.status,
-                                      label: deliverable?.status,
-                                    }
+                                    value: deliverable?.status,
+                                    label: deliverable?.status,
+                                  }
                                   : null
                               }
                               name="Status"
@@ -841,9 +842,9 @@ function Albums(props) {
                               value={
                                 deliverable?.clientRating
                                   ? {
-                                      value: deliverable?.clientRating,
-                                      label: deliverable?.clientRating,
-                                    }
+                                    value: deliverable?.clientRating,
+                                    label: deliverable?.clientRating,
+                                  }
                                   : null
                               }
                               name="clientRating"
@@ -890,7 +891,7 @@ function Albums(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser.rollSelect === "Editor" && (
+                      {currentUser?.rollSelect === "Editor" && (
                         <tr
                           style={{
                             background: "#EFF0F5",
@@ -957,7 +958,7 @@ function Albums(props) {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -977,13 +978,17 @@ function Albums(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData);}}
+            onHide={() => {
+              setShow(false);
+              setUpdateData(!updateData);
+            }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -991,7 +996,7 @@ function Albums(props) {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>

@@ -8,66 +8,69 @@ import phone from "../assets/Profile/phone.svg";
 import { Outlet, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import BASE_URL from "../API";
+import { useLoggedInUser } from "../config/zStore";
 
 
-function ProfileHeader({ attendence = false, profile = false }) {
-  const [selected, setSelectedTab] = useState(1);
+function ProfileHeader() {
+  const [selected, setSelectedTab] = useState(0);
   const navigate = useNavigate();
-  const user = JSON.parse(Cookies.get('currentUser'));
+const {userData} = useLoggedInUser()
+console.log(userData);
+
   let Data3 = [
     {
-      title: "About",
+      title: "about",
       id: 1,
     },
     {
-      title: "Profile",
+      title: "details",
       id: 2,
     },
     {
-      title: "Job",
+      title: "job",
       id: 3,
     },
     {
-      title: "Documents",
+      title: "documents",
       id: 4,
     },
     {
-      title: "Assets",
+      title: "assets",
       id: 5,
     },
   ];
   let Data4 = [
     {
-      title: "About",
+      title: "about",
       id: 1,
     },
     {
-      title: "Profile",
+      title: "details",
       id: 2,
     },
     {
-      title: "Documents",
+      title: "documents",
       id: 4,
     },
     {
-      title: "Assets",
+      title: "assets",
       id: 5,
     },
   ];
   return (
     <div className="CalenderViewWidth">
       <div className="rowBox Profile_Web_hide">
-        {user?.photo ? (
+        {userData?.photo ? (
           <div className="ProfileBoxForImg w-25 Text50Semi">
-            <img alt="" className="w-100 h-100 imgRadius" src={BASE_URL + '/preview-file/' + user.photo} />
+            <img alt="" className="w-100 h-100 imgRadius" src={BASE_URL + '/preview-file/' + userData?.photo} />
           </div>
         ) : (
           <div className="ProfileBox Text50Semi">
-            {`${user?.firstName.charAt(0).toUpperCase()}${user?.lastName.charAt(0).toUpperCase()}`}
+            {`${userData?.firstName?.charAt(0).toUpperCase()}${userData?.lastName?.charAt(0).toUpperCase()}`}
           </div>
         )}
         <div className="ProfileRightBox">
-          <div className="Text20Semi padding_leftSmall">{`${user?.firstName.charAt(0).toUpperCase() + user?.firstName.slice(1).toLowerCase()} ${user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1).toLowerCase()}`}</div>
+          <div className="Text20Semi padding_leftSmall">{`${userData?.firstName?.charAt(0).toUpperCase() + userData?.firstName?.slice(1).toLowerCase()} ${userData?.lastName?.charAt(0).toUpperCase() + userData?.lastName?.slice(1).toLowerCase()}`}</div>
           <div className="padding_leftSmall rowalign mtsmall">
             <div
               className="d-flex align-items-center justify-content-between"
@@ -75,16 +78,16 @@ function ProfileHeader({ attendence = false, profile = false }) {
             >
               <div className="d-flex align-items-center">
                 <img alt="" src={locate} className="marginrightsmall" />
-                {/* <p className="title_profile">{user?.currentAddress}</p> */}
+                {/* <p className="title_profile">{userData?.currentAddress}</p> */}
                 <p className="title_profile">India</p>
               </div>
               <div className="d-flex align-items-center">
                 <img alt="" src={mail} className="marginrightsmall" />
-                <p className="title_profile">{user?.email}</p>
+                <p className="title_profile">{userData?.email}</p>
               </div>
               <div className="d-flex align-items-center">
                 <img alt="" src={phone} className="marginrightsmall" />
-                <p className="title_profile">{user?.phoneNo}</p>
+                <p className="title_profile">{userData?.phoneNo}</p>
               </div>
               <div className="d-flex align-items-center">
                 <img alt="" src={ID} className="marginrightsmall" />
@@ -103,10 +106,10 @@ function ProfileHeader({ attendence = false, profile = false }) {
                   Sub Role
                 </div>
                 <div className=" mtsmall d-flex">
-                  {user?.subRole?.length > 0 ? 
-                    user.subRole?.map((role,index) => (
-                      <div className="mx-1">
-                        {role}{index < user?.subRole?.length - 1 ? "," : null}
+                  {userData?.subRole?.length > 0 ? 
+                    userData?.subRole?.map((role,index) => (
+                      <div key={index} className="mx-1">
+                        {role}{index < userData?.subRole?.length - 1 ? "," : null}
                       </div>
                     ))
                   : "Not Selected"
@@ -118,7 +121,7 @@ function ProfileHeader({ attendence = false, profile = false }) {
                   EMP NO
                 </div>
                 <div className=" mtsmall">
-                  {user?.employeeNumber}
+                  {userData?.employeeNumber}
                 </div>
               </div>
             </div>
@@ -171,49 +174,17 @@ function ProfileHeader({ attendence = false, profile = false }) {
           <div />
         </div>
         <div className="Profile_mobile_View center">
-          {user?.photo ?
-            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img alt="" style={{ width: '100px', height: '100px', padding: '0px', objectFit: "cover", borderRadius: '50px' }} className="w-100" src={BASE_URL + '/preview-file/' + user.photo} /></div>
-            : <div className="HeaderName Text35R mt25">{user?.firstName.charAt(0).toUpperCase()}{user?.lastName.charAt(0).toUpperCase()}</div>
+          {userData?.photo ?
+            <div style={{ width: '100px', height: '100px', padding: '0px' }} className="HeaderName Text35R mt25"><img alt="" style={{ width: '100px', height: '100px', padding: '0px', objectFit: "cover", borderRadius: '50px' }} className="w-100" src={BASE_URL + '/preview-file/' + userData?.photo} /></div>
+            : <div className="HeaderName Text35R mt25">{userData?.firstName?.charAt(0).toUpperCase()}{userData?.lastName?.charAt(0).toUpperCase()}</div>
           }
-          <div className="Text16N mt12">{user?.firstName + ' ' + user?.lastName}</div>
-          <div className="Text12 mt7">{user?.rollSelect}</div>
+          <div className="Text16N mt12">{userData?.firstName + ' ' + userData?.lastName}</div>
+          <div className="Text12 mt7">{userData?.rollSelect}</div>
           <div className="R_A_Evenly mt7" style={{ width: "15%" }}>
             {/* <img src={Call} />
               <img src={MailIcon} /> */}
           </div>
         </div>
-
-        {/* <div
-            className="Profile_mobile_View headerBottom mt7"
-            style={{ width: "95%", justifyContent: "flex-start" }}
-          >
-            <div
-              className={
-                !timePage
-                  ? "Text12 gray ml20 textleft"
-                  : "Text12 gray selectedHeader2 ml20 textleft"
-              }
-              onClick={() => {
-                setTimePage(true);
-                navigate("/MyProfile/About");
-              }}
-            >
-              Profile
-            </div>
-            <div
-              className={
-                timePage
-                  ? "Text12 gray ml20 textleft"
-                  : "Text12 gray selectedHeader2 ml20 textleft"
-              }
-              onClick={() => {
-                setTimePage(false);
-                navigate("/MyProfile/Attendence");
-              }}
-            >
-              Time
-            </div>
-          </div> */}
       </>
       <div className="Profile_mobile_View mt12">
         <div

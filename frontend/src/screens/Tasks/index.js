@@ -1,6 +1,7 @@
 import React from "react";
 import CalenderBar from "../../components/CalenderBar";
 import DailyTasks from "./DailyTasks";
+import { Outlet } from "react-router-dom";
 
 
 function Tasks(props) {
@@ -8,7 +9,7 @@ function Tasks(props) {
     <>
       <div className="main_content">
         <div className="CalenderViewWidth">
-          <DailyTasks />
+          <Outlet/>
         </div>
         <CalenderBar Attendence />
       </div>

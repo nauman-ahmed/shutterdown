@@ -2,6 +2,7 @@ import axios from "axios";
 import BASE_URL from "./index";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import { useLoggedInUser } from "../config/zStore";
 
 export const postAttendenceData = async (data) => {
   try {
@@ -55,9 +56,8 @@ export const checkOutUser = async (data) => {
 
 export const getUserAttendence = async (Id) => {
   try {
-    const user = JSON.parse(Cookies.get("currentUser"));
     const res = await axios.get(
-      BASE_URL + "/MyProfile/Attendence/userAttendace/" + user._id,
+      BASE_URL + "/MyProfile/Attendence/userAttendace/" + Id,
       {
         Headers: {
           "Content-Type": "application/json",

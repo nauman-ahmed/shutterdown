@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import Spinner from "../../components/Spinner";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -30,8 +31,11 @@ function CheckLists(props) {
   const [allClients, setAllClients] = useState(null);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [page, setPage] = useState(2);
@@ -54,9 +58,8 @@ function CheckLists(props) {
       setLoading(true);
       const clients = await getClients(
         1,
-        monthForData,
-        yearForData,
-        dateForFilter,
+        startDate,
+        endDate,
         null
       );
       setClientsForShow(clients.data);
@@ -79,9 +82,8 @@ function CheckLists(props) {
       try {
         const data = await getClients(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter,
+          startDate,
+          endDate,
           null
         );
         if (data.data.length > 0) {
@@ -90,9 +92,9 @@ function CheckLists(props) {
               return clientData.events.some(
                 (eventData) =>
                   new Date(eventData.eventDate).getTime() >=
-                    new Date(dateForFilter).getTime() &&
+                  new Date(dateForFilter).getTime() &&
                   new Date(eventData.eventDate).getTime() <=
-                    new Date(dateForFilter).getTime()
+                  new Date(dateForFilter).getTime()
               );
             });
             setClientsForShow([...clientsForShow, ...clientsToAdd]);
@@ -183,23 +185,19 @@ function CheckLists(props) {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+                    <>
+                      {monthForData}
+                    </>
                   </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
-                        setUpdateData(!updateData)
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+                        setMonthForData(months[currentDate.getMonth()]  + " " + currentDate.getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
                   </div>
@@ -265,11 +263,11 @@ function CheckLists(props) {
                           value={
                             client.checklistDetails?.whatsAppGroup
                               ? {
-                                  value:
-                                    client?.checklistDetails?.whatsAppGroup,
-                                  label:
-                                    client?.checklistDetails?.whatsAppGroup,
-                                }
+                                value:
+                                  client?.checklistDetails?.whatsAppGroup,
+                                label:
+                                  client?.checklistDetails?.whatsAppGroup,
+                              }
                               : null
                           }
                           onChange={(selected) => {
@@ -345,13 +343,13 @@ function CheckLists(props) {
                           value={
                             client.checklistDetails?.iternaryCollection
                               ? {
-                                  value:
-                                    client?.checklistDetails
-                                      ?.iternaryCollection,
-                                  label:
-                                    client?.checklistDetails
-                                      ?.iternaryCollection,
-                                }
+                                value:
+                                  client?.checklistDetails
+                                    ?.iternaryCollection,
+                                label:
+                                  client?.checklistDetails
+                                    ?.iternaryCollection,
+                              }
                               : null
                           }
                           onChange={(selected) => {
@@ -394,7 +392,7 @@ function CheckLists(props) {
               })}
             </tbody>
           </Table>
-          {loading && <Spinner/>}
+          {loading && <Spinner />}
           {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
@@ -413,13 +411,14 @@ function CheckLists(props) {
           )}
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData)}}
+            onHide={() => { setShow(false); setUpdateData(!updateData) }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+            <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -427,7 +426,7 @@ function CheckLists(props) {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>

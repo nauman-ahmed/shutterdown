@@ -5,18 +5,14 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Cookies from "js-cookie";
 import { updateUserData } from "../../API/userApi";
 import dayjs from "dayjs";
+import { useLoggedInUser } from "../../config/zStore";
+import { fetchUser } from "../../hooks/authQueries";
 
 
 function Job() {
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    getUserData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  const currentUser = JSON.parse(Cookies.get('currentUser'));
-  const getUserData = async () => {
-    setUserData(currentUser);
-  }
+  const { userData : currentUser} = useLoggedInUser();
+  const [userData, setUserData] = useState(currentUser);
+
   const [updating, setUpdating] = useState(false);
   const handleChange = e => {
     setUserData({ ...userData, [e.target.name]: e.target.value })
@@ -35,7 +31,7 @@ function Job() {
   const [modal, setModal] = useState(false);
   const toggle = async () => {
     setUpdating(false);
-    await getUserData();
+    await fetchUser();
     setModal(!modal);
   }
 

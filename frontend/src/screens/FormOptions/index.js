@@ -4,7 +4,7 @@ import ClientHeader from "../../components/ClientHeader";
 import { Outlet } from "react-router-dom";
 import FormOptions from "./FormOptions";
 
-const AddClient = () => {
+const FormOptionsPage = () => {
   return (
     <>
       <div className="main_content">
@@ -12,7 +12,7 @@ const AddClient = () => {
           <ClientHeader title="Event Options" />
           <div className="Text24Semi alignCenter">Edit Form Options</div>
           <div>
-            <FormOptions />
+           <FormOptions />
           </div>
         </div>
         {/* <CalenderBar /> */}
@@ -20,4 +20,4 @@ const AddClient = () => {
     </>
   );
 };
-export default AddClient;
+export default FormOptionsPage;

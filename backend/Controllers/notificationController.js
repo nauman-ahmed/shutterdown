@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Notification = require("../models/notificationModel");
 
 const getNotifications = async (req, res) => {
@@ -14,15 +15,16 @@ const getNotifications = async (req, res) => {
         },
       });
       const individualNotifications = await Notification.find({
-        forUser: req.query.user,
+        forUser: mongoose.Types.ObjectId(req.query.user),
       });
       notificationsToSend = [
         ...notificationsToSend,
         ...individualNotifications,
       ];
+
     } else {
       notificationsToSend = await Notification.find({
-        forUser: req.query.user,
+        forUser: mongoose.Types.ObjectId(req.query.user),
       }).populate("data.events");
     }
     res.status(200).json(notificationsToSend);

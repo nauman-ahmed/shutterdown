@@ -23,7 +23,7 @@
     background-color: var(--sideBar);
     width: 17vw;
     border-radius: 0px 30px 0px 0px;
-    height: 100vh;
+    height: 84vh;
 }
 .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout .pro-sidebar-header{
     border-bottom: none !important;

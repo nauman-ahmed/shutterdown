@@ -7,15 +7,19 @@ const currentUser =
 
 export const getCinematography = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate,
 ) => {
   try {
     const res = await axios.get(
-      `${BASE_URL}/get-Cinematography?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      `${BASE_URL}/get-Cinematography`,
       {
         headers: { "Content-Type": "application/json" },
+        params: {
+          page,
+          startDate,
+          endDate
+        }
       }
     );
 
@@ -27,16 +31,20 @@ export const getCinematography = async (
 
 export const getAlbums = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate
 ) => {
   try {
     const res = await axios.get(
       BASE_URL +
-        `/get-Albums?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      `/get-Albums`,
       {
         Headers: { "Content-Type": "application/json" },
+        params: {
+          page,
+          startDate,
+          endDate
+        }
       }
     );
     return res.data;
@@ -47,16 +55,20 @@ export const getAlbums = async (
 
 export const getPhotos = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate,
 ) => {
   try {
     const res = await axios.get(
       BASE_URL +
-        `/get-Photos?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      `/get-Photos`,
       {
         Headers: { "Content-Type": "application/json" },
+        params: {
+          page,
+          startDate,
+          endDate
+        }
       }
     );
     return res.data;
@@ -67,16 +79,20 @@ export const getPhotos = async (
 
 export const getPreWeds = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate
 ) => {
   try {
     const res = await axios.get(
       BASE_URL +
-        `/get-Pre-Weds?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      `/get-Pre-Weds`,
       {
         Headers: { "Content-Type": "application/json" },
+        params: {
+          page,
+          startDate,
+          endDate
+        }
       }
     );
     return res.data;

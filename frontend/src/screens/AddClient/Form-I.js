@@ -22,7 +22,7 @@ function FormI() {
     e.preventDefault();
     if (formValues?.phoneNumber?.length > 8) {
       dispatch(updateClintData({ ...clientData, ...formValues, form1Submitted: true }))
-      navigate('/MyProfile/AddClient/Form-II');
+      navigate('/clients/add-client/form-2');
     } else {
       return window.notify("Please provide phone Number!", "error")
     }

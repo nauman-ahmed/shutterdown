@@ -23,16 +23,11 @@ function Preview() {
   const clientData = useSelector((state) => state.clientData);
   useEffect(() => {
     if (!clientData || !clientData.events) {
-      navigate("/MyProfile/AddClient/Form-I");
+      navigate("/clients/add-client/form-1");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientData]);
-  useEffect(() => {
-    if (!clientData || !clientData.events) {
-      navigate("/MyProfile/AddClient/Form-I");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
   const currentUser =
     Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
   const [eventIndex, setEventIndex] = useState(0);
@@ -89,8 +84,8 @@ function Preview() {
       dispatch(updateClintData({ albums: [""] }));
       setRequesting(false);
       if (saveResult.result) {
-        toast.success("Successfully added client")
-        navigate("/MyProfile/AddClient/Form-I");
+        toast.success("Successfully added client");
+        navigate("/clients/add-client/form-1");
       }
     }
   };
@@ -103,7 +98,7 @@ function Preview() {
         <Row>
           <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
             <div ref={target}>
-            <div className="mt25">
+              <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Date
                 </div>
@@ -122,7 +117,7 @@ function Preview() {
             </div>
           </Col>
           <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-          <div className="mt25">
+            <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Event Type
               </div>
@@ -142,7 +137,10 @@ function Preview() {
             </div>
           </Col>
           <Col xs="12" sm="6" md="6" lg="6" xl="4">
-            <div className="Text16N" style={{ marginBottom: "25px", marginTop : '25px' }}>
+            <div
+              className="Text16N"
+              style={{ marginBottom: "25px", marginTop: "25px" }}
+            >
               Is This a Wedding Event
             </div>
             <input
@@ -564,7 +562,7 @@ function Preview() {
             <div className="centerAlign mt40 mb15">
               <Button
                 className="submit_btn submit"
-                onClick={() => navigate("/MyProfile/AddClient/Form-II")}
+                onClick={() => navigate("/clients/add-client/form-2")}
               >
                 Edit
               </Button>
@@ -585,21 +583,6 @@ function Preview() {
           </Col>
         </Row>
       </div>
-      {/* <Overlay
-        rootClose={true}
-        onHide={() => setShow(false)}
-        target={target.current}
-        show={show}
-        placement="bottom"
-      >
-        {(props) => (
-          <Tooltip id="overlay-example" bsPrefix="tooltipBg" {...props}>
-            <div style={{ width: '300px' }} className="tooltipBg">
-              <Calendar onChange={setDate} value={date} />
-            </div>
-          </Tooltip>
-        )}
-      </Overlay> */}
     </>
   );
 }

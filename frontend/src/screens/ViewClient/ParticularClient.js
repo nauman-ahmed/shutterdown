@@ -10,17 +10,17 @@ function ParticularClient(props) {
   let Data3 = [
     {
       title: "Client info",
-      link: "ClientInfo/" + clientId,
+      link: "client-info/" + clientId,
       id: 1,
     },
     {
       title: "Shoot Details",
-      link: "ShootDetails/" + clientId,
+      link: "shoot-details/" + clientId,
       id: 2,
     },
     {
       title: "Deliverables",
-      link: "Deliverable/" + clientId,
+      link: "deliverables/" + clientId,
       id: 3,
     },
   ];

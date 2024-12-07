@@ -1,10 +1,7 @@
 import axios from "axios";
 import BASE_URL from "./index";
-import Cookies from "js-cookie";
-const currentUser =
-  Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
-export const getUserNotifications = async () => {
+export const getUserNotifications = async (currentUser) => { 
   try {
     const res = await axios.get(BASE_URL + `/get-notifications`, {
       params: {
@@ -13,6 +10,9 @@ export const getUserNotifications = async () => {
       },
       Headers: { "Content-Type": "application/json" },
     });
+   console.log(res.data);
+   
+    
     return res.data;
   } catch (error) {
     console.log(error);

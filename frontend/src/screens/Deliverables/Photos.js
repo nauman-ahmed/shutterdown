@@ -21,6 +21,8 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -41,7 +43,7 @@ function Photos() {
   const [editors, setEditors] = useState(null);
   const [allDeliverables, setAllDeliverables] = useState(null);
   const [filterBy, setFilterBy] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [deliverablesForShow, setDeliverablesForShow] = useState(null);
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(false);
@@ -53,8 +55,11 @@ function Photos() {
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
   const toggle = () => {
@@ -64,7 +69,7 @@ function Photos() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await getPhotos(1, monthForData, yearForData, dateForFilter);
+      const data = await getPhotos(1, startDate, endDate);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
@@ -110,9 +115,8 @@ function Photos() {
       try {
         const data = await getPhotos(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter
+          startDate,
+          endDate,
         );
         if (data.data.length > 0) {
           let dataToAdd;
@@ -199,9 +203,9 @@ function Photos() {
         if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable
             ? conditionDeliverable +
-              " || deliverable.deliverableName === '" +
-              obj.title +
-              "'"
+            " || deliverable.deliverableName === '" +
+            obj.title +
+            "'"
             : "deliverable.deliverableName === '" + obj.title + "'";
         } else if (obj.parentTitle == "Assigned Editor") {
           if (obj.title === "Unassigned Editor") {
@@ -211,9 +215,9 @@ function Photos() {
           } else {
             conditionEditor = conditionEditor
               ? conditionEditor +
-                " || deliverable.editor?.firstName === '" +
-                obj.title +
-                "'"
+              " || deliverable.editor?.firstName === '" +
+              obj.title +
+              "'"
               : " deliverable.editor?.firstName === '" + obj.title + "'";
           }
         } else if (obj.parentTitle == "Current Status") {
@@ -323,55 +327,55 @@ function Photos() {
   const filterOptions =
     currentUser?.rollSelect === "Manager"
       ? [
-          {
-            title: "Assigned Editor",
-            id: 1,
-            filters: editors && [
-              ...editors?.map((editor, i) => {
-                return { title: editor.firstName, id: i + 2 };
-              }),
-              { title: "Unassigned Editor", id: editors.length + 3 },
-            ],
-          },
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ]
+        {
+          title: "Assigned Editor",
+          id: 1,
+          filters: editors && [
+            ...editors?.map((editor, i) => {
+              return { title: editor.firstName, id: i + 2 };
+            }),
+            { title: "Unassigned Editor", id: editors.length + 3 },
+          ],
+        },
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ]
       : [
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ];
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ];
 
   // Define priority for parentTitle
   const priority = {
@@ -467,13 +471,11 @@ function Photos() {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+
+                    <>
+                      {monthForData}
+                    </>
+
                   </div>
                   <div
                     className="d-flex align-items-center"
@@ -483,9 +485,9 @@ function Photos() {
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
                       }}
                     />
@@ -600,9 +602,9 @@ function Photos() {
                               value={
                                 deliverable?.editor
                                   ? {
-                                      value: deliverable?.editor.firstName,
-                                      label: deliverable?.editor?.firstName,
-                                    }
+                                    value: deliverable?.editor.firstName,
+                                    label: deliverable?.editor?.firstName,
+                                  }
                                   : null
                               }
                               name="editor"
@@ -643,9 +645,9 @@ function Photos() {
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
-                                  getrelevantDeadline(
-                                    deliverable.deliverableName
-                                  )
+                                getrelevantDeadline(
+                                  deliverable.deliverableName
+                                )
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -671,15 +673,15 @@ function Photos() {
                               value={
                                 deliverable?.companyDeadline
                                   ? dayjs(deliverable?.companyDeadline).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -706,15 +708,15 @@ function Photos() {
                               value={
                                 deliverable?.firstDeliveryDate
                                   ? dayjs(
-                                      deliverable?.firstDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.firstDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -741,15 +743,15 @@ function Photos() {
                               value={
                                 deliverable?.finalDeliveryDate
                                   ? dayjs(
-                                      deliverable?.finalDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.finalDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -765,9 +767,9 @@ function Photos() {
                               value={
                                 deliverable?.status
                                   ? {
-                                      value: deliverable?.status,
-                                      label: deliverable?.status,
-                                    }
+                                    value: deliverable?.status,
+                                    label: deliverable?.status,
+                                  }
                                   : null
                               }
                               name="Status"
@@ -804,9 +806,9 @@ function Photos() {
                               value={
                                 deliverable?.clientRevision
                                   ? {
-                                      value: deliverable?.clientRevision,
-                                      label: deliverable?.clientRevision,
-                                    }
+                                    value: deliverable?.clientRevision,
+                                    label: deliverable?.clientRevision,
+                                  }
                                   : null
                               }
                               name="clientRevision"
@@ -842,9 +844,9 @@ function Photos() {
                               value={
                                 deliverable?.clientRating
                                   ? {
-                                      value: deliverable?.clientRating,
-                                      label: deliverable?.clientRating,
-                                    }
+                                    value: deliverable?.clientRating,
+                                    label: deliverable?.clientRating,
+                                  }
                                   : null
                               }
                               name="clientRating"
@@ -958,7 +960,7 @@ function Photos() {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -978,13 +980,17 @@ function Photos() {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData);}}
+            onHide={() => {
+              setShow(false);
+              setUpdateData(!updateData);
+            }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+            <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -992,7 +998,7 @@ function Photos() {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>

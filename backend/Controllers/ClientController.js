@@ -453,11 +453,9 @@ const getClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
-    // Get currentMonth, currentYear, and currentDate from the request query
-    let startDate, endDate;
 
-    const { currentMonth, currentYear, currentDate, filterClient } = req.query;
-    console.log("Get Client", currentMonth, currentYear, currentDate, filterClient)
+    const { startDate, endDate, filterClient } = req.query;
+    console.log("Get Client", startDate, endDate, filterClient)
     if (
       filterClient !== "null" &&
       filterClient !== "undefined" &&
@@ -492,20 +490,7 @@ const getClients = async (req, res) => {
 
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
-      // Date filter logic
-      if (currentDate !== "null") {
-        // Convert current date to just the date (without time)
-        startDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-        endDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-      } else {
-        // If no specific date, use the month and year filter
-        startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
-          .startOf("month")
-          .format("YYYY-MM-DD");
-        endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
-          .endOf("month")
-          .format("YYYY-MM-DD");
-      }
+     
 
       const clients = await ClientModel.find({
         dates: {
@@ -588,24 +573,10 @@ const getPreWedClients = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
-    // Get currentMonth, currentYear, and currentDate from the request query
-    let startDate, endDate;
-    const { currentMonth, currentYear, currentDate } = req.query;
 
-    // Date filter logic
-    if (currentDate !== "null") {
-      // Convert current date to just the date (without time)
-      startDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-      endDate = dayjs(new Date(currentDate)).format("YYYY-MM-DD");
-    } else {
-      // If no specific date, use the month and year filter
-      startDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      endDate = dayjs(`${currentYear}-${currentMonth}-01`, "YYYY-MMMM-DD")
-        .endOf("month")
-        .format("YYYY-MM-DD");
-    }
+    const { startDate, endDate, } = req.query;
+
+  
 
     const clients = await ClientModel.find({
       preWedding: true,

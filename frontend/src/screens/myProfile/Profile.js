@@ -6,16 +6,13 @@ import Cookies from "js-cookie";
 import { updateUserData } from "../../API/userApi";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { useLoggedInUser } from "../../config/zStore";
+import { fetchUser } from "../../hooks/authQueries";
 
 function Profile() {
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    getUserData();
-  }, [])
-  const getUserData = async () => {
-    const currentUser = JSON.parse(Cookies.get('currentUser'));
-    setUserData(currentUser);
-  }
+  const {userData : stateUser} = useLoggedInUser()
+  const [userData, setUserData] = useState(stateUser);
+
   const [updating, setUpdating] = useState(false);
   const handleChange = e => {
     setUserData({ ...userData, [e.target.name]: e.target.value })
@@ -40,11 +37,11 @@ function Profile() {
   }
   const [primaryModal, setPrimaryModal] = useState(false);
   const primary = async () => {
-    await getUserData();
+    await fetchUser()
     setPrimaryModal(!primaryModal);
   }
   const closeAll = async () => {
-    await getUserData();
+    await fetchUser();
     setUpdating(false);
     setPrimaryModal(false);
     setContactModel(false);
@@ -192,7 +189,7 @@ function Profile() {
             </Row>
           </>
           : <div style={{ height: '400px' }} className='d-flex justify-content-center align-items-center'>
-            <div class="spinner"></div>
+            <div className="spinner"></div>
           </div>
       }
       <Modal isOpen={primaryModal} primary={primary} centered={true} size="lg">
@@ -251,7 +248,7 @@ function Profile() {
           <Button className="Update_btn btnWidth Update" onClick={!updating && handleUpdateUserData}>
             {updating ? (
               <div className='w-100'>
-                <div class="smallSpinner mx-auto"></div>
+                <div className="smallSpinner mx-auto"></div>
               </div>
             ) : (
               'Update'
@@ -294,7 +291,7 @@ function Profile() {
           <Button className="Update_btn btnWidth" onClick={!updating && handleUpdateUserData}>
             {updating ? (
               <div className='w-100'>
-                <div class="smallSpinner mx-auto"></div>
+                <div className="smallSpinner mx-auto"></div>
               </div>
             ) : (
               'Update'
@@ -329,7 +326,7 @@ function Profile() {
           <Button className="Update_btn Update" onClick={!updating && handleUpdateUserData}>
             {updating ? (
               <div className='w-100'>
-                <div class="smallSpinner mx-auto"></div>
+                <div className="smallSpinner mx-auto"></div>
               </div>
             ) : (
               'Update'
@@ -367,7 +364,7 @@ function Profile() {
           <Button className="Update_btn Update" onClick={!updating && handleUpdateUserData}>
             {updating ? (
               <div className='w-100'>
-                <div class="smallSpinner mx-auto"></div>
+                <div className="smallSpinner mx-auto"></div>
               </div>
             ) : (
               'Update'

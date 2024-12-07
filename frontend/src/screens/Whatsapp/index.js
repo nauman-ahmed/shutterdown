@@ -4,7 +4,7 @@ import ClientHeader from "../../components/ClientHeader";
 import { Outlet } from "react-router-dom";
 import Whatsapp from "./Whatsapp";
 
-const AddClient = () => {
+const WhatsAppPage = () => {
   return (
     <>
       <div className="main_content">
@@ -20,4 +20,4 @@ const AddClient = () => {
     </>
   );
 };
-export default AddClient;
+export default WhatsAppPage;

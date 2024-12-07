@@ -18,6 +18,7 @@ import {
   clientFilterYear,
 } from "../../redux/atoms";
 import Spinner from "../../components/Spinner";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -38,31 +39,32 @@ function ViewClient() {
   const navigate = useNavigate();
   const [clients, setClients] = useState(null);
   const onPress = (clientId) => {
-    navigate("/MyProfile/Client/ParticularClient/ClientInfo/" + clientId);
+    navigate("/clients/view-client/particular-client/client-info/" + clientId);
   };
   const [allClients, setAllClients] = useState([]);
   const toggle = () => {
     setShow(!show);
   };
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [dateForFilter, setDateForFilter] = useAtom(clientFilterDate);
-  const [monthForData, setMonthForData] = useAtom(clientFilterMonth);
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()] + " " +new Date().getFullYear());
   const [yearForData, setYearForData] = useAtom(clientFilterYear);
   const [filterClient, setFilterClient] = useState(null);
   const [updateData, setUpdateData] = useState(false);
 
   const fetchData = async () => {
     try {
-      console.log("Date", monthForData, yearForData, dateForFilter,filterClient)
+      console.log("Date", startDate, endDate)
       const data = await getClients(
         1,
-        monthForData,
-        yearForData,
-        dateForFilter,
+        startDate,
+        endDate,
         filterClient
       );
 
@@ -86,10 +88,9 @@ function ViewClient() {
       try {
         const data = await getClients(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter,
-          null
+          startDate,
+          endDate,
+          filterClient
         );
         if (data.data.length > 0) {
           setClients([...clients, ...data.data]);
@@ -127,6 +128,7 @@ function ViewClient() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+  console.log(startDate, endDate);
 
   return (
     <>
@@ -134,7 +136,7 @@ function ViewClient() {
         <>
           <div
             className="widthForFilters ViewClient d-flex flex-row  mx-auto align-items-center"
-            style={{}}
+            style={{ width: '460px', marginTop : '0px' }}
             ref={target}
           >
             <div className="w-100 d-flex flex-row align-items-center">
@@ -144,22 +146,18 @@ function ViewClient() {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+                    <>
+                      {monthForData}
+                    </>
                   </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+                        setMonthForData(months[currentDate.getMonth()]  + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
                       }}
                     />
@@ -271,14 +269,14 @@ function ViewClient() {
                           {client.events.find(
                             (eventData) => eventData.isWedding
                           ) && (
-                            <p className="mb-0">
-                              {dayjs(
-                                client.events.find(
-                                  (eventData) => eventData.isWedding
-                                ).eventDate
-                              ).format("DD-MMM-YYYY")}
-                            </p>
-                          )}
+                              <p className="mb-0">
+                                {dayjs(
+                                  client.events.find(
+                                    (eventData) => eventData.isWedding
+                                  ).eventDate
+                                ).format("DD-MMM-YYYY")}
+                              </p>
+                            )}
                         </>
                       ) : (
                         "Not Defined"
@@ -290,7 +288,7 @@ function ViewClient() {
               ))}
             </tbody>
           </Table>
-          {loading && <Spinner/>}
+          {loading && <Spinner />}
           {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
@@ -309,25 +307,26 @@ function ViewClient() {
           )}
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData);}}
+            onHide={() => { setShow(false); setUpdateData(!updateData); }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
                 setShow={setShow}
-                setMonthForData={setMonthForData}
+                
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>
-      ) : <Spinner/>}
+      ) : <Spinner />}
     </>
   );
 }

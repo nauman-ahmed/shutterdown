@@ -5,6 +5,7 @@ const mimeTypes = require("mime-types");
 const mongoose = require("mongoose");
 const { Readable } = require("stream");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -51,7 +52,7 @@ const updateUserData = async (req, res) => {
       req.body,
       { new: true }
     );
-    res.status(200).json({ message: "Information Updated Successfully!" });
+    res.status(200).json({ message: "Information Updated Successfully!", updatedUser });
   } catch (error) {
     console.log(error);
   }
@@ -288,16 +289,16 @@ const RegisterPostRequest = async (req, res) => {
         password: password,
         rollSelect: rollSelect,
       });
-      await user.save();
+      const savedUser = await user.save();
+      const token = jwt.sign(
+        { id: savedUser._id, email: savedUser.email }, // Payload
+        process.env.JWT_SECRET, // Secret key
+        { expiresIn: "12h" } // Token expiration time
+      );
       res.status(200).json({
         message: "You are Registered Successfully",
-        User: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          rollSelect: user.rollSelect,
-          _id: user._id,
-        },
+        User: user,
+        token
       });
     }
   } catch (error) {
@@ -312,22 +313,38 @@ const SignInPostRequest = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
+
     if (loginUser) {
+      // Check account status
       if (loginUser.accountRequest) {
-        res.status(404).json({ message: "Your account is not approved" });
-        return;
+        return res
+          .status(403)
+          .json({ message: "Your account is not approved" });
       }
       if (loginUser.banAccount) {
-        res.status(404).json({ message: "Your account access is limited" });
-        return;
+        return res
+          .status(403)
+          .json({ message: "Your account access is limited" });
       }
-      res.status(200).json({ message: "Login Successfully", User: loginUser });
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { id: loginUser._id, email: loginUser.email }, // Payload
+        process.env.JWT_SECRET, // Secret key
+        { expiresIn: req.body.remember ? "7d" : "4h" } // Token expiration time
+      );
+
+      // Respond with user details and token
+      res.status(200).json({
+        user: loginUser,
+        token, // Include token in the response
+      });
     } else {
-      res.status(404).json({ message: "Invalid Credentials" });
+      res.status(401).json({ message: "Invalid Credentials" });
     }
   } catch (error) {
-    console.log(error);
-    res.status(404).json("invalid Credentials");
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -399,11 +416,14 @@ const newPassword = async (req, res) => {
 
 const getExistEmail = async (req, res) => {
   try {
-    const user = await userSchema.findOne({ email: req.body.data, banAccount: false });
-    if(user){
+    const user = await userSchema.findOne({
+      email: req.body.data,
+      banAccount: false,
+    });
+    if (user) {
       res.status(200).json(user);
     }
-    res.status(201).json({error: true});
+    res.status(201).json({ error: true });
   } catch (error) {
     console.log(error);
   }
@@ -438,8 +458,17 @@ const getShooters = async (req, res) => {
     console.log("error");
   }
 };
+const getMe = async (req, res) => {
+  try {
+    const user = await userSchema.findById(req.userId);
+    res.json(user);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
+  getMe,
   getUserAccountUnbanned,
   getUserAccountbanned,
   getUserAccountApproved,

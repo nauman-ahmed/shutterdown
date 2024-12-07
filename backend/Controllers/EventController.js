@@ -147,53 +147,25 @@ const updateEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * 10;
     let obj = {};
+    let { startDate, endDate } = req.body;
 
     if (req.body.clientId) {
       obj.client = req.body.clientId;
-    } 
-    else {
-      if (req.body.dateForFilter == null) {
-        if (req.body.currentMonth && req.body.currentYear) {
-          const year = req.body.currentYear;
-          const month = req.body.currentMonth;
-
-          let startOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
-            .startOf("month")
-            .format("YYYY-MM-DD");
-          let endOfMonth = dayjs(`${year}-${month}-01`, "YYYY-MMMM-DD")
-            .endOf("month")
-            .format("YYYY-MM-DD");
-
-          obj.eventDate = {
-            $gte: startOfMonth,
-            $lte: endOfMonth,
-          };
-        }
-      } else {
-        
-        let startDate = req.body.dateForFilter
-        let endDate = req.body.dateForFilter;
-
-        obj.eventDate = {
-          $gte: startDate,
-          $lte: endDate,
-        };
-      }
     }
-    console.log("req.body.dateForFilter", req.body.dateForFilter)
+    obj.eventDate = {
+      $gte: startDate,
+      $lte: endDate,
+    };
     console.log("Object", obj)
     const events = await EventModel.find(obj)
-      .skip(skip)
-      .limit(10)
       .populate(
         "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
       );
 
+    console.log('got data');
 
-    const hasMore = events.length === 10;
+    const hasMore = false;
     res.status(200).json({ hasMore, data: events });
   } catch (error) {
     console.log(error, "error");

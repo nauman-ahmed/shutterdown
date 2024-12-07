@@ -13,16 +13,17 @@ import {
   Table,
 } from 'reactstrap';
 import dayjs from "dayjs";
+import { useLoggedInUser } from "../../config/zStore";
 
 function Logs(props) {
   const [attendaces, setAttendaces] = useState(null);
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
-
+const {userData} = useLoggedInUser()
 
   const getUserAttendaces = async () => {
     try {
-      const userAttendaces = await getUserAttendence();
+      const userAttendaces = await getUserAttendence(userData._id);
       setAttendaces(userAttendaces);
     } catch (error) {
       console.log(error);

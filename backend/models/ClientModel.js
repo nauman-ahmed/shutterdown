@@ -30,6 +30,13 @@ const ClientSchema = mongoose.Schema({
   paymentStatus: {
     type: String,
   },
+  pendingAmount: {
+    type: String
+  },
+  projectStatus: {
+    type: String,
+    default : 'Open'
+  },
   suggestion: {
     type: String,
   },
@@ -56,7 +63,7 @@ const ClientSchema = mongoose.Schema({
   reels: {
     type: Number
   },
-  preWedcinematographers: { 
+  preWedcinematographers: {
     type: Number,
   },
   preWedassistants: {
@@ -68,9 +75,9 @@ const ClientSchema = mongoose.Schema({
   preWeddingDetails: {
     type: Object,
   },
-  dates : {
-    type : Array,
-    required : true
+  dates: {
+    type: Array,
+    required: true
   },
   checklistDetails: {
     type: Object,

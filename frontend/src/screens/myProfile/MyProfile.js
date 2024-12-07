@@ -2,14 +2,15 @@ import React from "react";
 import CalenderBar from "../../components/CalenderBar";
 import ProfileHeader from "../../components/ProfileHeader";
 import Cookies from 'js-cookie'
+import { useLoggedInUser } from "../../config/zStore";
 
 const MyProfile = () => {
-  const currentUser = Cookies.get('currentUser') && JSON.parse(Cookies.get('currentUser'))
+const {userData} = useLoggedInUser()
   return (
     <>
       <div className="main_content"> 
         <ProfileHeader />
-        {currentUser?.rollSelect !== 'Admin' && (
+        {userData?.rollSelect !== 'Admin' && (
           <CalenderBar />
         )}
       </div>

@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from "react";
 import CommonDropText from "../../components/CommonDropText";
-
-import { FormGroup, Input, Label, Button, Form } from "reactstrap";
+import { FormGroup, Label, Button, Form } from "reactstrap";
 import "../../assets/css/common.css";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
-
+import { toast } from "react-toastify";
 import Logo from "../../components/Logo";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
-import { GetsignUPData } from "../../API/userApi";
-import { GetSignInWithGoogleData } from "../../API/userApi";
 import Cookies from "js-cookie";
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+import { useLoggedInUser } from "../../config/zStore";
+import ButtonLoader from "../../components/common/buttonLoader";
+import { useSignUpGoogleQuery, useSignUpQuery } from "../../hooks/authQueries";
 
 const Signup = (props) => {
   const navigate = useNavigate();
-  const [successToast, setSuccessToast] = useState(false);
   const [phone, setPhone] = useState();
   const [error, setError] = useState(false);
   const [isMatch, setIsMatch] = useState(false);
   const [rollSelect, setRollSelect] = useState("Select");
   const [rollOpen, setRollOpen] = useState(false);
   const [signInData, setSignInData] = useState();
-
-  const [inputData, setInputData] = useState({
+  const { updateUserData } = useLoggedInUser()
+  const { mutate: simpleSignUp, isPending: creatigAcc, isError, error: simpleSignUpError } = useSignUpQuery();
+  const { mutate: googleSignUp, isPending: creatigAccbyGoogle, isgoogleError, error: googleSignUpError } = useSignUpGoogleQuery();
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -58,7 +56,7 @@ const Signup = (props) => {
     );
     setSignInData(signInWithGoogle);
   }, []);
-  const inputData1 = {
+  const googleSignData = {
     firstName: signInData?.given_name,
     lastName: signInData?.family_name,
     email: signInData?.email,
@@ -66,87 +64,74 @@ const Signup = (props) => {
 
   const handleOnChangeFunction = (e) => {
     const { name, value } = e.target;
-    setInputData({ ...inputData, [name]: value });
-    setError(false);
+    setFormData({ ...formData, [name]: value });
     setIsMatch(false);
   };
-  const { firstName, lastName, email, password, confirmPassword, roll } =
-    inputData;
+  const { firstName, lastName, email, password, confirmPassword, roll } = formData;
 
-  const RegisterData = { ...inputData, rollSelect };
-  const RegisterData2 = { ...inputData1, rollSelect };
+  const FormRegisterData = { ...formData, rollSelect };
+  const GoogleRegisterData = { ...googleSignData, rollSelect };
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    if (rollSelect === "Select") {
-      setError(true);
-      return
-    }
-    if (firstName === "") {
-      setError(true);
-      return
-    }
-    if (lastName === "") {
-      setError(true);
-      return
-    }
-    if (email === "") {
-      setError(true);
-      return
-    }
-    if (phone === "") {
-      setError(true);
-      return
-    }
-    if (password === "") {
-      setError(true);
-      return
-    }
-    if (confirmPassword === "") {
+    const fieldError = rollSelect === "Select" || firstName === "" || lastName === "" || email === "" || phone === "" || password === "" || confirmPassword === ""
+    if (fieldError) {
       setError(true);
       return
     } else if (password !== confirmPassword) {
       setError(true);
       setIsMatch(true);
+      toast.error('Confirm Password does not match!')
       return
     } else {
       try {
         setError(false);
-        await GetsignUPData(RegisterData, phone);
-        const res = JSON.parse(localStorage.getItem("res"));
-        if (res.status === 200) {
-          setSuccessToast(true);
-          toast.success("You Are Registered Successfully");
-          navigate("/");
-        } else {
-          toast.error("This Email is Already Exists");
-        }
+        simpleSignUp({ ...FormRegisterData, phone: phone }, {
+          onSuccess: (res) => {
+            if (res.status === 200) {
+              toast.success("You Are Registered Successfully");
+              navigate("/");
+            } else {
+              toast.error("This Email is Already Exists");
+            }
+          },
+          onError: (error) => {
+            console.log(error);
+            toast.error("Something went Wrong");
+          }
+        })
       } catch (error) {
-        toast.error("This Email is Already Exists");
+        console.log(error);
+        toast.error("Something went Wrong");
       }
     }
   };
 
   const handleSignInwithGoogleFunction = async (e) => {
     e.preventDefault();
-    if (phone === "") {
-      setError(true);
-      return
-    } else if (roll === "select") {
+    const fieldError = phone === "" || roll === "select";
+    if (fieldError) {
       setError(true);
       return
     } else {
       setError(false);
-      await GetSignInWithGoogleData(RegisterData2, phone);
-      const response = JSON.parse(localStorage.getItem("loginUser"));
-      if (response.status === 200) {
-        Cookies.set("currentUser", JSON.stringify(response.data.User), { expires: 7 });
-        localStorage.removeItem("loginUser");
-        localStorage.removeItem("signInWithGoogle");
-        navigate("/MyProfile");
-      } else {
-        toast.error("Invalid Credentials");
-      }
+      googleSignUp({ ...GoogleRegisterData, phone: phone }, {
+        onSuccess: (response) => {
+          if (response.status === 200) {
+            Cookies.set('userKeys', JSON.stringify({ userToken: response.data.token }))
+            Cookies.set("currentUser", JSON.stringify(response.data.User))
+            updateUserData(response.data.User)
+            toast.success("You Are Registered Successfully");
+            navigate("/profile");
+          } else {
+            toast.error("Something went wrong");
+          }
+        },
+        onError: (error) => {
+          toast.error("Something went wrong");
+        }
+      })
+
     }
   };
   const signin = () => {
@@ -154,7 +139,6 @@ const Signup = (props) => {
   };
   const handlePhoneNo = (e) => {
     setPhone(e);
-    setError(false);
   };
 
   return (
@@ -455,34 +439,18 @@ const Signup = (props) => {
               </div>
               <FormGroup style={{ marginTop: 5 }}>
                 <Label>
-                  {/* <Input type="checkbox" />{' '} */}
                   <span className="grey_color">
-                    By Sign Up, You agree with the{" "}
-                  </span>{" "}
+                    By Sign Up, You agree with the
+                  </span>
                   Terms & Privacy Policy
                 </Label>
               </FormGroup>
-              {props.signInWithGoogle === true ? (
-                <>
-                  <Button
-                    type="submit"
-                    className="submit_btn signup_submit_btn"
-                    onClick={handleSignInwithGoogleFunction}
-                  >
-                    Sign Up
-                  </Button>{" "}
-                </>
-              ) : (
-                <>
-                  <Button
-                    type="submit"
-                    className="submit_btn signup_submit_btn"
-                    onClick={handleSubmitForm}
-                  >
-                    Sign Up
-                  </Button>{" "}
-                </>
-              )}
+              <Button
+                type="submit"
+                className="submit_btn signup_submit_btn"
+                onClick={props.signInWithGoogle === true ? handleSignInwithGoogleFunction : handleSubmitForm}
+              >{creatigAcc || creatigAccbyGoogle ? <ButtonLoader /> : "Sign Up"}
+              </Button>
             </Form>
             <br />
             <div className="d-flex align-items-center justify-content-center bottom_width_signup mt-3">
@@ -503,20 +471,6 @@ const Signup = (props) => {
           </div>
         </div>
       </div>
-      {successToast ? (
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      ) : null}
     </>
   );
 };

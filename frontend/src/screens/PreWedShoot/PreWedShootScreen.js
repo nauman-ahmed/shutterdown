@@ -20,6 +20,8 @@ import "react-calendar/dist/Calendar.css";
 import Edit from "../../assets/Profile/Edit.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -38,7 +40,7 @@ const months = [
 
 function PreWedShootScreen() {
   const [preWedClients, setPreWedClients] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [clientsForShow, setClientsForShow] = useState(null);
   const [rangeFor, setRangeFor] = useState(-1);
   const [updatingIndex, setUpdatingIndex] = useState(null);
@@ -51,6 +53,9 @@ function PreWedShootScreen() {
   const toggle = () => {
     setShow(!show);
   };
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -60,7 +65,7 @@ function PreWedShootScreen() {
   const [flyer, setFlyer] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()]  + " " + new Date().getFullYear()
   );
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
 
@@ -111,31 +116,30 @@ function PreWedShootScreen() {
     try {
       const allPreWedClients = await getPreWedClients(
         1,
-        monthForData,
-        yearForData,
-        dateForFilter
+        startDate,
+        endDate,
       );
       const res = await getShooters();
       const usersData = await getAllUsers();
       setShooters(res.shooters);
       getFilterdUsers(usersData.users);
-      if (currentUser.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager") {
         setPreWedClients(allPreWedClients.data);
         setClientsForShow(allPreWedClients.data);
-      } else if (currentUser.rollSelect === "Shooter") {
+      } else if (currentUser?.rollSelect === "Shooter") {
         const clientsToShow = allPreWedClients.data.filter((client) => {
           return (
             client.preWeddingDetails?.photographers?.some(
-              (photographer) => photographer._id === currentUser._id
+              (photographer) => photographer._id === currentUser?._id
             ) ||
             client.preWeddingDetails?.cinematographers?.some(
-              (cinematographer) => cinematographer._id === currentUser._id
+              (cinematographer) => cinematographer._id === currentUser?._id
             ) ||
             client.preWeddingDetails?.assistants?.some(
-              (assistant) => assistant._id === currentUser._id
+              (assistant) => assistant._id === currentUser?._id
             ) ||
             client.preWeddingDetails?.droneFlyers?.some(
-              (flyer) => flyer._id === currentUser._id
+              (flyer) => flyer._id === currentUser?._id
             )
           );
         });
@@ -147,28 +151,28 @@ function PreWedShootScreen() {
         ) {
           if (
             clientsToShow[client_index]?.preWeddingDetails.photographers?.some(
-              (photographer) => photographer._id === currentUser._id
+              (photographer) => photographer._id === currentUser?._id
             )
           ) {
             clientsToShow[client_index].userRole = "Photographer";
             break;
           } else if (
             clientsToShow[client_index]?.preWeddingDetails.photographers?.some(
-              (cinematographer) => cinematographer._id === currentUser._id
+              (cinematographer) => cinematographer._id === currentUser?._id
             )
           ) {
             clientsToShow[client_index].userRole = "Cinematographer";
             break;
           } else if (
             clientsToShow[client_index]?.preWeddingDetails.photographers?.some(
-              (flyer) => flyer._id === currentUser._id
+              (flyer) => flyer._id === currentUser?._id
             )
           ) {
             clientsToShow[client_index].userRole = "Drone Flyer";
             break;
           } else if (
             clientsToShow[client_index]?.preWeddingDetails.photographers?.some(
-              (assistant) => assistant === currentUser._id
+              (assistant) => assistant === currentUser?._id
             )
           ) {
             clientsToShow[client_index].userRole = "Assistant";
@@ -197,8 +201,8 @@ function PreWedShootScreen() {
       try {
         const data = await getPreWedClients(
           page,
-          monthForData,
-          yearForData,
+          startDate,
+          endDate,
           dateForFilter
         );
         let dataToAdd;
@@ -209,20 +213,20 @@ function PreWedShootScreen() {
           } else {
             dataToAdd = data.data;
           }
-        } else if (currentUser.rollSelect === "Shooter") {
+        } else if (currentUser?.rollSelect === "Shooter") {
           const clientsToShow = data.data.filter((client) => {
             return (
               client.preWeddingDetails?.photographers?.some(
-                (photographer) => photographer._id === currentUser._id
+                (photographer) => photographer._id === currentUser?._id
               ) ||
               client.preWeddingDetails?.cinematographers?.some(
-                (cinematographer) => cinematographer._id === currentUser._id
+                (cinematographer) => cinematographer._id === currentUser?._id
               ) ||
               client.preWeddingDetails?.assistants?.some(
-                (assistant) => assistant._id === currentUser._id
+                (assistant) => assistant._id === currentUser?._id
               ) ||
               client.preWeddingDetails?.droneFlyers?.some(
-                (flyer) => flyer._id === currentUser._id
+                (flyer) => flyer._id === currentUser?._id
               )
             );
           });
@@ -239,28 +243,28 @@ function PreWedShootScreen() {
           ) {
             if (
               dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (photographer) => photographer._id === currentUser._id
+                (photographer) => photographer._id === currentUser?._id
               )
             ) {
               dataToAdd[client_index].userRole = "Photographer";
               break;
             } else if (
               dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (cinematographer) => cinematographer._id === currentUser._id
+                (cinematographer) => cinematographer._id === currentUser?._id
               )
             ) {
               dataToAdd[client_index].userRole = "Cinematographer";
               break;
             } else if (
               dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (flyer) => flyer._id === currentUser._id
+                (flyer) => flyer._id === currentUser?._id
               )
             ) {
               dataToAdd[client_index].userRole = "Drone Flyer";
               break;
             } else if (
               dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (assistant) => assistant === currentUser._id
+                (assistant) => assistant === currentUser?._id
               )
             ) {
               dataToAdd[client_index].userRole = "Assistant";
@@ -311,12 +315,12 @@ function PreWedShootScreen() {
           if (obj.title === "Date Assigned") {
             conditionAssigned = conditionAssigned
               ? conditionAssigned +
-                " || client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate"
+              " || client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate"
               : "client.preWeddingDetails?.shootStartDate && client.preWeddingDetails?.shootEndDate";
           } else if (obj.title === "Date Unassigned") {
             conditionUnassigned = conditionUnassigned
               ? conditionUnassigned +
-                " || !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDat"
+              " || !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDat"
               : " !client.preWeddingDetails?.shootStartDate && !client.preWeddingDetails?.shootEndDat";
           }
         }
@@ -461,22 +465,18 @@ function PreWedShootScreen() {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+                    <>
+                      {monthForData}
+                    </>
                   </div>
                   <div className="d-flex align-items-center">
                     <img alt="" src={CalenderImg} onClick={toggle} />
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
                       }}
                     />
@@ -486,7 +486,6 @@ function PreWedShootScreen() {
             </div>
           </div>
           <div
-          // style={{ overflowX: 'scroll', minWidth: '100%' }}
           >
             <ToastContainer />
             <Table
@@ -496,7 +495,7 @@ function PreWedShootScreen() {
               style={{ width: "150%", marginTop: "15px" }}
             >
               <thead>
-                {currentUser.rollSelect === "Manager" && (
+                {currentUser?.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column-prewed">Couple</th>
                     <th className="tableBody ">Wedding Date</th>
@@ -509,7 +508,7 @@ function PreWedShootScreen() {
                     <th className="tableBody">Save</th>
                   </tr>
                 )}
-                {currentUser.rollSelect === "Shooter" && (
+                {currentUser?.rollSelect === "Shooter" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Couple</th>
                     <th className="tableBody">Shoot Date</th>
@@ -528,7 +527,7 @@ function PreWedShootScreen() {
                 {clientsForShow?.map((client, index) => {
                   return (
                     <>
-                      {currentUser.rollSelect === "Manager" && (
+                      {currentUser?.rollSelect === "Manager" && (
                         <tr
                           key={index}
                           style={{
@@ -579,10 +578,10 @@ function PreWedShootScreen() {
                                     client?.preWeddingDetails?.photographers
                                   )
                                     ? [
-                                        ...client?.preWeddingDetails
-                                          ?.photographers,
-                                        userObj,
-                                      ]
+                                      ...client?.preWeddingDetails
+                                        ?.photographers,
+                                      userObj,
+                                    ]
                                     : [userObj];
                                 setPreWedClients(updatedClients);
                               }}
@@ -650,10 +649,10 @@ function PreWedShootScreen() {
                                     client?.preWeddingDetails?.cinematographers
                                   )
                                     ? [
-                                        ...client?.preWeddingDetails
-                                          ?.cinematographers,
-                                        userObj,
-                                      ]
+                                      ...client?.preWeddingDetails
+                                        ?.cinematographers,
+                                      userObj,
+                                    ]
                                     : [userObj];
                                 setPreWedClients(updatedClients);
                               }}
@@ -718,11 +717,11 @@ function PreWedShootScreen() {
                                 ].preWeddingDetails.assistants = Array.isArray(
                                   client?.preWeddingDetails?.assistants
                                 )
-                                  ? [
+                                    ? [
                                       ...client?.preWeddingDetails?.assistants,
                                       userObj,
                                     ]
-                                  : [userObj];
+                                    : [userObj];
                                 setPreWedClients(updatedClients);
                               }}
                               userUnChecked={(userObj) => {
@@ -786,11 +785,11 @@ function PreWedShootScreen() {
                                 ].preWeddingDetails.droneFlyers = Array.isArray(
                                   client?.preWeddingDetails?.droneFlyers
                                 )
-                                  ? [
+                                    ? [
                                       ...client?.preWeddingDetails?.droneFlyers,
                                       userObj,
                                     ]
-                                  : [userObj];
+                                    : [userObj];
                                 setPreWedClients(updatedClients);
                               }}
                               userUnChecked={(userObj) => {
@@ -874,11 +873,10 @@ function PreWedShootScreen() {
                                       right: "0px",
                                       transition: "0.5s ease-in-out",
                                     }}
-                                    className={`position-absolute transition-calendar ${
-                                      rangeFor === index
-                                        ? "fade-in"
-                                        : "fade-out"
-                                    }`}
+                                    className={`position-absolute transition-calendar ${rangeFor === index
+                                      ? "fade-in"
+                                      : "fade-out"
+                                      }`}
                                   >
                                     <Calendar
                                       selectRange
@@ -886,13 +884,13 @@ function PreWedShootScreen() {
                                         client?.preWeddingDetails
                                           ?.shootStartDate
                                           ? new Date(
-                                              client?.preWeddingDetails?.shootStartDate
-                                            )
+                                            client?.preWeddingDetails?.shootStartDate
+                                          )
                                           : new Date(),
                                         client?.preWeddingDetails?.shootEndDate
                                           ? new Date(
-                                              client?.preWeddingDetails?.shootEndDate
-                                            )
+                                            client?.preWeddingDetails?.shootEndDate
+                                          )
                                           : new Date(),
                                       ]}
                                       onChange={(value) => {
@@ -925,20 +923,20 @@ function PreWedShootScreen() {
                             </div>
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                            {currentUser.rollSelect === "Manager" ? (
+                            {currentUser?.rollSelect === "Manager" ? (
                               <Select
                                 value={
                                   client.preWeddingDetails?.status
                                     ? {
-                                        value:
-                                          client?.preWeddingDetails?.status,
-                                        label:
-                                          client?.preWeddingDetails?.status,
-                                      }
+                                      value:
+                                        client?.preWeddingDetails?.status,
+                                      label:
+                                        client?.preWeddingDetails?.status,
+                                    }
                                     : {
-                                        value: "Unassigned",
-                                        label: "Unassigned",
-                                      }
+                                      value: "Unassigned",
+                                      label: "Unassigned",
+                                    }
                                 }
                                 name="preWeddingDetailsStatus"
                                 onChange={(selected) => {
@@ -989,7 +987,7 @@ function PreWedShootScreen() {
                           </td>
                         </tr>
                       )}
-                      {currentUser.rollSelect === "Shooter" && (
+                      {currentUser?.rollSelect === "Shooter" && (
                         <tr
                           style={{
                             background: index % 2 === 0 ? "" : "#F6F6F6",
@@ -1011,18 +1009,18 @@ function PreWedShootScreen() {
                             <>
                               {client.preWeddingDetails?.shootStartDate
                                 ? new Date(
-                                    client.preWeddingDetails.shootStartDate
-                                  )
-                                    .toISOString()
-                                    .split("T")[0]
+                                  client.preWeddingDetails.shootStartDate
+                                )
+                                  .toISOString()
+                                  .split("T")[0]
                                 : "Not Available"}{" "}
                               to{" "}
                               {client.preWeddingDetails?.shootStartDate
                                 ? new Date(
-                                    client.preWeddingDetails.shootStartDate
-                                  )
-                                    .toISOString()
-                                    .split("T")[0]
+                                  client.preWeddingDetails.shootStartDate
+                                )
+                                  .toISOString()
+                                  .split("T")[0]
                                 : "Not Available"}
                             </>
                           </td>
@@ -1041,7 +1039,7 @@ function PreWedShootScreen() {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -1060,13 +1058,17 @@ function PreWedShootScreen() {
             )}
             <Overlay
               rootClose={true}
-              onHide={() => {setShow(false); setUpdateData(!updateData);}}
+              onHide={() => {
+                setShow(false);
+                setUpdateData(!updateData);
+              }}
               target={target.current}
               show={show}
               placement="bottom"
             >
               <div style={{ width: "300px" }}>
-                <CalenderMultiListView
+                <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+                {/* <CalenderMultiListView
                   monthForData={monthForData}
                   dateForFilter={dateForFilter}
                   yearForData={yearForData}
@@ -1074,12 +1076,14 @@ function PreWedShootScreen() {
                   setMonthForData={setMonthForData}
                   setYearForData={setYearForData}
                   setDateForFilter={setDateForFilter}
-                />
+                /> */}
               </div>
             </Overlay>
           </div>
         </>
-      ) : <Spinner/>}
+      ) : (
+        <Spinner />
+      )}
     </>
   );
 }

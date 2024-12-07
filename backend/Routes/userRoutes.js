@@ -2,6 +2,7 @@ const express=require("express")
 const userController=require('../Controllers/userController')
 const router=express.Router()
 const multer = require('multer');
+const verifyToken = require("../middlewares/tokenVerifier");
 
 const storage = multer.memoryStorage();
 
@@ -12,7 +13,8 @@ router.post('/signInWithGoogle', userController.RegisterPostRequest);
 router.get('/getAllUsers',userController.getAllUsers)
 router.get('/getEditors',userController.getEditors);
 router.get('/getShooters',userController.getShooters);
-router.post('/', userController.SignInPostRequest);
+router.get('/user/me', verifyToken ,userController.getMe);
+router.post('/sign-in', userController.SignInPostRequest);
 router.post('/emailVerify', userController.verifyEmail);
 router.put("/ResetPassword",userController.newPassword);
 router.post('/check-exist-email',userController.getExistEmail);

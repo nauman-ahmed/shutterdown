@@ -5,13 +5,13 @@ import Reports from "./Reports";
 function ReportsScreen(props) {
   return (
     <>
-      <div className="main_content">
-        <div className="CalenderViewWidth">
+      {/* <div className="main_content">
+        <div className="CalenderViewWidth"> */}
         
           <Reports />
-        </div>
-        <CalenderBar />
-      </div>
+        {/* </div> */}
+        {/* <CalenderBar /> */}
+      {/* </div> */}
     </>
   );
 }

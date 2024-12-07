@@ -24,6 +24,8 @@ import CalenderImg from "../../assets/Profile/Calender.svg";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
+import { useLoggedInUser } from "../../config/zStore";
+import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 
 const months = [
   "January",
@@ -48,13 +50,16 @@ function Cinematography(props) {
   const [filterBy, setFilterBy] = useState(null);
   const [ascendingWeding, setAscendingWeding] = useState(false);
   const [filterCondition, setFilterCondition] = useState(null);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [updateData, setUpdateData] = useState(false);
   const [editorState, setEditorState] = useState({
     albumTextGetImmutable: EditorState.createEmpty(),
     cinematographyTextGetImmutable: EditorState.createEmpty(),
     _id: null,
   });
+  const currentDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const dispatch = useDispatch();
   const extractText = () => {
     const contentState =
@@ -70,7 +75,7 @@ function Cinematography(props) {
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]
+    months[new Date().getMonth()]  + " " + new Date().getFullYear()
   );
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
@@ -78,7 +83,6 @@ function Cinematography(props) {
   const loadEditorContent = (rawContent) => {
     const contentState = convertFromRaw(JSON.parse(rawContent));
     return EditorState.createWithContent(contentState);
-    // Use `newEditorState` in your editor component
   };
 
   const getAllWhatsappTextHandler = async () => {
@@ -98,94 +102,94 @@ function Cinematography(props) {
   };
 
   const filterOptions =
-    currentUser.rollSelect === "Manager"
+    currentUser?.rollSelect === "Manager"
       ? [
-          {
-            title: "Deliverable",
-            id: 1,
-            filters: [
-              {
-                title: "Promo",
-                id: 2,
-              },
-              {
-                title: "Reel",
-                id: 3,
-              },
-              {
-                title: "Long Film",
-                id: 4,
-              },
-            ],
-          },
-          {
-            title: "Assigned Editor",
-            id: 2,
-            filters: editors && [
-              ...editors?.map((editor, i) => {
-                return { title: editor.firstName, id: i + 3 };
-              }),
-              { title: "Unassigned Editor", id: editors.length + 3 },
-            ],
-          },
+        {
+          title: "Deliverable",
+          id: 1,
+          filters: [
+            {
+              title: "Promo",
+              id: 2,
+            },
+            {
+              title: "Reel",
+              id: 3,
+            },
+            {
+              title: "Long Film",
+              id: 4,
+            },
+          ],
+        },
+        {
+          title: "Assigned Editor",
+          id: 2,
+          filters: editors && [
+            ...editors?.map((editor, i) => {
+              return { title: editor.firstName, id: i + 3 };
+            }),
+            { title: "Unassigned Editor", id: editors.length + 3 },
+          ],
+        },
 
-          {
-            title: "Current Status",
-            id: 6,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ]
+        {
+          title: "Current Status",
+          id: 6,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ]
       : [
-          {
-            title: "Deliverable",
-            id: 1,
-            filters: [
-              {
-                title: "Promo",
-                id: 2,
-              },
-              {
-                title: "Reel",
-                id: 3,
-              },
-              {
-                title: "Long Film",
-                id: 4,
-              },
-            ],
-          },
-          {
-            title: "Current Status",
-            id: 6,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ];
+        {
+          title: "Deliverable",
+          id: 1,
+          filters: [
+            {
+              title: "Promo",
+              id: 2,
+            },
+            {
+              title: "Reel",
+              id: 3,
+            },
+            {
+              title: "Long Film",
+              id: 4,
+            },
+          ],
+        },
+        {
+          title: "Current Status",
+          id: 6,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ];
 
   // Define priority for parentTitle
   const priority = {
@@ -199,16 +203,15 @@ function Cinematography(props) {
       setLoading(true);
       const data = await getCinematography(
         1,
-        monthForData,
-        yearForData,
-        dateForFilter
+        startDate,
+        endDate,
       );
 
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
       await getAllWhatsappTextHandler();
-      if (currentUser.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data.data);
         setDeliverablesForShow(
           data.data.sort((a, b) => {
@@ -217,9 +220,9 @@ function Cinematography(props) {
             return ascendingWeding ? dateB - dateA : dateA - dateB;
           })
         );
-      } else if (currentUser.rollSelect === "Editor") {
+      } else if (currentUser?.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
-          (deliverable) => deliverable?.editor?._id === currentUser._id
+          (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
         setDeliverablesForShow(
@@ -250,9 +253,8 @@ function Cinematography(props) {
       try {
         const data = await getCinematography(
           page,
-          monthForData,
-          yearForData,
-          dateForFilter
+          startDate,
+          endDate,
         );
         if (data.data.length > 0) {
           let dataToAdd;
@@ -272,9 +274,9 @@ function Cinematography(props) {
                 return ascendingWeding ? dateB - dateA : dateA - dateB;
               })
             );
-          } else if (currentUser.rollSelect === "Editor") {
+          } else if (currentUser?.rollSelect === "Editor") {
             const deliverablesToShow = data.data.filter(
-              (deliverable) => deliverable?.editor?._id === currentUser._id
+              (deliverable) => deliverable?.editor?._id === currentUser?._id
             );
             setAllDeliverables(
               [...allDeliverables, ...deliverablesToShow].sort((a, b) => {
@@ -355,9 +357,9 @@ function Cinematography(props) {
         if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable
             ? conditionDeliverable +
-              " || deliverable.deliverableName === '" +
-              obj.title +
-              "'"
+            " || deliverable.deliverableName === '" +
+            obj.title +
+            "'"
             : "deliverable.deliverableName === '" + obj.title + "'";
         } else if (obj.parentTitle == "Assigned Editor") {
           if (obj.title === "Unassigned Editor") {
@@ -367,9 +369,9 @@ function Cinematography(props) {
           } else {
             conditionEditor = conditionEditor
               ? conditionEditor +
-                " || deliverable.editor?.firstName === '" +
-                obj.title +
-                "'"
+              " || deliverable.editor?.firstName === '" +
+              obj.title +
+              "'"
               : " deliverable.editor?.firstName === '" + obj.title + "'";
           }
         } else if (obj.parentTitle == "Current Status") {
@@ -568,13 +570,9 @@ function Cinematography(props) {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                    {dateForFilter ? (
-                      dayjs(dateForFilter).format("DD-MMM-YYYY")
-                    ) : (
-                      <>
-                        {monthForData} {yearForData}
-                      </>
-                    )}
+                    <>
+                      {monthForData}
+                    </>
                   </div>
                   <div
                     className="d-flex align-items-center"
@@ -584,10 +582,10 @@ function Cinematography(props) {
                     <GrPowerReset
                       className="mx-1"
                       onClick={() => {
-                        setDateForFilter(null);
-                        setMonthForData(months[new Date().getMonth()]);
-                        setYearForData(new Date().getFullYear());
-                        setUpdateData(!updateData)
+                        setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+                        setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
+                        setUpdateData(!updateData);
                       }}
                     />
                   </div>
@@ -602,7 +600,7 @@ function Cinematography(props) {
               responsive
               className="tableViewClient"
               style={
-                currentUser.rollSelect === "Manager"
+                currentUser?.rollSelect === "Manager"
                   ? { width: "150%", marginTop: "15px" }
                   : { width: "100%", marginTop: "15px" }
               }
@@ -706,9 +704,9 @@ function Cinematography(props) {
                               value={
                                 deliverable?.editor
                                   ? {
-                                      value: deliverable?.editor?.firstName,
-                                      label: deliverable?.editor?.firstName,
-                                    }
+                                    value: deliverable?.editor?.firstName,
+                                    label: deliverable?.editor?.firstName,
+                                  }
                                   : null
                               }
                               name="editor"
@@ -749,9 +747,9 @@ function Cinematography(props) {
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
-                                  getrelevantDeadline(
-                                    deliverable?.deliverableName
-                                  )
+                                getrelevantDeadline(
+                                  deliverable?.deliverableName
+                                )
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -777,15 +775,15 @@ function Cinematography(props) {
                               value={
                                 deliverable?.companyDeadline
                                   ? dayjs(deliverable?.companyDeadline).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -812,15 +810,15 @@ function Cinematography(props) {
                               value={
                                 deliverable?.firstDeliveryDate
                                   ? dayjs(
-                                      deliverable?.firstDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.firstDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -847,15 +845,15 @@ function Cinematography(props) {
                               value={
                                 deliverable?.finalDeliveryDate
                                   ? dayjs(
-                                      deliverable?.finalDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.finalDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -871,9 +869,9 @@ function Cinematography(props) {
                               value={
                                 deliverable?.status
                                   ? {
-                                      value: deliverable?.status,
-                                      label: deliverable?.status,
-                                    }
+                                    value: deliverable?.status,
+                                    label: deliverable?.status,
+                                  }
                                   : null
                               }
                               name="Status"
@@ -924,9 +922,9 @@ function Cinematography(props) {
                               value={
                                 deliverable?.clientRevision
                                   ? {
-                                      value: deliverable?.clientRevision,
-                                      label: deliverable?.clientRevision,
-                                    }
+                                    value: deliverable?.clientRevision,
+                                    label: deliverable?.clientRevision,
+                                  }
                                   : null
                               }
                               name="clientRevision"
@@ -962,9 +960,9 @@ function Cinematography(props) {
                               value={
                                 deliverable?.clientRating
                                   ? {
-                                      value: deliverable?.clientRating,
-                                      label: deliverable?.clientRating,
-                                    }
+                                    value: deliverable?.clientRating,
+                                    label: deliverable?.clientRating,
+                                  }
                                   : null
                               }
                               name="clientRating"
@@ -1081,7 +1079,7 @@ function Cinematography(props) {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner/>}
+            {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
@@ -1101,13 +1099,17 @@ function Cinematography(props) {
           </div>
           <Overlay
             rootClose={true}
-            onHide={() => {setShow(false); setUpdateData(!updateData);}}
+            onHide={() => {
+              setShow(false);
+              setUpdateData(!updateData);
+            }}
             target={target.current}
             show={show}
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-              <CalenderMultiListView
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              {/* <CalenderMultiListView
                 monthForData={monthForData}
                 dateForFilter={dateForFilter}
                 yearForData={yearForData}
@@ -1115,7 +1117,7 @@ function Cinematography(props) {
                 setMonthForData={setMonthForData}
                 setYearForData={setYearForData}
                 setDateForFilter={setDateForFilter}
-              />
+              /> */}
             </div>
           </Overlay>
         </>

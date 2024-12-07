@@ -22,7 +22,7 @@ function AccountCreated() {
   },[])
  
   const navigationHandler = () => {
-    navigate('/Myprofile/Accounts/Users');
+    navigate('/admin/accounts/users');
   }
 
   return (

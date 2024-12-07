@@ -8,17 +8,14 @@ import BASE_URL from "../../API";
 import { GetUserData } from "../../API/userApi";
 import { IoMdDownload } from "react-icons/io";
 import { ImNewTab } from "react-icons/im";
+import { useLoggedInUser } from "../../config/zStore";
+import { fetchUser } from "../../hooks/authQueries";
 
 function Documents() {
+  const {userData : currentUser} = useLoggedInUser();
   const [user, setUser] = useState(null);
   const [uploadingFiles, setUploadingFiles] = useState(false);
-  const getUserData = async () => {
-    const currentUser = JSON.parse(Cookies.get('currentUser'));
-    setUser(currentUser)
-  }
-  useEffect(() => {
-    getUserData();
-  }, [])
+
 
   const [adhar, setAdhar] = useState();
   const adharCard = useRef(null);
@@ -125,7 +122,7 @@ function Documents() {
                    
                     
                     await GetUserData();
-                    getUserData();
+                    fetchUser();
                     setAdhar(null);
                     setPan(null);
                     setDrivingLicense(null);

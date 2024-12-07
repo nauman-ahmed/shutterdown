@@ -101,7 +101,6 @@ function FormII() {
     setMinDate(new Date(Date.now()));
   }, [clientData]);
 
-
   const handleDeleteEvent = (event, index) => {
     let updatedEvents = [...clientData?.events];
     updatedEvents.splice(index, 1);
@@ -143,14 +142,16 @@ function FormII() {
 
   useEffect(() => {
     if (!clientData.form1Submitted) {
-      navigate("/MyProfile/AddClient/Form-I");
+      navigate("/clients/add-client/form-1");
     }
     getAllFormOptionsHandler();
   }, []);
 
   const handleAddDate = (date) => {
-
-    setEventValues({ ...eventValues, eventDate: dayjs(new Date(date)).format('YYYY-MM-DD').toString() });
+    setEventValues({
+      ...eventValues,
+      eventDate: dayjs(new Date(date)).format("YYYY-MM-DD").toString(),
+    });
     setShow(!show);
   };
 
@@ -179,12 +180,11 @@ function FormII() {
         <Form
           onSubmit={(e) => {
             e.preventDefault();
-            if(editingEvent === null){
-
+            if (editingEvent === null) {
               handleAddEvent(e);
             } else {
-              const clientEvents = [...clientData.events]
-              clientEvents[editingEvent] = eventValues
+              const clientEvents = [...clientData.events];
+              clientEvents[editingEvent] = eventValues;
               const isWeddingAvailable = clientEvents.filter(
                 (event) => event.isWedding === true
               );
@@ -192,14 +192,16 @@ function FormII() {
                 setWeddingAssigned(true);
               }
               console.log(clientEvents);
-              
-              dispatch(updateClintData({ ...clientData, events: clientEvents }));
+
+              dispatch(
+                updateClintData({ ...clientData, events: clientEvents })
+              );
               // const updatedStoredEvents = [...allEvents];
               // updatedStoredEvents[editingEvent] = eventValues;
               // console.log(updatedStoredEvents);
-              
+
               setAllEvents([...storedEvents, ...clientEvents]);
-              setEditingEvent(null)
+              setEditingEvent(null);
             }
             setEventValues(null);
           }}
@@ -207,7 +209,7 @@ function FormII() {
           <Row>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div ref={target}>
-              <div className="mt25">
+                <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>
                     Add Date
                   </div>
@@ -224,7 +226,7 @@ function FormII() {
               </div>
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
+              <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "6px" }}>
                   Event Type
                 </div>
@@ -241,7 +243,7 @@ function FormII() {
               </div>
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4">
-            <div className="mt25">
+              <div className="mt25">
                 <div className="Text16N" style={{ marginBottom: "25px" }}>
                   Is This a Wedding Event
                 </div>
@@ -253,7 +255,7 @@ function FormII() {
                     });
                   }}
                   type="checkbox"
-                  style={{ width : '16px', height : '16px'}}
+                  style={{ width: "16px", height: "16px" }}
                   name="isWedding"
                   checked={eventValues?.isWedding}
                   disabled={weddingAssigned}
@@ -314,8 +316,8 @@ function FormII() {
             ))}
           </Row>
           <Button type="submit" className="add_album album mt-4">
-            {editingEvent !== null ? 'Edit ' : 'Add '}
-             Event
+            {editingEvent !== null ? "Edit " : "Add "}
+            Event
           </Button>
         </Form>
         <div className="mt-4">
@@ -358,7 +360,7 @@ function FormII() {
                             setWeddingAssigned(false);
                           }
                           setEventValues(event);
-                          setEditingEvent(i)
+                          setEditingEvent(i);
                           // handleDeleteEvent(event, i);
                         }}
                         className="mx-1 cursor-pointer"
@@ -378,46 +380,43 @@ function FormII() {
           onSubmit={(e) => {
             e.preventDefault();
             dispatch(updateClintData({ ...clientData, form2Submitted: true }));
-            navigate("/MyProfile/AddClient/Preview");
+            navigate("/clients/add-client/preview");
           }}
         >
-         
-          
-            <div className="Text16N d-flex flex-row flex-wrap gap-3 mt-2">
-              <div>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    updateDeliverables(e);
-                  }}
-                  name="preWeddingPhotos"
-                  checked={clientData?.deliverables?.preWeddingPhotos}
-                  disabled={false}
-                />
-                {"   "}
-                Pre Wedding Photos
-              </div>
-              <div>
-                <input
-                  onChange={(e) => {
-                    updateDeliverables(e);
-                  }}
-                  type="checkbox"
-                  name="preWeddingVideos"
-                  
-                  checked={clientData?.deliverables?.preWeddingVideos}
-                  disabled={false}
-                />
-                {"   "}
-                Pre Wedding Videos
-              </div>
+          <div className="Text16N d-flex flex-row flex-wrap gap-3 mt-2">
+            <div>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  updateDeliverables(e);
+                }}
+                name="preWeddingPhotos"
+                checked={clientData?.deliverables?.preWeddingPhotos}
+                disabled={false}
+              />
+              {"   "}
+              Pre Wedding Photos
             </div>
-          
+            <div>
+              <input
+                onChange={(e) => {
+                  updateDeliverables(e);
+                }}
+                type="checkbox"
+                name="preWeddingVideos"
+                checked={clientData?.deliverables?.preWeddingVideos}
+                disabled={false}
+              />
+              {"   "}
+              Pre Wedding Videos
+            </div>
+          </div>
+
           {(clientData?.deliverables?.preWeddingVideos ||
             clientData?.deliverables?.preWeddingPhotos) && (
             <Row>
               {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
-                <Col xs="12" sm="6" md="6" lg="6" xl="4"  className="pr5">
+                <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
                       {deliverableOptionsKeyValues &&
@@ -454,13 +453,13 @@ function FormII() {
             </Row>
           )}
 
-          
-
           <Row>
-          
             <Col xl="10" sm="8">
               <Row>
-                <div className="Text16N mt25" style={{ marginTop: "30px", marginBottom: "0px !important" }}>
+                <div
+                  className="Text16N mt25"
+                  style={{ marginTop: "30px", marginBottom: "0px !important" }}
+                >
                   Deliverables
                 </div>
                 {clientData?.albums?.map((albumValue, i) =>
@@ -609,7 +608,7 @@ function FormII() {
               type="button"
               className="submit_btn submit me-5"
               onClick={() => {
-                navigate("/MyProfile/AddClient/Form-I");
+                navigate("/clients/add-client/form-1");
               }}
             >
               Back
@@ -639,8 +638,12 @@ function FormII() {
                 tileClassName={({ date }) => {
                   let count = 0;
                   for (let index = 0; index < allEvents?.length; index++) {
-                    const initialDate = dayjs(new Date(allEvents[index].eventDate)).format('YYYY-MM-DD');
-                    const targetDate = dayjs(new Date(date)).format('YYYY-MM-DD');
+                    const initialDate = dayjs(
+                      new Date(allEvents[index].eventDate)
+                    ).format("YYYY-MM-DD");
+                    const targetDate = dayjs(new Date(date)).format(
+                      "YYYY-MM-DD"
+                    );
                     if (initialDate == targetDate) {
                       count += 1;
                     }

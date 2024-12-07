@@ -26,12 +26,13 @@ import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Form } from "react-router-dom";
 import Select from "react-select";
+import { useLoggedInUser } from "../../config/zStore";
 
 function DeadlineDays(props) {
   const [deadlinesData, setDeadlinesData] = useState(null);
   const [tempDeadlines, setTempDeadlines] = useState(null);
   const [updating, setUpdating] = useState(false);
-  const currentUser = JSON.parse(Cookies.get("currentUser"));
+  const { userData: currentUser } = useLoggedInUser();
   const [modal, setModal] = useState(false);
 
   const toggle = () => {
@@ -40,7 +41,7 @@ function DeadlineDays(props) {
   };
   const getDeadlineDaysData = async () => {
     try {
-      if (currentUser.rollSelect === "Admin") {
+      if (currentUser?.rollSelect === "Admin") {
         const deadline = await getDeadlinesDays();
         setDeadlinesData(deadline);
         setTempDeadlines(deadline);
@@ -91,7 +92,7 @@ function DeadlineDays(props) {
           >
             <>
               <thead>
-                {currentUser.rollSelect === "Admin" && (
+                {currentUser?.rollSelect === "Admin" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody primary2">Deliverable</th>
                     <th className="tableBody primary2">Deadline Days</th>
@@ -109,7 +110,7 @@ function DeadlineDays(props) {
             >
               <>
                 <div style={{ marginTop: "15px" }} />
-                {currentUser.rollSelect === "Admin" && (
+                {currentUser?.rollSelect === "Admin" && (
                   <>
                     <tr>
                       <td className="tableBody Text14Semi  tablePlaceContent">

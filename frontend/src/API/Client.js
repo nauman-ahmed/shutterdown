@@ -61,19 +61,20 @@ export const addAlbumsDeliverables = async (client) => {
 
 export const getClients = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter,
+  startDate,
+  endDate,
   filterClient
 ) => {
   try {
-    const res = await axios.get(
-      BASE_URL +
-        `/Client/getClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}&filterClient=${filterClient}`,
-      {
-        Headers: { "Content-Type": "application/json" },
-      }
-    );
+    const res = await axios.get(BASE_URL + "/Client/getClients", {
+      headers: { "Content-Type": "application/json" }, // Correct header capitalization
+      params: {
+        page: page,
+        startDate,
+        endDate,
+        filterClient: filterClient,
+      },
+    });
     return res.data;
   } catch (error) {
     console.log(error);
@@ -93,16 +94,20 @@ export const getAllClients = async () => {
 
 export const getPreWedClients = async (
   page,
-  monthForData,
-  yearForData,
-  dateForFilter
+  startDate,
+  endDate,
 ) => {
   try {
     const res = await axios.get(
       BASE_URL +
-        `/Client/getPreWedClients?page=${page}&currentMonth=${monthForData}&currentYear=${yearForData}&currentDate=${dateForFilter}`,
+      `/Client/getPreWedClients`,
       {
         Headers: { "Content-Type": "application/json" },
+        params : {
+          page, 
+          startDate,
+          endDate
+        }
       }
     );
     return res.data;
