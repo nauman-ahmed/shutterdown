@@ -71,9 +71,7 @@ const getAlbums = async (req, res) => {
 
     const { startDate, endDate } = req.query;
 
-   
-
-    // Fetch album deliverables based on album values
+    
     const albumsDeliverables = await DeliverableModel.find({
       deliverableName: { $in: albumValues },
       date: {

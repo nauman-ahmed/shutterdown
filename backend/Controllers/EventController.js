@@ -157,14 +157,9 @@ const getEvents = async (req, res) => {
       $gte: startDate,
       $lte: endDate,
     };
-    console.log("Object", obj)
-    const events = await EventModel.find(obj)
-      .populate(
-        "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
-      );
-
-    console.log('got data');
-
+    const events = await EventModel.find(obj).populate(
+      "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
+    );
     const hasMore = false;
     res.status(200).json({ hasMore, data: events });
   } catch (error) {
