@@ -45,7 +45,7 @@ function FormOptions() {
   const eventOptionObjectKeys = ["travelBy", "shootDirector", "photographers", "cinematographers", "drones", "sameDayPhotoEditors", "sameDayVideoEditors"]
   const deliverablePreWeddingOptionObjectKeys = ["assistants", "photographers", "cinematographers", "drones"]
   const deliverableAlbumOptionObjectKeys = ["albums"]
-  const deliverableOptionObjectKeys = ["promos", "longFilms", "reels", "hardDrives"]
+  const deliverableOptionObjectKeys = ["promos", "longFilms", "reels", "hardDrives", "performanceFilms"]
 
   const customStyles = {
     option: (defaultStyles, state) => ({

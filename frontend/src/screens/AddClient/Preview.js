@@ -512,6 +512,22 @@ function Preview() {
           <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
             <div className="mt25">
               <div className="Text16N" style={{ marginBottom: "6px" }}>
+                Performance Films
+              </div>
+              <Input
+                type="text"
+                name="performanceFilms"
+                disabled={true}
+                className="forminput"
+                value={clientData?.performanceFilms}
+                required={true}
+                // onChange={(e) => updateEventValues(e)}
+              />
+            </div>
+          </Col>
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+            <div className="mt25">
+              <div className="Text16N" style={{ marginBottom: "6px" }}>
                 Reels
               </div>
               <Input

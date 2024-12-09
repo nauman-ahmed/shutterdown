@@ -58,6 +58,7 @@ function FormII() {
     "longFilms",
     "reels",
     "hardDrives",
+    "performanceFilms"
   ];
 
   const target = useRef(null);
@@ -135,7 +136,10 @@ function FormII() {
   const getAllFormOptionsHandler = async () => {
     const eventOptions = await getAllEventOptions();
     const deliverableOptions = await getAllDeliverableOptions();
-
+    console.log(deliverableOptions);
+    console.log(eventOptions);
+    
+    
     setEventOptionsKeyValues(eventOptions);
     setDeliverableOptionsKeyValues(deliverableOptions);
   };
@@ -173,6 +177,8 @@ function FormII() {
   const toggle = () => {
     setShow(!show);
   };
+
+  
 
   return (
     <>

@@ -141,6 +141,15 @@ function DeadlineDays(props) {
                     </tr>
                     <tr>
                       <td className="tableBody Text14Semi  tablePlaceContent">
+                        Performance Films
+                      </td>
+
+                      <td className="tableBody Text14Semi  tablePlaceContent">
+                        {deadlinesData.performanceFilms}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="tableBody Text14Semi  tablePlaceContent">
                         Photos
                       </td>
 
@@ -236,6 +245,23 @@ function DeadlineDays(props) {
                       name="promo"
                       onChange={updateTempDeadlines}
                       value={tempDeadlines?.promo}
+                      className="w-100"
+                      required
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <Row className="p-3">
+                <Col xl="2" sm="2" lg="2" className="p-2">
+                  <div className="label">Performance Films</div>
+                </Col>
+                <Col xl="4" sm="4" lg="4" className="p-2">
+                  <div className="label">
+                    <input
+                      type="number"
+                      name="performanceFilms"
+                      onChange={updateTempDeadlines}
+                      value={tempDeadlines?.performanceFilms}
                       className="w-100"
                       required
                     />

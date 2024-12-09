@@ -21,6 +21,7 @@ const AddClientFunction = async (req, res) => {
     let photoDeadline = null;
     let preWedPhotoDeadline = null;
     let preWedVideoDeadline = null;
+    let performanceFilmDeadline = null;
     let datesOfClient = [];
     let dateforDeliverable = null;
     const eventIds = await Promise.all(
@@ -38,8 +39,12 @@ const AddClientFunction = async (req, res) => {
           albumDeadline = new Date(event.eventDate);
           preWedPhotoDeadline = new Date(event.eventDate);
           preWedVideoDeadline = new Date(event.eventDate);
+          performanceFilmDeadline = new Date(event.eventData)
           longFilmDeadline.setDate(
             longFilmDeadline.getDate() + deadlineDays[0].longFilm
+          );
+          performanceFilmDeadline.setDate(
+            longFilmDeadline.getDate() + deadlineDays[0].performanceFilm
           );
           promoDeadline.setDate(
             promoDeadline.getDate() + deadlineDays[0].promo
@@ -68,9 +73,11 @@ const AddClientFunction = async (req, res) => {
           photoDeadline === null &&
           preWedPhotoDeadline === null &&
           preWedVideoDeadline === null &&
-          albumDeadline
+          performanceFilmDeadline === null &&
+          albumDeadline === null
         ) {
           longFilmDeadline = new Date(event.eventDate);
+          performanceFilmDeadline = new Date(event.eventDate);
           promoDeadline = new Date(event.eventDate);
           reelDeadline = new Date(event.eventDate);
           photoDeadline = new Date(event.eventDate);
@@ -78,6 +85,9 @@ const AddClientFunction = async (req, res) => {
           preWedPhotoDeadline = new Date(event.eventDate);
           preWedVideoDeadline = new Date(event.eventDate);
           longFilmDeadline.setDate(
+            longFilmDeadline.getDate() + deadlineDays[0].longFilm
+          );
+          performanceFilmDeadline.setDate(
             longFilmDeadline.getDate() + deadlineDays[0].longFilm
           );
           promoDeadline.setDate(
@@ -109,7 +119,7 @@ const AddClientFunction = async (req, res) => {
         return event._id;
       })
     );
-    
+
 
     const photosDeliverable = new deliverableModel({
       client: client._id,
@@ -120,47 +130,71 @@ const AddClientFunction = async (req, res) => {
     });
 
     await photosDeliverable.save().then(() => {
-      
+
       deliverables.push(photosDeliverable._id);
     });
     if (req.body.data.promos > 0) {
-      const promoDeliverable = new deliverableModel({
-        client: client._id,
-        deliverableName: "Promo",
-        quantity: req.body.data.promos,
-        date: dateforDeliverable,
-        promoDeadline,
-      });
-
-      await promoDeliverable.save().then(() => {
-        deliverables.push(promoDeliverable._id);
-      });
+      for (let i = 0; i < req.body.data.promos; i++) {
+        const promoDeliverable = new deliverableModel({
+          client: client._id,
+          deliverableName: "Promo",
+          quantity: 1,
+          date: dateforDeliverable,
+          promoDeadline,
+        });
+        
+        await promoDeliverable.save().then(() => {
+          deliverables.push(promoDeliverable._id);
+        });
+      }
     }
     if (req.body.data.longFilms > 0) {
-      const longFilmDeliverable = new deliverableModel({
-        client: client._id,
-        deliverableName: "Long Film",
-        quantity: req.body.data.longFilms,
-        date: dateforDeliverable,
-        longFilmDeadline,
-      });
+      for (let i = 0; i < req.body.data.longFilms; i++) {
 
-      await longFilmDeliverable.save().then(() => {
-        deliverables.push(longFilmDeliverable._id);
-      });
+        const longFilmDeliverable = new deliverableModel({
+          client: client._id,
+          deliverableName: "Long Film",
+          quantity: 1,
+          date: dateforDeliverable,
+          longFilmDeadline,
+        });
+        
+        await longFilmDeliverable.save().then(() => {
+          deliverables.push(longFilmDeliverable._id);
+        });
+      }
+    }
+    if (req.body.data.performanceFilms > 0) {
+      for (let i = 0; i < req.body.data.performanceFilms; i++) {
+
+        const performanceFilmDeliverable = new deliverableModel({
+          client: client._id,
+          deliverableName: "Performance Film",
+          quantity: 1,
+          date: dateforDeliverable,
+          performanceFilmDeadline,
+        });
+        
+        await performanceFilmDeliverable.save().then(() => {
+          deliverables.push(performanceFilmDeliverable._id);
+        });
+      }
     }
     if (req.body.data.reels > 0) {
-      const reelDeliverable = new deliverableModel({
-        client: client._id,
-        deliverableName: "Reel",
-        quantity: req.body.data.reels,
-        date: dateforDeliverable,
-        reelDeadline,
-      });
+      for (let i = 0; i < req.body.data.reels; i++) {
 
-      await reelDeliverable.save().then(() => {
-        deliverables.push(reelDeliverable._id);
-      });
+        const reelDeliverable = new deliverableModel({
+          client: client._id,
+          deliverableName: "Reel",
+          quantity: 1,
+          date: dateforDeliverable,
+          reelDeadline,
+        });
+        
+        await reelDeliverable.save().then(() => {
+          deliverables.push(reelDeliverable._id);
+        });
+      }
     }
     if (req.body.data?.deliverables?.preWeddingPhotos === true) {
       client.preWedding = true;
@@ -465,7 +499,6 @@ const getClients = async (req, res) => {
       const client = await ClientModel.findById(filterClient)
         .populate({
           path: "events",
-
           model: "Event",
           populate: [
             { path: "choosenPhotographers", model: "user" },
@@ -487,10 +520,11 @@ const getClients = async (req, res) => {
           },
         })
         .populate("userID");
-
+        console.log(client);
+        
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
-     
+
 
       const clients = await ClientModel.find({
         dates: {
@@ -576,7 +610,7 @@ const getPreWedClients = async (req, res) => {
 
     const { startDate, endDate, } = req.query;
 
-  
+
 
     const clients = await ClientModel.find({
       preWedding: true,

@@ -14,18 +14,20 @@ import { FaDirections } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useLoggedInUser } from "../../config/zStore";
+import { useSelector } from "react-redux";
 
 function Calender() {
   const poperReferencd = useRef(null);
   const [allEvents, setAllEvents] = useState(null);
   const { userData: currentUser } = useLoggedInUser();
   const navigate = useNavigate();
-
+  const EventsList = useSelector((state) => state.allEvents);
   const getEventsData = async () => {
     try {
-      const res = await getAllEvents();
+      // const res = await getAllEvents();
+      const res = {data : EventsList}
       let eventsToShow;
-      if (currentUser?.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === 'Production Manager') {
         eventsToShow = res.data;
       } else if (currentUser?.rollSelect === "Shooter") {
         eventsToShow = res.data.map((event) => {
@@ -80,7 +82,7 @@ function Calender() {
       }
 
       setAllEvents(
-        eventsToShow.map((eventInfo) => {
+        eventsToShow?.map((eventInfo) => {
           if (eventInfo) {
             const eventType = eventInfo.eventType;
             const date = dayjs(new Date(eventInfo.eventDate)).format(

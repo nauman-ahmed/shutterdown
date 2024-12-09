@@ -108,8 +108,6 @@ function ListView(props) {
   const [assistant, setAssistant] = useState([]);
   const [photoEditor, setPhotoEditor] = useState([]);
   const [videoEditor, setVideoEditor] = useState([]);
-  const [yearForData, setYearForData] = useState(new Date().getFullYear());
-  const [dateForFilter, setDateForFilter] = useState(null);
   const [clientId, setClientId] = useState(clientIdd);
   const [allClients, setAllClients] = useState([]);
   const [updateData, setUpdateData] = useState(false);
@@ -143,6 +141,8 @@ function ListView(props) {
   };
 
   const getEventsData = async () => {
+    console.log(clientId);
+
     setLoading(true);
     try {
       const usersData = await getAllUsers();
@@ -181,7 +181,7 @@ function ListView(props) {
         startDate,
         endDate,
       );
-      if (currentUser.rollSelect === "Manager") {
+      if (currentUser.rollSelect === "Manager" || currentUser?.rollSelect === 'Production Manager') {
         setEventsForShow(
           groupByBrideName(
             res?.data?.sort((a, b) => {
@@ -426,7 +426,7 @@ function ListView(props) {
     {
       title: "Clients",
       id: 1,
-      filters: getClientsForFilters(),
+      filters: allClients,
     },
   ];
 
@@ -494,17 +494,21 @@ function ListView(props) {
   };
 
   const filterByNameHanler = (idOfClient) => {
+    console.log(idOfClient);
+
     if (idOfClient == "Reset") {
       setClientId(null);
+      setUpdateData(!updateData)
       return;
     }
     setClientId(idOfClient);
+    setUpdateData(!updateData)
   };
 
   const returnOneRow = (event, prevEvent) => {
     if (prevEvent && !clientId) {
       if (event?.client?._id !== prevEvent?.client?._id) {
-        if (currentUser?.rollSelect === "Manager") {
+        if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
           return (
             <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
@@ -575,7 +579,11 @@ function ListView(props) {
             <div style={{ width: "200px", zIndex: 102 }}>
               <Select
                 isSearchable={true}
-                onChange={(e) => filterByNameHanler(e.value)}
+                onChange={(e) => {
+                  console.log(e);
+
+                  filterByNameHanler(e.value)
+                }}
                 styles={{ ...customStyles, zIndex: -1000, width: "300px" }}
                 options={[
                   {
@@ -585,9 +593,11 @@ function ListView(props) {
                         <strong>Reset</strong>
                       </div>
                     ),
+                    brideName: 'reset',
+                    groomName: 'reset'
                   },
                   ...Array.from(
-                    currentUser.rollSelect == "Manager"
+                    (currentUser.rollSelect === "Manager" || currentUser.rollSelect === "Production Manager")
                       ? allClients
                       : getClientsForFilterShooter()
                   )?.map((client) => {
@@ -608,7 +618,9 @@ function ListView(props) {
                 filterOption={(option, searchInput) => {
                   const { brideName, groomName } = option.data;
                   const searchText = searchInput?.toLowerCase();
-
+                  if (brideName === 'reset' && groomName === 'reset') {
+                    return true
+                  }
                   // Perform search on both brideName and groomName
                   return (
                     brideName?.toLowerCase().startsWith(searchText) ||
@@ -657,69 +669,64 @@ function ListView(props) {
               responsive
               style={{
                 marginTop: "15px",
-                width: currentUser?.rollSelect === "Manager" ? "180%" : "100%",
+                width: "180%",
               }}
             >
               <thead style={{ position: "sticky", top: 0, zIndex: 101 }}>
-                {currentUser.rollSelect === "Manager" && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Couple Location</th>
-                    <th className="tableBody">
-                      Date{" "}
-                      {!ascending ? (
-                        <IoIosArrowRoundDown
-                          style={{ color: "#666DFF" }}
-                          onClick={() => {
-                            setAscending(false);
-                            applySorting(false);
-                          }}
-                          className="fs-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoIosArrowRoundUp
-                          style={{ color: "#666DFF" }}
-                          className="fs-4 cursor-pointer"
-                          onClick={() => {
-                            setAscending(true);
-                            applySorting(true);
-                          }}
-                        />
-                      )}
-                    </th>
-                    <th className="tableBody">Shoot Directors</th>
-                    <th className="tableBody mx-1">
-                      Photographers
-                      <img alt="" src={Camera} />
-                    </th>
-                    <th className="tableBody mx-1">
-                      Cinematographers
-                      <img alt="" src={Video} />
-                    </th>
-                    <th className="tableBody mx-1">
-                      Drone Flyers
-                      <img alt="" src={Drone} />
-                    </th>
-                    <th className="tableBody mx-1">
-                      Manager
-                      <img alt="" src={Manager} />
-                    </th>
-                    <th className="tableBody mx-1">
-                      Assistants
-                      <img alt="" src={Assistant} />
-                    </th>
-                    <th className="tableBody">Same Day Photos</th>
-                    <th className="tableBody">Same Day Videos</th>
+
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody">Couple Location</th>
+                  <th className="tableBody">
+                    Date{" "}
+                    {!ascending ? (
+                      <IoIosArrowRoundDown
+                        style={{ color: "#666DFF" }}
+                        onClick={() => {
+                          setAscending(false);
+                          applySorting(false);
+                        }}
+                        className="fs-4 cursor-pointer"
+                      />
+                    ) : (
+                      <IoIosArrowRoundUp
+                        style={{ color: "#666DFF" }}
+                        className="fs-4 cursor-pointer"
+                        onClick={() => {
+                          setAscending(true);
+                          applySorting(true);
+                        }}
+                      />
+                    )}
+                  </th>
+                  <th className="tableBody">Shoot Directors</th>
+                  <th className="tableBody mx-1">
+                    Photographers
+                    <img alt="" src={Camera} />
+                  </th>
+                  <th className="tableBody mx-1">
+                    Cinematographers
+                    <img alt="" src={Video} />
+                  </th>
+                  <th className="tableBody mx-1">
+                    Drone Flyers
+                    <img alt="" src={Drone} />
+                  </th>
+                  <th className="tableBody mx-1">
+                    Manager
+                    <img alt="" src={Manager} />
+                  </th>
+                  <th className="tableBody mx-1">
+                    Assistants
+                    <img alt="" src={Assistant} />
+                  </th>
+                  <th className="tableBody">Same Day Photos</th>
+                  <th className="tableBody">Same Day Videos</th>
+                  {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                     <th className="tableBody">Team Assign</th>
-                  </tr>
-                )}
-                {currentUser.rollSelect === "Shooter" && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Date</th>
-                    <th className="tableBody">Client</th>
-                    <th className="tableBody">Role</th>
-                    <th className="tableBody">Location</th>
-                  </tr>
-                )}
+                  )}
+                </tr>
+
+
               </thead>
               <tbody
                 className="Text12"
@@ -730,7 +737,7 @@ function ListView(props) {
               >
                 {eventsForShow?.map((event, index) => {
                   let errorText = "";
-                  if (currentUser?.rollSelect === "Manager") {
+                  if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
                     if (
                       Number(event?.sameDayVideoEditors) > 0 &&
                       (!event?.sameDayVideoMakers ||
@@ -789,6 +796,7 @@ function ListView(props) {
                     }
                   }
 
+
                   return (
                     <>
                       {returnOneRow(
@@ -797,7 +805,7 @@ function ListView(props) {
                       )}
                       {event && event !== null && (
                         <>
-                          {currentUser.rollSelect === "Manager" && (
+                          {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                             <tr className="relative" key={index}>
                               <td
                                 className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
@@ -1139,15 +1147,7 @@ function ListView(props) {
                                   ))}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                                <p
-                                  style={{
-                                    marginBottom: 0,
-                                    fontFamily: "Roboto Regular",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {event?.sameDayPhotoEditor}
-                                </p>
+                                
                                 <ShootDropDown
                                   role={"sameDayPhotoMakers"}
                                   message={"Same Day Photo Makers"}
@@ -1193,15 +1193,7 @@ function ListView(props) {
                                   ))}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                                <p
-                                  style={{
-                                    marginBottom: 0,
-                                    fontFamily: "Roboto Regular",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {event?.sameDayVideoEditor}
-                                </p>
+                                
                                 <ShootDropDown
                                   role={"sameDayVideoEditors"}
                                   message={"Same Day Video Makers"}
@@ -1268,17 +1260,42 @@ function ListView(props) {
                             </tr>
                           )}
                           {currentUser.rollSelect === "Shooter" && (
-                            <tr
-                              style={{
-                                background: index % 2 === 0 ? "" : "#F6F6F6",
-                              }}
-                            >
+                            <tr className="relative" key={index}>
+                              <td
+                                className={`tableBody Text14Semi primary2  tablePlaceContent`}
+                              >
+
+                                <div
+                                  className="d-flex flex-row justify-content-center"
+                                >
+                                  <div
+
+                                  >
+                                    {event?.client?.brideName}
+                                    <br />
+                                    <img alt="" src={Heart} />
+                                    <br />
+                                    {event?.client?.groomName}
+                                    <br />
+                                    <div
+                                      className="mt-2"
+                                      style={{ color: "green" }}
+                                    >
+                                      {event?.location}
+                                    </div>
+                                    <img
+                                      alt=""
+                                      src={transport_icons[event.travelBy]}
+                                    />
+                                  </div>
+                                </div>
+                              </td>
                               <td
                                 style={{
-                                  width: "120px",
-                                  marginLeft: 10,
+                                  width: "90px",
+
                                 }}
-                                className="tableBody Text14Semi primary2"
+                                className={`tableBody Text14Semi primary2  tablePlaceContent`}
                               >
                                 <div
                                   style={{
@@ -1292,30 +1309,133 @@ function ListView(props) {
                                   )}
                                 </div>
                               </td>
-                              <td className="tableBody Text14Semi primary2">
-                                {event?.client?.brideName}
-                                <br />
-                                <img alt="" src={Heart} />
-                                <br />
-                                {event?.client?.groomName}
-                                <br />
-                                <img
-                                  alt=""
-                                  src={transport_icons[event.travelBy]}
-                                />
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.shootDirectors) && event?.shootDirectors?.length > 0) ?
+                                  event?.shootDirectors?.map((director) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {director.firstName} {director.lastName}
+                                    </p>
+                                  )) : "None"}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
-                                {event?.userRole}
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.choosenPhotographers) && event?.choosenPhotographers?.length > 0) ?
+                                  event?.choosenPhotographers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
                               </td>
-                              <td className="tableBody Text14Semi primary2">
-                                <div
-                                  className="mt-2"
-                                  style={{ color: "green" }}
-                                >
-                                  {event?.location}
-                                </div>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.choosenCinematographers) && event?.choosenCinematographers?.length > 0) ?
+                                  event?.choosenCinematographers?.map(
+                                    (user) => (
+                                      <p
+                                        style={{
+                                          marginBottom: 0,
+                                          fontFamily: "Roboto Regular",
+                                          whiteSpace: "nowrap",
+                                        }}
+                                      >
+                                        {user.firstName} {user.lastName}
+                                      </p>
+                                    )
+                                  ) : "None"}
                               </td>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.droneFlyers) && event?.droneFlyers?.length > 0) ?
+                                  event?.droneFlyers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
+                              </td>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.manager) && event?.manager?.length > 0) ?
+                                  event?.manager?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
+                              </td>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
+                                {(Array.isArray(event?.assistants) && event?.assistants?.length > 0) ?
+                                  event?.assistants?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
+                              </td>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                               
+
+                                {(Array.isArray(event?.sameDayPhotoMakers) && event?.sameDayPhotoMakers?.length > 0) ?
+                                  event?.sameDayPhotoMakers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
+                              </td>
+                              <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                               
+
+                                {(Array.isArray(event?.sameDayVideoMakers) && event?.sameDayVideoMakers?.length > 0) ?
+                                  event?.sameDayVideoMakers?.map((user) => (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                  )) : "None"}
+                              </td>
+
                             </tr>
+
                           )}
                         </>
                       )}

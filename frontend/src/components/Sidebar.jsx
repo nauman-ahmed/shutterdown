@@ -34,6 +34,7 @@ import {
   adminMenuOptions,
   editorMenuOptions,
   managerMenuOptions,
+  productionManagerMenuOptions,
   shooterMenuOptions,
 } from "../utils/menuOptions";
 import MenuOption from "./layoutComps/MenuOption";
@@ -131,6 +132,13 @@ const SideBar = () => {
                 {currentUser?.rollSelect === "Manager" && (
                   <>
                     {managerMenuOptions.map((option) => (
+                      <MenuOption option={option} />
+                    ))}
+                  </>
+                )}
+                 {currentUser?.rollSelect === "Production Manager" && (
+                  <>
+                    {productionManagerMenuOptions.map((option) => (
                       <MenuOption option={option} />
                     ))}
                   </>

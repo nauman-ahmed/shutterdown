@@ -135,7 +135,7 @@ function ViewClient() {
       {clients ? (
         <>
           <div
-            className="widthForFilters ViewClient d-flex flex-row  mx-auto align-items-center"
+            className=" ViewClient d-flex flex-row  mx-auto align-items-center"
             style={{ width: '460px', marginTop : '0px' }}
             ref={target}
           >

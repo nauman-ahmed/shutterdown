@@ -26,7 +26,7 @@ const getCinematography = async (req, res) => {
     const { startDate, endDate } = req.query;
     // Fetch Cinematography deliverables
     const cinematographyDeliverables = await DeliverableModel.find({
-      deliverableName: { $in: ["Long Film", "Reel", "Promo"] },
+      deliverableName: { $in: ["Long Film", "Reel", "Promo", "Performance Film"] },
       date: {
         $gte: startDate,
         $lte: endDate,

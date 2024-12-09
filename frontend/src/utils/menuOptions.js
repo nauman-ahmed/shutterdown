@@ -156,6 +156,36 @@ export const managerMenuOptions = [
     ),
   },
 ];
+export const productionManagerMenuOptions = [
+ 
+  {
+    text: "Calendar",
+    icon: (active) => (
+      <IoCalendarOutline
+        className={`fs-4 ${active ? "text-white" : "text-black"}`}
+      />
+    ),
+    subMenus: [
+      {
+        path: "/calendar/calendar-view",
+        text: "Calendar View",
+      },
+      {
+        path: "/pre-wed-shoots/screen",
+        text: "Pre-Wed Shoots",
+      },
+    ],
+  },
+  {
+    path: "/attendance",
+    text: "Attendance",
+    icon: (active) => (
+      <MdOutlineCoPresent
+        className={`fs-4 ${active ? "text-white" : "text-black"}`}
+      />
+    ),
+  },
+];
 export const shooterMenuOptions = [
   {
     text: "Calendar",

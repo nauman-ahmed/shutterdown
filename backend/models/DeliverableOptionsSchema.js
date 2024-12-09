@@ -117,7 +117,20 @@ const deliverableOptionsSchema = mongoose.Schema({
                 type: String
             }
         }]
-    }
+    },
+    performanceFilms: {
+        label: {
+            type: String
+        },
+        values:[{
+            label: {
+                type: String
+            },
+            value:{
+                type: String
+            }
+        }]
+    },
 });
 
 const deliverableOptionsModel = new mongoose.model('Deliverable Options', deliverableOptionsSchema);

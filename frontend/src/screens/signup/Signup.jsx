@@ -40,13 +40,18 @@ const Signup = (props) => {
     },
     {
       check: "roll",
-      title: "Editor",
+      title: "Production Manager",
       id: 2,
     },
     {
       check: "roll",
-      title: "Shooter",
+      title: "Editor",
       id: 3,
+    },
+    {
+      check: "roll",
+      title: "Shooter",
+      id: 4,
     },
   ];
 

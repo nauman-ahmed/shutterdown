@@ -689,8 +689,9 @@ function Cinematography(props) {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName} :{" "}
-                              {deliverable?.quantity}
+                              {deliverable?.deliverableName} 
+                              {/* :{" "}
+                              {deliverable?.quantity} */}
                             </div>
                           </td>
                           <td

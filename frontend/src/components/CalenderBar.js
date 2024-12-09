@@ -28,7 +28,7 @@ function CalenderBar(props) {
       // const res = await getEvents();
 
       const res = await getAllEvents();
-      if (currentUser?.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
         dispatch(updateAllEvents(res?.data));
       } else if (
         currentUser?.rollSelect === "Shooter" ||

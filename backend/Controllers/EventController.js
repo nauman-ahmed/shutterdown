@@ -152,11 +152,13 @@ const getEvents = async (req, res) => {
 
     if (req.body.clientId) {
       obj.client = req.body.clientId;
+    } else {
+      obj.eventDate = {
+        $gte: startDate,
+        $lte: endDate,
+      };
     }
-    obj.eventDate = {
-      $gte: startDate,
-      $lte: endDate,
-    };
+    console.log(obj);
     const events = await EventModel.find(obj).populate(
       "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
     );

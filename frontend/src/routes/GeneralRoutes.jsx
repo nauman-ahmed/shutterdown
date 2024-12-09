@@ -12,7 +12,7 @@ const GeneralRoutes = ({userData}) => (
   <>
     <Route
       path="/attendance"
-      element={hasAccess(userData, ['Manager', 'Editor', 'Shooter']) ? <UserAttendence /> : <Navigate to="/" replace />}
+      element={hasAccess(userData, ['Manager', 'Editor', 'Shooter', 'Production Manager']) ? <UserAttendence /> : <Navigate to="/" replace />}
     />
     <Route
       exact

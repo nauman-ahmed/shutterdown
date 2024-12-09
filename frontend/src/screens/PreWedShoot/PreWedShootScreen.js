@@ -63,7 +63,7 @@ function PreWedShootScreen() {
   const [flyer, setFlyer] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]  + " " + new Date().getFullYear()
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
 
@@ -121,7 +121,7 @@ function PreWedShootScreen() {
       const usersData = await getAllUsers();
       setShooters(res.shooters);
       getFilterdUsers(usersData.users);
-      if (currentUser?.rollSelect === "Manager") {
+      if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
         setPreWedClients(allPreWedClients.data);
         setClientsForShow(allPreWedClients.data);
       } else if (currentUser?.rollSelect === "Shooter") {
@@ -204,7 +204,7 @@ function PreWedShootScreen() {
           dateForFilter
         );
         let dataToAdd;
-        if (currentUser?.rollSelect === "Manager") {
+        if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
           setPreWedClients([...preWedClients, ...data.data]);
           if (filterCondition) {
             dataToAdd = data.data.filter((client) => eval(filterCondition));
@@ -446,7 +446,7 @@ function PreWedShootScreen() {
         priority={priority}
         applyFilter={applyFilterNew}
         options={filterOptions}
-        filter={currentUser?.rollSelect == "Manager"}
+        filter={currentUser?.rollSelect == "Manager" || currentUser?.rollSelect == "Production Manager"}
         title="Pre-Wedding"
       />
       {clientsForShow ? (
@@ -493,27 +493,21 @@ function PreWedShootScreen() {
               style={{ width: "150%", marginTop: "15px" }}
             >
               <thead>
-                {currentUser?.rollSelect === "Manager" && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody sticky-column-prewed">Couple</th>
-                    <th className="tableBody ">Wedding Date</th>
-                    <th className="tableBody">Photographers</th>
-                    <th className="tableBody">Cinematographers</th>
-                    <th className="tableBody">Assistants</th>
-                    <th className="tableBody">Drone Flyers</th>
-                    <th className="tableBody">Shoot Date</th>
-                    <th className="tableBody">Status</th>
+
+                <tr className="logsHeader Text16N1">
+                  <th className="tableBody sticky-column-prewed">Couple</th>
+                  <th className="tableBody ">Wedding Date</th>
+                  <th className="tableBody">Photographers</th>
+                  <th className="tableBody">Cinematographers</th>
+                  <th className="tableBody">Assistants</th>
+                  <th className="tableBody">Drone Flyers</th>
+                  <th className="tableBody">Shoot Date</th>
+                  <th className="tableBody">Status</th>
+                  {(currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                     <th className="tableBody">Save</th>
-                  </tr>
-                )}
-                {currentUser?.rollSelect === "Shooter" && (
-                  <tr className="logsHeader Text16N1">
-                    <th className="tableBody">Couple</th>
-                    <th className="tableBody">Shoot Date</th>
-                    <th className="tableBody">Role</th>
-                    <th className="tableBody">Status</th>
-                  </tr>
-                )}
+                  )}
+                </tr>
+
               </thead>
               <tbody
                 className="Text12"
@@ -525,7 +519,7 @@ function PreWedShootScreen() {
                 {clientsForShow?.map((client, index) => {
                   return (
                     <>
-                      {currentUser?.rollSelect === "Manager" && (
+                      {(currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                         <tr
                           key={index}
                           style={{
@@ -987,50 +981,181 @@ function PreWedShootScreen() {
                       )}
                       {currentUser?.rollSelect === "Shooter" && (
                         <tr
+                          key={index}
                           style={{
                             background: index % 2 === 0 ? "" : "#F6F6F6",
                           }}
                         >
-                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                          <td className="tableBody Text14Semi sticky-column-prewed primary2 tablePlaceContent">
                             {client.brideName}
                             <br />
                             <img alt="" src={Heart} />
                             <br />
                             {client.groomName}
                           </td>
-                          {/* <td className="tableBody Text14Semi primary2">
+                          <td className="tableBody Text14Semi  primary2 tablePlaceContent">
                             <>
-                              {client.userID?.firstName}{' '}{client.userID?.lastName}
-                            </>
-                          </td> */}
-                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                            <>
-                              {client.preWeddingDetails?.shootStartDate
-                                ? new Date(
-                                  client.preWeddingDetails.shootStartDate
-                                )
-                                  .toISOString()
-                                  .split("T")[0]
-                                : "Not Available"}{" "}
-                              to{" "}
-                              {client.preWeddingDetails?.shootStartDate
-                                ? new Date(
-                                  client.preWeddingDetails.shootStartDate
-                                )
-                                  .toISOString()
-                                  .split("T")[0]
-                                : "Not Available"}
+                              {dayjs(
+                                client.events.find(
+                                  (event) => event.isWedding === true
+                                )?.eventDate
+                              ).format("DD-MMM-YYYY")}
+                              <br />
                             </>
                           </td>
+
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                            <>{client.userRole}</>
+
+                            {(Array.isArray(client?.preWeddingDetails?.photographers) && client?.preWeddingDetails?.photographers?.length > 0) ?
+                              client?.preWeddingDetails?.photographers?.map(
+                                (photographer) => {
+                                  return (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {photographer.firstName}{" "}
+                                      {photographer.lastName}
+                                    </p>
+                                  );
+                                }
+                              ) : "None"}
                           </td>
                           <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                            {(Array.isArray(client?.preWeddingDetails?.cinematographers) && client?.preWeddingDetails?.cinematographers?.length > 0) ?
+                              client?.preWeddingDetails?.cinematographers?.map(
+                                (cinematographer) => {
+                                  return (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {cinematographer.firstName}{" "}
+                                      {cinematographer.lastName}
+                                    </p>
+                                  );
+                                }
+                              ) : "None"}
+                          </td>
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                            {(Array.isArray(client?.preWeddingDetails?.assistants) && client?.preWeddingDetails?.assistants?.length > 0) ?
+                              client?.preWeddingDetails?.assistants?.map(
+                                (assistant) => {
+                                  return (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {assistant.firstName} {assistant.lastName}
+                                    </p>
+                                  );
+                                }
+                              ) : "None"}
+                          </td>
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                            {(Array.isArray(client?.preWeddingDetails?.droneFlyers) && client?.preWeddingDetails?.droneFlyers?.length > 0) ?
+                              client?.preWeddingDetails?.droneFlyers?.map(
+                                (flyer) => {
+                                  return (
+                                    <p
+                                      style={{
+                                        marginBottom: 0,
+                                        fontFamily: "Roboto Regular",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {flyer.firstName} {flyer.lastName}
+                                    </p>
+                                  );
+                                }
+                              ) : "None"}
+                          </td>
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                            <div className="d-flex flex-column position-relative">
+                              {(client?.preWeddingDetails?.shootStartDate &&
+                                client?.preWeddingDetails?.shootEndDate) ? (
+                                <>
+                                  <p className="mb-0">
+                                    {dayjs(
+                                      client?.preWeddingDetails
+                                        ?.shootStartDate
+                                    ).format("DD-MMM-YYYY")}
+                                  </p>
+                                  <p className=" text-center mb-0 my-1">TO</p>
+                                  <p className=" mb-0">
+                                    {dayjs(
+                                      client?.preWeddingDetails?.shootEndDate
+                                    ).format("DD-MMM-YYYY")}
+                                  </p>
+                                </>
+                              ) : "Not Set Yet"}
+
+                            </div>
+                          </td>
+                          <td className="tableBody Text14Semi primary2 tablePlaceContent">
+
                             <>
-                              {client.preWeddingDetails?.status || "Not Filled"}
+                              {client.preWeddingDetails?.status ||
+                                "Not Filled"}
                             </>
+
                           </td>
+
                         </tr>
+                        // <tr
+                        //   style={{
+                        //     background: index % 2 === 0 ? "" : "#F6F6F6",
+                        //   }}
+                        // >
+                        //   <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                        //     {client.brideName}
+                        //     <br />
+                        //     <img alt="" src={Heart} />
+                        //     <br />
+                        //     {client.groomName}
+                        //   </td>
+                        //   {/* <td className="tableBody Text14Semi primary2">
+                        //     <>
+                        //       {client.userID?.firstName}{' '}{client.userID?.lastName}
+                        //     </>
+                        //   </td> */}
+                        //   <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                        //     <>
+                        //       {client.preWeddingDetails?.shootStartDate
+                        //         ? new Date(
+                        //           client.preWeddingDetails.shootStartDate
+                        //         )
+                        //           .toISOString()
+                        //           .split("T")[0]
+                        //         : "Not Available"}{" "}
+                        //       to{" "}
+                        //       {client.preWeddingDetails?.shootStartDate
+                        //         ? new Date(
+                        //           client.preWeddingDetails.shootStartDate
+                        //         )
+                        //           .toISOString()
+                        //           .split("T")[0]
+                        //         : "Not Available"}
+                        //     </>
+                        //   </td>
+                        //   <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                        //     <>{client.userRole}</>
+                        //   </td>
+                        //   <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                        //     <>
+                        //       {client.preWeddingDetails?.status || "Not Filled"}
+                        //     </>
+                        //   </td>
+                        // </tr>
                       )}
                     </>
                   );
