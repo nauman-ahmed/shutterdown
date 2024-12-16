@@ -26,6 +26,7 @@ import {
   getAllDeliverableOptions,
   updateAllDeliverableOptions,
 } from "../../API/FormDeliverableOptionsAPI";
+import { toast } from "react-toastify";
 
 function FormII() {
   const storedEvents = useSelector((state) => state.allEvents);
@@ -36,6 +37,7 @@ function FormII() {
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] =
     useState(null);
   const [minDate, setMinDate] = useState(new Date(Date.now()));
+
 
   const eventOptionObjectKeys = [
     "travelBy",
@@ -57,7 +59,6 @@ function FormII() {
     "promos",
     "longFilms",
     "reels",
-    "hardDrives",
     "performanceFilms"
   ];
 
@@ -69,6 +70,7 @@ function FormII() {
   const updateEventValues = (e) => {
     setEventValues({ ...eventValues, [e.target.name]: e.target.value });
   };
+  const [deliverables, setDeliverables] = useState(clientData?.deliverables || [{ albums: [""], forEvents: [], photos: true, number: 1 }])
   const navigate = useNavigate();
 
   const handleAddEvent = (e) => {
@@ -88,6 +90,17 @@ function FormII() {
     updatedStoredEvents.push(eventValues);
     setAllEvents(updatedStoredEvents);
   };
+  const addNewDeliverables = () => {
+    const updatedDeliverables = [...deliverables];
+    updatedDeliverables.push({ photos: true, albums: [""], forEvents: [], number: deliverables?.length + 1 })
+    setDeliverables(updatedDeliverables)
+  }
+  const clearLatsDeliverables = () => {
+    const updatedDeliverables = [...deliverables];
+    updatedDeliverables.pop()
+    setDeliverables(updatedDeliverables)
+  }
+
 
   useEffect(() => {
     if (clientData.events && clientData.events.length) {
@@ -114,32 +127,17 @@ function FormII() {
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
   };
 
-  const updateDeliverables = (e) => {
-    var updatedDeliverables = { ...clientData?.deliverables } || {
-      photos: true,
-    };
-    updatedDeliverables = {
-      ...updatedDeliverables,
-      [e.target.name]: e.target.checked,
-    };
+  useEffect(() => {
     dispatch(
-      updateClintData({ ...clientData, deliverables: updatedDeliverables })
+      updateClintData({ ...clientData, deliverables: deliverables })
     );
-  };
+  }, [deliverables])
 
-  const addAlbum = () => {
-    let updatedAlbums = [...clientData?.albums];
-    updatedAlbums.push("");
-    dispatch(updateClintData({ ...clientData, albums: updatedAlbums }));
-  };
+
 
   const getAllFormOptionsHandler = async () => {
     const eventOptions = await getAllEventOptions();
     const deliverableOptions = await getAllDeliverableOptions();
-    console.log(deliverableOptions);
-    console.log(eventOptions);
-    
-    
     setEventOptionsKeyValues(eventOptions);
     setDeliverableOptionsKeyValues(deliverableOptions);
   };
@@ -178,7 +176,8 @@ function FormII() {
     setShow(!show);
   };
 
-  
+  console.log(clientData);
+
 
   return (
     <>
@@ -202,9 +201,6 @@ function FormII() {
               dispatch(
                 updateClintData({ ...clientData, events: clientEvents })
               );
-              // const updatedStoredEvents = [...allEvents];
-              // updatedStoredEvents[editingEvent] = eventValues;
-              // console.log(updatedStoredEvents);
 
               setAllEvents([...storedEvents, ...clientEvents]);
               setEditingEvent(null);
@@ -297,9 +293,9 @@ function FormII() {
                     value={
                       eventValues?.[Objkey]
                         ? {
-                            label: eventValues?.[Objkey],
-                            value: eventValues?.[Objkey],
-                          }
+                          label: eventValues?.[Objkey],
+                          value: eventValues?.[Objkey],
+                        }
                         : null
                     }
                     name={Objkey}
@@ -385,6 +381,12 @@ function FormII() {
         <Form
           onSubmit={(e) => {
             e.preventDefault();
+            console.log(clientData);
+
+            if (clientData.deliverables.some(deliv => deliv.forEvents?.length == 0)) {
+              toast.error("Deliverable cannot be added without selecting events")
+              return
+            }
             dispatch(updateClintData({ ...clientData, form2Submitted: true }));
             navigate("/clients/add-client/preview");
           }}
@@ -394,10 +396,16 @@ function FormII() {
               <input
                 type="checkbox"
                 onChange={(e) => {
-                  updateDeliverables(e);
+
+                  dispatch(
+                    updateClintData({
+                      ...clientData,
+                      preWeddingPhotos: e.target.checked,
+                    })
+                  );
                 }}
                 name="preWeddingPhotos"
-                checked={clientData?.deliverables?.preWeddingPhotos}
+                checked={clientData?.preWeddingPhotos}
                 disabled={false}
               />
               {"   "}
@@ -406,11 +414,16 @@ function FormII() {
             <div>
               <input
                 onChange={(e) => {
-                  updateDeliverables(e);
+                  dispatch(
+                    updateClintData({
+                      ...clientData,
+                      preWeddingVideos: e.target.checked,
+                    })
+                  );
                 }}
                 type="checkbox"
                 name="preWeddingVideos"
-                checked={clientData?.deliverables?.preWeddingVideos}
+                checked={clientData?.preWeddingVideos}
                 disabled={false}
               />
               {"   "}
@@ -418,175 +431,264 @@ function FormII() {
             </div>
           </div>
 
-          {(clientData?.deliverables?.preWeddingVideos ||
-            clientData?.deliverables?.preWeddingPhotos) && (
-            <Row>
-              {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
-                <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      {deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].label}
-                    </div>
-                    <Select
-                      value={
-                        clientData?.["preWed" + Objkey]
-                          ? {
+          {(clientData?.preWeddingVideos ||
+            clientData?.preWeddingPhotos) && (
+              <Row>
+                {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
+                  <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                    <div className="mt25">
+                      <div className="Text16N" style={{ marginBottom: "6px" }}>
+                        {deliverableOptionsKeyValues &&
+                          deliverableOptionsKeyValues[Objkey].label}
+                      </div>
+                      <Select
+                        value={
+                          clientData?.["preWed" + Objkey]
+                            ? {
                               value: clientData?.["preWed" + Objkey],
                               label: clientData?.["preWed" + Objkey],
                             }
-                          : null
-                      }
-                      name={"preWed" + Objkey}
-                      onChange={(selected) => {
-                        dispatch(
-                          updateClintData({
-                            ...clientData,
-                            ["preWed" + Objkey]: selected?.value,
-                          })
-                        );
-                      }}
-                      styles={customStyles}
-                      options={
-                        deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].values
-                      }
-                      required
-                    />
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          )}
+                            : null
+                        }
+                        name={"preWed" + Objkey}
+                        onChange={(selected) => {
+                          dispatch(
+                            updateClintData({
+                              ...clientData,
+                              ["preWed" + Objkey]: selected?.value,
+                            })
+                          );
+                        }}
+                        styles={customStyles}
+                        options={
+                          deliverableOptionsKeyValues &&
+                          deliverableOptionsKeyValues[Objkey].values
+                        }
+                        required
+                      />
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          {clientData?.events?.length > 0 && (
+            <>
+              <div
+                className="fs-3 mt25"
+                style={{ marginTop: "30px", marginBottom: "0px !important" }}
+              >
+                Deliverables
+              </div>
+              {deliverables?.map((deliverable, index) => (
+                <div className="bg-slight deliverableBox my-2">
 
-          <Row>
-            <Col xl="10" sm="8">
-              <Row>
-                <div
-                  className="Text16N mt25"
-                  style={{ marginTop: "30px", marginBottom: "0px !important" }}
-                >
-                  Deliverables
-                </div>
-                {clientData?.albums?.map((albumValue, i) =>
-                  deliverableAlbumOptionObjectKeys.map((Objkey) => (
-                    <Col xs="12" sm="6" key={i}>
-                      <div className="Drop">
-                        <h4 className="LabelDrop">Album {i + 1}</h4>
-                        <Select
-                          value={
-                            albumValue?.length > 0
-                              ? { value: albumValue, label: albumValue }
-                              : null
-                          }
-                          name={`album${i + 1}`}
-                          className="w-75"
-                          onChange={(selected) => {
-                            const updatedAlbums = [...clientData?.[Objkey]];
-                            updatedAlbums[i] = selected?.value;
-                            dispatch(
-                              updateClintData({
-                                ...clientData,
-                                [Objkey]: updatedAlbums,
-                              })
-                            );
-                            setEventValues({
-                              ...eventValues,
-                              [Objkey]: selected?.value,
-                            });
-                          }}
-                          styles={customStyles}
-                          options={
-                            deliverableOptionsKeyValues &&
-                            deliverableOptionsKeyValues[Objkey].values
-                          }
-                          required={true}
-                        />
+                  <Row>
+                    <Col xl="10" sm="8">
+                      <div className=" d-flex flex-row align-items-center gap-4">
+                        <h4 className="LabelDrop"> {deliverable.number + ")"} For Events :</h4>
+                        {clientData?.events?.map((event, eventIndex) => (
+                          <div className="d-flex flex-row align-items-center gap-2">
+                            <input
+                              onChange={(e) => {
+                                const updatedDeliverables = [...deliverables]
+                                const updatedForEvents = [...deliverable?.forEvents];
+                                if (e.target.checked) {
+                                  updatedForEvents.push(eventIndex)
+                                  updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: updatedForEvents }
+                                } else {
+                                  const filteredForEvents = updatedForEvents.filter(num => num != eventIndex)
+                                  updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: filteredForEvents }
+                                }
+
+
+                                setDeliverables(updatedDeliverables)
+
+                              }}
+                              type="checkbox"
+                              style={{ width: "16px", height: "16px" }}
+                              className="cursor-pointer"
+                              name={`event${index}-${eventIndex}`}
+                              checked={deliverable?.forEvents?.includes(eventIndex)}
+
+                            />
+                            <span>{event.eventType}</span>
+                          </div>
+                        ))}
+
+                      </div>
+                      <Row>
+                        {deliverable?.albums?.map((albumValue, i) =>
+                          deliverableAlbumOptionObjectKeys.map((Objkey) => (
+                            <Col xs="12" sm="6" key={i}>
+                              <div className="Drop">
+                                <h4 className="LabelDrop">Album {i + 1}</h4>
+                                <Select
+                                  value={
+                                    albumValue?.length > 0
+                                      ? { value: albumValue, label: albumValue }
+                                      : null
+                                  }
+                                  name={`album${i + 1}`}
+                                  className="w-75"
+                                  onChange={(selected) => {
+                                    if (selected.value !== 'Not included') {
+                                      const updatedDeliverables = [...deliverables]
+                                      const updatedAlbums = [...deliverable?.[Objkey]];
+                                      updatedAlbums[i] = selected?.value;
+                                      updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
+                                      setDeliverables(updatedDeliverables)
+                                    } else {
+                                      const updatedDeliverables = [...deliverables]
+                                      const updatedAlbums = [...deliverable?.[Objkey]];
+                                      if(i === 0){
+                                        updatedAlbums[i] = "Not included"
+                                      } else {
+
+                                        updatedAlbums.splice(i, 1);
+                                      }
+                                      updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
+                                      setDeliverables(updatedDeliverables)
+                                    }
+
+
+                                  }}
+                                  styles={customStyles}
+                                  options={
+                                    deliverableOptionsKeyValues &&
+                                    deliverableOptionsKeyValues[Objkey].values
+                                  }
+                               
+                                />
+                              </div>
+                            </Col>
+                          ))
+                        )}
+                      </Row>
+                    </Col>
+                    <Col xs="12" sm="6" lg="6" xl="4" className="mt-3">
+                      <div className="d-flex fex-row">
+                        {deliverable?.albums?.length > 1 && (
+                          <div
+                            style={{
+                              backgroundColor: "rgb(102, 109, 255)",
+                              color: "white",
+                              width: "30PX",
+                              height: "30px",
+                              borderRadius: "100%",
+                            }}
+                            className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
+                            onClick={() => {
+                              const updatedDeliverables = [...deliverables]
+                              const updatedAlbums = [...deliverable?.albums];
+                              updatedAlbums.pop();
+                              updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
+                              setDeliverables(updatedDeliverables)
+
+                            }}
+                          >
+                            <CgMathMinus />
+                          </div>
+                        )}
+                        {(deliverable?.albums?.length >= 1 && deliverable?.albums[0] !== "" && deliverable?.albums[0] !== "Not included") && (
+                          <div
+                            className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
+                            onClick={() => {
+                              const updatedDeliverables = [...deliverables]
+                              const updatedAlbums = [...deliverable?.albums];
+                              updatedAlbums.push("");
+                              updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
+                              setDeliverables(updatedDeliverables)
+                            }}
+                            style={{
+                              backgroundColor: "rgb(102, 109, 255)",
+                              color: "white",
+                              width: "30PX",
+                              height: "30px",
+                              borderRadius: "100%",
+                            }}
+                          >
+                            <LuPlus />
+                          </div>
+                        )}
+
                       </div>
                     </Col>
-                  ))
-                )}
-              </Row>
-            </Col>
+                  </Row>
+                  <Row>
+                    {deliverableOptionObjectKeys.map((Objkey) => (
+                      <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+                        <div className="mt25">
+                          <div className="Text16N" style={{ marginBottom: "6px" }}>
+                            {deliverableOptionsKeyValues &&
+                              deliverableOptionsKeyValues[Objkey].label}
+                          </div>
+                          <Select
+                            value={
+                              deliverable?.[Objkey]
+                                ? {
+                                  value: deliverable?.[Objkey],
+                                  label: deliverable?.[Objkey],
+                                }
+                                : null
+                            }
+                            name={Objkey}
+                            onChange={(selected) => {
+                              const updatedDeliverables = [...deliverables]
+                              updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: selected?.value, }
+                              setDeliverables(updatedDeliverables)
+                            }}
+                            styles={customStyles}
+                            options={
+                              deliverableOptionsKeyValues &&
+                              deliverableOptionsKeyValues[Objkey].values
+                            }
+                            required
+                          />
+                        </div>
+                      </Col>
+                    ))}
+                  </Row>
+                </div>
+              ))}
+            </>
+          )}
+          {clientData?.events?.length > 1 && (
             <Col xs="12" sm="6" lg="6" xl="4" className="mt-3">
               <div className="d-flex fex-row">
-                {clientData?.albums?.length > 1 && (
+                {deliverables?.length > 1 && (
                   <div
                     style={{
                       backgroundColor: "rgb(102, 109, 255)",
                       color: "white",
-                      width: "30PX",
+                      width: "30px",
                       height: "30px",
                       borderRadius: "100%",
                     }}
-                    className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
-                    onClick={() => {
-                      const updatedAlbums = [...clientData?.albums];
-                      updatedAlbums.pop();
-                      dispatch(
-                        updateClintData({
-                          ...clientData,
-                          albums: updatedAlbums,
-                        })
-                      );
-                    }}
+                    className="fs-3 cursor-pointer mt-4 mx-1 d-flex justify-content-center align-items-center"
+                    onClick={clearLatsDeliverables}
                   >
                     <CgMathMinus />
                   </div>
                 )}
                 <div
-                  className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
-                  onClick={addAlbum}
+                  className="fs-5 p-2 cursor-pointer mt-4 mx-1 d-flex justify-content-center align-items-center"
+                  onClick={addNewDeliverables}
                   style={{
                     backgroundColor: "rgb(102, 109, 255)",
                     color: "white",
-                    width: "30PX",
+
                     height: "30px",
-                    borderRadius: "100%",
+                    borderRadius: "6px",
                   }}
                 >
-                  <LuPlus />
+                  <LuPlus /> Deliverables
                 </div>
               </div>
             </Col>
-          </Row>
-          <Row>
-            {deliverableOptionObjectKeys.map((Objkey) => (
-              <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    {deliverableOptionsKeyValues &&
-                      deliverableOptionsKeyValues[Objkey].label}
-                  </div>
-                  <Select
-                    value={
-                      clientData?.[Objkey]
-                        ? {
-                            value: clientData?.[Objkey],
-                            label: clientData?.[Objkey],
-                          }
-                        : null
-                    }
-                    name={Objkey}
-                    onChange={(selected) => {
-                      dispatch(
-                        updateClintData({
-                          ...clientData,
-                          [Objkey]: selected?.value,
-                        })
-                      );
-                    }}
-                    styles={customStyles}
-                    options={
-                      deliverableOptionsKeyValues &&
-                      deliverableOptionsKeyValues[Objkey].values
-                    }
-                    required
-                  />
-                </div>
-              </Col>
-            ))}
-          </Row>
+          )}
+
+
+
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
               Client Suggestions If Any

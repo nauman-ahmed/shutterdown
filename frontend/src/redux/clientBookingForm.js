@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 
-const initialState = { albums: [""], deliverables: { photos: true } };
+const initialState = {  };
 
 const ClientBookingForm = createSlice({
     name: 'ClientBookingData',

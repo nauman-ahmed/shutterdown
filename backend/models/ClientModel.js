@@ -11,6 +11,9 @@ const ClientSchema = mongoose.Schema({
   phoneNumber: {
     type: String,
   },
+  deliverablesArr : {
+    type : Array
+  },
   deliverables: [
     {
       type: mongoose.Types.ObjectId,

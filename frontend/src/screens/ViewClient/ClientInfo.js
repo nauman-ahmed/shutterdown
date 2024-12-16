@@ -52,7 +52,7 @@ function ClientInfo() {
     "promos",
     "longFilms",
     "reels",
-    "hardDrives",
+    "performanceFilms"
   ];
 
   const target = useRef(null);
@@ -255,20 +255,7 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">+{clientData?.phoneNumber}</td>
 
             <td className="textPrimary fs-6 tablePlaceContent">
-              <>
-                {
-                  Object.entries(groupedAlbums).length == 0 ?
-                    <ul style={{ padding: 0 }} key={0}>
-                      Not Included
-                    </ul>
-                    :
-                    Object.entries(groupedAlbums).map(([key, value]) => (
-                      <li key={key}>
-                        {key}: {value}
-                      </li>
-                    ))
-                }
-              </>
+              {clientData?.deliverables?.filter(deliv => deliv.isAlbum == true)?.length}
             </td>
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.preWeddingPhotos ? "Yes" : "No"}
@@ -276,10 +263,11 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.preWeddingVideos ? "Yes" : "No"}
             </td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.hardDrives}</td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.longFilms}</td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.reels}</td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.promos}</td>
+
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Performance Film')?.length}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Long Film')?.length}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Reel')?.length}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo')?.length}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
             {clientData?.paymentStatus === 'Pending' && (
               <td className="textPrimary fs-6 tablePlaceContent">{clientData?.pendingAmount}</td>
@@ -648,12 +636,6 @@ function ClientInfo() {
                             allEvents[index].eventDate
                           )).format('YYYY-MM-DD');
                           const targetDate = dayjs(new Date(date)).format('YYYY-MM-DD');
-                          // const initialDatePart = initialDate
-                          //   .toISOString()
-                          //   .split("T")[0];
-                          // const targetDatePart = targetDate
-                          //   .toISOString()
-                          //   .split("T")[0];
                           if (initialDate === targetDate) {
                             count += 1;
                           }
@@ -975,7 +957,232 @@ function ClientInfo() {
                 )}
               <p className="text16N fs-5 fw-bolder">Deliverables</p>
 
-              {editedClient?.albums?.map((albumValue, i) =>
+
+
+              {editedClient?.events?.length > 0 && (
+                <>
+                  <div
+                    className="fs-3 mt25"
+                    style={{ marginTop: "30px", marginBottom: "0px !important" }}
+                  >
+                    Deliverables
+                  </div>
+                  {editedClient?.deliverablesArr?.map((deliverableObj, index) => (
+                    <div className="bg-slight deliverableBox p-2 my-2">
+
+                      <Row>
+                        <Col xl="10" sm="8">
+                          <div className=" d-flex flex-row align-items-center gap-4">
+                            <h4 className="LabelDrop">{deliverableObj?.number + ")"} For Events :</h4>
+                            {editedClient?.events?.map((event, eventIndex) => (
+                              <div className="d-flex flex-row align-items-center gap-2">
+                                <input
+                                  onChange={(e) => {
+                                    const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                    const updatedForEvents = [...deliverableObj?.forEvents];
+                                    if (e.target.checked) {
+                                      updatedForEvents.push(eventIndex)
+                                      updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: updatedForEvents }
+                                    } else {
+                                      const filteredForEvents = updatedForEvents.filter(num => num != eventIndex)
+                                      updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: filteredForEvents }
+                                    }
+                                    setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+
+                                  }}
+                                  type="checkbox"
+                                  style={{ width: "16px", height: "16px" }}
+                                  className="cursor-pointer"
+                                  name={`event${index}-${eventIndex}`}
+                                  checked={deliverableObj?.forEvents?.includes(eventIndex)}
+
+                                />
+                                <span>{event.eventType}</span>
+                              </div>
+                            ))}
+
+                          </div>
+                          <Row>
+                            {deliverableObj?.albums?.map((albumValue, i) =>
+                              deliverableAlbumOptionObjectKeys.map((Objkey) => (
+                                <Col xs="12" sm="6" key={i}>
+                                  <div className="Drop">
+                                    <h4 className="LabelDrop">Album {i + 1}</h4>
+                                    <Select
+                                      value={
+                                        albumValue?.length > 0
+                                          ? { value: albumValue, label: albumValue }
+                                          : null
+                                      }
+                                      name={`album${i + 1}`}
+                                      className="w-75"
+                                      onChange={(selected) => {
+                                        if (selected.value !== 'Not included') {
+
+                                          const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                          const updatedAlbums = [...deliverableObj?.[Objkey]];
+                                          updatedAlbums[i] = selected?.value;
+                                          updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
+                                          setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                                        } else {
+                                          const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                          const updatedAlbums = [...deliverableObj?.[Objkey]];
+                                          if (i === 0) {
+                                            updatedAlbums[i] = "Not included"
+                                          } else {
+                                            updatedAlbums.splice(i, 1);
+                                          }
+                                          updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
+                                          setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                                        }
+                                      }}
+                                      styles={customStyles}
+                                      options={
+                                        deliverableOptionsKeyValues &&
+                                        deliverableOptionsKeyValues[Objkey].values
+                                      }
+                                      
+                                    />
+                                  </div>
+                                </Col>
+                              ))
+                            )}
+                          </Row>
+                        </Col>
+                        <Col xs="12" sm="6" lg="6" xl="4" className="mt-3">
+                          <div className="d-flex fex-row">
+                            {deliverableObj?.albums?.length > 1 && (
+                              <div
+                                style={{
+                                  backgroundColor: "rgb(102, 109, 255)",
+                                  color: "white",
+                                  width: "30PX",
+                                  height: "30px",
+                                  borderRadius: "100%",
+                                }}
+                                className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
+                                onClick={() => {
+                                  const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                  const updatedAlbums = [...deliverableObj?.albums];
+                                  updatedAlbums.pop();
+                                  updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
+                                  setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+
+                                }}
+                              >
+                                <CgMathMinus />
+                              </div>
+                            )}
+                            {(deliverableObj?.albums?.length >= 1 && deliverableObj?.albums[0] !== "" && deliverableObj?.albums[0] !== "Not included") && (
+
+
+                              <div
+                                className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
+                                onClick={() => {
+                                  const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                  const updatedAlbums = [...deliverableObj?.albums];
+                                  updatedAlbums.push("");
+                                  updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
+                                  setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                                }}
+                                style={{
+                                  backgroundColor: "rgb(102, 109, 255)",
+                                  color: "white",
+                                  width: "30PX",
+                                  height: "30px",
+                                  borderRadius: "100%",
+                                }}
+                              >
+                                <LuPlus />
+                              </div>
+                            )}
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row>
+                        {deliverableOptionObjectKeys.map((Objkey) => (
+                          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+                            <div className="mt25">
+                              <div className="Text16N" style={{ marginBottom: "6px" }}>
+                                {deliverableOptionsKeyValues &&
+                                  deliverableOptionsKeyValues[Objkey].label}
+                              </div>
+                              <Select
+                                value={
+                                  deliverableObj?.[Objkey]
+                                    ? {
+                                      value: deliverableObj?.[Objkey],
+                                      label: deliverableObj?.[Objkey],
+                                    }
+                                    : null
+                                }
+                                name={Objkey}
+                                onChange={(selected) => {
+                                  const updatedDeliverables = [...editedClient?.deliverablesArr]
+                                  updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: selected?.value, }
+                                  setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                                }}
+                                styles={customStyles}
+                                options={
+                                  deliverableOptionsKeyValues &&
+                                  deliverableOptionsKeyValues[Objkey].values
+                                }
+                                required
+                              />
+                            </div>
+                          </Col>
+                        ))}
+                      </Row>
+                    </div>
+                  ))}
+                </>
+              )}
+              {editedClient?.events?.length > 1 && (
+                <Col xs="12" sm="6" lg="6" xl="4" className="mt-3">
+                  <div className="d-flex fex-row">
+                    {editedClient?.deliverablesArr?.length > 1 && (
+                      <div
+                        style={{
+                          backgroundColor: "rgb(102, 109, 255)",
+                          color: "white",
+                          width: "30px",
+                          height: "30px",
+                          borderRadius: "100%",
+                        }}
+                        className="fs-3 cursor-pointer mt-4 mx-1 d-flex justify-content-center align-items-center"
+                        onClick={() => {
+                          const updatedDeliverables = [...editedClient?.deliverablesArr];
+                          updatedDeliverables.pop()
+                          setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                        }}
+                      >
+                        <CgMathMinus />
+                      </div>
+                    )}
+                    <div
+                      className="fs-5 p-2 cursor-pointer mt-4 mx-1 d-flex justify-content-center align-items-center"
+                      onClick={() => {
+                        const updatedDeliverables = [...editedClient?.deliverablesArr];
+                        updatedDeliverables.push({ photos: true, albums: [""], forEvents: [], number : editedClient?.deliverablesArr?.length + 1 })
+                        setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
+                      }}
+                      style={{
+                        backgroundColor: "rgb(102, 109, 255)",
+                        color: "white",
+
+                        height: "30px",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      <LuPlus /> Deliverables
+                    </div>
+                  </div>
+                </Col>
+              )}
+            </Row>
+            <Row>
+
+              {/* {editedClient?.albums?.map((albumValue, i) =>
                 deliverableAlbumOptionObjectKeys.map((Objkey) => (
                   <Col xl="6" sm="6" className="p-2" key={i}>
                     <div className="Drop">
@@ -1080,7 +1287,7 @@ function ClientInfo() {
                     />
                   </div>
                 </Col>
-              ))}
+              ))} */}
 
               <Col className="p-2 mt-4">
                 <div className="label">Client Suggestions</div>

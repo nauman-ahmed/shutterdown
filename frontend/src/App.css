@@ -4,7 +4,9 @@
   font-family: "Roboto Regular";
   src: url("./assets/fonts/Roboto-Regular.ttf");
 }
+
 @import url('https://fonts.googleapis.com/css2?family=Merienda:wght@500&display=swap');
+
 @font-face {
   font-family: "Roboto Medium";
   src: url("./assets/fonts/Roboto-Medium.ttf");
@@ -21,21 +23,26 @@
 }
 
 ::-webkit-scrollbar {
-  width: 8px; /* decrease the width */
+  width: 8px;
+  /* decrease the width */
   height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #aaa; /* default color */
-  border-radius: 10px; /* round corners */
+  background-color: #aaa;
+  /* default color */
+  border-radius: 10px;
+  /* round corners */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #888; /* default hover color */
+  background-color: #888;
+  /* default hover color */
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #efeeee; /* default background color */
+  background-color: #efeeee;
+  /* default background color */
 }
 
 
@@ -48,6 +55,7 @@
   font-style: normal;
   color: #5f5435;
 }
+
 .sticky-column-prewed {
   position: sticky;
   left: 0;
@@ -55,13 +63,14 @@
   background-color: white;
 }
 
-.fc-h-event{
+.fc-h-event {
   background-color: transparent !important;
   border: none !important;
 }
 
-.sticky-column-prewed + .sticky-column-prewed {
-  left: 100px; /*This needs to be adjusted based on the actual width of the first column*/
+.sticky-column-prewed+.sticky-column-prewed {
+  left: 100px;
+  /*This needs to be adjusted based on the actual width of the first column*/
 }
 
 .sticky-column {
@@ -71,64 +80,83 @@
   background-color: white;
 }
 
-.sticky-column + .sticky-column {
-  left: 100px; /*This needs to be adjusted based on the actual width of the first column*/
+.sticky-column+.sticky-column {
+  left: 100px;
+  /*This needs to be adjusted based on the actual width of the first column*/
 }
 
-.widthForFiltersViewClient{
-  width:  50%;
+.widthForFiltersViewClient {
+  width: 50%;
   margin-top: -60px;
   margin-bottom: 30px;
 }
+
 .widthViewClient {
-  width:  70%;
+  width: 70%;
 }
 
-.widthForFilters{
- max-width:  300px;
+.widthForFilters {
+  max-width: 300px;
   margin-top: -60px;
   margin-bottom: 30px;
 }
-@media (max-width : 991px){
+
+@media (max-width : 991px) {
   .widthViewClient {
     width: 100% !important;
   }
 }
+
 .transition-calendar {
   transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
   opacity: 0;
-  transform: translateY(-10px); /* Initial position above */
+  transform: translateY(-10px);
+  /* Initial position above */
   visibility: hidden;
 }
 
 .transition-calendar.fade-in {
   opacity: 1;
-  transform: translateY(0); /* Move to the original position */
+  transform: translateY(0);
+  /* Move to the original position */
   visibility: visible;
 }
 
 .transition-calendar.fade-out {
   opacity: 0;
-  transform: translateY(-10px); /* Move back up when hiding */
+  transform: translateY(-10px);
+  /* Move back up when hiding */
   visibility: hidden;
 }
 
-@media only screen and (max-width: 500px){
+@media only screen and (max-width: 500px) {
 
-  .widthForFilters{
+  .widthForFilters {
     width: 300px !important;
     margin-top: 0px;
     margin-bottom: 0px;
   }
-  .widthForFiltersViewClient{
+
+  .widthForFiltersViewClient {
     width: 50% !important;
     margin-top: 0px;
     margin-bottom: 0px;
   }
-  .sticky-column + .sticky-column {
-    left: 90px; /*This needs to be adjusted based on the actual width of the first column*/
+
+
+ 
+.bg-slight {
+  background-color: #dbdbdb;
+}
+  .sticky-column {
+    position: relative;
+    left: 0px !important
   }
-  
+  .sticky-column-prewed {
+    position: relative;
+    left: 0px !important;
+  }
+
 }
 
 .calendar-container {
@@ -189,10 +217,10 @@ abbr[title] {
   background-color: #f8f8fa;
 }
 
-.wrapperClassName{
+.wrapperClassName {
   padding: 10px;
   height: 300px;
-  border: lightgray solid ;
+  border: lightgray solid;
   border-radius: 10px;
 }
 
@@ -250,7 +278,8 @@ abbr[title] {
   animation: spinner-d3wgkg 1s infinite linear;
 }
 
-.tooltip-arrow, .arrow {
+.tooltip-arrow,
+.arrow {
   display: none !important;
 }
 
@@ -259,20 +288,22 @@ abbr[title] {
     transform: rotate(1turn);
   }
 }
+
 .smallSpinner {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: conic-gradient(#0000 10%,#ffffff);
-  -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 3.8px),#000 0);
+  background: conic-gradient(#0000 10%, #ffffff);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 3.8px), #000 0);
   animation: spinner-zp9dbg 1s infinite linear;
 }
 
 @keyframes spinner-zp9dbg {
   to {
-     transform: rotate(1turn);
+    transform: rotate(1turn);
   }
 }
+
 .highlight4 {
   background: #87cefa;
   border-radius: 50%;
@@ -290,24 +321,30 @@ abbr[title] {
   border-radius: 50%;
   color: white;
 }
+
 .btnWidth {
   width: 90px;
 }
+
 .imgRadius {
   border-radius: 10px;
 }
-.pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layou{
+
+.pro-sidebar>.pro-sidebar-inner>.pro-sidebar-layou {
   margin-right: -20px !important;
 }
+
 .mobile-side-back {
-  height:  100% !important;
+  height: 100% !important;
 }
+
 .highlight7 {
   background: #00fa9a;
   border-radius: 50%;
   color: white;
 }
-.table-responsive{
+
+.table-responsive {
   padding-bottom: 20px !important;
 }
 

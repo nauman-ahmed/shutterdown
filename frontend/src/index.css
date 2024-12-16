@@ -12,7 +12,18 @@ code {
     monospace;
 }
 
+/* Custom styles for dates in the range */
+.react-calendar__tile--range {
+  background-color: rgb(215, 215, 255) !important; /* Light green background */
+ 
+}
 
+.deliverableBox {
+  border: 3px solid rgb(112, 109, 255) !important;
+  border-radius: 10px;
+  background-color: #fcfcfc;
+  padding: 10px 6px;
+ }
 /* Removes Default Link formatting from Full Calendar*/
 a.fc-daygrid-day-number{
     color:black;

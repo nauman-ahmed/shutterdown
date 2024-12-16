@@ -8,20 +8,10 @@ const dayjs = require("dayjs");
 
 const AddClientFunction = async (req, res) => {
   try {
-    const deadlineDays = await deadlineDaysModel.find();
     let clientBody = req.body.data;
-    clientBody.preWeddingPhotos = req.body.data?.deliverables?.preWeddingPhotos;
-    clientBody.preWeddingVideos = req.body.data?.deliverables?.preWeddingVideos;
     const client = new ClientModel(clientBody);
     let deliverables = [];
-    let longFilmDeadline = null;
-    let reelDeadline = null;
-    let promoDeadline = null;
-    let albumDeadline = null;
-    let photoDeadline = null;
-    let preWedPhotoDeadline = null;
-    let preWedVideoDeadline = null;
-    let performanceFilmDeadline = null;
+
     let datesOfClient = [];
     let dateforDeliverable = null;
     const eventIds = await Promise.all(
@@ -32,81 +22,12 @@ const AddClientFunction = async (req, res) => {
           eventDate: dayjs(eventData.eventDate).format("YYYY-MM-DD"),
         });
         if (event.isWedding) {
-          longFilmDeadline = new Date(event.eventDate);
-          promoDeadline = new Date(event.eventDate);
-          reelDeadline = new Date(event.eventDate);
-          photoDeadline = new Date(event.eventDate);
-          albumDeadline = new Date(event.eventDate);
-          preWedPhotoDeadline = new Date(event.eventDate);
-          preWedVideoDeadline = new Date(event.eventDate);
-          performanceFilmDeadline = new Date(event.eventData)
-          longFilmDeadline.setDate(
-            longFilmDeadline.getDate() + deadlineDays[0].longFilm
-          );
-          performanceFilmDeadline.setDate(
-            longFilmDeadline.getDate() + deadlineDays[0].performanceFilm
-          );
-          promoDeadline.setDate(
-            promoDeadline.getDate() + deadlineDays[0].promo
-          );
-          reelDeadline.setDate(reelDeadline.getDate() + deadlineDays[0].reel);
-          albumDeadline.setDate(
-            albumDeadline.getDate() + deadlineDays[0].album
-          );
-          photoDeadline.setDate(
-            photoDeadline.getDate() + deadlineDays[0].photo
-          );
-          preWedPhotoDeadline.setDate(
-            preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
-          );
-          preWedVideoDeadline.setDate(
-            preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
-          );
+
           dateforDeliverable = dayjs(new Date(event.eventDate)).format(
             "YYYY-MM-DD"
           );
         }
-        if (
-          longFilmDeadline === null &&
-          reelDeadline === null &&
-          promoDeadline === null &&
-          photoDeadline === null &&
-          preWedPhotoDeadline === null &&
-          preWedVideoDeadline === null &&
-          performanceFilmDeadline === null &&
-          albumDeadline === null
-        ) {
-          longFilmDeadline = new Date(event.eventDate);
-          performanceFilmDeadline = new Date(event.eventDate);
-          promoDeadline = new Date(event.eventDate);
-          reelDeadline = new Date(event.eventDate);
-          photoDeadline = new Date(event.eventDate);
-          albumDeadline = new Date(event.eventDate);
-          preWedPhotoDeadline = new Date(event.eventDate);
-          preWedVideoDeadline = new Date(event.eventDate);
-          longFilmDeadline.setDate(
-            longFilmDeadline.getDate() + deadlineDays[0].longFilm
-          );
-          performanceFilmDeadline.setDate(
-            longFilmDeadline.getDate() + deadlineDays[0].longFilm
-          );
-          promoDeadline.setDate(
-            promoDeadline.getDate() + deadlineDays[0].promo
-          );
-          reelDeadline.setDate(reelDeadline.getDate() + deadlineDays[0].reel);
-          albumDeadline.setDate(
-            albumDeadline.getDate() + deadlineDays[0].album
-          );
-          photoDeadline.setDate(
-            photoDeadline.getDate() + deadlineDays[0].photo
-          );
-          preWedPhotoDeadline.setDate(
-            preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
-          );
-          preWedVideoDeadline.setDate(
-            preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
-          );
-        }
+
         if (dateforDeliverable == null && i == 0) {
           dateforDeliverable = dayjs(new Date(event.eventDate)).format(
             "YYYY-MM-DD"
@@ -119,104 +40,135 @@ const AddClientFunction = async (req, res) => {
         return event._id;
       })
     );
+    for (const deliverable of req.body.data?.deliverables || []) {
+      const latestEventDate = deliverable.forEvents
+        .map(index => req.body.data.events[index].eventDate)
+        .reduce((max, current) => (max > current ? max : current));
+      const forEvents = deliverable.forEvents
+        .map(index => eventIds[index])
+      const numberInDeliverables = deliverable.number;
+      console.log(latestEventDate);
 
+      const photosDeliverable = new deliverableModel({
+        client: client._id,
+        deliverableName: "Photos",
+        quantity: 1,
+        date: latestEventDate,
+        forEvents,
+        numberInDeliverables,
+      });
 
-    const photosDeliverable = new deliverableModel({
-      client: client._id,
-      deliverableName: "Photos",
-      quantity: 1,
-      date: dateforDeliverable,
-      photoDeadline,
-    });
-
-    await photosDeliverable.save().then(() => {
-
+      await photosDeliverable.save();
       deliverables.push(photosDeliverable._id);
-    });
-    if (req.body.data.promos > 0) {
-      for (let i = 0; i < req.body.data.promos; i++) {
-        const promoDeliverable = new deliverableModel({
-          client: client._id,
-          deliverableName: "Promo",
-          quantity: 1,
-          date: dateforDeliverable,
-          promoDeadline,
-        });
-        
-        await promoDeliverable.save().then(() => {
+
+      if (deliverable.promos > 0) {
+        for (let i = 0; i < deliverable.promos; i++) {
+          const promoDeliverable = new deliverableModel({
+            client: client._id,
+            deliverableName: "Promo",
+            quantity: 1,
+            date: latestEventDate,
+            forEvents,
+            numberInDeliverables,
+          });
+
+          await promoDeliverable.save();
           deliverables.push(promoDeliverable._id);
-        });
+        }
       }
-    }
-    if (req.body.data.longFilms > 0) {
-      for (let i = 0; i < req.body.data.longFilms; i++) {
 
-        const longFilmDeliverable = new deliverableModel({
-          client: client._id,
-          deliverableName: "Long Film",
-          quantity: 1,
-          date: dateforDeliverable,
-          longFilmDeadline,
-        });
-        
-        await longFilmDeliverable.save().then(() => {
+      if (deliverable.longFilms > 0) {
+        for (let i = 0; i < deliverable.longFilms; i++) {
+          const longFilmDeliverable = new deliverableModel({
+            client: client._id,
+            deliverableName: "Long Film",
+            quantity: 1,
+            date: latestEventDate,
+            forEvents,
+            numberInDeliverables,
+          });
+
+          await longFilmDeliverable.save();
           deliverables.push(longFilmDeliverable._id);
-        });
+        }
       }
-    }
-    if (req.body.data.performanceFilms > 0) {
-      for (let i = 0; i < req.body.data.performanceFilms; i++) {
 
-        const performanceFilmDeliverable = new deliverableModel({
-          client: client._id,
-          deliverableName: "Performance Film",
-          quantity: 1,
-          date: dateforDeliverable,
-          performanceFilmDeadline,
-        });
-        
-        await performanceFilmDeliverable.save().then(() => {
+      if (deliverable.performanceFilms > 0) {
+        for (let i = 0; i < deliverable.performanceFilms; i++) {
+          const performanceFilmDeliverable = new deliverableModel({
+            client: client._id,
+            deliverableName: "Performance Film",
+            quantity: 1,
+            date: latestEventDate,
+            forEvents,
+            numberInDeliverables,
+          });
+
+          await performanceFilmDeliverable.save();
           deliverables.push(performanceFilmDeliverable._id);
-        });
+        }
       }
-    }
-    if (req.body.data.reels > 0) {
-      for (let i = 0; i < req.body.data.reels; i++) {
 
-        const reelDeliverable = new deliverableModel({
-          client: client._id,
-          deliverableName: "Reel",
-          quantity: 1,
-          date: dateforDeliverable,
-          reelDeadline,
-        });
-        
-        await reelDeliverable.save().then(() => {
+      if (deliverable.reels > 0) {
+        for (let i = 0; i < deliverable.reels; i++) {
+          const reelDeliverable = new deliverableModel({
+            client: client._id,
+            deliverableName: "Reel",
+            quantity: 1,
+            date: latestEventDate,
+            forEvents,
+            numberInDeliverables,
+          });
+
+          await reelDeliverable.save();
           deliverables.push(reelDeliverable._id);
-        });
+        }
       }
+
+      const albumsDeliverables = await Promise.all(
+        deliverable.albums.map(async (album) => {
+          if (album !== "Not included" && album !== "") {
+            const newAlbum = new deliverableModel({
+              client: client._id,
+              deliverableName: album,
+              quantity: 1,
+              date: latestEventDate,
+              isAlbum: true,
+              forEvents,
+              numberInDeliverables,
+            });
+            await newAlbum.save();
+            return newAlbum._id;
+          } else {
+            return null;
+          }
+        })
+      );
+
+      deliverables = [...deliverables, ...albumsDeliverables];
     }
-    if (req.body.data?.deliverables?.preWeddingPhotos === true) {
+
+
+
+    if (req.body.data?.preWeddingPhotos === true) {
       client.preWedding = true;
       const preWedPhotosDeliverable = new deliverableModel({
         client: client._id,
         deliverableName: "Pre-Wedding Photos",
         quantity: req.body.data.reels,
         date: dateforDeliverable,
-        preWedPhotoDeadline,
       });
 
       await preWedPhotosDeliverable.save().then(() => {
         deliverables.push(preWedPhotosDeliverable._id);
       });
     }
-    if (req.body.data?.deliverables?.preWeddingVideos === true) {
+    if (req.body.data?.preWeddingVideos === true) {
       client.preWedding = true;
       const preWedVideosDeliverable = new deliverableModel({
         client: client._id,
         deliverableName: "Pre-Wedding Videos",
         quantity: req.body.data.reels,
-        preWedVideoDeadline,
         date: dateforDeliverable,
       });
 
@@ -225,27 +177,11 @@ const AddClientFunction = async (req, res) => {
       });
     }
 
-    const albumsDeliverables = await Promise.all(
-      req.body.data.albums.map(async (album) => {
-        if (album !== "Not included") {
-          const newAlbum = new deliverableModel({
-            client: client._id,
-            deliverableName: album,
-            quantity: 1,
-            albumDeadline,
-            date: dateforDeliverable,
-          });
-          await newAlbum.save();
-          return newAlbum._id;
-        } else {
-          return null;
-        }
-      })
-    );
 
     client.events = eventIds;
-    client.deliverables = [...deliverables, ...albumsDeliverables];
+    client.deliverables = deliverables;
     client.dates = datesOfClient;
+    client.deliverablesArr = req.body.data?.deliverables;
     await client.save();
     res.status(200).json(client);
   } catch (error) {
@@ -294,58 +230,357 @@ const updateClient = async (req, res) => {
 const updateWholeClient = async (req, res) => {
   try {
     const reqClientData = { ...req.body.data };
-    const deadlineDays = await deadlineDaysModel.find();
     const clientToEdit = await ClientModel.findById(req.body.data._id).populate(
       "events"
     );
-    let preWedPhotoDeadline = null;
-    let preWedVideoDeadline = null;
+    let updatedDeliverablesIds = clientToEdit.deliverables;
+    if (reqClientData?.deliverablesArr?.length >= clientToEdit?.deliverablesArr?.length) {
+      for (const deliverableObj of reqClientData?.deliverablesArr || []) {
+        const deliverableNumber = deliverableObj.number;
+        const latestEventDate = deliverableObj.forEvents
+          .map(index => clientToEdit.events[index].eventDate)
+          .reduce((max, current) => (max > current ? max : current));
+        const forEvents = deliverableObj.forEvents
+          .map(index => reqClientData.events[index]._id)
+
+        const savedDeliverableObj = clientToEdit?.deliverablesArr.find(delivobj => delivobj.number == deliverableNumber)
+        console.log(savedDeliverableObj);
+
+        if (!savedDeliverableObj) {
+          console.log('new deliverable object');
+          console.log(clientToEdit._id);
+          console.log(reqClientData._id);
+
+
+          // New Deliverables Added
+          const photosDeliverable = new deliverableModel({
+            client: reqClientData._id,
+            deliverableName: "Photos",
+            quantity: 1,
+            date: latestEventDate,
+            forEvents,
+            numberInDeliverables: deliverableNumber
+          });
+
+          await photosDeliverable.save();
+          updatedDeliverablesIds.push(photosDeliverable._id);
+
+          if (deliverableObj.promos > 0) {
+            for (let i = 0; i < deliverableObj.promos; i++) {
+              const promoDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Promo",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await promoDeliverable.save();
+              updatedDeliverablesIds.push(promoDeliverable._id);
+            }
+          }
+
+          if (deliverableObj.longFilms > 0) {
+            for (let i = 0; i < deliverableObj.longFilms; i++) {
+              const longFilmDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Long Film",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await longFilmDeliverable.save();
+              updatedDeliverablesIds.push(longFilmDeliverable._id);
+            }
+          }
+
+          if (deliverableObj.performanceFilms > 0) {
+            for (let i = 0; i < deliverableObj.performanceFilms; i++) {
+              const performanceFilmDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Performance Film",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await performanceFilmDeliverable.save();
+              updatedDeliverablesIds.push(performanceFilmDeliverable._id);
+            }
+          }
+
+          if (deliverableObj.reels > 0) {
+            for (let i = 0; i < deliverableObj.reels; i++) {
+              const reelDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Reel",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await reelDeliverable.save();
+              updatedDeliverablesIds.push(reelDeliverable._id);
+            }
+          }
+
+          const albumsDeliverablesIds = await Promise.all(
+            deliverableObj.albums.map(async (album) => {
+              if (album !== "Not included") {
+                const newAlbum = new deliverableModel({
+                  client: reqClientData._id,
+                  deliverableName: album,
+                  quantity: 1,
+                  date: latestEventDate,
+                  isAlbum: true,
+                  forEvents,
+                  numberInDeliverables: deliverableNumber
+                });
+                await newAlbum.save();
+                return newAlbum._id;
+              } else {
+                return null;
+              }
+            })
+          );
+
+          updatedDeliverablesIds = [...updatedDeliverablesIds, albumsDeliverablesIds]
+
+        } else {
+
+
+          const photosDeliverable = reqClientData?.deliverables?.find(deliv => deliv.deliverableName === 'Photos' && deliv.numberInDeliverables == deliverableNumber);
+
+          await deliverableModel.findByIdAndUpdate(photosDeliverable._id, { $set: { forEvents: forEvents, date: latestEventDate } });
+
+
+          if (deliverableObj.promos > savedDeliverableObj.promos) {
+            // More promos added in this number deliverable
+            const moreAddedPromo = deliverableObj.promos - savedDeliverableObj.promos;
+            for (let i = 0; i < moreAddedPromo; i++) {
+              const promoDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Promo",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await promoDeliverable.save();
+              updatedDeliverablesIds.push(promoDeliverable._id);
+            }
+          } else if (deliverableObj.promos < savedDeliverableObj.promos) {
+            // Promos are decreaded in this numbe of deliverables 
+            const savedPromosIds = reqClientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo' && deliv.numberInDeliverables === deliverableNumber)?.map(deliv => deliv._id);
+            const extraPromos = savedDeliverableObj.promos - deliverableObj.promos;
+            const toRemoveIds = savedPromosIds.slice(-extraPromos)
+            const removeIdsSet = new Set(toRemoveIds)
+            for (const promoId of toRemoveIds) {
+              await deliverableModel.findByIdAndDelete(promoId);
+            }
+            updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          }
+
+          if (deliverableObj.longFilms > savedDeliverableObj.longFilms) {
+            // More long films added in this number deliverable
+            const moreAddedLongFilms = deliverableObj.longFilms - savedDeliverableObj.longFilms;
+            for (let i = 0; i < moreAddedLongFilms; i++) {
+              const longFilmDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Long Film",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await longFilmDeliverable.save();
+              updatedDeliverablesIds.push(longFilmDeliverable._id);
+            }
+          } else if (deliverableObj.longFilms < savedDeliverableObj.longFilms) {
+            // Long Films are decreaded in this numbe of deliverables 
+            const savedLongFilmsIds = reqClientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Long Film' && deliv.numberInDeliverables === deliverableNumber)?.map(deliv => deliv._id);
+            const extraLongFilms = savedDeliverableObj.longFilms - deliverableObj.longFilms;
+            const toRemoveIds = savedLongFilmsIds.slice(-extraLongFilms)
+            const removeIdsSet = new Set(toRemoveIds)
+            for (const longFilmId of toRemoveIds) {
+              await deliverableModel.findByIdAndDelete(longFilmId);
+            }
+            updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          }
+
+          if (deliverableObj.performanceFilms > savedDeliverableObj.performanceFilms) {
+            // More Performance films added in this number deliverable
+            const moreAddedPerformanceFilms = deliverableObj.performanceFilms - savedDeliverableObj.performanceFilms;
+            for (let i = 0; i < moreAddedPerformanceFilms; i++) {
+              const performanceFilmDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Performance Film",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await performanceFilmDeliverable.save();
+              updatedDeliverablesIds.push(performanceFilmDeliverable._id);
+            }
+          } else if (deliverableObj.performanceFilms < savedDeliverableObj.performanceFilms) {
+            // Performance Films are decreaded in this numbe of deliverables 
+            const savedPerformanceFilmsIds = reqClientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Performance Film' && deliv.numberInDeliverables === deliverableNumber)?.map(deliv => deliv._id);
+            const extraPerformanceFilms = savedDeliverableObj.performanceFilms - deliverableObj.performanceFilms;
+            const toRemoveIds = savedPerformanceFilmsIds.slice(-extraPerformanceFilms)
+            const removeIdsSet = new Set(toRemoveIds)
+            for (const performanceFilmId of toRemoveIds) {
+              await deliverableModel.findByIdAndDelete(performanceFilmId);
+            }
+            updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          }
+
+
+          if (deliverableObj.reels > savedDeliverableObj.reels) {
+            // More Reels added in this number deliverable
+            const moreAddedReels = deliverableObj.reels - savedDeliverableObj.reels;
+            for (let i = 0; i < moreAddedReels; i++) {
+              const reelDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Reel",
+                quantity: 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await reelDeliverable.save();
+              updatedDeliverablesIds.push(reelDeliverable._id);
+            }
+          } else if (deliverableObj.reels < savedDeliverableObj.reels) {
+            // Reels are decreaded in this numbe of deliverables 
+            const savedReelsIds = reqClientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Reel' && deliv.numberInDeliverables === deliverableNumber)?.map(deliv => deliv._id);
+            const extraReels = savedDeliverableObj.reels - deliverableObj.reels;
+            const toRemoveIds = savedReelsIds.slice(-extraReels)
+            const removeIdsSet = new Set(toRemoveIds)
+            for (const reelId of toRemoveIds) {
+              await deliverableModel.findByIdAndDelete(reelId);
+            }
+            updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          }
+          console.log('coming albums length', deliverableObj.albums?.length);
+          console.log('saved alums length', savedDeliverableObj.albums?.length);
+
+          if (deliverableObj.albums?.length > savedDeliverableObj.albums?.length) {
+            // More Albums are added in this number deliverable
+            console.log('more albums added');
+            console.log(deliverableObj);
+            console.log(savedDeliverableObj);
+
+
+            console.log('coming albums length', deliverableObj.albums?.length);
+            console.log('saved alums length', savedDeliverableObj.albums?.length);
+
+
+            const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
+            console.log(savedAlbumsDeliverable);
+
+
+            // loop til already added albums
+            for (let i = 0; i < savedDeliverableObj.albums?.length; i++) {
+              if (deliverableObj.albums[i] === "" || deliverableObj.albums[i] === "Not included") {
+                await deliverableModel.findByIdAndDelete(savedAlbumsDeliverable[i]?._id);
+              } else {
+                await deliverableModel.findByIdAndUpdate(savedAlbumsDeliverable[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate, deliverableName: deliverableObj?.albums[i] } });
+              }
+            }
+            // loop for new added albums
+            for (let i = savedDeliverableObj.albums?.length; i < deliverableObj.albums?.length; i++) {
+              if (deliverableObj?.albums[i] !== 'Not included' && deliverableObj?.albums[i] !== '') {
+                const albumDeliverable = new deliverableModel({
+                  client: reqClientData._id,
+                  deliverableName: deliverableObj?.albums[i],
+                  quantity: 1,
+                  date: latestEventDate,
+                  forEvents,
+                  isAlbum: true,
+                  numberInDeliverables: deliverableNumber
+                });
+
+                await albumDeliverable.save();
+                updatedDeliverablesIds.push(albumDeliverable._id);
+              }
+            }
+
+          } else if (deliverableObj.albums?.length < savedDeliverableObj.albums?.length) {
+            // albums are decreaded in this numbe of deliverables 
+            const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
+            const savedAlbumsIds = savedAlbumsDeliverable?.map(deliv => deliv._id);
+            const extraAlbums = savedDeliverableObj?.albums?.length - deliverableObj?.albums?.length;
+            const toRemoveIds = savedAlbumsIds.slice(-extraAlbums)
+            const removeIdsSet = new Set(toRemoveIds)
+            for (const albumId of toRemoveIds) {
+              await deliverableModel.findByIdAndDelete(albumId);
+            }
+            updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+            for (let i = 0; i < deliverableObj.albums?.length; i++) {
+              if (deliverableObj.albums[i] === "" || deliverableObj.albums[i] === "Not included") {
+                await deliverableModel.findByIdAndDelete(savedAlbumsDeliverable[i]?._id);
+              } else {
+                await deliverableModel.findByIdAndUpdate(savedAlbumsDeliverable[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate, deliverableName: deliverableObj?.albums[i] } });
+              }
+            }
+          } else if (deliverableObj.albums?.length === savedDeliverableObj.albums?.length) {
+            console.log('called equal');
+
+            console.log(deliverableObj.albums?.length === savedDeliverableObj.albums?.length);
+
+            const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
+            console.log(savedAlbumsDeliverable);
+
+            for (let i = 0; i < deliverableObj.albums?.length; i++) {
+              if (deliverableObj.albums[i] === "" || deliverableObj.albums[i] === "Not included") {
+                await deliverableModel.findByIdAndDelete(savedAlbumsDeliverable[i]?._id);
+              } else {
+                await deliverableModel.findByIdAndUpdate(savedAlbumsDeliverable[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate, deliverableName: deliverableObj?.albums[i] } });
+              }
+            }
+          }
+
+        }
+
+      }
+    } else {
+      const decreasedDeliverableNumber = clientToEdit?.deliverablesArr?.length - reqClientData?.deliverablesArr?.length
+      const toRemoveDeliverable = clientToEdit?.deliverablesArr.slice(-decreasedDeliverableNumber);
+      for (let i = 0; i < toRemoveDeliverable?.length; i++) {
+        const deliverableObjNumber = toRemoveDeliverable[i].number;
+        const numberDeliverables = await deliverableModel.find({client: reqClientData?._id, numberInDeliverables: deliverableObjNumber })
+        const numberDeliverablesIds = numberDeliverables.map(deliv => deliv._id);
+        updatedDeliverablesIds = updatedDeliverablesIds.filter(deliv => !numberDeliverablesIds.includes(deliv._id));
+        await deliverableModel.deleteMany({ client: reqClientData?._id, numberInDeliverables: deliverableObjNumber })
+      }
+    }
+
+    clientToEdit.deliverables = updatedDeliverablesIds;
+
     const weddingEvent = clientToEdit.events.find(
       (event) => event.isWedding === true
     );
     let updatedDate = null;
     if (weddingEvent) {
-      preWedPhotoDeadline = new Date(weddingEvent.eventDate);
-      preWedVideoDeadline = new Date(weddingEvent.eventDate);
-      preWedPhotoDeadline.setDate(
-        preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
-      );
-      preWedVideoDeadline.setDate(
-        preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
-      );
       updatedDate = dayjs(new Date(weddingEvent.eventDate)).format(
         "YYYY-MM-DD"
       );
     } else {
-      preWedPhotoDeadline = new Date(clientToEdit.events[0]?.eventDate);
-      preWedVideoDeadline = new Date(clientToEdit.events[0]?.eventDate);
-      preWedPhotoDeadline.setDate(
-        preWedPhotoDeadline.getDate() + deadlineDays[0].preWedPhoto
-      );
-      preWedVideoDeadline.setDate(
-        preWedVideoDeadline.getDate() + deadlineDays[0].preWedVideo
-      );
       updatedDate = dayjs(new Date(clientToEdit.events[0]?.eventDate)).format(
         "YYYY-MM-DD"
       );
     }
-    await Promise.all(
-      reqClientData.deliverables.map(async (deliverableData) => {
-        if (deliverableData.quantity > 0) {
-          const updatedDeliverable = await deliverableModel.findById(
-            deliverableData._id
-          );
-          updatedDeliverable.quantity = deliverableData.quantity;
-          updatedDeliverable.date = updatedDate;
-          await updatedDeliverable.save();
-        } else {
-          await deliverableModel.findByIdAndDelete(deliverableData._id);
-          clientToEdit.deliverables = clientToEdit.deliverables.filter(
-            (deliverableId) => !deliverableId.equals(deliverableData._id)
-          );
-        }
-      })
-    );
+
 
     if (
       reqClientData?.preWeddingPhotos === true &&
@@ -355,7 +590,6 @@ const updateWholeClient = async (req, res) => {
         deliverableName: "Pre-Wedding Photos",
         client: clientToEdit._id,
       });
-      updatedDeliverable.quantity = reqClientData.reels;
       updatedDeliverable.date = updatedDate;
       await updatedDeliverable.save();
     } else if (
@@ -368,7 +602,6 @@ const updateWholeClient = async (req, res) => {
         deliverableName: "Pre-Wedding Photos",
         quantity: reqClientData.reels,
         date: updatedDate,
-        preWedPhotoDeadline,
       });
       await newPreWedPhotosDeliverable.save().then(() => {
         clientToEdit.deliverables = [
@@ -398,7 +631,6 @@ const updateWholeClient = async (req, res) => {
         deliverableName: "Pre-Wedding Videos",
         client: clientToEdit._id,
       });
-      updatedDeliverable.quantity = reqClientData.reels;
       updatedDeliverable.date = updatedDate;
       await updatedDeliverable.save();
     } else if (
@@ -411,7 +643,6 @@ const updateWholeClient = async (req, res) => {
         deliverableName: "Pre-Wedding Videos",
         quantity: reqClientData.reels,
         date: updatedDate,
-        preWedPhotoDeadline,
       });
       await newPreWedVideosDeliverable.save().then(() => {
         clientToEdit.deliverables = [
@@ -445,30 +676,7 @@ const updateWholeClient = async (req, res) => {
       reqClientData.preWeddrones = null;
     }
 
-    await Promise.all(
-      reqClientData.albums.map(async (album) => {
-        if (album !== "Not inlcuded") {
-          const existAlbum = await deliverableModel.findOne({
-            deliverableName: album,
-            client: clientToEdit._id,
-          });
-          if (!existAlbum) {
-            const newAlbum = new deliverableModel({
-              client: clientToEdit._id,
-              deliverableName: album,
-              quantity: 1,
-              date: updatedDate,
-              // albumDeadline,
-            });
-            await newAlbum.save();
-            clientToEdit.deliverables = [
-              ...clientToEdit.deliverables,
-              newAlbum._id,
-            ];
-          }
-        }
-      })
-    );
+
 
     reqClientData.events = clientToEdit.events.map(
       (eventData) => eventData._id
@@ -520,8 +728,8 @@ const getClients = async (req, res) => {
           },
         })
         .populate("userID");
-        console.log(client);
-        
+      console.log(client);
+
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
 

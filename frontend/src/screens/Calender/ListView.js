@@ -675,8 +675,8 @@ function ListView(props) {
               <thead style={{ position: "sticky", top: 0, zIndex: 101 }}>
 
                 <tr className="logsHeader Text16N1">
-                  <th className="tableBody">Couple Location</th>
-                  <th className="tableBody">
+                  <th className="tableBody sticky-column ">Couple Location</th>
+                  <th className="tableBody sticky-column ">
                     Date{" "}
                     {!ascending ? (
                       <IoIosArrowRoundDown

@@ -15,18 +15,58 @@ import { getAllEvents } from "../../API/Event";
 import { updateAllEvents } from "../../redux/eventsSlice";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
+import { getAllEventOptions } from "../../API/FormEventOptionsAPI";
+import { getAllDeliverableOptions } from "../../API/FormDeliverableOptionsAPI";
 
 function Preview() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [requesting, setRequesting] = useState(false);
   const clientData = useSelector((state) => state.clientData);
+  const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] =
+    useState(null);
+
+  const getAllFormOptionsHandler = async () => {
+    const eventOptions = await getAllEventOptions();
+    const deliverableOptions = await getAllDeliverableOptions();
+    setEventOptionsKeyValues(eventOptions);
+    setDeliverableOptionsKeyValues(deliverableOptions);
+  };
+
+
   useEffect(() => {
     if (!clientData || !clientData.events) {
       navigate("/clients/add-client/form-1");
     }
+    getAllFormOptionsHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientData]);
+
+  const deliverablePreWeddingOptionObjectKeys = [
+    "photographers",
+    "cinematographers",
+    "assistants",
+    "drones",
+  ];
+
+  const eventOptionObjectKeys = [
+    "travelBy",
+    "shootDirector",
+    "photographers",
+    "cinematographers",
+    "drones",
+    "sameDayPhotoEditors",
+    "sameDayVideoEditors",
+  ];
+
+  const deliverableAlbumOptionObjectKeys = ["albums"];
+  const deliverableOptionObjectKeys = [
+    "promos",
+    "longFilms",
+    "reels",
+    "performanceFilms"
+  ];
 
   const currentUser =
     Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
@@ -173,148 +213,34 @@ function Preview() {
               />
             </div>
           </Col>
+          {eventOptionObjectKeys.map((Objkey) => (
+            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  {eventOptionsKeyValues &&
+                    eventOptionsKeyValues[Objkey].label}
+                </div>
+                <Input
+                  type="text"
 
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Travel By
+                  disabled={true}
+                  className="forminput"
+                  value={
+                    (clientData?.events &&
+                      clientData?.events[eventIndex]?.[Objkey]) ||
+                    ""
+                  }
+                  required={true}
+
+                />
+
               </div>
-              <Input
-                type="text"
-                name="travelBy"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events && clientData?.events[eventIndex]?.travelBy
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Shoot Directors
-              </div>
-              <Input
-                type="text"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.shootDirector
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Shoot Directors"}
-              />
-            </div>
-          </Col>
+            </Col>
+          ))}
+
         </Row>
-        <Row>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Photographers
-              </div>
-              <Input
-                type="text"
-                name="photographers"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.photographers
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Cinematographers
-              </div>
-              <Input
-                type="text"
-                name="cinematoraphers"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.cinematographers
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Drones
-              </div>
-              <Input
-                type="text"
-                name="drones"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events && clientData?.events[eventIndex]?.drones
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Same Day Photo Editor
-              </div>
-              <Input
-                type="text"
-                name="sameDayPhotoEditor"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.sameDayPhotoEditors
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-          <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-            <div className="mt25">
-              <div className="Text16N" style={{ marginBottom: "6px" }}>
-                Same Day Video Editor
-              </div>
-              <Input
-                type="text"
-                name="sameDayVideoEditor"
-                disabled={true}
-                className="forminput"
-                value={
-                  clientData?.events &&
-                  clientData?.events[eventIndex]?.sameDayVideoEditors
-                }
-                required={true}
-                // onChange={(e) => updateEventValues(e)}
-                placeholder={"Location"}
-              />
-            </div>
-          </Col>
-        </Row>
-        <div className="mt-5">
+
+        <div className="mt-4">
           <Table
             bordered
             hover
@@ -363,7 +289,136 @@ function Preview() {
             </tbody>
           </Table>
         </div>
-        <div className="Text16N mt25" style={{ marginBottom: "6px" }}>
+        <div className="Text16N d-flex flex-row flex-wrap gap-3 mt-2">
+          <div>
+            <input
+              type="checkbox"
+
+              name="preWeddingPhotos"
+              checked={clientData?.preWeddingPhotos}
+              disabled={false}
+            />
+            {"   "}
+            Pre Wedding Photos
+          </div>
+          <div>
+            <input
+
+              type="checkbox"
+              name="preWeddingVideos"
+              checked={clientData?.preWeddingVideos}
+              disabled={false}
+            />
+            {"   "}
+            Pre Wedding Videos
+          </div>
+        </div>
+
+        {(clientData?.preWeddingVideos ||
+          clientData?.preWeddingPhotos) && (
+            <Row>
+              {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
+                <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Input
+                      type="text"
+
+                      disabled={true}
+                      className="forminput"
+                      value={clientData?.["preWed" + Objkey]}
+                      required={true}
+
+                    />
+
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
+
+        {clientData?.events?.length > 0 && (
+          <>
+            <div
+              className="fs-3 mt25"
+              style={{ marginTop: "30px", marginBottom: "0px !important" }}
+            >
+              Deliverables
+            </div>
+            {clientData?.deliverables?.map((deliverable, index) => (
+              <div className="bg-slight deliverableBox my-2">
+
+                <Row>
+                  <Col xl="10" sm="8">
+                    <div className=" d-flex flex-row align-items-center gap-4">
+                      <h4 className="LabelDrop">{deliverable.number + ")"} For Events :</h4>
+                      {clientData?.events?.map((event, eventIndex) => (
+                        <div className="d-flex flex-row align-items-center gap-2">
+                          <input
+                            type="checkbox"
+                            style={{ width: "16px", height: "16px" }}
+                            className="cursor-pointer"
+                            name={`event${index}-${eventIndex}`}
+                            checked={deliverable?.forEvents?.includes(eventIndex)}
+                          />
+                          <span>{event.eventType}</span>
+                        </div>
+                      ))}
+
+                    </div>
+                    <Row>
+                      {deliverable?.albums?.map((albumValue, i) =>
+                        deliverableAlbumOptionObjectKeys.map((Objkey) => (
+                          <Col xs="12" sm="6" lg="6" xl="5"  key={i}>
+                            <div className="Drop">
+                              <h4 className="LabelDrop">Album {i + 1}</h4>
+                              <Input
+                                type="text"
+                                disabled={true}
+                                className="forminput"
+                                value={albumValue}
+                                required={true}
+
+                              />
+
+                            </div>
+                          </Col>
+                        ))
+                      )}
+                    </Row>
+                  </Col>
+
+                </Row>
+                <Row>
+                  {deliverableOptionObjectKeys.map((Objkey) => (
+                    <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+                      <div className="mt25">
+                        <div className="Text16N" style={{ marginBottom: "6px" }}>
+                          {deliverableOptionsKeyValues &&
+                            deliverableOptionsKeyValues[Objkey].label}
+                        </div>
+                        <Input
+                          type="text"
+
+                          disabled={true}
+                          className="forminput"
+                          value={deliverable?.[Objkey]}
+                          required={true}
+
+                        />
+
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            ))}
+          </>
+        )}
+        {/* <div className="Text16N mt25" style={{ marginBottom: "6px" }}>
           Deliverables
         </div>
         <div className="mt25">
@@ -393,69 +448,69 @@ function Preview() {
         </div>
         {(clientData?.deliverables?.preWeddingVideos ||
           clientData?.deliverables?.preWeddingPhotos) && (
-          <Row>
-            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Photographers
+            <Row>
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Photographers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedAssistants"
+                    disabled={true}
+                    className="forminput"
+                    value={clientData?.preWedphotographers}
+                    required={true}
+                  />
                 </div>
-                <Input
-                  type="text"
-                  name="preWedAssistants"
-                  disabled={true}
-                  className="forminput"
-                  value={clientData?.preWedphotographers}
-                  required={true}
-                />
-              </div>
-            </Col>
-            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Cinematographers
+              </Col>
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Cinematographers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedCinematographers"
+                    disabled={true}
+                    className="forminput"
+                    value={clientData?.preWedcinematographers}
+                    required={true}
+                  />
                 </div>
-                <Input
-                  type="text"
-                  name="preWedCinematographers"
-                  disabled={true}
-                  className="forminput"
-                  value={clientData?.preWedcinematographers}
-                  required={true}
-                />
-              </div>
-            </Col>
-            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Assistants
+              </Col>
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Assistants
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedAssistants"
+                    disabled={true}
+                    className="forminput"
+                    value={clientData?.preWedassistants}
+                    required={true}
+                  />
                 </div>
-                <Input
-                  type="text"
-                  name="preWedAssistants"
-                  disabled={true}
-                  className="forminput"
-                  value={clientData?.preWedassistants}
-                  required={true}
-                />
-              </div>
-            </Col>
-            <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Drone Flyers
+              </Col>
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    Drone Flyers
+                  </div>
+                  <Input
+                    type="text"
+                    name="preWedDroneFlyerss"
+                    disabled={true}
+                    className="forminput"
+                    value={clientData?.preWeddrones}
+                    required={true}
+                  />
                 </div>
-                <Input
-                  type="text"
-                  name="preWedDroneFlyerss"
-                  disabled={true}
-                  className="forminput"
-                  value={clientData?.preWeddrones}
-                  required={true}
-                />
-              </div>
-            </Col>
-          </Row>
-        )}
+              </Col>
+            </Row>
+          )}
         <Row>
           {clientData?.albums?.map((albumValue, i) => {
             return (
@@ -469,7 +524,7 @@ function Preview() {
                     className="forminput"
                     value={albumValue}
                     required={true}
-                    // onChange={(e) => updateEventValues(e)}
+                  // onChange={(e) => updateEventValues(e)}
                   />
                 </div>
               </Col>
@@ -489,7 +544,7 @@ function Preview() {
                 className="forminput"
                 value={clientData?.promos}
                 required={true}
-                // onChange={(e) => updateEventValues(e)}
+              // onChange={(e) => updateEventValues(e)}
               />
             </div>
           </Col>
@@ -505,7 +560,7 @@ function Preview() {
                 className="forminput"
                 value={clientData?.longFilms}
                 required={true}
-                // onChange={(e) => updateEventValues(e)}
+              // onChange={(e) => updateEventValues(e)}
               />
             </div>
           </Col>
@@ -521,7 +576,7 @@ function Preview() {
                 className="forminput"
                 value={clientData?.performanceFilms}
                 required={true}
-                // onChange={(e) => updateEventValues(e)}
+              // onChange={(e) => updateEventValues(e)}
               />
             </div>
           </Col>
@@ -537,7 +592,7 @@ function Preview() {
                 className="forminput"
                 value={clientData?.reels}
                 required={true}
-                // onChange={(e) => updateEventValues(e)}
+              // onChange={(e) => updateEventValues(e)}
               />
             </div>
           </Col>
@@ -553,11 +608,11 @@ function Preview() {
                 className="forminput"
                 value={clientData?.hardDrives}
                 required={true}
-                // onChange={(e) => updateEventValues(e)}
+              // onChange={(e) => updateEventValues(e)}
               />
             </div>
           </Col>
-        </Row>
+        </Row> */}
         <div className="mt25">
           <div className="Text16N" style={{ marginBottom: "6px" }}>
             Client Suggestions If Any

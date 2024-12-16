@@ -331,7 +331,7 @@ const SignInPostRequest = async (req, res) => {
       const token = jwt.sign(
         { id: loginUser._id, email: loginUser.email }, // Payload
         process.env.JWT_SECRET, // Secret key
-        { expiresIn: req.body.remember ? "7d" : "4h" } // Token expiration time
+        { expiresIn: req.body.remember ? undefined : "7d" } // Token expiration time
       );
 
       // Respond with user details and token

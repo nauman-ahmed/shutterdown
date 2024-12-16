@@ -18,7 +18,7 @@ function Deliverable(props) {
     try {
       const res = await getClientById(clientId)
       console.log(res);
-      
+
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0])
       const preWedDeliverable = res.deliverables?.filter(deliverable => deliverable.deliverableName === 'Pre-Wedding Photos' || deliverable.deliverableName === 'Pre-Wedding Videos');
@@ -64,14 +64,14 @@ function Deliverable(props) {
   const detectAlbum = (name) => {
     const notAlbum = ["Photos", "Promo", "Long Film", "Reel"]
     console.log("detectAlbum", name)
-    if(notAlbum.includes(name)){
+    if (notAlbum.includes(name)) {
       return name
     }
     return "Album: " + name
   }
 
-  
-  
+
+
   return (
     <div>
       {preWedDeliverables?.length > 0 && (
@@ -110,14 +110,14 @@ function Deliverable(props) {
               }}
             >
               {preWedDeliverables.map((deliverable, i) => {
-                
-                
+
+
                 return (
                   <tr>
                     <td className="textPrimary Text14Semi tablePlaceContent">{deliverable?.deliverableName}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate?.eventDate).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" > {dayjs(new Date(weddingDate?.eventDate).setDate(new Date(weddingDate?.eventDate).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(deliverable?.date).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" > {dayjs(new Date(deliverable?.date).setDate(new Date(deliverable.date).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.status || 'Pending'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.finalDeliverDate ? dayjs(deliverable?.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
@@ -169,10 +169,10 @@ function Deliverable(props) {
               {otherDeliverables.map((deliverable, i) => {
                 return (
                   <tr>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{detectAlbum(deliverable?.deliverableName)}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.isAlbum ? 'Album : ' + deliverable.deliverableName : deliverable?.deliverableName}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.editor?.firstName || 'Not Assigned'}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(weddingDate?.eventDate).format('DD-MMM-YYYY')}</td>
-                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(weddingDate?.eventDate).setDate(new Date(weddingDate?.eventDate).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(deliverable?.date).format('DD-MMM-YYYY')}</td>
+                    <td className="textPrimary Text14Semi tablePlaceContent" >{dayjs(new Date(deliverable?.date).setDate(new Date(deliverable?.date).getDate() - getrelevantDeadline(deliverable?.deliverableName))).format('DD-MMM-YYYY')}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.status || 'Pending'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.firstDeliveryDate ? dayjs(deliverable?.firstDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>
                     <td className="textPrimary Text14Semi tablePlaceContent" >{deliverable?.finalDeliveryDate ? dayjs(deliverable?.finalDeliveryDate).format('DD-MMM-YYYY') : 'Not Assigned'}</td>

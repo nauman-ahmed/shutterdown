@@ -314,15 +314,7 @@ function ViewClient() {
           >
             <div style={{ width: "300px" }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              {/* <CalenderMultiListView
-                monthForData={monthForData}
-                dateForFilter={dateForFilter}
-                yearForData={yearForData}
-                setShow={setShow}
-                
-                setYearForData={setYearForData}
-                setDateForFilter={setDateForFilter}
-              /> */}
+              
             </div>
           </Overlay>
         </>

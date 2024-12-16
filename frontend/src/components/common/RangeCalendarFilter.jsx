@@ -8,7 +8,6 @@ const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 function RangeCalendarFilter({ startDate, endDate, updateStartDate, updateEndDate, setMonthForData}) {
 
   const changeViewHandler = (props) => {
-    ;
     const activeDate = new Date(props.activeStartDate)
     updateStartDate(new Date(activeDate))
     updateEndDate(new Date(activeDate.getFullYear(), activeDate.getMonth() + 1, 0))

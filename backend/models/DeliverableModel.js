@@ -6,6 +6,9 @@ const deliverableSchema = mongoose.Schema({
         ref: 'Client',
         required: true
     },
+    numberInDeliverables: {
+        type: Number,
+    },
     deliverableName: {
         type: String,
         required: true
@@ -44,6 +47,14 @@ const deliverableSchema = mongoose.Schema({
     clientRating: {
         type: Number
     },
+    isAlbum: {
+        type: Boolean,
+        default: false
+    },
+    forEvents: [{
+        type: mongoose.Types.ObjectId,
+        ref: "Event",
+    },]
 })
 
 const deliverableModel = new mongoose.model('Deliverable', deliverableSchema);
