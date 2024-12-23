@@ -53,7 +53,7 @@ function ViewClient() {
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()] + " " +new Date().getFullYear());
+  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()] + " " + new Date().getFullYear());
   const [yearForData, setYearForData] = useAtom(clientFilterYear);
   const [filterClient, setFilterClient] = useState(null);
   const [updateData, setUpdateData] = useState(false);
@@ -136,7 +136,7 @@ function ViewClient() {
         <>
           <div
             className=" ViewClient d-flex flex-row  mx-auto align-items-center"
-            style={{ width: '460px', marginTop : '0px' }}
+            style={{ width: '460px', marginTop: '0px' }}
             ref={target}
           >
             <div className="w-100 d-flex flex-row align-items-center">
@@ -157,7 +157,7 @@ function ViewClient() {
                       onClick={() => {
                         setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
                         setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
-                        setMonthForData(months[currentDate.getMonth()]  + " " + currentDate.getFullYear());
+                        setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
                       }}
                     />
@@ -220,6 +220,8 @@ function ViewClient() {
                 <th className="tableBody" style={{ width: "33%" }}>
                   Wedding Date
                 </th>
+                <th className="tableBody">Payment Status</th>
+                <th className="tableBody">Project Status</th>
               </tr>
             </thead>
             <tbody
@@ -282,6 +284,26 @@ function ViewClient() {
                         "Not Defined"
                       )}
                     </td>
+                    <td
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                      className="tableBody Text14Semi primary2 textPrimary"
+                    >
+                      {client.paymentStatus}
+
+                    </td>
+                    <td
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                      className="tableBody Text14Semi primary2 textPrimary"
+                    >
+                      {client.projectStatus}
+
+                    </td>
                   </tr>
                   <div style={{ marginTop: "15px" }} />
                 </>
@@ -314,7 +336,7 @@ function ViewClient() {
           >
             <div style={{ width: "300px" }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              
+
             </div>
           </Overlay>
         </>
