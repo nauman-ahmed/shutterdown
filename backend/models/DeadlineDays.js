@@ -29,6 +29,10 @@ const deadlineDaysSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  performanceFilms: {
+    type: Number,
+    required: true,
+  },
 });
 
 const deadlineDaysModel = new mongoose.model("DeadlineDays", deadlineDaysSchema);

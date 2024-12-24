@@ -11,6 +11,8 @@ const getDeadlineDays = async (req, res) => {
 
 const updateDeadlineDays = async (req, res) => {
   const { _id, ...dataWithoutId } = req.body.data;
+  console.log(dataWithoutId);
+  
   try {
     await deadlineDaysModel
       .findByIdAndUpdate(req.body.data._id, dataWithoutId)
