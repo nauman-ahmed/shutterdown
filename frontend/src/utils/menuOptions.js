@@ -220,8 +220,8 @@ export const editorMenuOptions = [
     ),
     subMenus: [
       {
-        path: "/deliverables/cinematography",
-        text: "Cinematography",
+        path: "/deliverables/cinema",
+        text: "Cinema",
       },
       {
         path: "/deliverables/photos",
