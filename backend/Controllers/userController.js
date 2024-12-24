@@ -327,12 +327,14 @@ const SignInPostRequest = async (req, res) => {
           .json({ message: "Your account access is limited" });
       }
 
-      // Generate JWT token
+      const jwtOptions = req.body.remember ? {} : { expiresIn: "7d" };
+
       const token = jwt.sign(
         { id: loginUser._id, email: loginUser.email }, // Payload
         process.env.JWT_SECRET, // Secret key
-        { expiresIn: req.body.remember ? undefined : "7d" } // Token expiration time
+        jwtOptions // Conditional options
       );
+      
 
       // Respond with user details and token
       res.status(200).json({
