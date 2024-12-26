@@ -14,10 +14,7 @@ mongoose
   .connect(DB)
   .then(() => {
     console.log("DataBase Connected");
-   
-    //     changeDateString()
-    // adddatesinClients()
-    // addDateinDeliverales()
+
   })
   .catch((error) => {
     console.log("DataBase not Connected", error);
