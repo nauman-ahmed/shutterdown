@@ -972,10 +972,10 @@ function ClientInfo() {
 
                       <Row>
                         <Col xl="10" sm="8">
-                          <div className=" d-flex flex-row align-items-center gap-4">
+                          <div className=" d-flex flex-row align-items-center flex-wrap gap-4">
                             <h4 className="LabelDrop m-0">{deliverableObj?.number + ")"} For Events :</h4>
                             {editedClient?.events?.map((event, eventIndex) => (
-                              <div className="d-flex flex-row  align-items-center gap-2">
+                              <div className="d-flex flex-row  align-items-center flex-wrap gap-2">
                                 <input
                                   onChange={(e) => {
                                     const updatedDeliverables = [...editedClient?.deliverablesArr]

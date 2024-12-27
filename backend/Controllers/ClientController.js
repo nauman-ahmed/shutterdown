@@ -247,11 +247,6 @@ const updateWholeClient = async (req, res) => {
         console.log(savedDeliverableObj);
 
         if (!savedDeliverableObj) {
-          console.log('new deliverable object');
-          console.log(clientToEdit._id);
-          console.log(reqClientData._id);
-
-
           // New Deliverables Added
           const photosDeliverable = new deliverableModel({
             client: reqClientData._id,

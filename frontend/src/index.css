@@ -14,7 +14,7 @@ code {
 
 /* Custom styles for dates in the range */
 .react-calendar__tile--range {
-  background-color: rgb(215, 215, 255) !important; /* Light green background */
+  background-color: #666DFF !important; /* Light green background */
  
 }
 
