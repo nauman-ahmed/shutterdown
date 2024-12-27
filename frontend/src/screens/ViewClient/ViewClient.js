@@ -289,7 +289,7 @@ function ViewClient() {
                         paddingTop: "15px",
                         paddingBottom: "15px",
                       }}
-                      className="tableBody Text14Semi primary2 textPrimary"
+                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
                     >
                       {client.paymentStatus}
 
@@ -299,7 +299,7 @@ function ViewClient() {
                         paddingTop: "15px",
                         paddingBottom: "15px",
                       }}
-                      className="tableBody Text14Semi primary2 textPrimary"
+                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
                     >
                       {client.projectStatus}
 
