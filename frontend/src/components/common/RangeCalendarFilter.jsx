@@ -26,8 +26,8 @@ function RangeCalendarFilter({ startDate, endDate, updateStartDate, updateEndDat
         selectRange
         value={[new Date(startDate), new Date(endDate)]}
         view={'month'}
-        onViewChange={changeViewHandler}
-        onActiveStartDateChange={changeViewHandler}
+        // onViewChange={changeViewHandler}
+        // onActiveStartDateChange={changeViewHandler}
         onChange={onDateClickHandler}
       />
     </>

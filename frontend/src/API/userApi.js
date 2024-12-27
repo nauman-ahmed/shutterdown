@@ -72,6 +72,32 @@ export const getAllUserAccountRequestCount = async () => {
   }
 };
 
+export const getLastBackupInfo = async () => {
+  try {
+    const res = await axios.get(BASE_URL + "/recentBackup", {
+      Headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
+export const makeBackup = async () => {
+  try {
+    const res = await axios.post(BASE_URL + "/newBackup", {
+      Headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
 export const SignUpAPI = async (data) => {
   const {
     firstName,
@@ -207,6 +233,9 @@ export const newPass = async (data) => {
     alert(error.toString());
   }
 };
+
+
+
 
 export const updateUserDataAPI = async (userData) => {
   try {

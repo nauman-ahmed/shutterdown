@@ -2,6 +2,8 @@ const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { google } = require("googleapis");
+const BackupModel = require("../models/Backup");
+const dayjs = require('dayjs')
 
 // Load Google API credentials
 const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
@@ -12,8 +14,6 @@ const TOKEN_PATH = path.join(__dirname, "token.json");
  */
 const authorizeGoogleDrive = async () => {
     try {
-
-
         const auth = new google.auth.GoogleAuth({
             keyFile: CREDENTIALS_PATH,
             scopes: ["https://www.googleapis.com/auth/drive.file"],
@@ -21,7 +21,6 @@ const authorizeGoogleDrive = async () => {
         return auth.getClient();
     } catch (error) {
         console.log(error);
-
     }
 };
 
@@ -43,12 +42,14 @@ const uploadToGoogleDrive = async (filePath) => {
         body: fs.createReadStream(filePath),
     };
 
-    const res = await drive.files.create({
+    const res = await  drive.files.create({
         resource: fileMetadata,
         media,
         fields: "id",
     });
     console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
+    const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
+    await newbackup.save()
     await setFilePermissions(res.data.id);
 
 };
@@ -105,7 +106,7 @@ const setFilePermissions = async (fileId) => {
             emailAddress: "iamsafdarawan@gmail.com", // Replace with the desired email
         },
     });
-    
+
 
     console.log(`Permissions updated for file ID: ${fileId}`);
 };

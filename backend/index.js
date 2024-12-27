@@ -18,7 +18,9 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const eventRouter = require('./Routes/EventRouter');
 const deliverableRouter = require('./Routes/deliverableRouter');
+const BackupRouter = require("./Routes/Backup")
 const { applyBackupSchedule } = require('./utils/backupSchedule');
+const ClientModel = require('./models/ClientModel');
 dotenv.config({ path: './.env' });
 
 
@@ -64,12 +66,14 @@ app.use(deliverableRouter);
 app.use(notificationRouter);
 app.use(DeadlineDaysRouter);
 app.use('/', AttendenceRouter);
+app.use('/', BackupRouter);
 app.use(viewClientRouter);
 app.use('/', DailyTaskRouter);
 app.use('/eventOptions', EventOptionsRouter);
 app.use('/deliverableOptions', DeliverableOptionsRouter);
 app.use('/Whatsapp', WhatsappRouter);
 applyBackupSchedule()
+
 
 
 
