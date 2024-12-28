@@ -112,10 +112,7 @@ function ClientInfo() {
       value: 'Closed & Cleared',
       label: 'Closed & Cleared',
     },
-    {
-      value: 'Pending',
-      label: 'Pending',
-    },
+
   ];
   const deliverablePreWeddingOptionObjectKeys = [
     "photographers",
