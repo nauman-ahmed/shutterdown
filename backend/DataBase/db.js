@@ -17,10 +17,13 @@ const updateDeliverables = async () => {
   // const allClients = await ClientModel.find().populate('events').populate('deliverables');
   const albumDelivs = await deliverableModel.find({ deliverableName: { $in: ['Classic', 'Premium'] } })
   for(let deliv of albumDelivs){
+  
     await deliverableModel.findByIdAndUpdate(deliv._id, {isAlbum : true})
   }
 
   // for (let client of allClients) {
+  //   console.log('running');
+    
   //   const latestEventDate = client.events
   //     .map(event => event.eventDate)
   //     .reduce((max, current) => (max > current ? max : current));
