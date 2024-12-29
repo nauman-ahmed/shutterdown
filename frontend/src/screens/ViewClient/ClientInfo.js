@@ -29,6 +29,7 @@ import PhoneInput from "react-phone-input-2";
 import { getAllDeliverableOptions } from "../../API/FormDeliverableOptionsAPI";
 import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
+import ButtonLoader from "../../components/common/buttonLoader";
 
 function ClientInfo() {
   const { clientId } = useParams();
@@ -47,7 +48,7 @@ function ClientInfo() {
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] = useState(null);
   const [editClientModal, setEditClientModal] = useState(false)
   const [editedClient, setEditedClient] = useState(null)
-
+  const [editingClient, setEditingClient] = useState(false)
   const deliverableOptionObjectKeys = [
     "promos",
     "longFilms",
@@ -190,7 +191,9 @@ function ClientInfo() {
   };
   const updateClient = async () => {
     try {
+      setEditingClient(true)
       await updateClientData(editedClient);
+      setEditingClient(false)
       setEditedClient(null)
       setEditClientModal(false);
       getIdData();
@@ -1179,112 +1182,7 @@ function ClientInfo() {
             </Row>
             <Row>
 
-              {/* {editedClient?.albums?.map((albumValue, i) =>
-                deliverableAlbumOptionObjectKeys.map((Objkey) => (
-                  <Col xl="6" sm="6" className="p-2" key={i}>
-                    <div className="Drop">
-                      <h4 className="LabelDrop">Album {i + 1}</h4>
-                      <Select
-                        value={
-                          albumValue?.length > 0
-                            ? { value: albumValue, label: albumValue }
-                            : null
-                        }
-                        name={`album${i + 1}`}
-                        className="w-100"
-                        onChange={(selected) => {
-                          const updatedAlbums = [...editedClient?.[Objkey]];
-                          updatedAlbums[i] = selected?.value;
-                          setEditedClient({ ...editedClient, [Objkey]: updatedAlbums, })
-
-
-                        }}
-                        styles={customStyles}
-                        options={
-                          deliverableOptionsKeyValues &&
-                          deliverableOptionsKeyValues[Objkey].values
-                        }
-                        required={true}
-                      />
-                    </div>
-                  </Col>
-                ))
-              )}
-
-              <Col xs="12"  >
-                <div className="d-flex fex-row">
-                  {editedClient?.albums?.length > 1 && (
-                    <div
-                      style={{
-                        backgroundColor: "rgb(102, 109, 255)",
-                        color: "white",
-                        width: "30PX",
-                        height: "30px",
-                        borderRadius: "100%",
-                      }}
-                      className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
-                      onClick={() => {
-                        const updatedAlbums = [...editedClient?.albums];
-                        updatedAlbums.pop();
-                        setEditedClient({ ...editedClient, albums: updatedAlbums, })
-
-                      }}
-                    >
-                      <CgMathMinus />
-                    </div>
-                  )}
-                  <div
-                    className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
-                    onClick={() => {
-                      let updatedAlbums = [...editedClient?.albums];
-                      updatedAlbums.push("");
-                      setEditedClient({ ...editedClient, albums: updatedAlbums })
-
-                    }}
-                    style={{
-                      backgroundColor: "rgb(102, 109, 255)",
-                      color: "white",
-                      width: "30PX",
-                      height: "30px",
-                      borderRadius: "100%",
-                    }}
-                  >
-                    <LuPlus />
-                  </div>
-                </div>
-              </Col>
-
-              {deliverableOptionObjectKeys.map((Objkey) => (
-                <Col xl="6" sm="6" className="p-2">
-                  <div className="mt25">
-                    <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      {deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].label}
-                    </div>
-                    <Select
-                      value={
-                        editedClient?.[Objkey] !== null
-                          ? {
-                            value: editedClient?.[Objkey],
-                            label: editedClient?.[Objkey],
-                          }
-                          : null
-                      }
-                      name={Objkey}
-                      onChange={(selected) => {
-                        setEditedClient({ ...editedClient, [Objkey]: selected?.value, })
-
-                      }}
-                      styles={customStyles}
-                      options={
-                        deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].values
-                      }
-                      required
-                    />
-                  </div>
-                </Col>
-              ))} */}
+              
 
               <Col className="p-2 mt-4">
                 <div className="label">Client Suggestions</div>
@@ -1304,7 +1202,7 @@ function ClientInfo() {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" className="Update_btn">
-              UPDATE
+              {editingClient ? <ButtonLoader /> : "UPDATE"}
             </Button>
             <Button
               color="danger"
