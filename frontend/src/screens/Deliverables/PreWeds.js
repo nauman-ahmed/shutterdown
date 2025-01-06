@@ -23,6 +23,7 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
+import { groupByBrideName } from "./Cinematography";
 
 const months = [
   "January",
@@ -49,9 +50,7 @@ function PreWedDeliverables(props) {
   const [filterCondition, setFilterCondition] = useState(null);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [updateData, setUpdateData] = useState(false);
-  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
     months[new Date().getMonth()] + " " + new Date().getFullYear()
@@ -132,7 +131,7 @@ function PreWedDeliverables(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(sorted);
+        setDeliverablesForShow(groupByBrideName(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -143,26 +142,26 @@ function PreWedDeliverables(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(
+        setDeliverablesForShow(groupByBrideName(
           allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
         );
       } else {
         if (
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(
+          setDeliverablesForShow(groupByBrideName(
             allDeliverables.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
           );
         }
       }
@@ -175,7 +174,6 @@ function PreWedDeliverables(props) {
     try {
       setLoading(true);
       const data = await getPreWeds(
-        1,
        startDate,
        endDate
       );
@@ -196,24 +194,24 @@ function PreWedDeliverables(props) {
         setAllDeliverables(data.data);
        
         
-        setDeliverablesForShow(
+        setDeliverablesForShow(groupByBrideName(
           data.data.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+          }))
         );
       } else if (currentUser?.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(
+        setDeliverablesForShow(groupByBrideName(
           deliverablesToShow.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+          }))
         );
       }
       setLoading(false);
@@ -223,91 +221,11 @@ function PreWedDeliverables(props) {
     }
   };
   useEffect(() => {
-    setHasMore(true);
-    setPage(2);
     fetchData();
   }, [updateData]);
 
-  const fetchPreWeds = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getPreWeds(
-          page,
-          startDate,
-          endDate
-        );
-        if (data.data.length > 0) {
-          let dataToAdd;
-          if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data.data]);
-            if (filterCondition) {
-              dataToAdd = data.data.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = data.data;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          } else if (currentUser.rollSelect === "Editor") {
-            const deliverablesToShow = data.data.filter(
-              (deliverable) => deliverable?.editor?._id === currentUser._id
-            );
-            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if (filterCondition) {
-              dataToAdd = deliverablesForShow.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = deliverablesToShow;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          }
-        }
 
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
-      fetchPreWeds();
-    }
-  }, [deliverablesForShow, hasMore, loading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
-
-    if (bottomOfWindow) {
-      fetchPreWeds();
-    }
-  };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
 
   const applyFilterNew = (filterValue) => {
     if (filterValue.length) {
@@ -391,20 +309,20 @@ function PreWedDeliverables(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(
+      setDeliverablesForShow(groupByBrideName(
         newData?.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
-        })
+        }))
       );
     } else {
-      setDeliverablesForShow(
+      setDeliverablesForShow(groupByBrideName(
         allDeliverables?.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
-        })
+        }))
       );
     }
   };
@@ -456,6 +374,42 @@ function PreWedDeliverables(props) {
       return deadlineDays.preWedVideo;
     }
     return 45;
+  };
+
+  const returnOneRow = (deliverable, prevDeliverable) => {
+    if (prevDeliverable) {
+      if (deliverable?.client?._id !== prevDeliverable?.client?._id) {
+        if (currentUser?.rollSelect === "Manager") {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        } else {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        }
+      }
+    }
   };
 
   return (
@@ -573,6 +527,10 @@ function PreWedDeliverables(props) {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
+                    {returnOneRow(
+                        deliverable,
+                        index >= 0 ? deliverablesForShow[index - 1] : null
+                      )}
                       {index === 0 && <div style={{ marginTop: "15px" }} />}
                       {currentUser?.rollSelect === "Manager" && (
                         <tr
@@ -977,23 +935,7 @@ function PreWedDeliverables(props) {
                 })}
               </tbody>
             </Table>
-            {loading && <Spinner />}
-            {!hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div>No more data to load.</div>
-              </div>
-            )}
-            {!loading && hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchPreWeds()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+            
           </div>
           <Overlay
             rootClose={true}
@@ -1007,15 +949,6 @@ function PreWedDeliverables(props) {
           >
             <div style={{ width: "300px" }}>
             <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              {/* <CalenderMultiListView
-                monthForData={monthForData}
-                dateForFilter={dateForFilter}
-                yearForData={yearForData}
-                setShow={setShow}
-                setMonthForData={setMonthForData}
-                setYearForData={setYearForData}
-                setDateForFilter={setDateForFilter}
-              /> */}
             </div>
           </Overlay>
         </>

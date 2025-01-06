@@ -6,7 +6,6 @@ const currentUser =
   Cookies.get("currentUser") && JSON.parse(Cookies.get("currentUser"));
 
 export const getCinematography = async (
-  page,
   startDate,
   endDate,
 ) => {
@@ -16,7 +15,6 @@ export const getCinematography = async (
       {
         headers: { "Content-Type": "application/json" },
         params: {
-          page,
           startDate,
           endDate
         }
@@ -30,7 +28,6 @@ export const getCinematography = async (
 };
 
 export const getAlbums = async (
-  page,
   startDate,
   endDate
 ) => {
@@ -41,7 +38,6 @@ export const getAlbums = async (
       {
         Headers: { "Content-Type": "application/json" },
         params: {
-          page,
           startDate,
           endDate
         }
@@ -54,7 +50,6 @@ export const getAlbums = async (
 };
 
 export const getPhotos = async (
-  page,
   startDate,
   endDate,
 ) => {
@@ -65,7 +60,6 @@ export const getPhotos = async (
       {
         Headers: { "Content-Type": "application/json" },
         params: {
-          page,
           startDate,
           endDate
         }
@@ -78,7 +72,6 @@ export const getPhotos = async (
 };
 
 export const getPreWeds = async (
-  page,
   startDate,
   endDate
 ) => {
@@ -89,7 +82,6 @@ export const getPreWeds = async (
       {
         Headers: { "Content-Type": "application/json" },
         params: {
-          page,
           startDate,
           endDate
         }

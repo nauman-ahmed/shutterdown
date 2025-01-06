@@ -42,6 +42,33 @@ const months = [
   "Decemeber",
 ];
 
+export const groupByBrideName = (deliverables) => {
+  // Step 1: Group events by brideName
+  const groupedByBrideName = deliverables?.reduce((acc, deliverable) => {
+    const brideName = deliverable?.client?.brideName;
+    // Check if the bride's group already exists in acc
+    let found = acc?.find((group) => group.brideName === brideName);
+    if (!found) {
+      // Create a new group for this bride
+      found = { brideName, deliverables: [] };
+      acc.push(found);
+    }
+    // Add the current event to the bride's group
+    found.deliverables.push(deliverable);
+    return acc;
+  }, []);
+
+  // Step 3: Flatten the groups back into a single array of events
+  const sortedDeliverables = groupedByBrideName?.reduce((acc, group) => {
+    acc.push(...group.deliverables); // Append each group's sorted events
+    return acc;
+  }, []);
+
+  return sortedDeliverables;
+};
+
+
+
 function Cinematography(props) {
   const target = useRef(null);
   const [editors, setEditors] = useState(null);
@@ -69,13 +96,11 @@ function Cinematography(props) {
   const toggle = () => {
     setShow(!show);
   };
-  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
-    months[new Date().getMonth()]  + " " + new Date().getFullYear()
+    months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
   const [yearForData, setYearForData] = useState(new Date().getFullYear());
   const [show, setShow] = useState(false);
@@ -100,7 +125,41 @@ function Cinematography(props) {
       cinematographyTextGetImmutable: newEditorStatecinematography,
     });
   };
-
+  const returnOneRow = (deliverable, prevDeliverable) => {
+    if (prevDeliverable) {
+      if (deliverable?.client?._id !== prevDeliverable?.client?._id) {
+        if (currentUser?.rollSelect === "Manager") {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        } else {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        }
+      }
+    }
+  };
   const filterOptions =
     currentUser?.rollSelect === "Manager"
       ? [
@@ -110,14 +169,18 @@ function Cinematography(props) {
           filters: [
             {
               title: "Promo",
-              id: 2,
+              id: 1,
             },
             {
               title: "Reel",
-              id: 3,
+              id: 2,
             },
             {
               title: "Long Film",
+              id: 3,
+            },
+            {
+              title: "Performance Film",
               id: 4,
             },
           ],
@@ -197,12 +260,15 @@ function Cinematography(props) {
     "Assigned Editor": 2,
     "Current Status": 3,
   };
+
+
+
+
   const [updatingIndex, setUpdatingIndex] = useState(null);
   const fetchData = async () => {
     try {
       setLoading(true);
       const data = await getCinematography(
-        1,
         startDate,
         endDate,
       );
@@ -213,24 +279,22 @@ function Cinematography(props) {
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data.data);
-        setDeliverablesForShow(
-          data.data.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
-        );
+        setDeliverablesForShow(groupByBrideName(data.data.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        })));
       } else if (currentUser?.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(
-          deliverablesToShow.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+        setDeliverablesForShow(groupByBrideName(deliverablesToShow.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        })
+        )
         );
       }
       setEditors(
@@ -243,94 +307,9 @@ function Cinematography(props) {
     }
   };
   useEffect(() => {
-    setHasMore(true);
-    setPage(2);
     fetchData();
   }, [updateData]);
-  const fetchCinemas = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getCinematography(
-          page,
-          startDate,
-          endDate,
-        );
-        if (data.data.length > 0) {
-          let dataToAdd;
-          if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...allDeliverables, ...data.data]);
-            if (filterCondition) {
-              dataToAdd = data.data.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = data.data;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          } else if (currentUser?.rollSelect === "Editor") {
-            const deliverablesToShow = data.data.filter(
-              (deliverable) => deliverable?.editor?._id === currentUser?._id
-            );
-            setAllDeliverables(
-              [...allDeliverables, ...deliverablesToShow].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-            if (filterCondition) {
-              dataToAdd = deliverablesForShow.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = deliverablesToShow;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          }
-        }
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
-      fetchCinemas();
-    }
-  }, [deliverablesForShow, hasMore, loading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
 
-    if (bottomOfWindow) {
-      fetchCinemas();
-    }
-  };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
 
   const applySorting = (wedding = false) => {
     try {
@@ -340,7 +319,7 @@ function Cinematography(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(sorted);
+        setDeliverablesForShow(groupByBrideName(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -430,20 +409,18 @@ function Cinematography(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(
-        newData?.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        })
+      setDeliverablesForShow(groupByBrideName(newData?.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
       );
     } else {
-      setDeliverablesForShow(
-        allDeliverables?.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return ascendingWeding ? dateB - dateA : dateA - dateB;
-        })
+      setDeliverablesForShow(groupByBrideName(allDeliverables?.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return ascendingWeding ? dateB - dateA : dateA - dateB;
+      }))
       );
     }
   };
@@ -451,26 +428,26 @@ function Cinematography(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(
+        setDeliverablesForShow(groupByBrideName(
           allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
         );
       } else {
         if (
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(
+          setDeliverablesForShow(groupByBrideName(
             allDeliverables.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
           );
         }
       }
@@ -544,6 +521,8 @@ function Cinematography(props) {
 
     return 45;
   };
+
+  
 
   return (
     <>
@@ -659,7 +638,12 @@ function Cinematography(props) {
               >
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
+
                     <>
+                      {returnOneRow(
+                        deliverable,
+                        index >= 0 ? deliverablesForShow[index - 1] : null
+                      )}
                       {index === 0 && <div style={{ marginTop: "15px" }} />}
                       {currentUser?.rollSelect === "Manager" && (
                         <tr
@@ -689,7 +673,7 @@ function Cinematography(props) {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName} 
+                              {deliverable?.deliverableName}
                               {/* :{" "}
                               {deliverable?.quantity} */}
                             </div>
@@ -1081,22 +1065,6 @@ function Cinematography(props) {
               </tbody>
             </Table>
             {loading && <Spinner />}
-            {!hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div>No more data to load.</div>
-              </div>
-            )}
-            {!loading && hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchCinemas()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
           </div>
           <Overlay
             rootClose={true}
@@ -1110,15 +1078,7 @@ function Cinematography(props) {
           >
             <div style={{ width: "300px" }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              {/* <CalenderMultiListView
-                monthForData={monthForData}
-                dateForFilter={dateForFilter}
-                yearForData={yearForData}
-                setShow={setShow}
-                setMonthForData={setMonthForData}
-                setYearForData={setYearForData}
-                setDateForFilter={setDateForFilter}
-              /> */}
+
             </div>
           </Overlay>
         </>

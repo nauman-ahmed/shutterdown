@@ -27,6 +27,7 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
+import { groupByBrideName} from "./Cinematography";
 
 const months = [
   "January",
@@ -60,9 +61,7 @@ function Albums(props) {
   const currentDate = new Date();
   const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
   const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
-  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [dateForFilter, setDateForFilter] = useState(null);
   const [updateData, setUpdateData] = useState(false);
@@ -104,7 +103,7 @@ function Albums(props) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await getAlbums(1, startDate, endDate);
+      const data = await getAlbums(startDate, endDate);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
@@ -114,24 +113,23 @@ function Albums(props) {
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data?.data);
-        setDeliverablesForShow(
-          data?.data.sort((a, b) => {
+        setDeliverablesForShow(groupByBrideName(data?.data.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+          }))
         );
       } else if (currentUser?.rollSelect === "Editor") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(
+        setDeliverablesForShow(groupByBrideName(
           deliverablesToShow.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
-          })
+          }))
         );
       }
       setLoading(false);
@@ -141,89 +139,10 @@ function Albums(props) {
     }
   };
   useEffect(() => {
-    setHasMore(true);
-    setPage(2);
     fetchData();
   }, [updateData]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchAlbums = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getAlbums(
-          page,
-          startDate,
-          endDate
-        );
-        if (data.data.length > 0) {
-          let dataToAdd;
-          if (currentUser?.rollSelect === "Manager") {
-            setAllDeliverables([...deliverablesForShow, ...data.data]);
-            if (filterCondition) {
-              dataToAdd = data.data.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = data.data;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          } else if (currentUser?.rollSelect === "Editor") {
-            const deliverablesToShow = data.data.filter(
-              (deliverable) => deliverable?.editor?._id === currentUser?._id
-            );
-            setAllDeliverables([...allDeliverables, ...deliverablesToShow]);
-            if (filterCondition) {
-              dataToAdd = deliverablesForShow.filter((deliverable) =>
-                eval(filterCondition)
-              );
-            } else {
-              dataToAdd = deliverablesToShow;
-            }
-            setDeliverablesForShow(
-              [...deliverablesForShow, ...dataToAdd].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return ascendingWeding ? dateB - dateA : dateA - dateB;
-              })
-            );
-          }
-        }
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (deliverablesForShow?.length < 10 && hasMore && !loading) {
-      fetchAlbums();
-    }
-  }, [deliverablesForShow, hasMore, loading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
-    if (bottomOfWindow) {
-      console.log("at bottom");
-      fetchAlbums();
-    }
-  };
 
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
+
 
   const filterOptions =
     currentUser?.rollSelect === "Manager"
@@ -292,7 +211,7 @@ function Albums(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(sorted);
+        setDeliverablesForShow(groupByBrideName(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -303,26 +222,24 @@ function Albums(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(
-          allDeliverables
+        setDeliverablesForShow(groupByBrideName(allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
         );
       } else {
         if (
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(
-            allDeliverables?.sort((a, b) => {
+          setDeliverablesForShow(groupByBrideName(allDeliverables?.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
-            })
+            }))
           );
         }
       }
@@ -404,9 +321,9 @@ function Albums(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(newData);
+      setDeliverablesForShow(groupByBrideName(newData));
     } else {
-      setDeliverablesForShow(allDeliverables);
+      setDeliverablesForShow(groupByBrideName(allDeliverables));
     }
   };
 
@@ -464,7 +381,41 @@ function Albums(props) {
   const getrelevantDeadline = (title) => {
     return deadlineDays.album;
   };
-
+  const returnOneRow = (deliverable, prevDeliverable) => {
+    if (prevDeliverable) {
+      if (deliverable?.client?._id !== prevDeliverable?.client?._id) {
+        if (currentUser?.rollSelect === "Manager") {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        } else {
+          return (
+            <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+            </tr>
+          );
+        }
+      }
+    }
+  };
   return (
     <>
       <ClientHeader
@@ -582,6 +533,10 @@ function Albums(props) {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
+                    {returnOneRow(
+                        deliverable,
+                        index >= 0 ? deliverablesForShow[index - 1] : null
+                      )}
                       {index === 0 && <div style={{ marginTop: "15px" }} />}
                       {currentUser?.rollSelect === "Manager" && (
                         <tr
@@ -959,22 +914,7 @@ function Albums(props) {
               </tbody>
             </Table>
             {loading && <Spinner />}
-            {!hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div>No more data to load.</div>
-              </div>
-            )}
-            {!loading && hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchAlbums()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+            
           </div>
           <Overlay
             rootClose={true}
@@ -988,15 +928,6 @@ function Albums(props) {
           >
             <div style={{ width: "300px" }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              {/* <CalenderMultiListView
-                monthForData={monthForData}
-                dateForFilter={dateForFilter}
-                yearForData={yearForData}
-                setShow={setShow}
-                setMonthForData={setMonthForData}
-                setYearForData={setYearForData}
-                setDateForFilter={setDateForFilter}
-              /> */}
             </div>
           </Overlay>
         </>

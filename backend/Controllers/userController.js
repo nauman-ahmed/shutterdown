@@ -293,7 +293,7 @@ const RegisterPostRequest = async (req, res) => {
       const token = jwt.sign(
         { id: savedUser._id, email: savedUser.email }, // Payload
         process.env.JWT_SECRET, // Secret key
-        { expiresIn: "12h" } // Token expiration time
+        {}
       );
       res.status(200).json({
         message: "You are Registered Successfully",

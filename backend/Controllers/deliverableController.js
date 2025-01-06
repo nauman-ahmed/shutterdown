@@ -19,8 +19,7 @@ const monthNumbers = {
 
 const getCinematography = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * 10;
+   
 
 
     const { startDate, endDate } = req.query;
@@ -31,10 +30,7 @@ const getCinematography = async (req, res) => {
         $gte: startDate,
         $lte: endDate,
       },
-    })
-      .skip(skip)
-      .limit(10)
-      .populate([
+    }).populate([
         {
           path: "client",
           populate: {
@@ -45,9 +41,8 @@ const getCinematography = async (req, res) => {
         { path: "editor", model: "user" },
       ]);
       
-    const hasMore = cinematographyDeliverables.length == 10;
-    // Send response with filtered deliverables and hasMore flag
-    res.status(200).json({ hasMore, data: cinematographyDeliverables });
+  
+    res.status(200).json({ data: cinematographyDeliverables });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Something went wrong." });
@@ -65,9 +60,7 @@ const getAlbums = async (req, res) => {
       albumValues.push(allDocument[0].albums.values[index]["value"]);
     }
 
-    // Pagination logic
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * 10;
+   
 
     const { startDate, endDate } = req.query;
 
@@ -78,10 +71,7 @@ const getAlbums = async (req, res) => {
         $gte: startDate,
         $lte: endDate,
       },
-    })
-      .skip(skip)
-      .limit(10)
-      .populate([
+    }).populate([
         {
           path: "client",
           populate: {
@@ -92,10 +82,8 @@ const getAlbums = async (req, res) => {
         { path: "editor", model: "user" },
       ]);
 
-    // Determine if there are more albums to fetch
-    const hasMore = albumsDeliverables.length === 10;
-    // Respond with hasMore and filtered deliverables
-    res.status(200).json({ hasMore, data: albumsDeliverables });
+
+    res.status(200).json({ data: albumsDeliverables });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Something went wrong." });
@@ -104,8 +92,6 @@ const getAlbums = async (req, res) => {
 
 const getPhotos = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * 10;
 
     const { startDate, endDate } = req.query;
 
@@ -117,10 +103,7 @@ const getPhotos = async (req, res) => {
         $gte: startDate,
         $lte: endDate,
       },
-    })
-      .skip(skip)
-      .limit(10)
-      .populate([
+    }).populate([
         {
           path: "client",
           populate: {
@@ -131,9 +114,8 @@ const getPhotos = async (req, res) => {
         { path: "editor", model: "user" },
       ]);
 
-    // Determine if there are more albums to fetch
-    const hasMore = photosDeliverables.length === 10;
-    res.status(200).json({ hasMore, data: photosDeliverables });
+   
+    res.status(200).json({  data: photosDeliverables });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Something went wrong." });
@@ -142,8 +124,7 @@ const getPhotos = async (req, res) => {
 
 const getPreWeds = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * 10;
+  
     const {startDate, endDate} = req.query;
    
 
@@ -154,10 +135,7 @@ const getPreWeds = async (req, res) => {
         $gte: startDate,
         $lte: endDate,
       },
-    })
-      .skip(skip)
-      .limit(10)
-      .populate([
+    }).populate([
         {
           path: "client",
           populate: {
@@ -168,29 +146,7 @@ const getPreWeds = async (req, res) => {
         { path: "editor", model: "user" },
       ]);
 
-    // Extract dates and assign them to deliverables
-    // const deliverablesWithDates = preWedDeliverables.map(deliverable => {
-    //     const weddingEvent = deliverable?.client?.events?.find(event => event.isWedding);
-    //     const eventDate = weddingEvent?.eventDate || deliverable.client.events?.[0]?.eventDate;
-    //     return {
-    //         ...deliverable.toObject(),
-    //         date: eventDate ? dayjs(eventDate).format('YYYY-MM-DD') : null,
-    //     };
-    // });
-
-    // Filter deliverables based on date
-    // const filteredDeliverables = deliverablesWithDates.filter(deliverable => {
-    //     if (deliverable.date) {
-    //         const deliverableDate = dayjs(new Date(deliverable.date)).format('YYYY-MM-DD');
-    //         return (deliverableDate >= startDate) && deliverableDate <= endDate;
-    //     }
-    //     return false;
-    // });
-
-    const hasMore = preWedDeliverables.length === 10 ? true : false;
-
-    // Send response with filtered deliverables and hasMore flag
-    res.status(200).json({ hasMore, data: preWedDeliverables });
+    res.status(200).json({  data: preWedDeliverables });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Something went wrong." });
