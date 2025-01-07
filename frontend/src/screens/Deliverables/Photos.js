@@ -68,7 +68,7 @@ function Photos() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await getPhotos(1, startDate, endDate);
+      const data = await getPhotos(startDate, endDate);
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);

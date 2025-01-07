@@ -327,7 +327,7 @@ const SignInPostRequest = async (req, res) => {
           .json({ message: "Your account access is limited" });
       }
 
-      const jwtOptions = req.body.remember ? {} : { expiresIn: "7d" };
+      const jwtOptions = req.body.remember ? {} : { expiresIn: "10d" };
 
       const token = jwt.sign(
         { id: loginUser._id, email: loginUser.email }, // Payload
