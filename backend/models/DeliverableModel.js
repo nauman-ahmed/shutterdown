@@ -17,7 +17,7 @@ const deliverableSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    quantity: {
+    delivNumber: {
         type: Number
     },
     firstDeliveryDate: {

@@ -543,7 +543,7 @@ function Photos() {
                               paddingBottom: "15px",
                             }}
                           >
-                            <div>{deliverable.deliverableName}</div>
+                            <div>{deliverable?.deliverableName}{" "}{deliverable?.delivNumber}</div>
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -875,8 +875,7 @@ function Photos() {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName} :{" "}
-                              {deliverable?.quantity}
+                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
                             </div>
                           </td>
                           <td

@@ -54,9 +54,7 @@ function PreWedShootScreen() {
   const currentDate = new Date();
   const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
   const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
-  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [assistant, setAssistant] = useState([]);
   const [photographer, setPhotographer] = useState([]);
   const [cinematographer, setCinematographer] = useState([]);
@@ -113,7 +111,6 @@ function PreWedShootScreen() {
     setLoading(true);
     try {
       const allPreWedClients = await getPreWedClients(
-        1,
         startDate,
         endDate,
       );
@@ -188,121 +185,9 @@ function PreWedShootScreen() {
     setLoading(false);
   };
   useEffect(() => {
-    setPage(2);
-    setHasMore(true);
     getClients();
   }, [updateData]);
 
-  const fetchClients = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getPreWedClients(
-          page,
-          startDate,
-          endDate,
-          dateForFilter
-        );
-        let dataToAdd;
-        if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
-          setPreWedClients([...preWedClients, ...data.data]);
-          if (filterCondition) {
-            dataToAdd = data.data.filter((client) => eval(filterCondition));
-          } else {
-            dataToAdd = data.data;
-          }
-        } else if (currentUser?.rollSelect === "Shooter") {
-          const clientsToShow = data.data.filter((client) => {
-            return (
-              client.preWeddingDetails?.photographers?.some(
-                (photographer) => photographer._id === currentUser?._id
-              ) ||
-              client.preWeddingDetails?.cinematographers?.some(
-                (cinematographer) => cinematographer._id === currentUser?._id
-              ) ||
-              client.preWeddingDetails?.assistants?.some(
-                (assistant) => assistant._id === currentUser?._id
-              ) ||
-              client.preWeddingDetails?.droneFlyers?.some(
-                (flyer) => flyer._id === currentUser?._id
-              )
-            );
-          });
-          setPreWedClients([...preWedClients, ...clientsToShow]);
-          if (filterCondition) {
-            dataToAdd = clientsToShow.filter((client) => eval(filterCondition));
-          } else {
-            dataToAdd = clientsToShow;
-          }
-          for (
-            let client_index = 0;
-            client_index < dataToAdd.length;
-            client_index++
-          ) {
-            if (
-              dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (photographer) => photographer._id === currentUser?._id
-              )
-            ) {
-              dataToAdd[client_index].userRole = "Photographer";
-              break;
-            } else if (
-              dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (cinematographer) => cinematographer._id === currentUser?._id
-              )
-            ) {
-              dataToAdd[client_index].userRole = "Cinematographer";
-              break;
-            } else if (
-              dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (flyer) => flyer._id === currentUser?._id
-              )
-            ) {
-              dataToAdd[client_index].userRole = "Drone Flyer";
-              break;
-            } else if (
-              dataToAdd[client_index]?.preWeddingDetails.photographers?.some(
-                (assistant) => assistant === currentUser?._id
-              )
-            ) {
-              dataToAdd[client_index].userRole = "Assistant";
-              break;
-            } else {
-              dataToAdd[client_index].userRole = "Not Assigned";
-            }
-          }
-        }
-        setClientsForShow([...clientsForShow, ...dataToAdd]);
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (clientsForShow?.length < 10 && hasMore && !loading) {
-      fetchClients();
-    }
-  }, [clientsForShow, , hasMore, loading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >= 800 * page;
-
-    if (bottomOfWindow) {
-      fetchClients();
-    }
-  };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
 
   const applyFilterNew = (filterValue) => {
     if (filterValue.length) {
@@ -1163,22 +1048,8 @@ function PreWedShootScreen() {
               </tbody>
             </Table>
             {loading && <Spinner />}
-            {!hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <div>No more data to load.</div>
-              </div>
-            )}
-            {!loading && hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchClients()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+          
+            
             <Overlay
               rootClose={true}
               onHide={() => {
@@ -1191,15 +1062,7 @@ function PreWedShootScreen() {
             >
               <div style={{ width: "300px" }}>
                 <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-                {/* <CalenderMultiListView
-                  monthForData={monthForData}
-                  dateForFilter={dateForFilter}
-                  yearForData={yearForData}
-                  setShow={setShow}
-                  setMonthForData={setMonthForData}
-                  setYearForData={setYearForData}
-                  setDateForFilter={setDateForFilter}
-                /> */}
+                
               </div>
             </Overlay>
           </div>

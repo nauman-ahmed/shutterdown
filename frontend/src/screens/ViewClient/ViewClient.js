@@ -50,9 +50,7 @@ function ViewClient() {
   const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const target = useRef(null);
   const [show, setShow] = useState(false);
-  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
   const [monthForData, setMonthForData] = useState(months[new Date().getMonth()] + " " + new Date().getFullYear());
   const [yearForData, setYearForData] = useAtom(clientFilterYear);
   const [filterClient, setFilterClient] = useState(null);
@@ -62,7 +60,6 @@ function ViewClient() {
     try {
       console.log("Date", startDate, endDate)
       const data = await getClients(
-        1,
         startDate,
         endDate,
         filterClient
@@ -77,40 +74,11 @@ function ViewClient() {
   };
 
   useEffect(() => {
-    setHasMore(true);
-    setPage(2);
     fetchData();
   }, [updateData, filterClient]);
 
-  const fetchClients = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getClients(
-          page,
-          startDate,
-          endDate,
-          filterClient
-        );
-        if (data.data.length > 0) {
-          setClients([...clients, ...data.data]);
-        }
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
+ 
 
-  useEffect(() => {
-    if (clients?.length < 10 && hasMore && !loading && !filterClient) {
-      fetchClients();
-    }
-  }, [clients, hasMore, loading]);
 
   const customStyles = {
     option: (defaultStyles, state) => ({
@@ -128,7 +96,6 @@ function ViewClient() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
-  console.log(startDate, endDate);
 
   return (
     <>
@@ -311,22 +278,7 @@ function ViewClient() {
             </tbody>
           </Table>
           {loading && <Spinner />}
-          {!hasMore && (
-            <div className="d-flex my-3 justify-content-center align-items-center">
-              <div>No more data to load.</div>
-            </div>
-          )}
-          {!loading && hasMore && (
-            <div className="d-flex my-3 justify-content-center align-items-center">
-              <button
-                onClick={() => fetchClients()}
-                className="btn btn-primary"
-                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-              >
-                Load More
-              </button>
-            </div>
-          )}
+          
           <Overlay
             rootClose={true}
             onHide={() => { setShow(false); setUpdateData(!updateData); }}

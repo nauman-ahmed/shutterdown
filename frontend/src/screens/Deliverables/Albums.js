@@ -566,7 +566,7 @@ function Albums(props) {
                               paddingBottom: "15px",
                             }}
                           >
-                            <div>{deliverable.deliverableName}</div>
+                            <div>{deliverable?.deliverableName}{" "}{deliverable?.delivNumber}</div>
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -874,8 +874,7 @@ function Albums(props) {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName} :{" "}
-                              {deliverable?.quantity}
+                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
                             </div>
                           </td>
                           <td

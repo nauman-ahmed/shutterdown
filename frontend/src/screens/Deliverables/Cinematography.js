@@ -673,7 +673,7 @@ function Cinematography(props) {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName}
+                              {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
                               {/* :{" "}
                               {deliverable?.quantity} */}
                             </div>
@@ -1022,8 +1022,8 @@ function Cinematography(props) {
                             }}
                           >
                             <div>
-                              {deliverable?.deliverableName} :{" "}
-                              {deliverable?.quantity}
+                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
+                          
                             </div>
                           </td>
                           <td

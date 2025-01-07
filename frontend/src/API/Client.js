@@ -60,7 +60,6 @@ export const addAlbumsDeliverables = async (client) => {
 };
 
 export const getClients = async (
-  page,
   startDate,
   endDate,
   filterClient
@@ -69,7 +68,6 @@ export const getClients = async (
     const res = await axios.get(BASE_URL + "/Client/getClients", {
       headers: { "Content-Type": "application/json" }, // Correct header capitalization
       params: {
-        page: page,
         startDate,
         endDate,
         filterClient: filterClient,
