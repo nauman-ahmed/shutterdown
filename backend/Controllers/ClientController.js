@@ -227,8 +227,145 @@ const updateClient = async (req, res) => {
 const updateWholeClient = async (req, res) => {
   try {
     const reqClientData = { ...req.body.data };
-    const clientToEdit = await ClientModel.findById(req.body.data._id).populate("events").populate('deliverables');
+    let clientToEdit = await ClientModel.findById(req.body.data._id).populate("events").populate('deliverables');
     let updatedDeliverablesIds = clientToEdit.deliverables.map(deliv => deliv._id);
+    let reelsDelivs = await deliverableModel.find({ deliverableName: 'Reel', client: clientToEdit._id })
+    let promosDelivs = await deliverableModel.find({ deliverableName: 'Promo', client: clientToEdit._id })
+    let longFilmsDelivs = await deliverableModel.find({ deliverableName: 'Long Film', client: clientToEdit._id })
+    let performanceFilmsDelivs = await deliverableModel.find({ deliverableName: 'Performance Film', client: clientToEdit._id })
+    let albumsDelivs = await deliverableModel.find({ isAlbum: true, client: clientToEdit._id })
+
+
+    let maxReelNumber = reelsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    let maxPromoNumber = promosDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    let maxLongFilmNumber = longFilmsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    let maxPerformanceFilmNumber = performanceFilmsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    let maxAlbumNumber = albumsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    const latestEventDate = clientToEdit.deliverablesArr[clientToEdit.deliverablesArr.length - 1].forEvents
+      .map(index => clientToEdit.events[index].eventDate)
+      .reduce((max, current) => (max > current ? max : current));
+
+    const forEvents = clientToEdit.deliverablesArr[clientToEdit.deliverablesArr.length - 1].forEvents
+      .map(index => clientToEdit.events[index]._id)
+
+
+    // Utility function to adjust deliverables
+    async function adjustDeliverables(filteredDelivs, type, requiredCount, maxNumber, albums) {
+      const currentCount = filteredDelivs.length;
+      const difference = Number(currentCount) - Number(requiredCount);
+
+
+
+      if (type === 'Album') {
+
+        if (difference > 0) {
+          // Remove extra deliverables
+          for (let i = 0; i < difference; i++) {
+            const delivToRemove = filteredDelivs.pop();
+
+            // Remove deliverable from the database
+            await deliverableModel.findByIdAndDelete(delivToRemove._id);
+            // Remove deliverable ID from the client's deliverables array
+            updatedDeliverablesIds = updatedDeliverablesIds.filter(id => id !== delivToRemove._id);
+          }
+          for (let i = 0; i < filteredDelivs.length; i++) {
+            await deliverableModel.findByIdAndUpdate(filteredDelivs[i]._id, { delivNumber: i + 1 })
+
+          }
+        } else if (difference < 0) {
+
+          for (let i = 0; i < Math.abs(difference); i++) {
+            const newDeliverable = await deliverableModel.create({
+              client: clientToEdit._id,
+              isAlbum: true,
+              deliverableName: albums[albums.length - (i + 1)],
+              delivNumber: maxNumber + i + 1, // Assign the next number
+              date: latestEventDate,
+              forEvents: forEvents,
+              numberInDeliverables: currentCount > 0 ? filteredDelivs[currentCount - 1].numberInDeliverables : clientToEdit.deliverablesArr[clientToEdit.deliverablesArr.length - 1].number
+              // Add any additional fields required for a new deliverable
+            });
+
+            // Add the new deliverable ID to the client's deliverables array
+            updatedDeliverablesIds.push(newDeliverable._id);
+          }
+        }
+
+      } else {
+        if (difference > 0) {
+          console.log('difference', difference);
+
+          // Remove extra deliverables
+          for (let i = 0; i < difference; i++) {
+            const delivToRemove = filteredDelivs.pop();
+
+            // Remove deliverable from the database
+            await deliverableModel.findByIdAndDelete(delivToRemove._id);
+            // Remove deliverable ID from the client's deliverables array
+            updatedDeliverablesIds = updatedDeliverablesIds.filter(id => id !== delivToRemove._id);
+          }
+          for (let i = 0; i < filteredDelivs.length; i++) {
+            await deliverableModel.findByIdAndUpdate(filteredDelivs[i]._id, { delivNumber: i + 1 })
+
+          }
+        } else if (difference < 0) {
+          // Add missing deliverables
+          for (let i = 0; i < Math.abs(difference); i++) {
+            const newDeliverable = await deliverableModel.create({
+              client: clientToEdit._id,
+              deliverableName: type,
+              delivNumber: maxNumber + i + 1, // Assign the next number
+              date: latestEventDate,
+              forEvents: forEvents,
+              numberInDeliverables: currentCount > 0 ? filteredDelivs[currentCount - 1].numberInDeliverables : clientToEdit.deliverablesArr[clientToEdit.deliverablesArr.length - 1].number
+              // Add any additional fields required for a new deliverable
+            });
+
+            // Add the new deliverable ID to the client's deliverables array
+            updatedDeliverablesIds.push(newDeliverable._id);
+          }
+        }
+      }
+
+    }
+
+
+    const totalReelsNum = clientToEdit?.deliverablesArr?.reduce((total, delivObj) => Number(delivObj.reels) + total, 0)
+    const totalPromosNum = clientToEdit?.deliverablesArr?.reduce((total, delivObj) => Number(delivObj.promos) + total, 0)
+    const totalLongFilmsNum = clientToEdit?.deliverablesArr?.reduce((total, delivObj) => Number(delivObj.longFilms) + total, 0)
+    const totalperformanceFilmsNum = clientToEdit?.deliverablesArr?.reduce((total, delivObj) => Number(delivObj.performanceFilms) + total, 0)
+    const totalAlbumsNum = clientToEdit?.deliverablesArr?.reduce((total, delivObj) => delivObj.albums?.filter(album => album !== 'Not included' && album !== '' && album !== undefined)?.length + total, 0)
+    let albumsNames = [];
+    clientToEdit?.deliverablesArr?.forEach(delivObj => delivObj.albums?.forEach(album => album !== 'Not included' && albumsNames.push(album)))
+    await adjustDeliverables(reelsDelivs || [], "Reel", totalReelsNum, maxReelNumber);
+    await adjustDeliverables(promosDelivs || [], "Promo", totalPromosNum, maxPromoNumber);
+    await adjustDeliverables(longFilmsDelivs || [], "Long Film", totalLongFilmsNum, maxLongFilmNumber);
+    await adjustDeliverables(performanceFilmsDelivs || [], "Performance Film", totalperformanceFilmsNum, maxPerformanceFilmNumber);
+    await adjustDeliverables(albumsDelivs || [], "Album", totalAlbumsNum, maxAlbumNumber, albumsNames);
+    clientToEdit.deliverables = updatedDeliverablesIds;
+    // Save the updated client with the adjusted deliverables array
+    await clientToEdit.save();
+
+    console.log("Deliverables adjusted and saved.");
+    clientToEdit = await ClientModel.findById(req.body.data._id).populate("events").populate('deliverables');
+    updatedDeliverablesIds = clientToEdit.deliverables.map(deliv => deliv._id);
+    reelsDelivs = clientToEdit.deliverables
+      .filter(deliv => deliv.deliverableName === 'Reel')
+    promosDelivs = clientToEdit.deliverables
+      .filter(deliv => deliv.deliverableName === 'Promo')
+    longFilmsDelivs = clientToEdit.deliverables
+      .filter(deliv => deliv.deliverableName === 'Long Film')
+    performanceFilmsDelivs = clientToEdit.deliverables
+      .filter(deliv => deliv.deliverableName === 'Performance Film')
+    albumsDelivs = clientToEdit.deliverables
+      .filter(deliv => deliv.isAlbum)
+    maxReelNumber = reelsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    maxPromoNumber = promosDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    maxLongFilmNumber = longFilmsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    maxPerformanceFilmNumber = performanceFilmsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+    maxAlbumNumber = albumsDelivs.reduce((max, deliv) => Math.max(max, deliv.delivNumber), 0);
+
+
     if (reqClientData?.deliverablesArr?.length >= clientToEdit?.deliverablesArr?.length) {
       for (const deliverableObj of reqClientData?.deliverablesArr || []) {
         const deliverableNumber = deliverableObj.number;
@@ -239,22 +376,9 @@ const updateWholeClient = async (req, res) => {
           .map(index => reqClientData.events[index]._id)
 
         const savedDeliverableObj = clientToEdit?.deliverablesArr.find(delivobj => delivobj.number == deliverableNumber)
-        console.log(savedDeliverableObj);
-        const maxReelNumber = clientToEdit.deliverables
-          .filter(deliv => deliv.deliverableName === 'Reel')
-          .reduce((max, deliv) => Math.max(max, deliv.delivNumber), -Infinity); // Use -Infinity as a safe initial value
-        const maxPromoNumber = clientToEdit.deliverables
-          .filter(deliv => deliv.deliverableName === 'Promo')
-          .reduce((max, deliv) => Math.max(max, deliv.delivNumber), -Infinity); // Use -Infinity as a safe initial value
-        const maxLongFilmNumber = clientToEdit.deliverables
-          .filter(deliv => deliv.deliverableName === 'Long Film')
-          .reduce((max, deliv) => Math.max(max, deliv.delivNumber), -Infinity); // Use -Infinity as a safe initial value
-        const maxPerformanceFilmNumber = clientToEdit.deliverables
-          .filter(deliv => deliv.deliverableName === 'Performance Film')
-          .reduce((max, deliv) => Math.max(max, deliv.delivNumber), -Infinity); // Use -Infinity as a safe initial value
-        const maxAlbumNumber = clientToEdit.deliverables
-          .filter(deliv => deliv.isAlbum)
-          .reduce((max, deliv) => Math.max(max, deliv.delivNumber), -Infinity); // Use -Infinity as a safe initial value
+
+
+
 
         if (!savedDeliverableObj) {
           // New Deliverables Added
@@ -274,7 +398,7 @@ const updateWholeClient = async (req, res) => {
               const promoDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Promo",
-                delivNumber: i + 1 + maxPromoNumber,
+                delivNumber: maxPromoNumber ? i + 1 + maxPromoNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -290,7 +414,7 @@ const updateWholeClient = async (req, res) => {
               const longFilmDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Long Film",
-                delivNumber: i + 1 + maxLongFilmNumber,
+                delivNumber: maxLongFilmNumber ? i + 1 + maxLongFilmNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -306,7 +430,7 @@ const updateWholeClient = async (req, res) => {
               const performanceFilmDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Performance Film",
-                delivNumber: i + 1 + maxPerformanceFilmNumber,
+                delivNumber: maxPerformanceFilmNumber ? i + 1 + maxPerformanceFilmNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -322,7 +446,7 @@ const updateWholeClient = async (req, res) => {
               const reelDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Reel",
-                delivNumber: i + 1 + maxReelNumber,
+                delivNumber: maxReelNumber ? i + 1 + maxReelNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -339,7 +463,7 @@ const updateWholeClient = async (req, res) => {
                 const newAlbum = new deliverableModel({
                   client: reqClientData._id,
                   deliverableName: album,
-                  delivNumber: i + 1 + maxAlbumNumber,
+                  delivNumber: maxAlbumNumber ? i + 1 + maxAlbumNumber : i + 1,
                   date: latestEventDate,
                   isAlbum: true,
                   forEvents,
@@ -370,7 +494,7 @@ const updateWholeClient = async (req, res) => {
               const promoDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Promo",
-                delivNumber: i + 1 + maxPromoNumber,
+                delivNumber: maxPromoNumber ? i + 1 + maxPromoNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -398,7 +522,7 @@ const updateWholeClient = async (req, res) => {
               const longFilmDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Long Film",
-                delivNumber: i + 1 + maxLongFilmNumber,
+                delivNumber: maxLongFilmNumber ? i + 1 + maxLongFilmNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -426,7 +550,7 @@ const updateWholeClient = async (req, res) => {
               const performanceFilmDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Performance Film",
-                delivNumber: i + 1 + maxPerformanceFilmNumber,
+                delivNumber: maxPerformanceFilmNumber ? i + 1 + maxPerformanceFilmNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -455,7 +579,7 @@ const updateWholeClient = async (req, res) => {
               const reelDeliverable = new deliverableModel({
                 client: reqClientData._id,
                 deliverableName: "Reel",
-                delivNumber: i + 1 + maxReelNumber,
+                delivNumber: maxReelNumber ? i + 1 + maxReelNumber : i + 1,
                 date: latestEventDate,
                 forEvents,
                 numberInDeliverables: deliverableNumber
@@ -507,7 +631,7 @@ const updateWholeClient = async (req, res) => {
                 const albumDeliverable = new deliverableModel({
                   client: reqClientData._id,
                   deliverableName: deliverableObj?.albums[i],
-                  delivNumber: i +  1 + maxAlbumNumber,
+                  delivNumber: maxAlbumNumber ? i + 1 + maxAlbumNumber : i + 1,
                   date: latestEventDate,
                   forEvents,
                   isAlbum: true,
@@ -679,8 +803,6 @@ const updateWholeClient = async (req, res) => {
       reqClientData.preWedassistants = null;
       reqClientData.preWeddrones = null;
     }
-
-
 
     reqClientData.events = clientToEdit.events.map(
       (eventData) => eventData._id
