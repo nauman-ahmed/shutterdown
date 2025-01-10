@@ -10,7 +10,7 @@ import { Overlay } from "react-bootstrap";
 import Select from "react-select";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import { GrPowerReset } from "react-icons/gr";
-import CalenderMultiListView from "../../components/CalendarFilterListView";
+import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { useAtom } from "jotai";
 import {
   clientFilterDate,
@@ -37,6 +37,7 @@ const months = [
 
 function ViewClient() {
   const navigate = useNavigate();
+  const [ascendingWeding, setAscendingWeding] = useState(false);
   const [clients, setClients] = useState(null);
   const onPress = (clientId) => {
     navigate("/clients/view-client/particular-client/client-info/" + clientId);
@@ -58,14 +59,12 @@ function ViewClient() {
 
   const fetchData = async () => {
     try {
-      console.log("Date", startDate, endDate)
       const data = await getClients(
         startDate,
         endDate,
         filterClient
       );
-
-      setClients(data.data);
+      applySorting(data.data);
       const completeclients = await getAllClients();
       setAllClients(completeclients);
     } catch (error) {
@@ -96,6 +95,34 @@ function ViewClient() {
     }),
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
+
+    const applySorting = (data = null) => {
+      try {
+        
+        if(data == null){
+          const sorted = clients.sort((a, b) => {
+            const client1 = a.events.filter(event => event.isWedding)
+            const client2 = b.events.filter(event => event.isWedding)
+            const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
+            const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
+            return !ascendingWeding ? dateB - dateA : dateA - dateB;
+          });
+          setClients(sorted);
+          setAscendingWeding(!ascendingWeding);
+        }else{
+          const sorted = data.sort((a, b) => {
+            const client1 = a.events.filter(event => event.isWedding)
+            const client2 = b.events.filter(event => event.isWedding)
+            const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
+            const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
+            return !ascendingWeding ? dateA - dateB : dateB - dateA;
+          });
+          setClients(sorted);
+        }
+      } catch (error) {
+        console.log("applySorting ERROR", error);
+      }
+    };
 
   return (
     <>
@@ -184,8 +211,19 @@ function ViewClient() {
             <thead>
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Client</th>
-                <th className="tableBody" style={{ width: "33%" }}>
+                <th className="tableBody" style={{ width: "33%" }} onClick={() => applySorting()}> 
                   Wedding Date
+                  {!ascendingWeding ? (
+                    <IoIosArrowRoundDown
+                      style={{ color: "#666DFF" }}
+                      className="fs-4 cursor-pointer"
+                    />
+                  ) : (
+                    <IoIosArrowRoundUp
+                      style={{ color: "#666DFF" }}
+                      className="fs-4 cursor-pointer"
+                    />
+                  )}
                 </th>
                 <th className="tableBody">Payment Status</th>
                 <th className="tableBody">Project Status</th>
