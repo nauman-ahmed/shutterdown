@@ -226,7 +226,7 @@ mongoose
   .connect(DB)
   .then(async () => {
     console.log("DataBase Connected");
-    await updateDeliverables()
+    // await updateDeliverables()
   })
   .catch((error) => {
     console.log("DataBase not Connected", error);
