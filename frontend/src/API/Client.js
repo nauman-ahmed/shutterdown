@@ -91,7 +91,6 @@ export const getAllClients = async () => {
 };
 
 export const getPreWedClients = async (
-  page,
   startDate,
   endDate,
 ) => {
@@ -101,8 +100,7 @@ export const getPreWedClients = async (
       `/Client/getPreWedClients`,
       {
         Headers: { "Content-Type": "application/json" },
-        params : {
-          page, 
+        params : { 
           startDate,
           endDate
         }

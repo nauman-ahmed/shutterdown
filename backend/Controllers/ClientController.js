@@ -377,9 +377,6 @@ const updateWholeClient = async (req, res) => {
 
         const savedDeliverableObj = clientToEdit?.deliverablesArr.find(delivobj => delivobj.number == deliverableNumber)
 
-
-
-
         if (!savedDeliverableObj) {
           // New Deliverables Added
           const photosDeliverable = new deliverableModel({
@@ -603,18 +600,10 @@ const updateWholeClient = async (req, res) => {
           console.log('saved alums length', savedDeliverableObj.albums?.length);
 
           if (deliverableObj.albums?.length > savedDeliverableObj.albums?.length) {
-            // More Albums are added in this number deliverable
-            console.log('more albums added');
-            console.log(deliverableObj);
-            console.log(savedDeliverableObj);
-
-
-            console.log('coming albums length', deliverableObj.albums?.length);
-            console.log('saved alums length', savedDeliverableObj.albums?.length);
+      
 
 
             const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
-            console.log(savedAlbumsDeliverable);
 
 
             // loop til already added albums
@@ -970,9 +959,8 @@ const getPreWedClients = async (req, res) => {
       .populate("userID")
       .populate("events");
 
-    // Determine if there are more objects to fetch
-    const hasMore = clients.length === 10;
-    res.status(200).json({ hasMore, data: clients });
+
+    res.status(200).json({data: clients });
   } catch (error) {
     res.status(404).json(error);
   }
