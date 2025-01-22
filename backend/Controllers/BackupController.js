@@ -10,8 +10,7 @@ const { backupDatabaseToGoogleDrive } = require("../utils/backup");
 const makeNewBackup = async (req, res) => {
     try {
         await backupDatabaseToGoogleDrive("shutterDown", "/tmp");
-        console.log("Backup and upload to Google Drive completed!");
-        
+        console.log("Backup and upload to Google Drive completed!");        
         const recentBackup = await BackupModel.findOne().sort({ date: -1 });
         res.status(200).json(recentBackup);
     } catch (error) {
