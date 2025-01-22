@@ -3,7 +3,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+     "postinstall": "curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mv mongodb-database-tools-*/bin/mongodump /usr/local/bin/"
   },
   "dependencies": {
     "body-parser": "^1.20.1",

@@ -51,8 +51,7 @@
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-     "postinstall": "curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mv mongodb-database-tools-*/bin/mongodump /usr/local/bin/"
+    "eject": "react-scripts eject"    
   },
   "eslintConfig": {
     "extends": [
