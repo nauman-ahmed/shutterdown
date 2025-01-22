@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-     "postinstall": "curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mv mongodb-database-tools-*/bin/mongodump /usr/local/bin/"
+    "postinstall": "curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mkdir -p /tmp/mongodb-tools && mv mongodb-database-tools-*/bin/mongodump /tmp/mongodb-tools/ && chmod +x /tmp/mongodb-tools/mongodump"
   },
   "dependencies": {
     "body-parser": "^1.20.1",

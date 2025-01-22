@@ -75,8 +75,7 @@ const uploadToGoogleDrive = async (filePath) => {
 const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
     const date = new Date().toISOString().replace(/[:.]/g, "-");
     const backupFile = path.join(backupPath, `backup-${date}.gz`);
-    const command = `/tmp/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
-
+    const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
     // const command = `mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
