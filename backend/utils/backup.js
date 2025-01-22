@@ -4,10 +4,22 @@ const path = require("path");
 const { google } = require("googleapis");
 const BackupModel = require("../models/Backup");
 const dayjs = require('dayjs')
-
+require('dotenv').config();
 // Load Google API credentials
-const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
-const TOKEN_PATH = path.join(__dirname, "token.json");
+const credentials = {
+    type: process.env.GOOGLE_TYPE,
+    project_id: process.env.GOOGLE_PROJECT_ID,
+    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    auth_uri: process.env.GOOGLE_AUTH_URI,
+    token_uri: process.env.GOOGLE_TOKEN_URI,
+    auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+    client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
+    universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN
+};
+
 
 /**
  * Authorize Google Drive API
@@ -15,9 +27,13 @@ const TOKEN_PATH = path.join(__dirname, "token.json");
 const authorizeGoogleDrive = async () => {
     try {
         const auth = new google.auth.GoogleAuth({
-            keyFile: CREDENTIALS_PATH,
+            credentials, // Using the credentials object loaded from environment variables
             scopes: ["https://www.googleapis.com/auth/drive.file"],
         });
+        // const auth = new google.auth.GoogleAuth({
+        //     keyFile: CREDENTIALS_PATH,
+        //     scopes: ["https://www.googleapis.com/auth/drive.file"],
+        // });
         console.log('auth completed');
 
         return auth.getClient();

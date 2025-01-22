@@ -21,8 +21,7 @@ const deliverableRouter = require('./Routes/deliverableRouter');
 const BackupRouter = require("./Routes/Backup")
 const { applyBackupSchedule } = require('./utils/backupSchedule');
 const ClientModel = require('./models/ClientModel');
-dotenv.config({ path: './.env' });
-
+require('dotenv').config();
 
 const PORT = 5002;
 
