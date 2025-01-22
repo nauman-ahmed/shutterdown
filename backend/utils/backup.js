@@ -19,7 +19,7 @@ const authorizeGoogleDrive = async () => {
             scopes: ["https://www.googleapis.com/auth/drive.file"],
         });
         console.log('auth completed');
-        
+
         return auth.getClient();
     } catch (error) {
         console.log(error);
@@ -33,37 +33,37 @@ const authorizeGoogleDrive = async () => {
  */
 const uploadToGoogleDrive = async (filePath) => {
     try {
-        
-    
-    const auth = await authorizeGoogleDrive();
-    console.log('after authorize');
 
-    const drive = google.drive({ version: "v3", auth });
-    const fileMetadata = {
-        name: path.basename(filePath),
-    };
-    console.log('media creating');
-    
-    const media = {
-        mimeType: "application/gzip",
-        body: fs.createReadStream(filePath),
-    };
-    console.log('creating files');
-    
-    const res = await drive.files.create({
-        resource: fileMetadata,
-        media,
-        fields: "id",
-    });
-    console.log(res);
-    
-    console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
-    const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
-    await newbackup.save()
-    await setFilePermissions(res.data.id);
-} catch (error) {
-        console.log(error);       
-}
+
+        const auth = await authorizeGoogleDrive();
+        console.log('after authorize');
+
+        const drive = google.drive({ version: "v3", auth });
+        const fileMetadata = {
+            name: path.basename(filePath),
+        };
+        console.log('media creating');
+
+        const media = {
+            mimeType: "application/gzip",
+            body: fs.createReadStream(filePath),
+        };
+        console.log('creating files');
+
+        const res = await drive.files.create({
+            resource: fileMetadata,
+            media,
+            fields: "id",
+        });
+        console.log(res);
+
+        console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
+        const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
+        await newbackup.save()
+        await setFilePermissions(res.data.id);
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 /**
@@ -75,27 +75,40 @@ const uploadToGoogleDrive = async (filePath) => {
 const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
     const date = new Date().toISOString().replace(/[:.]/g, "-");
     const backupFile = path.join(backupPath, `backup-${date}.gz`);
+
+    // Install mongodump before performing the backup
+    const installCommand = `curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mkdir -p /tmp/mongodb-tools && mv mongodb-database-tools-*/bin/mongodump /tmp/mongodb-tools/ && chmod +x /tmp/mongodb-tools/mongodump`;
+
     const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
-    // const command = `mongodump --db=${dbName} --archive=${backupFile} --gzip`;
-
     return new Promise((resolve, reject) => {
-        console.log(`Starting backup: ${backupFile}`);
-        exec(command, async (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Backup failed: ${stderr}`);
-                return reject(error);
+        console.log(`Starting mongodump installation...`);
+
+        // Install mongodump
+        exec(installCommand, (installError, installStdout, installStderr) => {
+            if (installError) {
+                console.error(`Mongodump installation failed: ${installStderr}`);
+                return reject(installError);
             }
-            console.log(`Backup created: ${stdout}`);
-            try {
-                await uploadToGoogleDrive(backupFile);
-                // Cleanup local backup file after upload
-                fs.unlinkSync(backupFile);
-                resolve();
-            } catch (uploadError) {
-                console.error("Error uploading backup to Google Drive:", uploadError);
-                reject(uploadError);
-            }
+            console.log(`Mongodump installed successfully: ${installStdout}`);
+
+            console.log(`Starting backup: ${backupFile}`);
+            exec(command, async (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Backup failed: ${stderr}`);
+                    return reject(error);
+                }
+                console.log(`Backup created: ${stdout}`);
+                try {
+                    await uploadToGoogleDrive(backupFile);
+                    // Cleanup local backup file after upload
+                    fs.unlinkSync(backupFile);
+                    resolve();
+                } catch (uploadError) {
+                    console.error("Error uploading backup to Google Drive:", uploadError);
+                    reject(uploadError);
+                }
+            });
         });
     });
 };
