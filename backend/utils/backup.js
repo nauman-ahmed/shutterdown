@@ -18,6 +18,8 @@ const authorizeGoogleDrive = async () => {
             keyFile: CREDENTIALS_PATH,
             scopes: ["https://www.googleapis.com/auth/drive.file"],
         });
+        console.log('auth completed');
+        
         return auth.getClient();
     } catch (error) {
         console.log(error);
@@ -30,6 +32,9 @@ const authorizeGoogleDrive = async () => {
  * @returns {Promise<void>}
  */
 const uploadToGoogleDrive = async (filePath) => {
+    try {
+        
+    
     const auth = await authorizeGoogleDrive();
     console.log('after authorize');
 
@@ -37,21 +42,28 @@ const uploadToGoogleDrive = async (filePath) => {
     const fileMetadata = {
         name: path.basename(filePath),
     };
+    console.log('media creating');
+    
     const media = {
         mimeType: "application/gzip",
         body: fs.createReadStream(filePath),
     };
-
-    const res = await  drive.files.create({
+    console.log('creating files');
+    
+    const res = await drive.files.create({
         resource: fileMetadata,
         media,
         fields: "id",
     });
+    console.log(res);
+    
     console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
     const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
     await newbackup.save()
     await setFilePermissions(res.data.id);
-
+} catch (error) {
+        console.log(error);       
+}
 };
 
 /**
@@ -101,9 +113,8 @@ const setFilePermissions = async (fileId) => {
     await drive.permissions.create({
         fileId: fileId,
         requestBody: {
-            role: "writer", // or "reader"
-            type: "user",
-            emailAddress: "iamsafdarawan@gmail.com", // Replace with the desired email
+            role: "reader",
+            type: "anyone",
         },
     });
 
