@@ -92,7 +92,7 @@ function AccountCreated() {
         >
           <button onClick={handleNewBackup} style={{ backgroundColor: "#666dff", width: '100px', borderRadius: "6px", color: "white", borderWidth: '0px', height: '40px' }} className="">
             
-            {backingUp ? "doing..." : "Backup" }
+            {backingUp ? "In progress.." : "Backup" }
           </button>
           <span>Last : {dayjs(recentBackup?.date).format('YYYY-MM-DD')}</span>
         </div>
