@@ -478,13 +478,10 @@ const updateWholeClient = async (req, res) => {
 
         } else {
 
-
           const photosDeliverable = reqClientData?.deliverables?.find(deliv => deliv.deliverableName === 'Photos' && deliv.numberInDeliverables == deliverableNumber);
 
           await deliverableModel.findByIdAndUpdate(photosDeliverable._id, { $set: { forEvents: forEvents, date: latestEventDate } });
-
-
-          if (deliverableObj.promos > savedDeliverableObj.promos) {
+          if (Number(deliverableObj.promos) > Number(savedDeliverableObj.promos)) {
             // More promos added in this number deliverable
             const moreAddedPromo = deliverableObj.promos - savedDeliverableObj.promos;
             for (let i = 0; i < moreAddedPromo; i++) {
@@ -500,7 +497,8 @@ const updateWholeClient = async (req, res) => {
               await promoDeliverable.save();
               updatedDeliverablesIds.push(promoDeliverable._id);
             }
-          } else if (deliverableObj.promos < savedDeliverableObj.promos) {
+          } else if (Number(deliverableObj.promos) < Number(savedDeliverableObj.promos)) {
+
             // Promos are decreaded in this numbe of deliverables 
             const savedPromosIds = reqClientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo' && deliv.numberInDeliverables === deliverableNumber)?.map(deliv => deliv._id);
             const extraPromos = savedDeliverableObj.promos - deliverableObj.promos;
@@ -510,6 +508,41 @@ const updateWholeClient = async (req, res) => {
               await deliverableModel.findByIdAndDelete(promoId);
             }
             updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          } else {
+            const promoDeliverables = clientToEdit?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo' && deliv.numberInDeliverables == deliverableNumber);
+            if (promoDeliverables?.length < deliverableObj.promos) {
+              const moreAddedPromo = deliverableObj.promos - promoDeliverables?.length;
+              for (let i = 0; i < moreAddedPromo; i++) {
+                const promoDeliverable = new deliverableModel({
+                  client: reqClientData._id,
+                  deliverableName: "Promo",
+                  delivNumber: maxPromoNumber ? i + 1 + maxPromoNumber : i + 1,
+                  date: latestEventDate,
+                  forEvents,
+                  numberInDeliverables: deliverableNumber
+                });
+
+                await promoDeliverable.save();
+                updatedDeliverablesIds.push(promoDeliverable._id);
+              }
+            } else if (promoDeliverables?.length > deliverableObj.promos) {
+              const savedPromosIds = promoDeliverables?.map(deliv => deliv._id);
+              const extraPromos = promoDeliverables?.length - deliverableObj.promos;
+              const toRemoveIds = savedPromosIds.slice(-extraPromos)
+              const removeIdsSet = new Set(toRemoveIds)
+              for (const promoId of toRemoveIds) {
+                await deliverableModel.findByIdAndDelete(promoId);
+              }
+              updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+            } else {
+              for (let i = 0; i < promoDeliverables?.length; i++) {
+                // console.log(LPPPRDeliverables[i]);
+
+                await deliverableModel.findByIdAndUpdate(promoDeliverables[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate } });
+              }
+
+            }
+
           }
 
           if (deliverableObj.longFilms > savedDeliverableObj.longFilms) {
@@ -538,6 +571,39 @@ const updateWholeClient = async (req, res) => {
               await deliverableModel.findByIdAndDelete(longFilmId);
             }
             updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          } else {
+            const longFilmDeliverables = clientToEdit?.deliverables?.filter(deliv => deliv.deliverableName === 'Long Film' && deliv.numberInDeliverables == deliverableNumber);
+            if (longFilmDeliverables?.length < deliverableObj.longFilms) {
+              const moreAddedLongFilms = deliverableObj.longFilms - longFilmDeliverables?.length;
+              for (let i = 0; i < moreAddedLongFilms; i++) {
+                const longFilmDeliverable = new deliverableModel({
+                  client: reqClientData._id,
+                  deliverableName: "Long Film",
+                  delivNumber: maxLongFilmNumber ? i + 1 + maxLongFilmNumber : i + 1,
+                  date: latestEventDate,
+                  forEvents,
+                  numberInDeliverables: deliverableNumber
+                });
+
+                await longFilmDeliverable.save();
+                updatedDeliverablesIds.push(longFilmDeliverable._id);
+              }
+            } else if (longFilmDeliverables?.length > deliverableObj.longFilms) {
+              const savedIds = longFilmDeliverables?.map(deliv => deliv._id);
+              const extraLongFilms = longFilmDeliverables?.length - deliverableObj.longFilms;
+              const toRemoveIds = savedIds.slice(-extraLongFilms)
+              const removeIdsSet = new Set(toRemoveIds)
+              for (const longFilmId of toRemoveIds) {
+                await deliverableModel.findByIdAndDelete(longFilmId);
+              }
+              updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+            } else {
+              for (let i = 0; i < longFilmDeliverables?.length; i++) {
+                await deliverableModel.findByIdAndUpdate(longFilmDeliverables[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate } });
+              }
+
+            }
+
           }
 
           if (deliverableObj.performanceFilms > savedDeliverableObj.performanceFilms) {
@@ -566,6 +632,39 @@ const updateWholeClient = async (req, res) => {
               await deliverableModel.findByIdAndDelete(performanceFilmId);
             }
             updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          } else {
+            const performanceFilmDeliverables = clientToEdit?.deliverables?.filter(deliv => deliv.deliverableName === 'Performance Film' && deliv.numberInDeliverables == deliverableNumber);
+            if (performanceFilmDeliverables?.length < deliverableObj.performanceFilms) {
+              const moreAddedPerformanceFilms = deliverableObj.performanceFilms - performanceFilmDeliverables?.length;
+              for (let i = 0; i < moreAddedPerformanceFilms; i++) {
+                const performanceFilmDeliverable = new deliverableModel({
+                  client: reqClientData._id,
+                  deliverableName: "Performance Film",
+                  delivNumber: maxPerformanceFilmNumber ? i + 1 + maxPerformanceFilmNumber : i + 1,
+                  date: latestEventDate,
+                  forEvents,
+                  numberInDeliverables: deliverableNumber
+                });
+
+                await performanceFilmDeliverable.save();
+                updatedDeliverablesIds.push(performanceFilmDeliverable._id);
+              }
+            } else if (performanceFilmDeliverables?.length > deliverableObj.performanceFilms) {
+              const savedIds = performanceFilmDeliverables?.map(deliv => deliv._id);
+              const extraPerformanceFilms = performanceFilmDeliverables?.length - deliverableObj.performanceFilms;
+              const toRemoveIds = savedIds.slice(-extraPerformanceFilms)
+              const removeIdsSet = new Set(toRemoveIds)
+              for (const performanceFilmId of toRemoveIds) {
+                await deliverableModel.findByIdAndDelete(performanceFilmId);
+              }
+              updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+            } else {
+              for (let i = 0; i < performanceFilmDeliverables?.length; i++) {
+                await deliverableModel.findByIdAndUpdate(performanceFilmDeliverables[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate } });
+              }
+
+            }
+
           }
 
 
@@ -595,17 +694,42 @@ const updateWholeClient = async (req, res) => {
               await deliverableModel.findByIdAndDelete(reelId);
             }
             updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+          } else {
+            const reelDeliverables = clientToEdit?.deliverables?.filter(deliv => deliv.deliverableName === 'Reel' && deliv.numberInDeliverables == deliverableNumber);
+            if (reelDeliverables?.length < deliverableObj.reels) {
+              const moreAddedReels = deliverableObj.reels - reelDeliverables?.length;
+            for (let i = 0; i < moreAddedReels; i++) {
+              const reelDeliverable = new deliverableModel({
+                client: reqClientData._id,
+                deliverableName: "Reel",
+                delivNumber: maxReelNumber ? i + 1 + maxReelNumber : i + 1,
+                date: latestEventDate,
+                forEvents,
+                numberInDeliverables: deliverableNumber
+              });
+
+              await reelDeliverable.save();
+              updatedDeliverablesIds.push(reelDeliverable._id);
+            }
+            } else if (reelDeliverables?.length > deliverableObj.reels) {
+              const savedIds = reelDeliverables?.map(deliv => deliv._id);
+              const extraReels = reelDeliverables?.length - deliverableObj.reels;
+              const toRemoveIds = savedIds.slice(-extraReels)
+              const removeIdsSet = new Set(toRemoveIds)
+              for (const reelId of toRemoveIds) {
+                await deliverableModel.findByIdAndDelete(reelId);
+              }
+              updatedDeliverablesIds = updatedDeliverablesIds?.filter(delivId => !removeIdsSet.has(delivId))
+            } else {
+              for (let i = 0; i < reelDeliverables?.length; i++) {
+                await deliverableModel.findByIdAndUpdate(reelDeliverables[i]?._id, { $set: { forEvents: forEvents, date: latestEventDate } });
+              }
+
+            }
           }
-          console.log('coming albums length', deliverableObj.albums?.length);
-          console.log('saved alums length', savedDeliverableObj.albums?.length);
 
           if (deliverableObj.albums?.length > savedDeliverableObj.albums?.length) {
-      
-
-
             const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
-
-
             // loop til already added albums
             for (let i = 0; i < savedDeliverableObj.albums?.length; i++) {
               if (deliverableObj.albums[i] === "" || deliverableObj.albums[i] === "Not included") {
@@ -651,12 +775,9 @@ const updateWholeClient = async (req, res) => {
               }
             }
           } else if (deliverableObj.albums?.length === savedDeliverableObj.albums?.length) {
-            console.log('called equal');
 
-            console.log(deliverableObj.albums?.length === savedDeliverableObj.albums?.length);
 
             const savedAlbumsDeliverable = reqClientData?.deliverables?.filter(deliv => deliv.isAlbum === true && deliv.numberInDeliverables == deliverableNumber);
-            console.log(savedAlbumsDeliverable);
 
             for (let i = 0; i < deliverableObj.albums?.length; i++) {
               if (deliverableObj.albums[i] === "" || deliverableObj.albums[i] === "Not included") {
@@ -960,7 +1081,7 @@ const getPreWedClients = async (req, res) => {
       .populate("events");
 
 
-    res.status(200).json({data: clients });
+    res.status(200).json({ data: clients });
   } catch (error) {
     res.status(404).json(error);
   }
