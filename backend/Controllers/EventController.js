@@ -158,6 +158,7 @@ const getEvents = async (req, res) => {
         $lte: endDate,
       };
     }
+    obj.eventType = { $ne: "Pre-Wedding" };
     console.log(obj);
     const events = await EventModel.find(obj).populate(
       "client choosenPhotographers choosenCinematographers droneFlyers manager assistants shootDirectors sameDayPhotoMakers sameDayVideoMakers"
