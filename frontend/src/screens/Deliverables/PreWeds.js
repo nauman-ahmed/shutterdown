@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Table } from "reactstrap";
-import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import "../../assets/css/tableRoundHeader.css";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
 import { getEditors } from "../../API/userApi";
 import Select from "react-select";
-import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import {
   getPreWeds,
@@ -18,12 +16,10 @@ import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { GrPowerReset } from "react-icons/gr";
 import CalenderImg from "../../assets/Profile/Calender.svg";
-import CalenderMultiListView from "../../components/CalendarFilterListView";
 import { Overlay } from "react-bootstrap";
-import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
-import { groupByBrideName } from "./Cinematography";
+import { groupByClientID } from "./Cinematography";
 
 const months = [
   "January",
@@ -51,7 +47,6 @@ function PreWedDeliverables(props) {
   const [deadlineDays, setDeadlineDays] = useState([]);
   const [updateData, setUpdateData] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [dateForFilter, setDateForFilter] = useState(null);
   const [monthForData, setMonthForData] = useState(
     months[new Date().getMonth()] + " " + new Date().getFullYear()
   );
@@ -131,7 +126,7 @@ function PreWedDeliverables(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(groupByBrideName(sorted));
+        setDeliverablesForShow(groupByClientID(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -142,7 +137,7 @@ function PreWedDeliverables(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(groupByBrideName(
+        setDeliverablesForShow(groupByClientID(
           allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
@@ -156,7 +151,7 @@ function PreWedDeliverables(props) {
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(groupByBrideName(
+          setDeliverablesForShow(groupByClientID(
             allDeliverables.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
@@ -194,19 +189,19 @@ function PreWedDeliverables(props) {
         setAllDeliverables(data.data);
        
         
-        setDeliverablesForShow(groupByBrideName(
+        setDeliverablesForShow(groupByClientID(
           data.data.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
           }))
         );
-      } else if (currentUser?.rollSelect === "Editor") {
+      } else if (currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(groupByBrideName(
+        setDeliverablesForShow(groupByClientID(
           deliverablesToShow.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
@@ -309,7 +304,7 @@ function PreWedDeliverables(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(groupByBrideName(
+      setDeliverablesForShow(groupByClientID(
         newData?.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
@@ -317,7 +312,7 @@ function PreWedDeliverables(props) {
         }))
       );
     } else {
-      setDeliverablesForShow(groupByBrideName(
+      setDeliverablesForShow(groupByClientID(
         allDeliverables?.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
@@ -475,7 +470,7 @@ function PreWedDeliverables(props) {
               }
             >
               <thead>
-                {currentUser?.rollSelect === "Editor" ? (
+                {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") ? (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Deliverables</th>
@@ -864,7 +859,7 @@ function PreWedDeliverables(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect === "Editor" && (
+                      {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") && (
                         <tr
                           style={{
                             background: "#EFF0F5",

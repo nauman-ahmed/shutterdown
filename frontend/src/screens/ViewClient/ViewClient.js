@@ -76,7 +76,7 @@ function ViewClient() {
     fetchData();
   }, [updateData, filterClient]);
 
- 
+
 
 
   const customStyles = {
@@ -96,33 +96,33 @@ function ViewClient() {
     singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-    const applySorting = (data = null) => {
-      try {
-        
-        if(data == null){
-          const sorted = clients.sort((a, b) => {
-            const client1 = a.events.filter(event => event.isWedding)
-            const client2 = b.events.filter(event => event.isWedding)
-            const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
-            const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
-            return !ascendingWeding ? dateB - dateA : dateA - dateB;
-          });
-          setClients(sorted);
-          setAscendingWeding(!ascendingWeding);
-        }else{
-          const sorted = data.sort((a, b) => {
-            const client1 = a.events.filter(event => event.isWedding)
-            const client2 = b.events.filter(event => event.isWedding)
-            const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
-            const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
-            return !ascendingWeding ? dateA - dateB : dateB - dateA;
-          });
-          setClients(sorted);
-        }
-      } catch (error) {
-        console.log("applySorting ERROR", error);
+  const applySorting = (data = null) => {
+    try {
+
+      if (data == null) {
+        const sorted = clients.sort((a, b) => {
+          const client1 = a.events.filter(event => event.isWedding)
+          const client2 = b.events.filter(event => event.isWedding)
+          const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
+          const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
+          return !ascendingWeding ? dateB - dateA : dateA - dateB;
+        });
+        setClients(sorted);
+        setAscendingWeding(!ascendingWeding);
+      } else {
+        const sorted = data.sort((a, b) => {
+          const client1 = a.events.filter(event => event.isWedding)
+          const client2 = b.events.filter(event => event.isWedding)
+          const dateA = client1.length ? new Date(client1[0].eventDate) : new Date()
+          const dateB = client2.length ? new Date(client2[0].eventDate) : new Date()
+          return !ascendingWeding ? dateA - dateB : dateB - dateA;
+        });
+        setClients(sorted);
       }
-    };
+    } catch (error) {
+      console.log("applySorting ERROR", error);
+    }
+  };
 
   return (
     <>
@@ -211,7 +211,7 @@ function ViewClient() {
             <thead>
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Client</th>
-                <th className="tableBody" style={{ width: "33%" }} onClick={() => applySorting()}> 
+                <th className="tableBody" style={{ width: "33%" }} onClick={() => applySorting()}>
                   Wedding Date
                   {!ascendingWeding ? (
                     <IoIosArrowRoundDown
@@ -239,76 +239,93 @@ function ViewClient() {
             >
               {clients?.map((client, i) => (
                 <>
+
                   <tr
                     key={i}
                     style={{
-                      background: "#EFF0F5",
+                      backgroundColor: "white",
                       borderRadius: "8px",
                     }}
-                    onClick={() => onPress(client._id)}
+                    className="clientrow"
+                  // onClick={() => onPress(client._id)}
                   >
-                    <td
-                      style={{
-                        paddingTop: "15px",
-                        paddingBottom: "15px",
-                        width: "33%",
+                    <a
+                      href={`/clients/view-client/particular-client/client-info/${client._id}`} // Link for right-click "Open in new tab"
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default link behavior (page reload)
+                        onPress(client._id); // Use your existing navigation function
                       }}
-                      className="tableBody Text14Semi primary2 textPrimary"
-                    >
-                      {client.brideName}
-                      <br />
-                      <img alt="" src={Heart} />
-                      <br />
-                      {client.groomName}
-                    </td>
-                    <td
-                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
                       style={{
-                        paddingTop: "15px",
-                        paddingBottom: "15px",
-                        width: "33%",
+                        display: "contents", // Makes the <a> tag behave like it's not there, so the row layout stays intact
+                        textDecoration: "none", // Remove underline
+                        color: "inherit", // Inherit text color
+                        
                       }}
                     >
-                      {" "}
-                      {client.events?.filter((event) => event.isWedding)
-                        ?.length !== 0 ? (
-                        <>
-                          {client.events.find(
-                            (eventData) => eventData.isWedding
-                          ) && (
-                              <p className="mb-0">
-                                {dayjs(
-                                  client.events.find(
-                                    (eventData) => eventData.isWedding
-                                  ).eventDate
-                                ).format("DD-MMM-YYYY")}
-                              </p>
-                            )}
-                        </>
-                      ) : (
-                        "Not Defined"
-                      )}
-                    </td>
-                    <td
-                      style={{
-                        paddingTop: "15px",
-                        paddingBottom: "15px",
-                      }}
-                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
-                    >
-                      {client.paymentStatus}
+                      <td
+                        style={{
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                          width: "33%",
+                        }}
+                        className="tableBody Text14Semi primary2 textPrimary"
+                      >
+                        {client.brideName}
+                        <br />
+                        <img alt="" src={Heart} />
+                        <br />
+                        {client.groomName}
+                      </td>
 
-                    </td>
-                    <td
-                      style={{
-                        paddingTop: "15px",
-                        paddingBottom: "15px",
-                      }}
-                      className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
-                    >
-                      {client.projectStatus}
+                      <td
+                        className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
+                        style={{
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                          width: "33%",
+                        }}
+                      >
+                        {" "}
+                        {client.events?.filter((event) => event.isWedding)
+                          ?.length !== 0 ? (
+                          <>
+                            {client.events.find(
+                              (eventData) => eventData.isWedding
+                            ) && (
+                                <p className="mb-0">
+                                  {dayjs(
+                                    client.events.find(
+                                      (eventData) => eventData.isWedding
+                                    ).eventDate
+                                  ).format("DD-MMM-YYYY")}
+                                </p>
+                              )}
+                          </>
+                        ) : (
+                          "Not Defined"
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                        }}
+                        className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
+                      >
+                        {client.paymentStatus}
 
-                    </td>
+                      </td>
+                      <td
+                        style={{
+                          paddingTop: "15px",
+                          paddingBottom: "15px",
+                        }}
+                        className="tableBody Text14Semi primary2 textPrimary tablePlaceContent"
+                      >
+                        {client.projectStatus}
+
+                      </td>
+                    </a>
                   </tr>
                   <div style={{ marginTop: "15px" }} />
                 </>
@@ -316,7 +333,7 @@ function ViewClient() {
             </tbody>
           </Table>
           {loading && <Spinner />}
-          
+
           <Overlay
             rootClose={true}
             onHide={() => { setShow(false); setUpdateData(!updateData); }}

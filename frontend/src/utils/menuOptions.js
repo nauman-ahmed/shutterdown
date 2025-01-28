@@ -157,7 +157,7 @@ export const managerMenuOptions = [
   },
 ];
 export const productionManagerMenuOptions = [
- 
+
   {
     text: "Calendar",
     icon: (active) => (
@@ -204,11 +204,47 @@ export const shooterMenuOptions = [
     ],
   },
   {
+    text: "Deliverables",
+    icon: (active) => (
+      <BsCameraReels className={`fs-4 ${active ? "text-white" : "text-black"}`} />
+    ),
+    subMenus: [
+      {
+        path: "/deliverables/cinema",
+        text: "Cinema",
+      },
+      {
+        path: "/deliverables/photos",
+        text: "Photos",
+      },
+      {
+        path: "/deliverables/albums",
+        text: "Albums",
+      },
+      {
+        path: "/deliverables/pre-wed-deliverables",
+        text: "Pre-Weddings",
+      },
+    ],
+  },
+  {
     path: "/attendance",
     text: "Attendance",
     icon: (active) => (
       <MdOutlineCoPresent className={`fs-4 ${active ? "text-white" : "text-black"}`} />
     ),
+  },
+  {
+    text: "Tasks",
+    icon: (active) => (
+      <GoTasklist className={`fs-4 ${active ? "text-white" : "text-black"}`} />
+    ),
+    subMenus: [
+      {
+        path: "/tasks/daily-tasks",
+        text: "Daily Tasks",
+      },
+    ],
   },
 ];
 

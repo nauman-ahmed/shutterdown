@@ -27,7 +27,7 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
-import { groupByBrideName} from "./Cinematography";
+import { groupByClientID} from "./Cinematography";
 
 const months = [
   "January",
@@ -113,18 +113,18 @@ function Albums(props) {
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data?.data);
-        setDeliverablesForShow(groupByBrideName(data?.data.sort((a, b) => {
+        setDeliverablesForShow(groupByClientID(data?.data.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return ascendingWeding ? dateB - dateA : dateA - dateB;
           }))
         );
-      } else if (currentUser?.rollSelect === "Editor") {
+      } else if (currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(groupByBrideName(
+        setDeliverablesForShow(groupByClientID(
           deliverablesToShow.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
@@ -211,7 +211,7 @@ function Albums(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(groupByBrideName(sorted));
+        setDeliverablesForShow(groupByClientID(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -222,7 +222,7 @@ function Albums(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(groupByBrideName(allDeliverables
+        setDeliverablesForShow(groupByClientID(allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
               const dateA = new Date(a.date);
@@ -235,7 +235,7 @@ function Albums(props) {
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(groupByBrideName(allDeliverables?.sort((a, b) => {
+          setDeliverablesForShow(groupByClientID(allDeliverables?.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return ascendingWeding ? dateB - dateA : dateA - dateB;
@@ -321,9 +321,9 @@ function Albums(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(groupByBrideName(newData));
+      setDeliverablesForShow(groupByClientID(newData));
     } else {
-      setDeliverablesForShow(groupByBrideName(allDeliverables));
+      setDeliverablesForShow(groupByClientID(allDeliverables));
     }
   };
 
@@ -480,7 +480,7 @@ function Albums(props) {
               }
             >
               <thead>
-                {currentUser?.rollSelect === "Editor" ? (
+                {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") ? (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Albums</th>
@@ -846,7 +846,7 @@ function Albums(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect === "Editor" && (
+                      {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") && (
                         <tr
                           style={{
                             background: "#EFF0F5",

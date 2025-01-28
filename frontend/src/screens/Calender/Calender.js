@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useLoggedInUser } from "../../config/zStore";
 import { useSelector } from "react-redux";
+import { IoIosWarning } from "react-icons/io";
 
 function Calender() {
   const poperReferencd = useRef(null);
@@ -25,11 +26,11 @@ function Calender() {
   const getEventsData = async () => {
     try {
       // const res = await getAllEvents();
-      const res = {data : EventsList}
+      const res = { data: EventsList }
       let eventsToShow;
       if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === 'Production Manager') {
         eventsToShow = res.data;
-      } else if (currentUser?.rollSelect === "Shooter") {
+      } else if (currentUser?.rollSelect === "Shooter" || currentUser?.rollSelect === "Editor") {
         eventsToShow = res.data.map((event) => {
           if (
             event?.shootDirectors.some(
@@ -123,22 +124,94 @@ function Calender() {
               ]}
               defaultView="basicWeek"
               eventContent={(eventInfo) => {
+                console.log(eventInfo);
+                let errorText = "";
+                if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
+                  if (
+                    Number(eventInfo.event?.extendedProps?.sameDayVideoEditors) > 0 &&
+                    (!eventInfo.event?.extendedProps?.sameDayVideoMakers ||
+                      eventInfo.event?.extendedProps?.sameDayVideoMakers.length !=
+                      Number(eventInfo.event?.extendedProps.sameDayVideoEditors))
+                  ) {
+                    errorText += "Same Day Video Maker(s) are incomplete, \n";
+                  }
+
+                  if (
+                    Number(eventInfo.event?.extendedProps?.sameDayPhotoEditors) > 0 &&
+                    (!eventInfo.event?.extendedProps?.sameDayPhotoMakers ||
+                      eventInfo.event?.extendedProps?.sameDayPhotoMakers.length !==
+                      Number(eventInfo.event?.extendedProps.sameDayPhotoEditors))
+                  ) {
+                    errorText += "Same Day Photo Maker(s) are incomplete, \n";
+                  }
+
+                  if (
+                    Number(eventInfo.event?.extendedProps?.cinematographers) > 0 &&
+                    (!eventInfo.event?.extendedProps?.choosenCinematographers ||
+                      eventInfo.event?.extendedProps?.choosenCinematographers?.length !==
+                      Number(eventInfo.event?.extendedProps?.cinematographers))
+                  ) {
+                    errorText += "Cinematographer(s) are incomplete, \n";
+                  }
+
+                  if (
+                    Number(eventInfo.event?.extendedProps?.drones) > 0 &&
+                    (!eventInfo.event?.extendedProps?.droneFlyers ||
+                      eventInfo.event?.extendedProps?.droneFlyers.length !== Number(eventInfo.event?.extendedProps.drones))
+                  ) {
+                    errorText += "Drone Flyer(s) are not complete, \n";
+                  }
+
+                  if (!eventInfo.event?.extendedProps?.manager || eventInfo.event?.extendedProps?.manager.length !== 1) {
+                    errorText += "Manager(s) are incomplete, \n";
+                  }
+
+                  if (
+                    Number(eventInfo.event?.extendedProps?.photographers) > 0 &&
+                    (!eventInfo.event?.extendedProps?.choosenPhotographers ||
+                      eventInfo.event?.extendedProps?.choosenPhotographers.length !==
+                      Number(eventInfo.event?.extendedProps?.photographers))
+                  ) {
+                    errorText += "Photographer(s) are incomplete, \n";
+                  }
+
+                  if (
+                    Number(eventInfo.event?.extendedProps?.shootDirector) > 0 &&
+                    (!eventInfo.event?.extendedProps?.shootDirectors ||
+                      eventInfo.event?.extendedProps?.shootDirectors.length !==
+                      Number(eventInfo.event?.extendedProps?.shootDirector))
+                  ) {
+                    errorText += "Shoot Director(s) are incomplete. \n";
+                  }
+                }
+
                 return (
                   <div className="d-block" style={{ cursor: "pointer" }}>
                     <div className="rowalign2 p4 ">
                       <div className="Text10N white ">
-                        <FaDirections color="black" />
+                       
+                        {errorText.length > 0 ? (
+                          <IoIosWarning
+                          style={{fontSize : '18px'}}
+                            className=" text-danger"
+                          />
+                        ) : (
+                          <FaDirections color="black" style={{fontSize : '15px'}} />
+                        )}
                       </div>
                       <div
                         className={
-                          eventInfo.event?.extendedProps.allDataCompleted
-                            ? "Text10N p-1 calenderEventBox"
-                            : "Text10N p-1 calenderEventBoxYellow"
+                          // eventInfo.event?.extendedProps.allDataCompleted
+                          //   ? "Text10N p-1 calenderEventBox"
+                          // :
+                          "Text10N p-1 calenderEventBoxYellow"
                         }
                         style={{
                           marginLeft: "5px",
                           width: "100%",
                           overflow: "auto",
+                          backgroundColor: eventInfo.event?.extendedProps.client.bookingStatus !== "Yes" ? "#ff4242" : eventInfo.event?.extendedProps.isWedding ? "#4aff4a" : eventInfo.event?.extendedProps.eventType === 'Pre-Wedding' ? "#6663ff" : "#fcfc58",
+                          color: (eventInfo.event?.extendedProps.client.bookingStatus !== "Yes" || eventInfo.event?.extendedProps.eventType === 'Pre-Wedding') ? "white" : "black"
                         }}
                       >
                         {" "}
@@ -171,7 +244,7 @@ function Calender() {
                 }
                 navigate(
                   "/calendar/list-view/client/" +
-                    info.event?.extendedProps.client._id
+                  info.event?.extendedProps.client._id
                 );
               }}
               eventMouseEnter={(info) => {

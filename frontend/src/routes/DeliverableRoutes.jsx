@@ -12,7 +12,7 @@ const DeliverableRoutes = ({userData}) => (
         <Route
             exact
             path="/deliverables"
-            element={hasAccess(userData, ['Manager', 'Editor']) ? <Deliverables /> : <Navigate to="/" replace />}
+            element={hasAccess(userData, ['Manager', 'Editor', 'Shooter']) ? <Deliverables /> : <Navigate to="/" replace />}
         >
             <Route
                 path="cinema"

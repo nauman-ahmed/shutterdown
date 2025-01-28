@@ -46,6 +46,8 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
+import { MdOutlinePhotoCameraFront } from "react-icons/md";
+import { MdPhotoCameraFront } from "react-icons/md";
 
 const months = [
   "January",
@@ -115,15 +117,15 @@ function ListView(props) {
     setShow(!show);
   };
 
-  const groupByBrideName = (events) => {
+  const groupByClientID = (events) => {
     // Step 1: Group events by brideName
-    const groupedByBrideName = events?.reduce((acc, event) => {
-      const brideName = event?.client?.brideName;
+    const groupedByClientID = events?.reduce((acc, event) => {
+      const clientID = event?.client?._id;
       // Check if the bride's group already exists in acc
-      let found = acc?.find((group) => group.brideName === brideName);
+      let found = acc?.find((group) => group.clientID === clientID);
       if (!found) {
         // Create a new group for this bride
-        found = { brideName, events: [] };
+        found = { clientID, events: [] };
         acc.push(found);
       }
       // Add the current event to the bride's group
@@ -132,7 +134,7 @@ function ListView(props) {
     }, []);
 
     // Step 3: Flatten the groups back into a single array of events
-    const sortedEvents = groupedByBrideName.reduce((acc, group) => {
+    const sortedEvents = groupedByClientID.reduce((acc, group) => {
       acc.push(...group.events); // Append each group's sorted events
       return acc;
     }, []);
@@ -141,8 +143,6 @@ function ListView(props) {
   };
 
   const getEventsData = async () => {
-    console.log(clientId);
-
     setLoading(true);
     try {
       const usersData = await getAllUsers();
@@ -183,7 +183,7 @@ function ListView(props) {
       );
       if (currentUser.rollSelect === "Manager" || currentUser?.rollSelect === 'Production Manager') {
         setEventsForShow(
-          groupByBrideName(
+          groupByClientID(
             res?.data?.sort((a, b) => {
               const dateA = new Date(a?.eventDate);
               const dateB = new Date(b?.eventDate);
@@ -191,7 +191,7 @@ function ListView(props) {
             })
           )
         );
-      } else if (currentUser.rollSelect === "Shooter") {
+      } else if (currentUser.rollSelect === "Shooter" || currentUser.rollSelect === "Editor") {
         let eventsToShow = [];
         res?.data?.forEach((event) => {
           if (
@@ -241,7 +241,7 @@ function ListView(props) {
           }
         });
         setEventsForShow(
-          groupByBrideName(
+          groupByClientID(
             eventsToShow?.sort((a, b) => {
               const dateA = new Date(a?.eventDate);
               const dateB = new Date(b?.eventDate);
@@ -433,7 +433,7 @@ function ListView(props) {
   const applySorting = (order) => {
     try {
       setEventsForShow(
-        groupByBrideName(
+        groupByClientID(
           eventsForShow?.sort((a, b) => {
             const dateA = new Date(a?.eventDate);
             const dateB = new Date(b?.eventDate);
@@ -808,6 +808,9 @@ function ListView(props) {
                           {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                             <tr className="relative" key={index}>
                               <td
+                              style={{
+                                width: "180px",
+                              }}
                                 className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
                                   (rowOfWarning === index - 1 &&
                                     errorText?.length > 150)
@@ -815,21 +818,9 @@ function ListView(props) {
                                   : " sticky-column "
                                   } tablePlaceContent`}
                               >
-                                {errorText.length > 0 && (
-                                  <ButtonWithHoverBox
-                                    buttonText="error"
-                                    hoverText={errorText}
-                                    setRowOfWarnig={setRowOfWarnig}
-                                    i={index}
-                                  />
-                                )}
+
                                 <div
-                                  className={
-                                    errorText.length > 0
-                                      ? "d-flex flex-row ps-5"
-                                      : "d-flex flex-row"
-                                  }
-                                >
+                                  className={"d-flex flex-row justify-content-center"}>
                                   <div
                                     className={`${errorText.length === 0 && "ms-4"
                                       }`}
@@ -846,10 +837,26 @@ function ListView(props) {
                                     >
                                       {event?.location}
                                     </div>
-                                    <img
-                                      alt=""
-                                      src={transport_icons[event.travelBy]}
-                                    />
+                                    <div className="d-flex justify-content-center align-items-center">
+                                      {errorText.length > 0 && (
+                                        <ButtonWithHoverBox
+                                          buttonText="error"
+                                          hoverText={errorText}
+                                          setRowOfWarnig={setRowOfWarnig}
+                                          i={index}
+                                        />
+                                      )}
+                                      <img
+                                        alt=""
+                                        src={transport_icons[event.travelBy]}
+                                      />
+                                      {Number(event?.sameDayPhotoEditors) > 0 && (
+                                        <MdOutlinePhotoCameraFront className="fs-5" />
+                                      )}
+                                      {Number(event?.sameDayVideoEditors) > 0 && (
+                                        <MdPhotoCameraFront className="fs-5" />
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               </td>
@@ -1147,7 +1154,7 @@ function ListView(props) {
                                   ))}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                                
+
                                 <ShootDropDown
                                   role={"sameDayPhotoMakers"}
                                   message={"Same Day Photo Makers"}
@@ -1193,7 +1200,7 @@ function ListView(props) {
                                   ))}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                                
+
                                 <ShootDropDown
                                   role={"sameDayVideoEditors"}
                                   message={"Same Day Video Makers"}
@@ -1259,7 +1266,7 @@ function ListView(props) {
                               </td>
                             </tr>
                           )}
-                          {currentUser.rollSelect === "Shooter" && (
+                          {(currentUser.rollSelect === "Shooter" || currentUser.rollSelect === "Editor") && (
                             <tr className="relative" key={index}>
                               <td
                                 className={`tableBody Text14Semi primary2  tablePlaceContent`}
@@ -1402,7 +1409,7 @@ function ListView(props) {
                                   )) : "None"}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                               
+
 
                                 {(Array.isArray(event?.sameDayPhotoMakers) && event?.sameDayPhotoMakers?.length > 0) ?
                                   event?.sameDayPhotoMakers?.map((user) => (
@@ -1418,7 +1425,7 @@ function ListView(props) {
                                   )) : "None"}
                               </td>
                               <td className="tableBody Text14Semi primary2 tablePlaceContent">
-                               
+
 
                                 {(Array.isArray(event?.sameDayVideoMakers) && event?.sameDayVideoMakers?.length > 0) ?
                                   event?.sameDayVideoMakers?.map((user) => (
@@ -1733,7 +1740,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   };
 
   return (
-    <div style={{ position: "absolute" }}>
+    <div style={{position : 'relative'}}>
       <IoIosWarning
         className="fs-3 text-danger"
         onMouseEnter={handleMouseEnter}
@@ -1743,7 +1750,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
         <div
           style={{
             position: "absolute",
-            top: 10,
+            top: -90,
             left: 20,
             zIndex: 10000,
             width: "300px",

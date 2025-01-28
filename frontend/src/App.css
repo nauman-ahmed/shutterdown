@@ -46,7 +46,9 @@
 }
 
 
-
+.cklientrow {
+  background-color: #EFF0F5 !important;
+}
 
 .merienda-medium {
   font-family: "Merienda", cursive;
@@ -81,7 +83,7 @@
 }
 
 .sticky-column+.sticky-column {
-  left: 100px;
+  left: 140px;
   /*This needs to be adjusted based on the actual width of the first column*/
 }
 

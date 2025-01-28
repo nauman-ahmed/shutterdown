@@ -97,7 +97,7 @@ tr:first-child {
      border-bottom-right-radius: 20px !important;
  } */
 td {
-     border: solid 1px #000;
+     border: solid 1px #e0e0e0 !important;
      border-style: solid none;
      padding: 10px;
 }

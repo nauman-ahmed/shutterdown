@@ -42,15 +42,15 @@ const months = [
   "Decemeber",
 ];
 
-export const groupByBrideName = (deliverables) => {
+export const groupByClientID = (deliverables) => {
   // Step 1: Group events by brideName
-  const groupedByBrideName = deliverables?.reduce((acc, deliverable) => {
-    const brideName = deliverable?.client?.brideName;
+  const groupedByClientID = deliverables?.reduce((acc, deliverable) => {
+    const clientID = deliverable?.client?._id;
     // Check if the bride's group already exists in acc
-    let found = acc?.find((group) => group.brideName === brideName);
+    let found = acc?.find((group) => group.clientID === clientID);
     if (!found) {
       // Create a new group for this bride
-      found = { brideName, deliverables: [] };
+      found = { clientID, deliverables: [] };
       acc.push(found);
     }
     // Add the current event to the bride's group
@@ -59,7 +59,7 @@ export const groupByBrideName = (deliverables) => {
   }, []);
 
   // Step 3: Flatten the groups back into a single array of events
-  const sortedDeliverables = groupedByBrideName?.reduce((acc, group) => {
+  const sortedDeliverables = groupedByClientID?.reduce((acc, group) => {
     acc.push(...group.deliverables); // Append each group's sorted events
     return acc;
   }, []);
@@ -279,17 +279,17 @@ function Cinematography(props) {
       await getAllWhatsappTextHandler();
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data.data);
-        setDeliverablesForShow(groupByBrideName(data.data.sort((a, b) => {
+        setDeliverablesForShow(groupByClientID(data.data.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
         })));
-      } else if (currentUser?.rollSelect === "Editor") {
+      } else if (currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") {
         const deliverablesToShow = data.data.filter(
           (deliverable) => deliverable?.editor?._id === currentUser?._id
         );
         setAllDeliverables(deliverablesToShow);
-        setDeliverablesForShow(groupByBrideName(deliverablesToShow.sort((a, b) => {
+        setDeliverablesForShow(groupByClientID(deliverablesToShow.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return ascendingWeding ? dateB - dateA : dateA - dateB;
@@ -319,7 +319,7 @@ function Cinematography(props) {
           const dateB = new Date(b.date);
           return !ascendingWeding ? dateB - dateA : dateA - dateB;
         });
-        setDeliverablesForShow(groupByBrideName(sorted));
+        setDeliverablesForShow(groupByClientID(sorted));
         setAscendingWeding(!ascendingWeding);
       }
     } catch (error) {
@@ -409,14 +409,14 @@ function Cinematography(props) {
       }
       setFilterCondition(finalCond);
       const newData = allDeliverables.filter((deliverable) => eval(finalCond));
-      setDeliverablesForShow(groupByBrideName(newData?.sort((a, b) => {
+      setDeliverablesForShow(groupByClientID(newData?.sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         return ascendingWeding ? dateB - dateA : dateA - dateB;
       }))
       );
     } else {
-      setDeliverablesForShow(groupByBrideName(allDeliverables?.sort((a, b) => {
+      setDeliverablesForShow(groupByClientID(allDeliverables?.sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         return ascendingWeding ? dateB - dateA : dateA - dateB;
@@ -428,7 +428,7 @@ function Cinematography(props) {
   const changeFilter = (filterType) => {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
-        setDeliverablesForShow(groupByBrideName(
+        setDeliverablesForShow(groupByClientID(
           allDeliverables
             .filter((deliverable) => !deliverable.editor)
             .sort((a, b) => {
@@ -442,7 +442,7 @@ function Cinematography(props) {
           filterType !== "Wedding Date sorting" &&
           filterType !== "Deadline sorting"
         ) {
-          setDeliverablesForShow(groupByBrideName(
+          setDeliverablesForShow(groupByClientID(
             allDeliverables.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
@@ -522,7 +522,7 @@ function Cinematography(props) {
     return 45;
   };
 
-  
+
 
   return (
     <>
@@ -585,7 +585,7 @@ function Cinematography(props) {
               }
             >
               <thead>
-                {currentUser?.rollSelect === "Editor" ? (
+                {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") ? (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Deliverables</th>
@@ -994,7 +994,7 @@ function Cinematography(props) {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect === "Editor" && (
+                      {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") && (
                         <tr
                           style={{
                             background: "#EFF0F5",
@@ -1022,8 +1022,8 @@ function Cinematography(props) {
                             }}
                           >
                             <div>
-                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
-                          
+                              {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
+
                             </div>
                           </td>
                           <td

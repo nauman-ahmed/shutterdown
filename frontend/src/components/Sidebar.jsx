@@ -136,7 +136,7 @@ const SideBar = () => {
                     ))}
                   </>
                 )}
-                 {currentUser?.rollSelect === "Production Manager" && (
+                {currentUser?.rollSelect === "Production Manager" && (
                   <>
                     {productionManagerMenuOptions.map((option) => (
                       <MenuOption option={option} />
@@ -271,8 +271,8 @@ const SideBar = () => {
                         <div className="notificationsBox mt12 R_A_Justify">
                           {notification.forManager
                             ? !notification.readBy.includes(
-                                currentUser?._id
-                              ) && <div className="Circle" />
+                              currentUser?._id
+                            ) && <div className="Circle" />
                             : !notification.read && <div className="Circle" />}
 
                           <div>
@@ -286,15 +286,15 @@ const SideBar = () => {
                               <br />
                               <text className="gray">
                                 {notification.notificationOf === "client" ||
-                                notification.notificationOf === "Pre-Wed Shoot"
+                                  notification.notificationOf === "Pre-Wed Shoot"
                                   ? notification.data.brideName +
-                                    " Weds " +
-                                    notification.data.groomName
+                                  " Weds " +
+                                  notification.data.groomName
                                   : ""}
                                 {notification.notificationOf === "event"
                                   ? notification.data.client?.brideName +
-                                    " Weds " +
-                                    notification.data.client?.groomName
+                                  " Weds " +
+                                  notification.data.client?.groomName
                                   : ""}
                               </text>
                             </div>
@@ -342,35 +342,35 @@ const SideBar = () => {
                               notification.notificationOf === "client"
                                 ? navigate("/MyProfile/Client/ViewClient")
                                 : notification.notificationOf === "event"
-                                ? navigate(
+                                  ? navigate(
                                     currentUser?.rollSelect === "Manager"
                                       ? "/MyProfile/Calender/ListView"
                                       : "/MyProfile/Deliverables/Cinematography"
                                   )
-                                : notification.notificationOf ===
-                                  "Pre-Wed Shoot"
-                                ? navigate(
-                                    currentUser?.rollSelect === "Manager"
-                                      ? "/MyProfile/PreWedShoot/PreWedShootScreen"
-                                      : "/MyProfile/Deliverables/PreWed-Deliverables"
-                                  )
-                                : notification.notificationOf ===
-                                  "Cinema Deliverable"
-                                ? navigate(
-                                    "/MyProfile/Deliverables/Cinematography"
-                                  )
-                                : notification.notificationOf ===
-                                  "Photos Deliverable"
-                                ? navigate("/MyProfile/Deliverables/Photos")
-                                : notification.notificationOf ===
-                                  "Albums Deliverable"
-                                ? navigate("/MyProfile/Deliverables/Albums")
-                                : notification.notificationOf ===
-                                  "Pre-Wed Deliverable"
-                                ? navigate(
-                                    "/MyProfile/Deliverables/PreWed-Deliverables"
-                                  )
-                                : navigate("/");
+                                  : notification.notificationOf ===
+                                    "Pre-Wed Shoot"
+                                    ? navigate(
+                                      currentUser?.rollSelect === "Manager"
+                                        ? "/MyProfile/PreWedShoot/PreWedShootScreen"
+                                        : "/MyProfile/Deliverables/PreWed-Deliverables"
+                                    )
+                                    : notification.notificationOf ===
+                                      "Cinema Deliverable"
+                                      ? navigate(
+                                        "/MyProfile/Deliverables/Cinematography"
+                                      )
+                                      : notification.notificationOf ===
+                                        "Photos Deliverable"
+                                        ? navigate("/MyProfile/Deliverables/Photos")
+                                        : notification.notificationOf ===
+                                          "Albums Deliverable"
+                                          ? navigate("/MyProfile/Deliverables/Albums")
+                                          : notification.notificationOf ===
+                                            "Pre-Wed Deliverable"
+                                            ? navigate(
+                                              "/MyProfile/Deliverables/PreWed-Deliverables"
+                                            )
+                                            : navigate("/");
                               setShowNoti(false);
                             }}
                             alt=""
@@ -393,8 +393,8 @@ const SideBar = () => {
                         <div className="notificationsBox mt12 R_A_Justify">
                           {notification.forManager
                             ? !notification.readBy.includes(
-                                currentUser?._id
-                              ) && <div className="Circle" />
+                              currentUser?._id
+                            ) && <div className="Circle" />
                             : !notification.read && <div className="Circle" />}
 
                           <div>
@@ -408,15 +408,15 @@ const SideBar = () => {
                               <br />
                               <text className="gray">
                                 {notification.notificationOf === "client" ||
-                                notification.notificationOf === "Pre-Wed Shoot"
+                                  notification.notificationOf === "Pre-Wed Shoot"
                                   ? notification.data.brideName +
-                                    " Weds " +
-                                    notification.data.groomName
+                                  " Weds " +
+                                  notification.data.groomName
                                   : ""}
                                 {notification.notificationOf === "event"
                                   ? notification.data.client?.brideName +
-                                    " Weds " +
-                                    notification.data.client?.groomName
+                                  " Weds " +
+                                  notification.data.client?.groomName
                                   : ""}
                               </text>
                             </div>
@@ -477,29 +477,29 @@ const SideBar = () => {
                               notification.notificationOf === "client"
                                 ? navigate("/MyProfile/Client/ViewClient")
                                 : notification.notificationOf === "event"
-                                ? navigate("/MyProfile/Calender/ListView")
-                                : notification.notificationOf ===
-                                  "Pre-Wed Shoot"
-                                ? navigate(
-                                    "/MyProfile/PreWedShoot/PreWedShootScreen"
-                                  )
-                                : notification.notificationOf ===
-                                  "Cinema Deliverable"
-                                ? navigate(
-                                    "/MyProfile/Deliverables/Cinematography"
-                                  )
-                                : notification.notificationOf ===
-                                  "Photos Deliverable"
-                                ? navigate("/MyProfile/Deliverables/Photos")
-                                : notification.notificationOf ===
-                                  "Albums Deliverable"
-                                ? navigate("/MyProfile/Deliverables/Albums")
-                                : notification.notificationOf ===
-                                  "Pre-Wed Deliverable"
-                                ? navigate(
-                                    "/MyProfile/Deliverables/PreWed-Deliverables"
-                                  )
-                                : navigate("/");
+                                  ? navigate("/MyProfile/Calender/ListView")
+                                  : notification.notificationOf ===
+                                    "Pre-Wed Shoot"
+                                    ? navigate(
+                                      "/MyProfile/PreWedShoot/PreWedShootScreen"
+                                    )
+                                    : notification.notificationOf ===
+                                      "Cinema Deliverable"
+                                      ? navigate(
+                                        "/MyProfile/Deliverables/Cinematography"
+                                      )
+                                      : notification.notificationOf ===
+                                        "Photos Deliverable"
+                                        ? navigate("/MyProfile/Deliverables/Photos")
+                                        : notification.notificationOf ===
+                                          "Albums Deliverable"
+                                          ? navigate("/MyProfile/Deliverables/Albums")
+                                          : notification.notificationOf ===
+                                            "Pre-Wed Deliverable"
+                                            ? navigate(
+                                              "/MyProfile/Deliverables/PreWed-Deliverables"
+                                            )
+                                            : navigate("/");
                               setShowNoti(false);
                             }}
                             alt=""
@@ -511,7 +511,7 @@ const SideBar = () => {
                   </>
                 )}
               </div>
-              
+
             </div>
           )}
         </div>

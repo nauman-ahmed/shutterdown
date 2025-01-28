@@ -13,7 +13,7 @@ const CalendarRoutes = ({userData}) => {
     <Route
       exact
       path="/calendar"
-      element={hasAccess(userData, ['Manager', 'Shooter', 'Production Manager']) ? <CalenderView /> : <Navigate to="/" replace />}
+      element={hasAccess(userData, ['Manager', 'Shooter', 'Production Manager', "Editor"]) ? <CalenderView /> : <Navigate to="/" replace />}
     >
       <Route
         path="calendar-view"
@@ -31,7 +31,7 @@ const CalendarRoutes = ({userData}) => {
     <Route
       exact
       path="/pre-wed-shoots"
-      element={hasAccess(userData, ['Manager', 'Shooter', 'Production Manager']) ? <PreWedShoot /> : <Navigate to="/" replace />}
+      element={hasAccess(userData, ['Manager', 'Shooter', 'Production Manager', "Editor"]) ? <PreWedShoot /> : <Navigate to="/" replace />}
     >
       <Route
         path="screen"
