@@ -77,29 +77,42 @@ const AssignTeam = async (req, res) => {
     console.log(req.body.data.choosenCinematographers);
 
     const photographersIds = req.body.data.choosenPhotographers?.map((user) => {
-
       calendarRequestMaker(user, event)
-
       return user._id
     });
     const cinematographersIds = req.body.data.choosenCinematographers?.map(
       (user) => {
-
         calendarRequestMaker(user, event)
-  
+        return user._id
+      });
+    const droneFlyersIds = req.body.data.droneFlyers?.map((user) => {
+      calendarRequestMaker(user, event)
+      return user._id
+    });
+    const sameDayPhotoMakersIds = req.body.data.sameDayPhotoMakers?.map(
+      (user) => {
+        calendarRequestMaker(user, event)
         return user._id
       }
     );
-    const droneFlyersIds = req.body.data.droneFlyers?.map((user) => user._id);
-    const sameDayPhotoMakersIds = req.body.data.sameDayPhotoMakers?.map(
-      (user) => user._id
-    );
     const sameDayVideoMakersIds = req.body.data.sameDayVideoMakers?.map(
-      (user) => user._id
+      (user) => {
+        calendarRequestMaker(user, event)
+        return user._id
+      }
     );
-    const assistantsIds = req.body.data.assistants?.map((user) => user._id);
-    const managerIds = req.body.data.manager?.map((user) => user._id);
-    const directorIds = req.body.data.shootDirectors?.map((user) => user._id);
+    const assistantsIds = req.body.data.assistants?.map((user) => {
+      calendarRequestMaker(user, event)
+      return user._id
+    });
+    const managerIds = req.body.data.manager?.map((user) => {
+      calendarRequestMaker(user, event)
+      return user._id
+    });
+    const directorIds = req.body.data.shootDirectors?.map((user) => {
+      calendarRequestMaker(user, event)
+      return user._id
+    });
 
 
     event.choosenCinematographers = cinematographersIds;
