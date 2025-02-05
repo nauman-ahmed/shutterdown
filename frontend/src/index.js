@@ -10,12 +10,12 @@ import { store } from "./redux/configureStore";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient();
-
+// 182472950003-n2rlh7uvlc8i4bbfoh4fn28a7sf1ufqr.apps.googleusercontent.com
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
     <BrowserRouter>
-      <GoogleOAuthProvider clientId="182472950003-n2rlh7uvlc8i4bbfoh4fn28a7sf1ufqr.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId="949851727067-0j31pm6caapb1knin3v84jgq0r03e9lb.apps.googleusercontent.com">
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>

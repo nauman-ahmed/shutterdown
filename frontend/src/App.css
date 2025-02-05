@@ -197,6 +197,13 @@
 abbr[title] {
   text-decoration: none;
 }
+.connectGBtn {
+  font-family: 'Poppins Medium';
+  border-radius: 30px;
+  padding: 0px 12px;
+  border: 2px solid #666DFF;
+  margin-top: -6px;
+}
 
 /* .react-calendar__month-view__days__day--weekend {
   color: #d10000;

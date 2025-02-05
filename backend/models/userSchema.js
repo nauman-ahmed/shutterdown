@@ -114,6 +114,13 @@ const userSchema = mongoose.Schema({
   },
   signature : {
     type : String
+  },
+  googleToken : {
+    type : String
+  },
+  googleConnected : {
+    type : Boolean,
+    default : false
   }
 });
 const userModel = mongoose.model('user', userSchema);

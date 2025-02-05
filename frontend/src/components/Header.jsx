@@ -17,7 +17,7 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import NotiSelect from "../assets/Profile/NotiSelect.svg";
 import Cookies from "js-cookie";
-import { updateUserDataAPI } from "../API/userApi";
+import { updateUserDataAPI, updateUserG } from "../API/userApi";
 import { toast } from "react-toastify";
 import "../assets/css/Profile.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +31,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { CheckPassword } from "../functions/authFns/passwordFn";
 import ButtonLoader from "./common/buttonLoader";
 import NotificationsOverlay from "./layoutComps/NotificationsOverlay";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 const Header = (args) => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ const Header = (args) => {
     setModal(!modal);
     setShow(false);
   };
-  const { userData: currentUser } = useLoggedInUser();
+  const { userData: currentUser, updateUserData } = useLoggedInUser();
   const dispatch = useDispatch();
   const [userData, setUserData] = useState(currentUser);
   const { openedMenu, setOpenedMenu } = useOpenedMenu()
@@ -115,6 +117,25 @@ const Header = (args) => {
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location]);
+
+  const loginByGoogle = useGoogleLogin({
+    scope: 'https://www.googleapis.com/auth/calendar.events',
+    onSuccess: async (tokenResponse) => {
+      try {
+
+        console.log(tokenResponse);
+
+        const updatedUser = await updateUserG({ ...currentUser, googleToken: tokenResponse.access_token })
+
+        updateUserData(updatedUser)
+      } catch (error) {
+        toast.error("Google login failed. Please try again.");
+      }
+    },
+    onError: () => {
+      toast.error("Google login was unsuccessful.");
+    },
+  });
 
   return (
     <>
@@ -191,6 +212,15 @@ const Header = (args) => {
               <div className="w-100 d-flex align-items-center justify-content-end">
 
                 <div className="d-flex align-items-center">
+                  {(!currentUser.googleConnected && (currentUser.rollSelect == 'Shooter' || currentUser.rollSelect === 'Editor')) ? (
+                    <div onClick={loginByGoogle} className=" mx-3 d-flex align-items-center cursor-pointer  connectGBtn ">
+                      Connect <svg xmlns="http://www.w3.org/2000/svg" aria-label="Google Calendar" role="img" viewBox="0 0 512 512" width="40px" height="40px" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="512" height="512" rx="15%" fill="#ffffff"></rect><path d="M100 340h74V174H340v-74H137Q100 100 100 135" fill="#4285f4"></path><path d="M338 100v76h74v-41q0-35-35-35" fill="#1967d2"></path><path d="M338 174h74V338h-74" fill="#fbbc04"></path><path d="M100 338v39q0 35 35 35h41v-74" fill="#188038"></path><path d="M174 338H338v74H174" fill="#34a853"></path><path d="M338 412v-74h74" fill="#ea4335"></path><path d="M204 229a25 22 1 1 1 25 27h-9h9a25 22 1 1 1-25 27M270 231l27-19h4v-7V308" stroke="#4285f4" stroke-width="15" stroke-linejoin="bevel" fill="none"></path></g></svg>
+                    </div>
+                  ) : (currentUser.googleConnected &&
+                    <div  className=" mx-3 d-flex align-items-center   connectGBtn ">
+                      Connected <svg xmlns="http://www.w3.org/2000/svg" aria-label="Google Calendar" role="img" viewBox="0 0 512 512" width="40px" height="40px" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="512" height="512" rx="15%" fill="#ffffff"></rect><path d="M100 340h74V174H340v-74H137Q100 100 100 135" fill="#4285f4"></path><path d="M338 100v76h74v-41q0-35-35-35" fill="#1967d2"></path><path d="M338 174h74V338h-74" fill="#fbbc04"></path><path d="M100 338v39q0 35 35 35h41v-74" fill="#188038"></path><path d="M174 338H338v74H174" fill="#34a853"></path><path d="M338 412v-74h74" fill="#ea4335"></path><path d="M204 229a25 22 1 1 1 25 27h-9h9a25 22 1 1 1-25 27M270 231l27-19h4v-7V308" stroke="#4285f4" stroke-width="15" stroke-linejoin="bevel" fill="none"></path></g></svg>
+                    </div>
+                  )}
                   <img
                     ref={targetNoti}
                     alt="notification"
@@ -203,7 +233,7 @@ const Header = (args) => {
                     width={25}
                     height={25}
                   />
-                  <div className="name_div_flex mb-1">
+                  <div className="name_div_flex align-items-center">
                     <img
                       alt=""
                       src="/images/navbar/oval.png"
@@ -322,7 +352,6 @@ const Header = (args) => {
           )}
         </Overlay>
         <NotificationsOverlay showNoti={showNoti} setShowNoti={setShowNoti} targetNoti={targetNoti} />
-
       </div>
     </>
   );

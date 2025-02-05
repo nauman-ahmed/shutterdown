@@ -52,7 +52,24 @@ const updateUserData = async (req, res) => {
       req.body,
       { new: true }
     );
-    res.status(200).json({ message: "Information Updated Successfully!", updatedUser });
+    const userObject = updatedUser.toObject(); // Convert to plain object
+    const { googleToken, password, ...userToSend } = userObject;
+    res.status(200).json({ message: "Information Updated Successfully!", updatedUser: userToSend });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateUserDataGoogle = async (req, res) => {
+  try {
+    const updatedUser = await userSchema.findByIdAndUpdate(
+      req.body._id,
+      { googleToken: req.body.googleToken, googleConnected: true },
+      { new: true }
+    );
+    const userObject = updatedUser.toObject(); // Convert to plain object
+    const { googleToken, password, ...userToSend } = userObject;
+    res.status(200).json({ message: "Information Updated Successfully!", updatedUser: userToSend });
   } catch (error) {
     console.log(error);
   }
@@ -265,21 +282,39 @@ const uploadFiles = async (req, res) => {
 };
 const RegisterPostRequest = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNo, password, rollSelect } =
-      req.body;
+    const { firstName, lastName, email, phoneNo, password, rollSelect, googleToken } = req.body;
     const existEmail = await userSchema.findOne({ email: email });
+
     if (existEmail) {
-      res.status(400).json({
-        message: "user already exists",
-        existEmail: { existEmail },
-        User: {
-          firstName: existEmail.firstName,
-          lastName: existEmail.lastName,
-          email: existEmail.email,
-          rollSelect: existEmail.rollSelect,
-          _id: existEmail._id,
-        },
-      });
+      if (existEmail.googleToken) {
+
+        res.status(400).json({
+          message: "user already exists",
+          existEmail: { existEmail },
+          User: {
+            firstName: existEmail.firstName,
+            lastName: existEmail.lastName,
+            email: existEmail.email,
+            rollSelect: existEmail.rollSelect,
+            _id: existEmail._id,
+          },
+        });
+      } else {
+        existEmail.googleToken = req.body.googleToken;
+        existEmail.googleConnected = true;
+        const updateduser = await existEmail.save();
+        const token = jwt.sign(
+          { id: updateduser._id, email: updateduser.email }, // Payload
+          process.env.JWT_SECRET, // Secret key
+          {}
+        );
+        const { googleToken, password, ...userToSend } = updateduser.toObject();
+        res.status(200).json({
+          message: "You are Registered Successfully",
+          User: userToSend,
+          token
+        });
+      }
     } else if (existEmail === null) {
       const user = new userSchema({
         firstName,
@@ -295,9 +330,12 @@ const RegisterPostRequest = async (req, res) => {
         process.env.JWT_SECRET, // Secret key
         {}
       );
+
+      const userObject = savedUser.toObject(); // Convert to plain object
+      const { googleToken, password, ...userToSend } = userObject;
       res.status(200).json({
         message: "You are Registered Successfully",
-        User: user,
+        User: userToSend,
         token
       });
     }
@@ -334,11 +372,13 @@ const SignInPostRequest = async (req, res) => {
         process.env.JWT_SECRET, // Secret key
         jwtOptions // Conditional options
       );
-      
+
+      // Convert to plain object before removing sensitive fields
+      const { googleToken, password, ...userToSend } = loginUser.toObject();
 
       // Respond with user details and token
       res.status(200).json({
-        user: loginUser,
+        user: userToSend,
         token, // Include token in the response
       });
     } else {
@@ -409,7 +449,8 @@ const newPassword = async (req, res) => {
       }
     );
     if (updatedData) {
-      res.status(200).json(updatedData);
+      const { googleToken, password, ...userToSend } = updatedUser.toObject();
+      res.status(200).json(userToSend);
     }
   } catch (error) {
     res.status(400).json("not Updated");
@@ -423,9 +464,10 @@ const getExistEmail = async (req, res) => {
       banAccount: false,
     });
     if (user) {
-      res.status(200).json(user);
+      const { googleToken, password, ...userToSend } = user.toObject();
+      return res.status(200).json(userToSend);
     }
-    res.status(201).json({ error: true });
+    return res.status(201).json({ error: true });
   } catch (error) {
     console.log(error);
   }
@@ -434,7 +476,12 @@ const getExistEmail = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await userSchema.find({ banAccount: false });
-    res.json({ users });
+    const usersToSend = users.map(user => {
+      const userObject = user.toObject(); // Convert to plain object
+      const { password, googleToken, ...userToSend } = userObject; // Remove sensitive data
+      return userToSend;
+    });
+    res.json({ users: usersToSend });
   } catch (error) {
     console.log("error");
   }
@@ -446,7 +493,12 @@ const getEditors = async (req, res) => {
       rollSelect: "Editor",
       banAccount: false,
     });
-    res.json({ editors });
+    const usersToSend = editors.map(user => {
+      const userObject = user.toObject(); // Convert to plain object
+      const { password, googleToken, ...userToSend } = userObject; // Remove sensitive data
+      return userToSend;
+    });
+    res.json({ editors: usersToSend });
   } catch (error) {
     console.log("error");
   }
@@ -455,7 +507,12 @@ const getEditors = async (req, res) => {
 const getShooters = async (req, res) => {
   try {
     const shooters = await userSchema.find({ rollSelect: "Shooter" });
-    res.json({ shooters });
+    const usersToSend = shooters.map(user => {
+      const userObject = user.toObject(); // Convert to plain object
+      const { password, googleToken, ...userToSend } = userObject; // Remove sensitive data
+      return userToSend;
+    });
+    res.json({ shooters: usersToSend });
   } catch (error) {
     console.log("error");
   }
@@ -463,7 +520,8 @@ const getShooters = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await userSchema.findById(req.userId);
-    res.json(user);
+    const { googleToken, password, ...userToSend } = user.toObject();
+    res.json(userToSend);
   } catch (error) {
     console.log(error);
   }
@@ -488,4 +546,5 @@ module.exports = {
   downloadFile,
   previewFile,
   updateUserData,
+  updateUserDataGoogle
 };

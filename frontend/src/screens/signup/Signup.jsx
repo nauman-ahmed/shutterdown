@@ -120,7 +120,7 @@ const Signup = (props) => {
       return
     } else {
       setError(false);
-      googleSignUp({ ...GoogleRegisterData, phone: phone }, {
+      googleSignUp({ ...GoogleRegisterData, phone: phone, googleToken : signInData.googleToken }, {
         onSuccess: (response) => {
           if (response.status === 200) {
             Cookies.set('userKeys', JSON.stringify({ userToken: response.data.token }))

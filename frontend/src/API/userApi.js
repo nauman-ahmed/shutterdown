@@ -126,7 +126,7 @@ export const SignUpAPI = async (data) => {
   // localStorage.setItem("res", JSON.stringify(res));
 };
 export const SignInWithGoogleDataAPI = async (data) => {
-  const { firstName, lastName, email, rollSelect, phoneNo } = data;
+  const { firstName, lastName, email, rollSelect, phoneNo, googleToken } = data;
 
   const res = await axios.post(BASE_URL + "/signInWithGoogle", {
     Headers: {
@@ -137,6 +137,7 @@ export const SignInWithGoogleDataAPI = async (data) => {
     email: email,
     phoneNo: phoneNo,
     rollSelect: rollSelect,
+    googleToken,
   });
   return res
 };
@@ -166,6 +167,8 @@ export const GetSignInApi = async (data) => {
       password: password,
     })
     .then((res) => {
+      console.log(res);
+      
       Cookies.set("currentUser", JSON.stringify(res.data.User), { expires: 7 });
       toast.success("Logged in successfully!");
     })
@@ -244,6 +247,17 @@ export const updateUserDataAPI = async (userData) => {
     return res.data.updatedUser; // Return the response data
   } catch (error) {
     toast.error("Error in updating Details");
+    throw error; // Ensure the error is propagated to the mutation's `onError` handler
+  }
+};
+
+export const updateUserG = async (userData) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/update-userInfoG`, userData);
+    toast.success("Google Calendar Connected!");
+    return res.data.updatedUser; // Return the response data
+  } catch (error) {
+    toast.error("Error in connecting googke calendar");
     throw error; // Ensure the error is propagated to the mutation's `onError` handler
   }
 };

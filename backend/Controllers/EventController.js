@@ -3,6 +3,32 @@ const ClientModel = require("../models/ClientModel");
 const eventModel = require("../models/EventModel");
 const dayjs = require("dayjs");
 const deliverableModel = require("../models/DeliverableModel");
+const userModel = require("../models/userSchema");
+const { syncEventWithGoogleCalendar } = require("../utils/googleCalendarFns");
+
+
+const calendarRequestMaker = async (user, event) => {
+  try {
+    console.log(user.googleConnected);
+    
+    if (user.googleConnected) {
+      const userData = await userModel.findById(user._id);
+      const clientData = await ClientModel.findById(event.client)
+      console.log(userData.googleToken);
+      if (userData.googleToken) {
+
+        await syncEventWithGoogleCalendar(userData.googleToken, event.eventDate, clientData.brideName + " weds " + clientData.groomName, { location: event.location, description: 'Travel By -> '+ event.travelBy })
+          .then(response => console.log(response))
+          .catch(error => console.error(error));
+      } else {
+        userData.googleConnected = false;
+        await userData.save()
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 const AddEvent = async (req, res) => {
   try {
@@ -48,11 +74,21 @@ const AddEvent = async (req, res) => {
 const AssignTeam = async (req, res) => {
   try {
     const event = await EventModel.findById(req.body.data._id);
-    const photographersIds = req.body.data.choosenPhotographers?.map(
-      (user) => user._id
-    );
+    console.log(req.body.data.choosenCinematographers);
+
+    const photographersIds = req.body.data.choosenPhotographers?.map((user) => {
+
+      calendarRequestMaker(user, event)
+
+      return user._id
+    });
     const cinematographersIds = req.body.data.choosenCinematographers?.map(
-      (user) => user._id
+      (user) => {
+
+        calendarRequestMaker(user, event)
+  
+        return user._id
+      }
     );
     const droneFlyersIds = req.body.data.droneFlyers?.map((user) => user._id);
     const sameDayPhotoMakersIds = req.body.data.sameDayPhotoMakers?.map(
@@ -64,6 +100,7 @@ const AssignTeam = async (req, res) => {
     const assistantsIds = req.body.data.assistants?.map((user) => user._id);
     const managerIds = req.body.data.manager?.map((user) => user._id);
     const directorIds = req.body.data.shootDirectors?.map((user) => user._id);
+
 
     event.choosenCinematographers = cinematographersIds;
     event.choosenPhotographers = photographersIds;

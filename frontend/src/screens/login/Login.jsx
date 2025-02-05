@@ -35,6 +35,8 @@ const Login = () => {
     }
     mutate({...inputData, remember}, {
       onSuccess: (data) => {
+        console.log(data);
+        
         Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }))
         updateUserData(data.user)
         Cookies.set("currentUser", JSON.stringify(data.user))
@@ -49,6 +51,7 @@ const Login = () => {
 
   const signup = () => navigate("sign-up");
   const loginByGoogle = useGoogleLogin({
+    scope: 'https://www.googleapis.com/auth/calendar.events',
     onSuccess: async (tokenResponse) => {
       try {
         const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -58,14 +61,14 @@ const Login = () => {
         });
         const accountExist = await checkExistEmail(res.data.email);
         if (res.status === 200) {
-
-          if (accountExist?.email) {
+          if (accountExist?.email && accountExist.googleConnected) {
             updateUserData(accountExist)
             Cookies.set("currentUser", JSON.stringify(accountExist))
             toast.success("Logged in successfully!");
             navigate("/profile");
           } else {
-            localStorage.setItem("signInWithGoogle", JSON.stringify(res.data));
+            localStorage.setItem("signInWithGoogle", JSON.stringify({...res.data, googleToken : tokenResponse.access_token }));
+            
             navigate("/signIn-with-google");
           }
         }
