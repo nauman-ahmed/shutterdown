@@ -121,7 +121,7 @@ function PreWedShootScreen() {
       if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
         setPreWedClients(allPreWedClients.data);
         setClientsForShow(allPreWedClients.data);
-      } else if (currentUser?.rollSelect === "Shooter") {
+      } else if (currentUser?.rollSelect === "Shooter" || currentUser?.rollSelect === "Editor") {
         const clientsToShow = allPreWedClients.data.filter((client) => {
           return (
             client.preWeddingDetails?.photographers?.some(
@@ -864,7 +864,7 @@ function PreWedShootScreen() {
                           </td>
                         </tr>
                       )}
-                      {currentUser?.rollSelect === "Shooter" && (
+                      {(currentUser?.rollSelect === "Shooter" || currentUser?.rollSelect === "Shooter") && (
                         <tr
                           key={index}
                           style={{

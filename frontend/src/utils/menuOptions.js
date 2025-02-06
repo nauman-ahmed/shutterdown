@@ -250,6 +250,22 @@ export const shooterMenuOptions = [
 
 export const editorMenuOptions = [
   {
+    text: "Calendar",
+    icon: (active) => (
+      <IoCalendarOutline className={`fs-4 ${active ? "text-white" : "text-black"}`} />
+    ),
+    subMenus: [
+      {
+        path: "/calendar/calendar-view",
+        text: "Calendar View",
+      },
+      {
+        path: "/pre-wed-shoots/screen",
+        text: "Pre-Wed Shoots",
+      },
+    ],
+  },
+  {
     text: "Deliverables",
     icon: (active) => (
       <BsCameraReels className={`fs-4 ${active ? "text-white" : "text-black"}`} />

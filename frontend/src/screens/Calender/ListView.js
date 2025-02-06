@@ -533,6 +533,12 @@ function ListView(props) {
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+
             </tr>
           );
         }
@@ -846,15 +852,15 @@ function ListView(props) {
                                           i={index}
                                         />
                                       )}
-                                      <img
+                                      <img height="30"
                                         alt=""
                                         src={transport_icons[event.travelBy]}
                                       />
                                       {Number(event?.sameDayPhotoEditors) > 0 && (
-                                        <MdOutlinePhotoCameraFront className="fs-5" />
+                                        <MdOutlinePhotoCameraFront className="fs-4" />
                                       )}
                                       {Number(event?.sameDayVideoEditors) > 0 && (
-                                        <MdPhotoCameraFront className="fs-5" />
+                                        <MdPhotoCameraFront className="fs-4" />
                                       )}
                                     </div>
                                   </div>
@@ -1742,7 +1748,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   return (
     <div style={{position : 'relative'}}>
       <IoIosWarning
-        className="fs-3 text-danger"
+        className="fs-5 text-danger"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />
@@ -1750,8 +1756,8 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
         <div
           style={{
             position: "absolute",
-            top: -90,
-            left: 20,
+            bottom: 18,
+            left: 16,
             zIndex: 10000,
             width: "300px",
             background: "silver",
