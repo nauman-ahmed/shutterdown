@@ -20,6 +20,7 @@ import { Overlay } from "react-bootstrap";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 import { groupByClientID } from "./Cinematography";
+import { IoWarning } from "react-icons/io5";
 
 const months = [
   "January",
@@ -62,55 +63,55 @@ function PreWedDeliverables(props) {
   const filterOptions =
     currentUser?.rollSelect === "Manager"
       ? [
-          {
-            title: "Assigned Editor",
-            id: 1,
-            filters: editors && [
-              ...editors?.map((editor, i) => {
-                return { title: editor.firstName, id: i + 2 };
-              }),
-              { title: "Unassigned Editor", id: editors.length + 3 },
-            ],
-          },
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ]
+        {
+          title: "Assigned Editor",
+          id: 1,
+          filters: editors && [
+            ...editors?.map((editor, i) => {
+              return { title: editor.firstName, id: i + 2 };
+            }),
+            { title: "Unassigned Editor", id: editors.length + 3 },
+          ],
+        },
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ]
       : [
-          {
-            title: "Current Status",
-            id: 5,
-            filters: [
-              {
-                title: "Yet to Start",
-                id: 2,
-              },
-              {
-                title: "In Progress",
-                id: 3,
-              },
-              {
-                title: "Completed",
-                id: 4,
-              },
-            ],
-          },
-        ];
+        {
+          title: "Current Status",
+          id: 5,
+          filters: [
+            {
+              title: "Yet to Start",
+              id: 2,
+            },
+            {
+              title: "In Progress",
+              id: 3,
+            },
+            {
+              title: "Completed",
+              id: 4,
+            },
+          ],
+        },
+      ];
 
   // Define priority for parentTitle
   const priority = {
@@ -169,11 +170,11 @@ function PreWedDeliverables(props) {
     try {
       setLoading(true);
       const data = await getPreWeds(
-       startDate,
-       endDate
+        startDate,
+        endDate
       );
       console.log(data);
-      
+
       const res = await getEditors();
       const deadline = await getAllTheDeadline();
       setDeadlineDays(deadline[0]);
@@ -184,11 +185,11 @@ function PreWedDeliverables(props) {
             user.subRole.includes("Photo Editor")
         )
       );
-      
+
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data.data);
-       
-        
+
+
         setDeliverablesForShow(groupByClientID(
           data.data.sort((a, b) => {
             const dateA = new Date(a.date);
@@ -231,9 +232,9 @@ function PreWedDeliverables(props) {
         if (obj.parentTitle == "Deliverable") {
           conditionDeliverable = conditionDeliverable
             ? conditionDeliverable +
-              " || deliverable.deliverableName === '" +
-              obj.title +
-              "'"
+            " || deliverable.deliverableName === '" +
+            obj.title +
+            "'"
             : "deliverable.deliverableName === '" + obj.title + "'";
         } else if (obj.parentTitle == "Assigned Editor") {
           if (obj.title === "Unassigned Editor") {
@@ -243,9 +244,9 @@ function PreWedDeliverables(props) {
           } else {
             conditionEditor = conditionEditor
               ? conditionEditor +
-                " || deliverable.editor?.firstName === '" +
-                obj.title +
-                "'"
+              " || deliverable.editor?.firstName === '" +
+              obj.title +
+              "'"
               : " deliverable.editor?.firstName === '" + obj.title + "'";
           }
         } else if (obj.parentTitle == "Current Status") {
@@ -432,11 +433,11 @@ function PreWedDeliverables(props) {
                   style={{ cursor: "pointer" }}
                 >
                   <div onClick={toggle}>
-                   
-                      <>
-                        {monthForData}
-                      </>
-                 
+
+                    <>
+                      {monthForData}
+                    </>
+
                   </div>
                   <div
                     className="d-flex align-items-center"
@@ -522,7 +523,7 @@ function PreWedDeliverables(props) {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
-                    {returnOneRow(
+                      {returnOneRow(
                         deliverable,
                         index >= 0 ? deliverablesForShow[index - 1] : null
                       )}
@@ -568,9 +569,9 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.editor
                                   ? {
-                                      value: deliverable?.editor.firstName,
-                                      label: deliverable?.editor?.firstName,
-                                    }
+                                    value: deliverable?.editor.firstName,
+                                    label: deliverable?.editor?.firstName,
+                                  }
                                   : null
                               }
                               name="editor"
@@ -599,6 +600,7 @@ function PreWedDeliverables(props) {
                               paddingBottom: "15px",
                             }}
                           >
+
                             {dayjs(deliverable?.date).format("DD-MMM-YYYY")}
                           </td>
                           <td
@@ -608,12 +610,15 @@ function PreWedDeliverables(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.date && dayjs(deliverable?.date).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
-                                  getrelevantDeadline(
-                                    deliverable.deliverableName
-                                  )
+                                getrelevantDeadline(
+                                  deliverable.deliverableName
+                                )
                               )
                             ).format("DD-MMM-YYYY")}
                           </td>
@@ -624,6 +629,9 @@ function PreWedDeliverables(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             <input
                               type="date"
                               name="companyDeadline"
@@ -639,15 +647,15 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.companyDeadline
                                   ? dayjs(deliverable?.companyDeadline).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -674,15 +682,15 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.firstDeliveryDate
                                   ? dayjs(
-                                      deliverable?.firstDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.firstDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -709,15 +717,15 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.finalDeliveryDate
                                   ? dayjs(
-                                      deliverable?.finalDeliveryDate
-                                    ).format("YYYY-MM-DD")
+                                    deliverable?.finalDeliveryDate
+                                  ).format("YYYY-MM-DD")
                                   : ""
                               }
                               min={
                                 deliverable?.date
                                   ? dayjs(deliverable?.date).format(
-                                      "YYYY-MM-DD"
-                                    )
+                                    "YYYY-MM-DD"
+                                  )
                                   : ""
                               }
                             />
@@ -733,9 +741,9 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.status
                                   ? {
-                                      value: deliverable?.status,
-                                      label: deliverable?.status,
-                                    }
+                                    value: deliverable?.status,
+                                    label: deliverable?.status,
+                                  }
                                   : null
                               }
                               name="Status"
@@ -755,6 +763,8 @@ function PreWedDeliverables(props) {
                                 },
                                 { value: "In Progress", label: "In Progress" },
                                 { value: "Completed", label: "Completed" },
+                                { value: "Delivered", label: "Delivered" },
+                                { value: "Closed", label: "Closed" },
                               ]}
                               required
                             />
@@ -772,9 +782,9 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.clientRevision
                                   ? {
-                                      value: deliverable?.clientRevision,
-                                      label: deliverable?.clientRevision,
-                                    }
+                                    value: deliverable?.clientRevision,
+                                    label: deliverable?.clientRevision,
+                                  }
                                   : null
                               }
                               name="clientRevision"
@@ -810,9 +820,9 @@ function PreWedDeliverables(props) {
                               value={
                                 deliverable?.clientRating
                                   ? {
-                                      value: deliverable?.clientRating,
-                                      label: deliverable?.clientRating,
-                                    }
+                                    value: deliverable?.clientRating,
+                                    label: deliverable?.clientRating,
+                                  }
                                   : null
                               }
                               name="clientRating"
@@ -908,6 +918,9 @@ function PreWedDeliverables(props) {
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(deliverable?.companyDeadline).format(
                               "YYYY-MMM-DD"
                             )}
@@ -930,7 +943,7 @@ function PreWedDeliverables(props) {
                 })}
               </tbody>
             </Table>
-            
+
           </div>
           <Overlay
             rootClose={true}
@@ -943,7 +956,7 @@ function PreWedDeliverables(props) {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-            <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
             </div>
           </Overlay>
         </>

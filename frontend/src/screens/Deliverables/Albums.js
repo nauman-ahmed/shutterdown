@@ -27,7 +27,8 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
-import { groupByClientID} from "./Cinematography";
+import { groupByClientID } from "./Cinematography";
+import { IoWarning } from "react-icons/io5";
 
 const months = [
   "January",
@@ -114,10 +115,10 @@ function Albums(props) {
       if (currentUser?.rollSelect === "Manager") {
         setAllDeliverables(data?.data);
         setDeliverablesForShow(groupByClientID(data?.data.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return ascendingWeding ? dateB - dateA : dateA - dateB;
-          }))
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return ascendingWeding ? dateB - dateA : dateA - dateB;
+        }))
         );
       } else if (currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") {
         const deliverablesToShow = data.data.filter(
@@ -223,12 +224,12 @@ function Albums(props) {
     if (filterType !== filterBy) {
       if (filterType === "Unassigned Editor") {
         setDeliverablesForShow(groupByClientID(allDeliverables
-            .filter((deliverable) => !deliverable.editor)
-            .sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              return ascendingWeding ? dateB - dateA : dateA - dateB;
-            }))
+          .filter((deliverable) => !deliverable.editor)
+          .sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          }))
         );
       } else {
         if (
@@ -236,10 +237,10 @@ function Albums(props) {
           filterType !== "Deadline sorting"
         ) {
           setDeliverablesForShow(groupByClientID(allDeliverables?.sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              return ascendingWeding ? dateB - dateA : dateA - dateB;
-            }))
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return ascendingWeding ? dateB - dateA : dateA - dateB;
+          }))
           );
         }
       }
@@ -533,7 +534,7 @@ function Albums(props) {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
-                    {returnOneRow(
+                      {returnOneRow(
                         deliverable,
                         index >= 0 ? deliverablesForShow[index - 1] : null
                       )}
@@ -619,6 +620,9 @@ function Albums(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.date && dayjs(deliverable?.date).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
@@ -635,6 +639,9 @@ function Albums(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             <input
                               type="date"
                               name="companyDeadline"
@@ -766,6 +773,8 @@ function Albums(props) {
                                 },
                                 { value: "In Progress", label: "In Progress" },
                                 { value: "Completed", label: "Completed" },
+                                { value: "Delivered", label: "Delivered" },
+                                { value: "Closed", label: "Closed" },
                               ]}
                               required
                             />
@@ -874,7 +883,7 @@ function Albums(props) {
                             }}
                           >
                             <div>
-                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
+                              {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
                             </div>
                           </td>
                           <td
@@ -893,6 +902,9 @@ function Albums(props) {
                             }}
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
+                             {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {deliverable?.companyDeadline}
                           </td>
                           <td
@@ -913,7 +925,7 @@ function Albums(props) {
               </tbody>
             </Table>
             {loading && <Spinner />}
-            
+
           </div>
           <Overlay
             rootClose={true}

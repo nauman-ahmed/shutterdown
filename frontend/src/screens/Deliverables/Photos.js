@@ -24,6 +24,7 @@ import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 import { groupByClientID } from "./Cinematography";
+import { IoWarning } from "react-icons/io5";
 
 const months = [
   "January",
@@ -511,7 +512,7 @@ function Photos() {
                 {deliverablesForShow?.map((deliverable, index) => {
                   return (
                     <>
-                    {returnOneRow(
+                      {returnOneRow(
                         deliverable,
                         index >= 0 ? deliverablesForShow[index - 1] : null
                       )}
@@ -587,6 +588,7 @@ function Photos() {
                               paddingBottom: "15px",
                             }}
                           >
+
                             {dayjs(deliverable?.date).format("DD-MMM-YYYY")}
                           </td>
                           <td
@@ -596,6 +598,9 @@ function Photos() {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.date && dayjs(deliverable?.date).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
@@ -612,6 +617,9 @@ function Photos() {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             <input
                               type="date"
                               name="companyDeadline"
@@ -743,6 +751,8 @@ function Photos() {
                                 },
                                 { value: "In Progress", label: "In Progress" },
                                 { value: "Completed", label: "Completed" },
+                                { value: "Delivered", label: "Delivered" },
+                                { value: "Closed", label: "Closed" },
                               ]}
                               required
                             />
@@ -875,7 +885,7 @@ function Photos() {
                             }}
                           >
                             <div>
-                            {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
+                              {deliverable?.deliverableName}{" "}{deliverable?.delivNumber}
                             </div>
                           </td>
                           <td
@@ -894,6 +904,9 @@ function Photos() {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {deliverable?.companyDeadline}
                           </td>
                           <td
@@ -926,8 +939,8 @@ function Photos() {
             placement="bottom"
           >
             <div style={{ width: "300px" }}>
-            <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-             
+              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+
             </div>
           </Overlay>
         </>

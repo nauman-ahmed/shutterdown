@@ -26,6 +26,7 @@ import { Overlay } from "react-bootstrap";
 import Spinner from "../../components/Spinner";
 import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
+import { IoWarning } from "react-icons/io5";
 
 const months = [
   "January",
@@ -729,6 +730,9 @@ function Cinematography(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.date && dayjs(deliverable?.date).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
@@ -745,6 +749,9 @@ function Cinematography(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5" />
+                            )}
                             <input
                               type="date"
                               name="companyDeadline"
@@ -876,6 +883,8 @@ function Cinematography(props) {
                                 },
                                 { value: "In Progress", label: "In Progress" },
                                 { value: "Completed", label: "Completed" },
+                                { value: "Delivered", label: "Delivered" },
+                                { value: "Closed", label: "Closed" },
                               ]}
                               required
                             />
@@ -1042,6 +1051,9 @@ function Cinematography(props) {
                               paddingBottom: "15px",
                             }}
                           >
+                            {(deliverable?.companyDeadline && dayjs(deliverable?.companyDeadline).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                              <IoWarning className="text-danger fs-5 me-2" />
+                            )}
                             {dayjs(deliverable?.companyDeadline).format(
                               "DD-MMM-YYYY"
                             )}
