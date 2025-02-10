@@ -282,12 +282,12 @@ const uploadFiles = async (req, res) => {
 };
 const RegisterPostRequest = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNo, password, rollSelect, googleToken } = req.body;
+    const { firstName, lastName, email, phoneNo, password : actualPass, rollSelect, googleToken : actualGoogleToken } = req.body;
     const existEmail = await userSchema.findOne({ email: email });
-
+    console.log(req.body);
+    
     if (existEmail) {
       if (existEmail.googleToken) {
-
         res.status(400).json({
           message: "user already exists",
           existEmail: { existEmail },
@@ -300,7 +300,7 @@ const RegisterPostRequest = async (req, res) => {
           },
         });
       } else {
-        existEmail.googleToken = req.body.googleToken;
+        existEmail.googleToken = actualGoogleToken;
         existEmail.googleConnected = true;
         const updateduser = await existEmail.save();
         const token = jwt.sign(
@@ -321,7 +321,7 @@ const RegisterPostRequest = async (req, res) => {
         lastName: lastName,
         email: email,
         phoneNo: phoneNo,
-        password: password,
+        password: actualPass,
         rollSelect: rollSelect,
       });
       const savedUser = await user.save();

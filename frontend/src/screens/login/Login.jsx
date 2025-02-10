@@ -33,10 +33,10 @@ const Login = () => {
 
       return;
     }
-    mutate({...inputData, remember}, {
+    mutate({ ...inputData, remember }, {
       onSuccess: (data) => {
         console.log(data);
-        
+
         Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }))
         updateUserData(data.user)
         Cookies.set("currentUser", JSON.stringify(data.user))
@@ -44,7 +44,12 @@ const Login = () => {
         navigate("/profile/info");
       },
       onError: (error) => {
-        toast.error("Invalid credentials");
+
+        if (error.response.status === 403) {
+          toast.error(error.response.data.message)
+        } else { 
+          toast.error("Invalid credentials");
+        }
       },
     });
   }
@@ -67,8 +72,8 @@ const Login = () => {
             toast.success("Logged in successfully!");
             navigate("/profile");
           } else {
-            localStorage.setItem("signInWithGoogle", JSON.stringify({...res.data, googleToken : tokenResponse.access_token }));
-            
+            localStorage.setItem("signInWithGoogle", JSON.stringify({ ...res.data, googleToken: tokenResponse.access_token }));
+
             navigate("/signIn-with-google");
           }
         }

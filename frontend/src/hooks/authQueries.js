@@ -45,12 +45,8 @@ const signIn = async (data) => {
       },
     }
   );
+  return response.json()
 
-  if (response.status === 200) {
-    return response.data;
-  }
-
-  throw new Error("Failed to sign in");
 };
 
 export const useSignInQuery = () => {
