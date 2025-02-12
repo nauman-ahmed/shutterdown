@@ -7,17 +7,39 @@ import { useGoogleLogin } from "@react-oauth/google";
 import Cookies from "js-cookie";
 import { checkExistEmail } from "../../API/userApi";
 import axios from "axios";
-import { useSignInQuery } from "../../hooks/authQueries";
+import { signIn, useSignInQuery } from "../../hooks/authQueries";
 import { toast } from "react-toastify";
 import { useLoggedInUser } from "../../config/zStore";
 import ButtonLoader from "../../components/common/buttonLoader";
+import { useMutation } from "@tanstack/react-query";
 
 const Login = () => {
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({ email: "", password: "" });
   const { email, password } = inputData;
   const { updateUserData } = useLoggedInUser()
-  const { mutate, isPending } = useSignInQuery();
+  const { mutate, isPending } = useMutation({
+    mutationFn : signIn,
+    onSuccess: (data) => {
+      console.log(data);
+
+      Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }))
+      updateUserData(data.user)
+      Cookies.set("currentUser", JSON.stringify(data.user))
+      toast.success("Logged in successfully!");
+      navigate("/profile/info");
+    },
+    onError: (error) => {
+      console.log(error);
+      
+      if (error.response.status === 403) {
+        toast.error(error.response.data.message)
+      } else { 
+        toast.error("Invalid credentials");
+      }
+    },
+
+  });
   const [fieldError, setFieldError] = useState(false)
   const [remember, setRemember] = useState(false)
   const handleOnChange = (e) => {
@@ -33,25 +55,9 @@ const Login = () => {
 
       return;
     }
-    mutate({ ...inputData, remember }, {
-      onSuccess: (data) => {
-        console.log(data);
-
-        Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }))
-        updateUserData(data.user)
-        Cookies.set("currentUser", JSON.stringify(data.user))
-        toast.success("Logged in successfully!");
-        navigate("/profile/info");
-      },
-      onError: (error) => {
-
-        if (error.response.status === 403) {
-          toast.error(error.response.data.message)
-        } else { 
-          toast.error("Invalid credentials");
-        }
-      },
-    });
+    console.log('mutatijng');
+    
+    mutate({ ...inputData, remember });
   }
 
   const signup = () => navigate("sign-up");

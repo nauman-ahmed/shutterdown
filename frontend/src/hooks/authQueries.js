@@ -31,7 +31,9 @@ export const fetchUser = async (token) => {
 
 
 
-const signIn = async (data) => {
+export const signIn = async (data) => {
+  console.log('called');
+  
   const response = await axios.post(
     BASE_URL + "/sign-in",
     {
@@ -45,7 +47,7 @@ const signIn = async (data) => {
       },
     }
   );
-  return response.json()
+  return response.data
 
 };
 

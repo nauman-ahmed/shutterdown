@@ -351,7 +351,8 @@ const SignInPostRequest = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
-
+    console.log(loginUser);
+    
     if (loginUser) {
       // Check account status
       if (loginUser.accountRequest) {
