@@ -7,17 +7,17 @@ const dayjs = require('dayjs')
 require('dotenv').config();
 // Load Google API credentials
 const credentials = {
-    type: process.env.GOOGLE_TYPE,
+    // type: process.env.GOOGLE_TYPE,
     project_id: process.env.GOOGLE_PROJECT_ID,
-    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
-    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    // private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+    // private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    // client_email: process.env.GOOGLE_CLIENT_EMAIL,
     client_id: process.env.GOOGLE_CLIENT_ID,
     auth_uri: process.env.GOOGLE_AUTH_URI,
     token_uri: process.env.GOOGLE_TOKEN_URI,
     auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
-    universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN
+    // client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
+    // universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN
 };
 
 
@@ -95,9 +95,9 @@ const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
     // Install mongodump before performing the backup
     const installCommand = `curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mkdir -p /tmp/mongodb-tools && mv mongodb-database-tools-*/bin/mongodump /tmp/mongodb-tools/ && chmod +x /tmp/mongodb-tools/mongodump`;
 
-    const command = `/tmp/mongodb-tools/mongodump --uri="mongodb+srv://developersafdar:shutterDown@cluster0.zein9x3.mongodb.net/shutterDown" --archive=${backupFile} --gzip`;
+    // const command = `/tmp/mongodb-tools/mongodump --uri="mongodb+srv://developersafdar:shutterDown@cluster0.zein9x3.mongodb.net/shutterDown" --archive=${backupFile} --gzip`;
 
-    // const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
+    const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
     return new Promise((resolve, reject) => {
         console.log(`Starting mongodump installation...`);
