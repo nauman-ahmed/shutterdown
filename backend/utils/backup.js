@@ -74,7 +74,7 @@ const uploadToGoogleDrive = async (filePath) => {
         console.log(res);
 
         console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
-        const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
+        const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD'), fileName: filePath })
         await newbackup.save()
         await setFilePermissions(res.data.id);
     } catch (error) {
