@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const SCOPE = ['https://www.googleapis.com/auth/drive'];
 
-const private_key = process.env.NEW_PRIVATE_KEY
+const private_key = process.env.NEW_PRIVATE_KEY.replace(/\\n/g, '\n')
 const client_email = process.env.NEW_CLIENT_EMAIL
 
 const authorizeGoogleDrive = async () => {
@@ -52,7 +52,7 @@ const uploadToGoogleDrive = async (filePath) => {
         };
         console.log('creating files');
 
-        const res = drive.files.create({
+        const res = await drive.files.create({
             resource: fileMetadata,
             media,
             fields: "id",
@@ -101,11 +101,18 @@ const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
                     console.error(`Backup failed: ${stderr}`);
                     return reject(error);
                 }
+            
                 console.log(`Backup created: ${stdout}`);
+            
+                // Check if the file actually exists
+                if (!fs.existsSync(backupFile)) {
+                    console.error(`Backup file not found: ${backupFile}`);
+                    return reject(new Error("Backup file creation failed."));
+                }
+            
                 try {
                     await uploadToGoogleDrive(backupFile);
-                    // Cleanup local backup file after upload
-                    fs.unlinkSync(backupFile);
+                    fs.unlinkSync(backupFile); // Remove file after upload
                     resolve();
                 } catch (uploadError) {
                     console.error("Error uploading backup to Google Drive:", uploadError);
