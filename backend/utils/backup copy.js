@@ -6,7 +6,6 @@ const BackupModel = require("../models/Backup");
 const dayjs = require('dayjs')
 require('dotenv').config();
 
-const apikeys = require('./apikeys.json');
 const SCOPE = ['https://www.googleapis.com/auth/drive'];
 
 const private_key = process.env.NEW_PRIVATE_KEY
