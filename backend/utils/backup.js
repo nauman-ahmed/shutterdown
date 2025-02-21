@@ -57,6 +57,7 @@ const uploadToGoogleDrive = async (filePath) => {
         const drive = google.drive({ version: "v3", auth });
         const fileMetadata = {
             name: path.basename(filePath),
+            parents:['14GqlsC6wgufsizP-qvw4O_dIBlQaWocQ']
         };
         console.log('media creating');
 
