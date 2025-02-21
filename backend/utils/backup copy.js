@@ -13,13 +13,22 @@ const client_email = process.env.NEW_CLIENT_EMAIL
 
 const authorizeGoogleDrive = async () => {
     try {
+
         const jwtClient = new google.auth.JWT(
             client_email,
             null,
             private_key,
             SCOPE
         );
-        await jwtClient.authorize();
+
+        jwtClient.authorize((err, tokens) => {
+            if (err) {
+                console.error("Google Drive Authentication failed:", err);
+            } else {
+                console.log("Google Drive Authentication successful:", tokens);
+            }
+        });
+
         return jwtClient;
 
     } catch (error) {
@@ -36,8 +45,9 @@ const uploadToGoogleDrive = async (filePath) => {
     try {
 
 
+        console.log('Starting authorize');
         const auth = await authorizeGoogleDrive();
-        console.log('after authorize');
+        console.log('After authorization');
 
         const drive = google.drive({ version: "v3", auth });
         const fileMetadata = {
@@ -50,18 +60,19 @@ const uploadToGoogleDrive = async (filePath) => {
             mimeType: "application/gzip",
             body: fs.createReadStream(filePath),
         };
-        console.log('creating files');
+        console.log('uploading files');
 
         const res = await drive.files.create({
             resource: fileMetadata,
             media,
             fields: "id",
         });
-        console.log(res);
 
         console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
         const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD'), fileName: filePath })
         await newbackup.save()
+        console.log(`Data Created in DB`);
+
     } catch (error) {
         console.log(error);
     }
@@ -77,17 +88,12 @@ const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
     const date = new Date().toISOString().replace(/[:.]/g, "-");
     const backupFile = path.join(backupPath, `backup-${date}.gz`);
 
-    // Install mongodump before performing the backup
     const installCommand = `curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mkdir -p /tmp/mongodb-tools && mv mongodb-database-tools-*/bin/mongodump /tmp/mongodb-tools/ && chmod +x /tmp/mongodb-tools/mongodump`;
-
     const command = `/tmp/mongodb-tools/mongodump --uri="mongodb+srv://developersafdar:shutterDown@cluster0.zein9x3.mongodb.net/shutterDown" --archive=${backupFile} --gzip`;
-
-    // const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
     return new Promise((resolve, reject) => {
         console.log(`Starting mongodump installation...`);
 
-        // Install mongodump
         exec(installCommand, (installError, installStdout, installStderr) => {
             if (installError) {
                 console.error(`Mongodump installation failed: ${installStderr}`);
