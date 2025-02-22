@@ -7,7 +7,7 @@ const userModel = require("../models/userSchema");
 const { syncEventWithGoogleCalendar } = require("../utils/googleCalendarFns");
 
 
-const calendarRequestMaker = async (user, event) => {
+const calendarRequestMaker = async (user, event) => { 
   try {
     console.log(user.googleConnected);
     
