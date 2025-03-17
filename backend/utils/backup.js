@@ -57,6 +57,7 @@ const uploadToGoogleDrive = async (filePath) => {
         const drive = google.drive({ version: "v3", auth });
         const fileMetadata = {
             name: path.basename(filePath),
+            parents:['14GqlsC6wgufsizP-qvw4O_dIBlQaWocQ']
         };
         console.log('media creating');
 
@@ -74,7 +75,7 @@ const uploadToGoogleDrive = async (filePath) => {
         console.log(res);
 
         console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
-        const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD') })
+        const newbackup = new BackupModel({ fileId: res.data.id, date: dayjs(new Date()).format('YYYY-MM-DD'), fileName: filePath })
         await newbackup.save()
         await setFilePermissions(res.data.id);
     } catch (error) {

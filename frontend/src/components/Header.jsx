@@ -119,15 +119,14 @@ const Header = (args) => {
   }, [location]);
 
   const loginByGoogle = useGoogleLogin({
-    scope: 'https://www.googleapis.com/auth/calendar.events',
+    scope: 'https://www.googleapis.com/auth/calendar.events', 
     onSuccess: async (tokenResponse) => {
       try {
 
         console.log(tokenResponse);
-
         const updatedUser = await updateUserG({ ...currentUser, googleToken: tokenResponse.access_token })
-
         updateUserData(updatedUser)
+
       } catch (error) {
         toast.error("Google login failed. Please try again.");
       }
