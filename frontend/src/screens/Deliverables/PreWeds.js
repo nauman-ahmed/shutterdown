@@ -610,7 +610,14 @@ function PreWedDeliverables(props) {
                               paddingBottom: "15px",
                             }}
                           >
-                            {(deliverable?.date && dayjs(deliverable?.date).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
+                            {(deliverable?.date && dayjs(
+                              new Date(deliverable?.date).setDate(
+                                new Date(deliverable?.date).getDate() +
+                                getrelevantDeadline(
+                                  deliverable?.deliverableName
+                                )
+                              )
+                            ).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
                               <IoWarning className="text-danger fs-5 me-2" />
                             )}
                             {dayjs(

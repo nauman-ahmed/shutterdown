@@ -23,7 +23,7 @@ const { applyBackupSchedule } = require('./utils/backupSchedule');
 const ClientModel = require('./models/ClientModel');
 require('dotenv').config();
 
-const PORT = 5002;
+const PORT = 5003;
 
 app.use(cors());
 // Set CORS headers manually
