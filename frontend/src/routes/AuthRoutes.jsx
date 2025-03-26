@@ -6,6 +6,7 @@ import EmailVerification from "../screens/EmailVerification/EmailVerification";
 import LoginWithGoogle from "../screens/login/LoginWithGoogle";
 import Login from "../screens/login/Login";
 import { useLoggedInUser } from "../config/zStore";
+import PrivacyPolicy from "../screens/privacyPolicy";
 
 const AuthRoutes = ({ user }) => {
     return (
@@ -18,6 +19,7 @@ const AuthRoutes = ({ user }) => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/email-verify" element={<EmailVerification />} />
             <Route path="/signIn-with-google" element={<LoginWithGoogle />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </>
     )
 };

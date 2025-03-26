@@ -1,0 +1,28 @@
+.privacy-policy {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    background-color: #fff;
+  }
+  
+  .privacy-policy h1,
+  .privacy-policy h2,
+  .privacy-policy h5 {
+    color: #2c3e50;
+  }
+  
+  .privacy-policy a {
+    color: #007bff;
+    text-decoration: underline;
+  }
+  
+  .privacy-policy a:hover {
+    color: #0056b3;
+    text-decoration: none;
+  }
+  
+  .privacy-policy ul {
+    margin-left: 1rem;
+    padding-left: 1rem;
+  }
+  
