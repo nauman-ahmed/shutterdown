@@ -31,6 +31,9 @@ import { CgMathMinus } from "react-icons/cg";
 import { LuPlus } from "react-icons/lu";
 import ButtonLoader from "../../components/common/buttonLoader";
 
+import { FiChevronDown } from 'react-icons/fi';
+import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+
 function ClientInfo() {
   const { clientId } = useParams();
   const deleteClientDetails = useRef()
@@ -99,6 +102,10 @@ function ClientInfo() {
       value: 'Pending',
       label: 'Pending',
     },
+    {
+      value: 'Others',
+      label: 'Others',
+    }
   ];
   let projectOptions = [
     {
@@ -203,6 +210,62 @@ function ClientInfo() {
   };
   const navigate = useNavigate()
 
+
+
+  // Add this useEffect to initialize phoneNumbers array from single phoneNumber if needed
+  useEffect(() => {
+    if (editedClient) {
+      if (!editedClient.phoneNumbers && editedClient.phoneNumber) {
+        setEditedClient({
+          ...editedClient,
+          phoneNumbers: [{ number: editedClient.phoneNumber, belongsTo: 'Both' }]
+        });
+      }
+    }
+  }, [editedClient?.phoneNumber]);
+
+  // Function to add a new phone number
+  const addPhoneNumber = () => {
+    setEditedClient({
+      ...editedClient,
+      phoneNumbers: editedClient.phoneNumbers
+        ? [...editedClient.phoneNumbers, { number: '', belongsTo: 'Bride' }]
+        : [{ number: '', belongsTo: 'Bride' }]
+    });
+  };
+
+  // Function to remove a phone number
+  const removePhoneNumber = (index) => {
+    if (editedClient.phoneNumbers.length > 1) {
+      const updatedPhoneNumbers = [...editedClient.phoneNumbers];
+      updatedPhoneNumbers.splice(index, 1);
+      setEditedClient({ ...editedClient, phoneNumbers: updatedPhoneNumbers });
+    }
+  };
+
+  // Function to update a phone number
+  const updatePhoneNumber = (value, index) => {
+    const updatedPhoneNumbers = [...editedClient.phoneNumbers];
+    updatedPhoneNumbers[index].number = value;
+
+    // Also update the primary phoneNumber for backward compatibility
+    if (index === 0) {
+      setEditedClient({
+        ...editedClient,
+        phoneNumbers: updatedPhoneNumbers,
+        phoneNumber: value
+      });
+    } else {
+      setEditedClient({ ...editedClient, phoneNumbers: updatedPhoneNumbers });
+    }
+  };
+
+  // Function to update who the phone number belongs to
+  const updatePhoneOwner = (value, index) => {
+    const updatedPhoneNumbers = [...editedClient.phoneNumbers];
+    updatedPhoneNumbers[index].belongsTo = value;
+    setEditedClient({ ...editedClient, phoneNumbers: updatedPhoneNumbers });
+  };
   return (
     <div>
       <Table bordered hover responsive>
@@ -252,7 +315,7 @@ function ClientInfo() {
               <br />
               {clientData?.groomName}
             </td>
-            <td className="textPrimary fs-6 tablePlaceContent">+{clientData?.phoneNumber}</td>
+            <td className="textPrimary fs-6 tablePlaceContent"> {clientData?.phoneNumbers ? clientData?.phoneNumbers.map(phoneObj => <span>{phoneObj.belongsTo}: +{phoneObj.number}</span>) : clientData?.phoneNumber && "+" + clientData?.phoneNumber}</td>
 
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.deliverables?.filter(deliv => deliv.isAlbum == true)?.length}
@@ -740,7 +803,6 @@ function ClientInfo() {
       </Modal>
 
 
-
       <Modal isOpen={editClientModal} centered={true} size="lg" >
         <ModalHeader>Client Details</ModalHeader>
         <Form
@@ -776,21 +838,66 @@ function ClientInfo() {
                   required
                 />
               </Col>
+              {/* Replace the existing Phone Number section with this */}
               <Col xl="6" sm="6" className="p-2 mt-4">
-                <div className="label">Phone Number</div>
-                <PhoneInput
-                  country='in'
-                  name="phoneNumber"
-                  id="exampleEmail"
-                  required={true}
-                  onChange={(value) => {
-                    setEditedClient({ ...editedClient, phoneNumber: value })
-                  }}
+                <div className="label" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  Phone Numbers
+                  <Button
+                    color="primary"
+                    size="sm"
+                    onClick={addPhoneNumber}
+                    style={{ borderRadius: '50%', padding: '6px 6px' }}
+                  >
+                    <LuPlus />
+                  </Button>
+                </div>
 
-                  value={editedClient?.phoneNumber}
-                  placeholder="Phone_Number"
-                  inputClass={'ContactModel textPrimary editClientPhone'}
-                />
+                {editedClient?.phoneNumbers?.map((phone, index) => (
+                  <div key={index} style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                    <PhoneInput
+                      country='in'
+                      name={`phoneNumber-${index}`}
+                      required={index === 0}
+                      onChange={(value) => updatePhoneNumber(value, index)}
+                      value={phone.number}
+                      placeholder="Phone_Number"
+                      inputClass='ContactModel textPrimary'
+                      containerStyle={{ width: '70%' }}
+                    />
+                    <UncontrolledDropdown style={{ marginLeft: '5px', flex: 1 }}>
+                      <DropdownToggle
+                        caret
+                        color="light"
+                        style={{
+                          backgroundColor: '#EFF0F5',
+                          boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.15)',
+                          color: '#666DFF',
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {phone.belongsTo} <FiChevronDown size={14} />
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem onClick={() => updatePhoneOwner('Bride', index)}>Bride</DropdownItem>
+                        <DropdownItem onClick={() => updatePhoneOwner('Groom', index)}>Groom</DropdownItem>
+                        <DropdownItem onClick={() => updatePhoneOwner('Both', index)}>Both</DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    {editedClient.phoneNumbers.length > 1 && (
+                      <Button
+                        color="danger"
+                        size="sm"
+                        onClick={() => removePhoneNumber(index)}
+                        style={{ borderRadius: '50%', marginLeft: '5px', padding: '6px 6px' }}
+                      >
+                        <CgMathMinus />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </Col>
               <Col xl="6" sm="6" className="p-2 mt-4">
                 <div className="label">Email Id</div>
@@ -1041,7 +1148,7 @@ function ClientInfo() {
                                         deliverableOptionsKeyValues &&
                                         deliverableOptionsKeyValues[Objkey].values
                                       }
-                                      
+
                                     />
                                   </div>
                                 </Col>
@@ -1163,7 +1270,7 @@ function ClientInfo() {
                       className="fs-5 p-2 cursor-pointer mt-4 mx-1 d-flex justify-content-center align-items-center"
                       onClick={() => {
                         const updatedDeliverables = [...editedClient?.deliverablesArr];
-                        updatedDeliverables.push({ photos: true, albums: [""], forEvents: [], number : editedClient?.deliverablesArr?.length + 1 })
+                        updatedDeliverables.push({ photos: true, albums: [""], forEvents: [], number: editedClient?.deliverablesArr?.length + 1 })
                         setEditedClient({ ...editedClient, deliverablesArr: updatedDeliverables })
                       }}
                       style={{
@@ -1182,7 +1289,7 @@ function ClientInfo() {
             </Row>
             <Row>
 
-              
+
 
               <Col className="p-2 mt-4">
                 <div className="label">Client Suggestions</div>

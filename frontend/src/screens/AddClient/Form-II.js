@@ -27,12 +27,17 @@ import {
   updateAllDeliverableOptions,
 } from "../../API/FormDeliverableOptionsAPI";
 import { toast } from "react-toastify";
+import { getDraftClientData, saveDraftClientData } from "./Form-I";
 
 function FormII() {
   const storedEvents = useSelector((state) => state.allEvents);
   const [allEvents, setAllEvents] = useState(storedEvents);
   const [weddingAssigned, setWeddingAssigned] = useState(false);
   const [eventOptionsKeyValues, setEventOptionsKeyValues] = useState(null);
+  const [sameLocationForAll, setSameLocationForAll] = useState(false);
+  const [sameTravelForAll, setSameTravelForAll] = useState(false);
+  const [useCustomLocation, setUseCustomLocation] = useState(false);
+  const [useCustomTravel, setUseCustomTravel] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [deliverableOptionsKeyValues, setDeliverableOptionsKeyValues] =
     useState(null);
@@ -62,6 +67,7 @@ function FormII() {
     "performanceFilms"
   ];
 
+  
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
@@ -72,10 +78,35 @@ function FormII() {
   };
   const [deliverables, setDeliverables] = useState(clientData?.deliverables || [{ albums: [""], forEvents: [], photos: true, number: 1 }])
   const navigate = useNavigate();
+  // Add this useEffect to apply global settings for location and travel
+  useEffect(() => {
+    if (clientData?.events?.length > 0 && eventValues) {
+      // If using same location for all and not custom, set location from first event
+      if (sameLocationForAll && !useCustomLocation) {
+        const firstEvent = clientData.events[0];
+        setEventValues(prev => ({
+          ...prev,
+          location: firstEvent.location
+        }));
+      }
+
+      // If using same travel for all and not custom, set travel from first event
+      if (sameTravelForAll && !useCustomTravel) {
+        const firstEvent = clientData.events[0];
+        setEventValues(prev => ({
+          ...prev,
+          travelBy: firstEvent.travelBy
+        }));
+      }
+    }
+  }, [clientData?.events, sameLocationForAll, sameTravelForAll, useCustomLocation, useCustomTravel]);
 
   const handleAddEvent = (e) => {
     if (!eventValues?.eventDate) {
       return window.notify("Please Select the Date", "error");
+    }
+    if (!weddingAssigned) {
+      toast.warning('Wedding Event is not aAdded yet!')
     }
     const updatedEvents = clientData?.events ? [...clientData?.events] : [];
     updatedEvents.push(eventValues);
@@ -86,6 +117,8 @@ function FormII() {
       setWeddingAssigned(true);
     }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
+    updateGlobalSettings(updatedEvents);
+    saveDraftClientData({ ...clientData, events: updatedEvents })
     const updatedStoredEvents = [...allEvents];
     updatedStoredEvents.push(eventValues);
     setAllEvents(updatedStoredEvents);
@@ -125,12 +158,12 @@ function FormII() {
       setWeddingAssigned(false);
     }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
+    saveDraftClientData({ ...clientData, events: updatedEvents })
   };
 
   useEffect(() => {
-    dispatch(
-      updateClintData({ ...clientData, deliverables: deliverables })
-    );
+    dispatch(updateClintData({ ...clientData, deliverables: deliverables }));
+    saveDraftClientData({ ...clientData, deliverables: deliverables })
   }, [deliverables])
 
 
@@ -147,6 +180,11 @@ function FormII() {
       navigate("/clients/add-client/form-1");
     }
     getAllFormOptionsHandler();
+
+    const data = getDraftClientData()
+    if (data) {
+      dispatch(updateClintData(data));
+    }
   }, []);
 
   const handleAddDate = (date) => {
@@ -176,12 +214,73 @@ function FormII() {
     setShow(!show);
   };
 
-  console.log(clientData);
+  // Add this function to handle global updates when first event is added/updated
+const updateGlobalSettings = (events) => {
+  if (events?.length > 0) {
+    const firstEvent = events[0];
+    
+    // If we're using global settings, update all existing events
+    if (sameLocationForAll || sameTravelForAll) {
+      const updatedEvents = events.map((event, index) => {
+        // First event stays as is
+        if (index === 0) return event;
+        
+        // For other events, apply global settings
+        let updatedEvent = {...event};
+        
+        if (sameLocationForAll) {
+          updatedEvent.location = firstEvent.location;
+        }
+        
+        if (sameTravelForAll) {
+          updatedEvent.travelBy = firstEvent.travelBy;
+        }
+        
+        return updatedEvent;
+      });
+      
+      dispatch(updateClintData({ ...clientData, events: updatedEvents }));
+      saveDraftClientData({ ...clientData, events: updatedEvents });
+    }
+  }
+};
 
 
   return (
     <>
       <div className="mt18">
+        <div className="Text16N d-flex flex-wrap gap-4 mt-4 mb-3">
+          <div>
+            <input
+              type="checkbox"
+              id="sameLocationForAll"
+              checked={sameLocationForAll}
+              onChange={(e) => {
+                setSameLocationForAll(e.target.checked);
+                if (e.target.checked) {
+                  setUseCustomLocation(false);
+                }
+              }}
+              style={{ width: "16px", height: "16px", marginRight: "8px" }}
+            />
+            <label htmlFor="sameLocationForAll" className="cursor-pointer">Same Location for All Events</label>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="sameTravelForAll"
+              checked={sameTravelForAll}
+              onChange={(e) => {
+                setSameTravelForAll(e.target.checked);
+                if (e.target.checked) {
+                  setUseCustomTravel(false);
+                }
+              }}
+              style={{ width: "16px", height: "16px", marginRight: "8px" }}
+            />
+            <label htmlFor="sameTravelForAll" className="cursor-pointer">Same Travel Mode for All Events</label>
+          </div>
+        </div>
         <Form
           onSubmit={(e) => {
             e.preventDefault();
@@ -195,13 +294,14 @@ function FormII() {
               );
               if (isWeddingAvailable.length > 0) {
                 setWeddingAssigned(true);
+              } else if (isWeddingAvailable.length === 0 && !weddingAssigned) {
+                toast.warning('Wedding Event not Added yet!')
               }
-              console.log(clientEvents);
-
               dispatch(
                 updateClintData({ ...clientData, events: clientEvents })
               );
-
+              updateGlobalSettings(clientEvents);
+              saveDraftClientData({ ...clientData, events: clientEvents })
               setAllEvents([...storedEvents, ...clientEvents]);
               setEditingEvent(null);
             }
@@ -266,13 +366,25 @@ function FormII() {
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  Location
+                <div className="Text16N" style={{ marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+                  <span>Location</span>
+                  {sameLocationForAll && clientData?.events?.length > 0 && (
+                    <div>
+                      <input
+                        type="checkbox"
+                        id="customLocation"
+                        checked={useCustomLocation}
+                        onChange={(e) => setUseCustomLocation(e.target.checked)}
+                        style={{ width: "16px", height: "16px", marginRight: "5px" }}
+                      />
+                      <label htmlFor="customLocation" style={{ fontSize: "12px" }}>Custom for this event</label>
+                    </div>
+                  )}
                 </div>
                 <Input
                   type="text"
                   name="location"
-                  disabled={false}
+                  disabled={sameLocationForAll && !useCustomLocation && clientData?.events?.length > 0}
                   className="forminput"
                   value={eventValues?.location || ""}
                   required={true}
@@ -282,14 +394,24 @@ function FormII() {
               </div>
             </Col>
             {eventOptionObjectKeys.map((Objkey) => (
-              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5" key={Objkey}>
                 <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    {eventOptionsKeyValues &&
-                      eventOptionsKeyValues[Objkey].label}
+                  <div className="Text16N" style={{ marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+                    <span>{eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}</span>
+                    {Objkey === "travelBy" && sameTravelForAll && clientData?.events?.length > 0 && (
+                      <div>
+                        <input
+                          type="checkbox"
+                          id="customTravel"
+                          checked={useCustomTravel}
+                          onChange={(e) => setUseCustomTravel(e.target.checked)}
+                          style={{ width: "16px", height: "16px", marginRight: "5px" }}
+                        />
+                        <label htmlFor="customTravel" style={{ fontSize: "12px" }}>Custom for this event</label>
+                      </div>
+                    )}
                   </div>
                   <Select
-                    // ref={travelSelect}
                     value={
                       eventValues?.[Objkey]
                         ? {
@@ -312,6 +434,7 @@ function FormII() {
                       eventOptionsKeyValues[Objkey].values
                     }
                     required={true}
+                    isDisabled={Objkey === "travelBy" && sameTravelForAll && !useCustomTravel && clientData?.events?.length > 0}
                   />
                 </div>
               </Col>
@@ -388,6 +511,7 @@ function FormII() {
               return
             }
             dispatch(updateClintData({ ...clientData, form2Submitted: true }));
+            saveDraftClientData({ ...clientData, form2Submitted: true })
             navigate("/clients/add-client/preview");
           }}
         >
@@ -403,6 +527,10 @@ function FormII() {
                       preWeddingPhotos: e.target.checked,
                     })
                   );
+                  saveDraftClientData({
+                    ...clientData,
+                    preWeddingPhotos: e.target.checked,
+                  })
                 }}
                 name="preWeddingPhotos"
                 checked={clientData?.preWeddingPhotos}
@@ -420,6 +548,10 @@ function FormII() {
                       preWeddingVideos: e.target.checked,
                     })
                   );
+                  saveDraftClientData({
+                    ...clientData,
+                    preWeddingVideos: e.target.checked,
+                  })
                 }}
                 type="checkbox"
                 name="preWeddingVideos"
@@ -458,6 +590,10 @@ function FormII() {
                               ["preWed" + Objkey]: selected?.value,
                             })
                           );
+                          saveDraftClientData({
+                            ...clientData,
+                            ["preWed" + Objkey]: selected?.value,
+                          })
                         }}
                         styles={customStyles}
                         options={
@@ -540,7 +676,7 @@ function FormII() {
                                     } else {
                                       const updatedDeliverables = [...deliverables]
                                       const updatedAlbums = [...deliverable?.[Objkey]];
-                                      if(i === 0){
+                                      if (i === 0) {
                                         updatedAlbums[i] = "Not included"
                                       } else {
 
@@ -557,7 +693,7 @@ function FormII() {
                                     deliverableOptionsKeyValues &&
                                     deliverableOptionsKeyValues[Objkey].values
                                   }
-                               
+
                                 />
                               </div>
                             </Col>
@@ -700,13 +836,19 @@ function FormII() {
               className="forminput h100 alignTop"
               value={clientData?.suggestion || ""}
               required={false}
-              onChange={(e) =>
+              onChange={(e) => {
+
                 dispatch(
                   updateClintData({
                     ...clientData,
                     [e.target.name]: e.target.value,
                   })
                 )
+                saveDraftClientData({
+                  ...clientData,
+                  [e.target.name]: e.target.value,
+                })
+              }
               }
               placeholder={"Write notes here..."}
             />

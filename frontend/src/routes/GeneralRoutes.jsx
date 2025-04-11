@@ -7,8 +7,10 @@ import ReportsScreen from "../screens/Reports";
 import TeamScreen from "../screens/Team";
 import UserAttendence from "../screens/Attendence/Attendence";
 import { hasAccess } from "../helpers/roleValidation";
+import ChecklistDeliverables from "../screens/CheckLists/Deliverables";
+import CheckLists from "../screens/CheckLists/CheckLists";
 
-const GeneralRoutes = ({userData}) => (
+const GeneralRoutes = ({ userData }) => (
   <>
     <Route
       path="/attendance"
@@ -31,21 +33,19 @@ const GeneralRoutes = ({userData}) => (
 
 
     <Route
-      exact
       path="/checklists"
-      element={hasAccess(userData, ['Manager']) ? <CheckListsPage /> : <Navigate to="/" replace />}
-    ></Route>
-    <Route
-      exact
-      path="/team"
-      element={hasAccess(userData, ['Manager']) ? <Tasks /> : <Navigate to="/" replace />}
+      element={hasAccess(userData, ['Manager'])
+        ? <CheckListsPage />
+        : <Navigate to="/" replace />
+      }
     >
-      <Route
-        path="reports"
-        element={<ReportsScreen />}
-      />
-     
+      <Route path="logistics" element={<CheckLists />} />
+      <Route path="deliverables" element={<ChecklistDeliverables />} />
+      
     </Route>
+
+    <Route path="/reports" element={<ReportsScreen />} />
+
 
 
     <Route

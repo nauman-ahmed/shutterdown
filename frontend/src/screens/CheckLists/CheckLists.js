@@ -57,7 +57,6 @@ function CheckLists(props) {
     try {
       setLoading(true);
       const clients = await getClients(
-        1,
         startDate,
         endDate,
         null
@@ -81,7 +80,6 @@ function CheckLists(props) {
       setLoading(true);
       try {
         const data = await getClients(
-          page,
           startDate,
           endDate,
           null

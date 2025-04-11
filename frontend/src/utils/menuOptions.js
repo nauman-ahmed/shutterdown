@@ -108,13 +108,23 @@ export const managerMenuOptions = [
     ],
   },
   {
-    path: "/checklists",
     text: "Checklists",
     icon: (active) => (
       <BsCardChecklist
         className={`fs-4 ${active ? "text-white" : "text-black"}`}
       />
     ),
+    subMenus: [
+      {
+        path: "/checklists/logistics",
+        text: "Logistics",
+      },
+      {
+        path: "/checklists/deliverables",
+        text: "Deliverables",
+      },
+      
+    ],
   },
   {
     path: "/attendance",
@@ -124,6 +134,7 @@ export const managerMenuOptions = [
         className={`fs-4 ${active ? "text-white" : "text-black"}`}
       />
     ),
+    
   },
   {
     text: "Tasks",

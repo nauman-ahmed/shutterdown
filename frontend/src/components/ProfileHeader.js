@@ -15,7 +15,7 @@ function ProfileHeader() {
   const [selected, setSelectedTab] = useState(0);
   const navigate = useNavigate();
 const {userData} = useLoggedInUser()
-console.log(userData);
+
 
   let Data3 = [
     {

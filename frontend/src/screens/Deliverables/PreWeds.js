@@ -21,6 +21,7 @@ import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 import { groupByClientID } from "./Cinematography";
 import { IoWarning } from "react-icons/io5";
+import { MdPhotoCameraFront } from "react-icons/md";
 
 const months = [
   "January",
@@ -36,6 +37,24 @@ const months = [
   "November",
   "Decemeber",
 ];
+
+const checkForSameDayEdit = (deliverable) => {
+  // Check if deliverable and necessary properties exist
+  if (!deliverable?.client?.events || !deliverable?.forEvents) {
+    return false;
+  }
+
+  // Get the event IDs from forEvents array
+  const eventIds = deliverable.forEvents.map(eventId =>
+    typeof eventId === 'object' ? eventId._id : eventId
+  );
+
+  // Check if any event in client.events that matches forEvents has sameDayVideoEditors > 0
+  return deliverable.client.events.some(event => {
+    const eventId = typeof event._id === 'string' ? event._id : event._id.toString();
+    return eventIds.includes(eventId) && (deliverable.deliverableName === 'Pre-Wedding Videos' ? parseInt(event.sameDayVideoEditors, 10) > 0 : parseInt(event.sameDayPhotoEditors, 10) > 0);
+  });
+};
 
 function PreWedDeliverables(props) {
   const [editors, setEditors] = useState(null);
@@ -391,11 +410,14 @@ function PreWedDeliverables(props) {
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
             </tr>
           );
         } else {
           return (
             <tr style={{ backgroundColor: "rgb(102, 109, 255)" }}>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
+              <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
               <td style={{ backgroundColor: "rgb(102, 109, 255)" }}></td>
@@ -478,6 +500,8 @@ function PreWedDeliverables(props) {
                     <th className="tableBody">Editor</th>
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">Status</th>
+                    <th className="tableBody">Delivery URL</th>
+                    <th className="tableBody">Save</th>
                   </tr>
                 ) : currentUser?.rollSelect === "Manager" ? (
                   <tr className="logsHeader Text16N1">
@@ -507,6 +531,7 @@ function PreWedDeliverables(props) {
                     <th className="tableBody">First Delivery Date</th>
                     <th className="tableBody">Final Delivery Date</th>
                     <th className="tableBody">Status</th>
+                    <th className="tableBody">Delivered Url</th>
                     <th className="tableBody">Client Revisions</th>
                     <th className="tableBody">Client Ratings</th>
                     <th className="tableBody">Save</th>
@@ -548,6 +573,13 @@ function PreWedDeliverables(props) {
                             <img alt="" src={Heart} />
                             <br />
                             {deliverable.client?.groomName}
+                            {checkForSameDayEdit(deliverable) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -618,8 +650,8 @@ function PreWedDeliverables(props) {
                                 )
                               )
                             ).isBefore(dayjs().startOf("day")) && (deliverable.status === 'Yet to Start' || deliverable.status === 'In Progress')) && (
-                              <IoWarning className="text-danger fs-5 me-2" />
-                            )}
+                                <IoWarning className="text-danger fs-5 me-2" />
+                              )}
                             {dayjs(
                               new Date(deliverable?.date).setDate(
                                 new Date(deliverable?.date).getDate() +
@@ -782,6 +814,21 @@ function PreWedDeliverables(props) {
                               paddingTop: "15px",
                               paddingBottom: "15px",
                             }}
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                          >
+                            {deliverable.link ? <>
+                              <a href={deliverable.link} target="_blank">View</a>
+                            </> : <>
+                              Not Given
+                            </>}
+
+                          </td>
+
+                          <td
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
                             className="tableBody tablePlaceContent"
                           >
                             {" "}
@@ -895,6 +942,13 @@ function PreWedDeliverables(props) {
                             <img alt="" src={Heart} />
                             <br />
                             {deliverable?.client?.groomName}
+                            {checkForSameDayEdit(deliverable) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
                           </td>
                           <td
                             className="tableBody Text14Semi primary2 tablePlaceContent"
@@ -940,6 +994,56 @@ function PreWedDeliverables(props) {
                             className="tableBody Text14Semi primary2 tablePlaceContent"
                           >
                             {deliverable?.status}
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                          >
+
+                            <input
+                              type="text"
+                              name="link"
+                              className="p-1"
+                              style={{ width: '230px' }}
+                              onChange={(e) => {
+                                const updatedDeliverables = [
+                                  ...deliverablesForShow,
+                                ];
+                                updatedDeliverables[index].link =
+                                  e.target.value;
+                                setDeliverablesForShow(updatedDeliverables);
+                              }}
+                              value={
+                                deliverable?.link
+                                || ""
+                              }
+
+                            />
+                          </td>
+                          <td
+                            className="tableBody Text14Semi primary2 tablePlaceContent"
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                          >
+                            <button
+                              className="btn btn-primary "
+                              onClick={(e) =>
+                                updatingIndex === null && handleSaveData(index)
+                              }
+                            >
+                              {updatingIndex === index ? (
+                                <div className="w-100">
+                                  <div class="smallSpinner mx-auto"></div>
+                                </div>
+                              ) : (
+                                "Save"
+                              )}
+                            </button>
                           </td>
                         </tr>
                       )}

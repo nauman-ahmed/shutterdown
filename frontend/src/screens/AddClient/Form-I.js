@@ -1,30 +1,136 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Row, Form, Input } from 'reactstrap';
+import { Button, Col, Row, Form, Input, InputGroup, InputGroupText, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import 'react-phone-input-2/lib/style.css';
 import { useDispatch, useSelector } from "react-redux";
 import { updateClintData } from "../../redux/clientBookingForm";
 import PhoneInput from 'react-phone-input-2';
-import Select from 'react-select'
+import Select from 'react-select';
+import { FiPlus, FiMinus, FiChevronDown } from 'react-icons/fi';
 
+
+export const saveDraftClientData = (data) => {
+  try {
+    // Check if data is empty
+    if (!data || 
+        (typeof data === 'object' && Object.keys(data).length === 1) || !data.brideName) {
+      console.log('No data to save as draft');
+      return false;
+    }
+    
+    // Convert the data object to a JSON string
+    const jsonData = JSON.stringify(data);
+    
+    // Save the JSON string to localStorage with the key 'draftClientData'
+    localStorage.setItem('draftClientData', jsonData);
+    
+    console.log('Client data draft saved successfully');
+    return true;
+  } catch (error) {
+    console.error('Error saving client data draft:', error);
+    return false;
+  }
+};
+
+
+export const getDraftClientData = () => {
+  try {
+    const jsonData = localStorage.getItem('draftClientData');
+    return jsonData ? JSON.parse(jsonData) : null;
+  } catch (error) {
+    console.error('Error retrieving draft client data:', error);
+    return null;
+  }
+};
 function FormI() {
   const dispatch = useDispatch();
   const clientData = useSelector(state => state.clientData);
   const [formValues, setFormValues] = useState({});
+  
   useEffect(() => {
-    setFormValues(clientData);
+    // Initialize the phoneNumbers array if it doesn't exist in clientData
+    const data = getDraftClientData()
+    if(data){
+      setFormValues(data);
+      dispatch(updateClintData(data));
+    }
+
+    setFormValues({
+      ...clientData,
+      phoneNumbers: clientData.phoneNumbers || [{ number:  '', belongsTo: 'Bride' }]
+    });
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(()=>{
+    saveDraftClientData(formValues)
+  }, [formValues])
+
+  useEffect(()=>{
+    const data = getDraftClientData()
+    if(data){
+      setFormValues(data);
+      dispatch(updateClintData(data));
+
+    }
   }, [])
+
   const updateValues = (e) => {
-    setFormValues({ ...formValues, [e.target.name]: e.target.value })
-  }
+    setFormValues({ ...formValues, [e.target.name]: e.target.value });
+  };
+
+  const updatePhoneNumber = (value, index) => {
+    const updatedPhoneNumbers = [...formValues.phoneNumbers];
+    updatedPhoneNumbers[index].number = value;
+    setFormValues({ ...formValues, phoneNumbers: updatedPhoneNumbers });
+  };
+
+  const updatePhoneOwner = (value, index) => {
+    const updatedPhoneNumbers = [...formValues.phoneNumbers];
+    updatedPhoneNumbers[index].belongsTo = value;
+    setFormValues({ ...formValues, phoneNumbers: updatedPhoneNumbers });
+  };
+
+  const addPhoneNumber = () => {
+    setFormValues({
+      ...formValues,
+      phoneNumbers: formValues.phoneNumbers ? [...formValues.phoneNumbers, { number: '', belongsTo: 'Bride' }] : [{ number: '', belongsTo: 'Bride' }]
+    });
+  };
+
+  const removePhoneNumber = (index) => {
+    if (formValues.phoneNumbers.length > 1) {
+      const updatedPhoneNumbers = [...formValues.phoneNumbers];
+      updatedPhoneNumbers.splice(index, 1);
+      setFormValues({ ...formValues, phoneNumbers: updatedPhoneNumbers });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formValues?.phoneNumber?.length > 8) {
-      dispatch(updateClintData({ ...clientData, ...formValues, form1Submitted: true }))
+    // Check if at least one phone number is valid
+    const hasValidPhone = formValues.phoneNumbers.some(phone => phone.number && phone.number.length > 8);
+    
+    if (hasValidPhone) {
+      // Get the first valid phone number for backward compatibility
+      const primaryPhone = formValues.phoneNumbers.find(phone => phone.number && phone.number.length > 8)?.number || '';
+      
+      dispatch(updateClintData({ 
+        ...clientData, 
+        ...formValues, 
+        phoneNumber: primaryPhone, // Keep for backward compatibility
+        form1Submitted: true 
+      }));
+      saveDraftClientData({ 
+        ...clientData, 
+        ...formValues, 
+        phoneNumber: primaryPhone, // Keep for backward compatibility
+        form1Submitted: true 
+      })
       navigate('/clients/add-client/form-2');
     } else {
-      return window.notify("Please provide phone Number!", "error")
+      return window.notify("Please provide at least one valid phone number!", "error");
     }
   };
 
@@ -45,25 +151,16 @@ function FormI() {
   };
   
   let bookingOptions = [
-    {
-      value: 'Yes',
-      label: 'Yes',
-    },
-    {
-      value: 'No',
-      label: 'No',
-    },
+    { value: 'Yes', label: 'Yes' },
+    { value: 'No', label: 'No' },
   ];
+  
   let paymentOptions = [
-    {
-      value: 'Advance',
-      label: 'Advance',
-    },
-    {
-      value: 'Full Payment',
-      label: 'Full Payment',
-    },
+    { value: 'Advance', label: 'Advance' },
+    { value: 'Full Payment', label: 'Full Payment' },
+    { value: 'Others', label: 'Others' },
   ];
+  
   const navigate = useNavigate();
 
   return (
@@ -71,7 +168,7 @@ function FormI() {
       <Form onSubmit={(e) => { handleSubmit(e) }}>
         <Row>
           <Col xs="12" sm="6" className="pr6">
-          <div className='mt25'>
+            <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Bride Name
               </div>
@@ -88,7 +185,7 @@ function FormI() {
             </div>
           </Col>
           <Col xs="12" sm="6">
-          <div className='mt25'>
+            <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Groom Name
               </div>
@@ -106,26 +203,64 @@ function FormI() {
           </Col>
         </Row>
         <Row>
-          <Col xs="12" sm="6" className="pr6">
+          <Col xs="12" sm="6">
             <div className='mt25'>
-              <div className="Text16N" style={{ marginBottom: '6px' }}>
-                Phone Number
+              <div className="Text16N" style={{ marginBottom: '6px', display: 'flex', justifyContent: 'flex-start', gap : '10px', alignItems: 'center' }}>
+                Phone Numbers
+                <Button 
+                  color="primary" 
+                  size="sm" 
+                  onClick={addPhoneNumber}
+                  style={{ borderRadius: '50%', padding: '6px 6px' }}
+                >
+                  <FiPlus />
+                </Button>
               </div>
-              {/* <div style={{ display: 'flex' }}> */}
-                <PhoneInput
-                  country='in'
-                  name="phoneNumber"
-                  id="exampleEmail"
-                  required={true}
-                  onChange={(value) => {
-                    setFormValues({ ...formValues, phoneNumber: value })
-                  }}
-                  
-                  value={formValues?.phoneNumber}
-                  placeholder="Phone Number"
-                  inputClass={'forminput phoneinput'}
-                />
-              {/* </div> */}
+              {formValues.phoneNumbers?.map((phone, index) => (
+                <div key={index} style={{ marginBottom: '10px' }}>
+                  <InputGroup>
+                    <PhoneInput
+                      country='in'
+                      name={`phoneNumber-${index}`}
+                      required={index === 0}
+                      onChange={(value) => updatePhoneNumber(value, index)}
+                      value={phone.number}
+                      placeholder="Phone Number"
+                      inputClass='forminput phoneinput'
+                      containerStyle={{ width: '75%' }}
+                    />
+                    <UncontrolledDropdown>
+                      <DropdownToggle 
+                        caret 
+                        color="light"
+                        style={{
+                          backgroundColor: '#EFF0F5',
+                          borderRadius: '0',
+                          boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.15)',
+                          borderLeft: 'none',
+                          color: '#666DFF'
+                        }}
+                      >
+                        {phone.belongsTo} <FiChevronDown size={14} />
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem onClick={() => updatePhoneOwner('Bride', index)}>Bride</DropdownItem>
+                        <DropdownItem onClick={() => updatePhoneOwner('Groom', index)}>Groom</DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    {formValues.phoneNumbers.length > 1 && (
+                      <Button 
+                        color="danger" 
+                        size="sm" 
+                        onClick={() => removePhoneNumber(index)}
+                        style={{ borderRadius: '0 4px 4px 0', margin: '0' }}
+                      >
+                        <FiMinus />
+                      </Button>
+                    )}
+                  </InputGroup>
+                </div>
+              ))}
             </div>
           </Col>
           <Col xs="12" sm="6">
@@ -147,15 +282,24 @@ function FormI() {
             </div>
           </Col>
         </Row>
+
         <Row>
           <Col xs="12" sm="6" lg='6' className="pr6">
             <div className='mt25'>
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Booking Confirmed
               </div>
-              <Select value={formValues?.bookingStatus ? { value: formValues?.bookingStatus, label: formValues?.bookingStatus } : null} name='bookingStatus' className='w-50' onChange={(selected) => {
-                setFormValues({ ...formValues, bookingStatus: selected.value })
-              }} styles={customStyles} options={bookingOptions} required />
+              <Select 
+                value={formValues?.bookingStatus ? { value: formValues?.bookingStatus, label: formValues?.bookingStatus } : null} 
+                name='bookingStatus' 
+                className='w-50' 
+                onChange={(selected) => {
+                  setFormValues({ ...formValues, bookingStatus: selected.value })
+                }} 
+                styles={customStyles} 
+                options={bookingOptions} 
+                required 
+              />
             </div>
           </Col>
           <Col xs="12" lg='6' sm="6">
@@ -163,9 +307,17 @@ function FormI() {
               <div className="Text16N" style={{ marginBottom: '6px' }}>
                 Payment Status
               </div>
-              <Select value={formValues?.paymentStatus ? { value: formValues?.paymentStatus, label: formValues?.paymentStatus } : null} name='paymentStatus' onChange={(selected) => {
-                setFormValues({ ...formValues, paymentStatus: selected.value })
-              }} className='w-50' styles={customStyles} options={paymentOptions} required />
+              <Select 
+                value={formValues?.paymentStatus ? { value: formValues?.paymentStatus, label: formValues?.paymentStatus } : null} 
+                name='paymentStatus' 
+                onChange={(selected) => {
+                  setFormValues({ ...formValues, paymentStatus: selected.value })
+                }} 
+                className='w-50' 
+                styles={customStyles} 
+                options={paymentOptions} 
+                required 
+              />
             </div>
           </Col>
         </Row>

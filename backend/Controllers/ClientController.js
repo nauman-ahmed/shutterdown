@@ -123,7 +123,7 @@ const AddClientFunction = async (req, res) => {
       }
 
       const albumsDeliverables = await Promise.all(
-        deliverable.albums.map(async (album) => {
+        deliverable.albums.map(async (album, i) => {
           if (album !== "Not included" && album !== "") {
             const newAlbum = new deliverableModel({
               client: client._id,

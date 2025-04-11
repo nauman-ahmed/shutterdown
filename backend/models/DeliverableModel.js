@@ -51,6 +51,9 @@ const deliverableSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    link: {
+        type : String
+    },
     forEvents: [{
         type: mongoose.Types.ObjectId,
         ref: "Event",

@@ -122,6 +122,7 @@ function Preview() {
         dispatch(updateAllEvents(eventsToShow));
       }
       dispatch(updateClintData({ albums: [""] }));
+      localStorage.removeItem('draftClientData');
       setRequesting(false);
       if (saveResult.result) {
         toast.success("Successfully added client");

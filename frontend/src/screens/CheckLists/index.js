@@ -2,6 +2,7 @@ import React from "react";
 import CalenderBar from "../../components/CalenderBar";
 import ClientHeader from "../../components/ClientHeader";
 import CheckLists from "./CheckLists";
+import { Outlet } from "react-router-dom";
 
 function CheckListsPage(props) {
   return (
@@ -9,7 +10,7 @@ function CheckListsPage(props) {
       <div className="main_content">
         <div className="CalenderViewWidth">
           <ClientHeader  title="CheckLists" />
-          <CheckLists />
+          <Outlet />
         </div>
         <CalenderBar Attendence />
       </div>

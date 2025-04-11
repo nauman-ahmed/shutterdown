@@ -814,9 +814,9 @@ function ListView(props) {
                           {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                             <tr className="relative" key={index}>
                               <td
-                              style={{
-                                width: "180px",
-                              }}
+                                style={{
+                                  width: "180px",
+                                }}
                                 className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
                                   (rowOfWarning === index - 1 &&
                                     errorText?.length > 150)
@@ -1277,12 +1277,10 @@ function ListView(props) {
                               <td
                                 className={`tableBody Text14Semi primary2  tablePlaceContent`}
                               >
-
                                 <div
                                   className="d-flex flex-row justify-content-center"
                                 >
                                   <div
-
                                   >
                                     {event?.client?.brideName}
                                     <br />
@@ -1746,7 +1744,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   };
 
   return (
-    <div style={{position : 'relative'}}>
+    <div style={{ position: 'relative' }}>
       <IoIosWarning
         className="fs-5 text-danger"
         onMouseEnter={handleMouseEnter}
