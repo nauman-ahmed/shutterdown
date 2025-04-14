@@ -315,7 +315,7 @@ function ClientInfo() {
               <br />
               {clientData?.groomName}
             </td>
-            <td className="textPrimary fs-6 tablePlaceContent"> {clientData?.phoneNumbers ? clientData?.phoneNumbers.map(phoneObj => <span>{phoneObj.belongsTo}: +{phoneObj.number}</span>) : clientData?.phoneNumber && "+" + clientData?.phoneNumber}</td>
+            <td className="textPrimary fs-6 tablePlaceContent"> {clientData?.phoneNumbers ? clientData?.phoneNumbers.map(phoneObj => <p>{phoneObj.belongsTo}: +{phoneObj.number}</p>) : clientData?.phoneNumber && "+" + clientData?.phoneNumber}</td>
 
             <td className="textPrimary fs-6 tablePlaceContent">
               {clientData?.deliverables?.filter(deliv => deliv.isAlbum == true)?.length}
