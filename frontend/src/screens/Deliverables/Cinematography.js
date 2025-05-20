@@ -217,6 +217,14 @@ function Cinematography(props) {
               title: "Completed",
               id: 4,
             },
+            {
+              title: "Delivered",
+              id: 5,
+            },
+            {
+              title: "Closed",
+              id: 6,
+            },
           ],
         },
       ]
@@ -254,6 +262,14 @@ function Cinematography(props) {
             {
               title: "Completed",
               id: 4,
+            },
+            {
+              title: "Delivered",
+              id: 5,
+            },
+            {
+              title: "Closed",
+              id: 6,
             },
           ],
         },
