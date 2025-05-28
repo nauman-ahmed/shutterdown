@@ -209,6 +209,24 @@ function DailyTasks(props) {
     }
   };
 
+
+  useEffect(() => {
+    // Select the .table-responsive element
+    const tableResponsiveElement = document.querySelector(".table-responsive");
+    // Apply the max-height style
+    if (tableResponsiveElement) {
+      tableResponsiveElement.style.maxHeight = "75vh";
+      tableResponsiveElement.style.overflowY = "auto";
+    }
+
+    // Clean up style when the component unmounts
+    return () => {
+      if (tableResponsiveElement) {
+        tableResponsiveElement.style.maxHeight = "";
+        tableResponsiveElement.style.overflowY = "";
+      }
+    };
+  }, [document.querySelector(".table-responsive")]);
   return (
     <>
       <ToastContainer />
@@ -232,7 +250,7 @@ function DailyTasks(props) {
             style={{ width: "100%", marginTop: "15px" }}
           >
             <>
-              <thead>
+              <thead style={{ position: "sticky", top: 0, zIndex: 101 }} >
                 {currentUser.rollSelect === "Manager" && (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>

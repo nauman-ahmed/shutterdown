@@ -13,8 +13,8 @@ const ClientSchema = mongoose.Schema({
     belongsTo: String
   }
   ],
-  deliverablesArr : {
-    type : Array
+  deliverablesArr: {
+    type: Array
   },
   deliverables: [
     {
@@ -40,7 +40,7 @@ const ClientSchema = mongoose.Schema({
   },
   projectStatus: {
     type: String,
-    default : 'Open'
+    default: 'Open'
   },
   suggestion: {
     type: String,
@@ -79,6 +79,18 @@ const ClientSchema = mongoose.Schema({
   },
   preWeddingDetails: {
     type: Object,
+  },
+  rawPhotos: {
+    type: Boolean,
+  },
+  box: {
+    type: Boolean
+  },
+  penDrives: {
+    type: Boolean
+  },
+  frames: {
+    type: Boolean
   },
   dates: {
     type: Array,

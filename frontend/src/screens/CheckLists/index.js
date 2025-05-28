@@ -9,7 +9,7 @@ function CheckListsPage(props) {
     <>
       <div className="main_content">
         <div className="CalenderViewWidth">
-          <ClientHeader  title="CheckLists" />
+          
           <Outlet />
         </div>
         <CalenderBar Attendence />

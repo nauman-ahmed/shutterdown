@@ -9,6 +9,8 @@ import UserAttendence from "../screens/Attendence/Attendence";
 import { hasAccess } from "../helpers/roleValidation";
 import ChecklistDeliverables from "../screens/CheckLists/Deliverables";
 import CheckLists from "../screens/CheckLists/CheckLists";
+import Reports from "../screens/Tasks/Reports";
+import EditorsReports from "../screens/Reports/Reports";
 
 const GeneralRoutes = ({ userData }) => (
   <>
@@ -27,7 +29,7 @@ const GeneralRoutes = ({ userData }) => (
       />
       <Route
         path="reports"
-        element={<ReportsScreen />}
+        element={<Reports />}
       />
     </Route>
 
@@ -41,10 +43,15 @@ const GeneralRoutes = ({ userData }) => (
     >
       <Route path="logistics" element={<CheckLists />} />
       <Route path="deliverables" element={<ChecklistDeliverables />} />
-      
+
     </Route>
 
-    <Route path="/reports" element={<ReportsScreen />} />
+    <Route exact path="/reports" element={hasAccess(userData, ['Manager']) ? <ReportsScreen /> : <Navigate to="/" replace />} >
+      <Route
+        path="editors-reports"
+        element={<EditorsReports />}
+      />
+    </Route>
 
 
 

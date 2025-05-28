@@ -58,6 +58,9 @@ function ClientInfo() {
     "reels",
     "performanceFilms"
   ];
+  const simpleFields = [
+    "hardDrives"
+  ]
 
   const target = useRef(null);
   const getAllFormOptionsHandler = async () => {
@@ -283,6 +286,7 @@ function ClientInfo() {
             <th>Long Films</th>
             <th>Reels</th>
             <th>Promo</th>
+            <th>Hard Drives</th>
             <th>Payment Status</th>
             {clientData?.paymentStatus === 'Pending' && (
               <th>Pending Amount</th>
@@ -331,6 +335,7 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Long Film')?.length}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Reel')?.length}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo')?.length}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.hardDrives || 0}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
             {clientData?.paymentStatus === 'Pending' && (
               <td className="textPrimary fs-6 tablePlaceContent">{clientData?.pendingAmount}</td>
@@ -410,6 +415,7 @@ function ClientInfo() {
                 <td className="textPrimary tablePlaceContent fs-6">{event?.photographers}</td>
                 <td className="textPrimary tablePlaceContent fs-6">{event?.cinematographers}</td>
                 <td className="textPrimary tablePlaceContent fs-6">{event?.drones}</td>
+
                 <td className="textPrimary tablePlaceContent fs-6">
                   {event?.sameDayPhotoEditors}
                 </td>
@@ -1288,9 +1294,39 @@ function ClientInfo() {
               )}
             </Row>
             <Row>
-
-
-
+              {simpleFields.map((Objkey) => (
+                <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Select
+                      value={
+                        editedClient?.[Objkey]
+                          ? {
+                            value: editedClient?.[Objkey],
+                            label: editedClient?.[Objkey],
+                          }
+                          : null
+                      }
+                      name={Objkey}
+                      onChange={(selected) => {
+                        setEditedClient({ ...editedClient, [Objkey]: selected.value });
+                        
+                      }}
+                      styles={customStyles}
+                      options={
+                        deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].values
+                      }
+                      required
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+            <Row>
               <Col className="p-2 mt-4">
                 <div className="label">Client Suggestions</div>
                 <input

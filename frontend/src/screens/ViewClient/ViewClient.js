@@ -124,6 +124,24 @@ function ViewClient() {
     }
   };
 
+  useEffect(() => {
+    // Select the .table-responsive element
+    const tableResponsiveElement = document.querySelector(".table-responsive");
+    // Apply the max-height style
+    if (tableResponsiveElement) {
+      tableResponsiveElement.style.maxHeight = "75vh";
+      tableResponsiveElement.style.overflowY = "auto";
+    }
+
+    // Clean up style when the component unmounts
+    return () => {
+      if (tableResponsiveElement) {
+        tableResponsiveElement.style.maxHeight = "";
+        tableResponsiveElement.style.overflowY = "";
+      }
+    };
+  }, [document.querySelector(".table-responsive")]);
+
   return (
     <>
       {clients ? (
@@ -208,7 +226,7 @@ function ViewClient() {
             </div>
           </div>
           <Table bordered hover responsive style={{ marginTop: "15px" }}>
-            <thead>
+            <thead style={{ position: "sticky", top: 0 }} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Client</th>
                 <th className="tableBody" style={{ width: "33%" }} onClick={() => applySorting()}>

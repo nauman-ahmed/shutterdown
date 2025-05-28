@@ -71,6 +71,8 @@ export const getPhotos = async (
   }
 };
 
+
+
 export const getPreWeds = async (
   startDate,
   endDate
@@ -119,6 +121,43 @@ export const updateDeliverable = async (deliverable) => {
       .then(() => {
         window.notify("Deliverable updated successfully!", "success");
       });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const getEditorsData = async (
+  page,
+  editorId,
+) => {
+  try {
+    const res = await axios.get(
+      BASE_URL +
+      `/get-editorsdata`,
+      {
+        Headers: { "Content-Type": "application/json" },
+        params: {
+          page,
+          editorId
+        }
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getEditorsList = async () => {
+  try {
+    const res = await axios.get(
+      BASE_URL +
+      `/all-editors`,
+      {
+        Headers: { "Content-Type": "application/json" }
+      }
+    );
+    return res.data;
   } catch (error) {
     console.log(error);
   }

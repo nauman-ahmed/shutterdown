@@ -153,7 +153,7 @@ export const managerMenuOptions = [
     ],
   },
   {
-    path: "/team/reports",
+    path: "/reports/editors-reports",
     text: "Reports",
     icon: (active) => (
       <HiOutlineDocumentReport className={`fs-4 ${active ? "text-white" : "text-black"}`} />

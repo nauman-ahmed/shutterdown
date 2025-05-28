@@ -64,10 +64,14 @@ function FormII() {
     "promos",
     "longFilms",
     "reels",
-    "performanceFilms"
-  ];
+    "performanceFilms",
 
-  
+  ];
+  const simpleFields = [
+    "hardDrives"
+  ]
+
+
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
@@ -215,35 +219,35 @@ function FormII() {
   };
 
   // Add this function to handle global updates when first event is added/updated
-const updateGlobalSettings = (events) => {
-  if (events?.length > 0) {
-    const firstEvent = events[0];
-    
-    // If we're using global settings, update all existing events
-    if (sameLocationForAll || sameTravelForAll) {
-      const updatedEvents = events.map((event, index) => {
-        // First event stays as is
-        if (index === 0) return event;
-        
-        // For other events, apply global settings
-        let updatedEvent = {...event};
-        
-        if (sameLocationForAll) {
-          updatedEvent.location = firstEvent.location;
-        }
-        
-        if (sameTravelForAll) {
-          updatedEvent.travelBy = firstEvent.travelBy;
-        }
-        
-        return updatedEvent;
-      });
-      
-      dispatch(updateClintData({ ...clientData, events: updatedEvents }));
-      saveDraftClientData({ ...clientData, events: updatedEvents });
+  const updateGlobalSettings = (events) => {
+    if (events?.length > 0) {
+      const firstEvent = events[0];
+
+      // If we're using global settings, update all existing events
+      if (sameLocationForAll || sameTravelForAll) {
+        const updatedEvents = events.map((event, index) => {
+          // First event stays as is
+          if (index === 0) return event;
+
+          // For other events, apply global settings
+          let updatedEvent = { ...event };
+
+          if (sameLocationForAll) {
+            updatedEvent.location = firstEvent.location;
+          }
+
+          if (sameTravelForAll) {
+            updatedEvent.travelBy = firstEvent.travelBy;
+          }
+
+          return updatedEvent;
+        });
+
+        dispatch(updateClintData({ ...clientData, events: updatedEvents }));
+        saveDraftClientData({ ...clientData, events: updatedEvents });
+      }
     }
-  }
-};
+  };
 
 
   return (
@@ -825,6 +829,45 @@ const updateGlobalSettings = (events) => {
 
 
 
+            {simpleFields.map((Objkey) => (
+              <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+                <div className="mt25">
+                  <div className="Text16N" style={{ marginBottom: "6px" }}>
+                    {deliverableOptionsKeyValues &&
+                      deliverableOptionsKeyValues[Objkey].label}
+                  </div>
+                  <Select
+                    value={
+                      clientData?.[Objkey]
+                        ? {
+                          value: clientData?.[Objkey],
+                          label: clientData?.[Objkey],
+                        }
+                        : null
+                    }
+                    name={Objkey}
+                    onChange={(selected) => {
+                      dispatch(
+                        updateClintData({
+                          ...clientData,
+                          [Objkey]: selected.value,
+                        })
+                      )
+                      saveDraftClientData({
+                        ...clientData,
+                        [Objkey]: selected.value,
+                      })
+                    }}
+                    styles={customStyles}
+                    options={
+                      deliverableOptionsKeyValues &&
+                      deliverableOptionsKeyValues[Objkey].values
+                    }
+                    required
+                  />
+                </div>
+              </Col>
+            ))}
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
               Client Suggestions If Any

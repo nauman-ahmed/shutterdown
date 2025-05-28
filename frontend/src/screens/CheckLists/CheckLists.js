@@ -11,6 +11,7 @@ import { GrPowerReset } from "react-icons/gr";
 import CalenderMultiListView from "../../components/CalendarFilterListView";
 import Spinner from "../../components/Spinner";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
+import ClientHeader from "../../components/ClientHeader";
 
 const months = [
   "January",
@@ -74,6 +75,24 @@ function CheckLists(props) {
   useEffect(() => {
     fetchClients();
   }, [updateData]);
+
+  useEffect(() => {
+    // Select the .table-responsive element
+    const tableResponsiveElement = document.querySelector(".table-responsive");
+    // Apply the max-height style
+    if (tableResponsiveElement) {
+      tableResponsiveElement.style.maxHeight = "75vh";
+      tableResponsiveElement.style.overflowY = "auto";
+    }
+
+    // Clean up style when the component unmounts
+    return () => {
+      if (tableResponsiveElement) {
+        tableResponsiveElement.style.maxHeight = "";
+        tableResponsiveElement.style.overflowY = "";
+      }
+    };
+  }, [document.querySelector(".table-responsive")]);
 
   const fetchClientsAgain = async () => {
     if (hasMore) {
@@ -169,7 +188,7 @@ function CheckLists(props) {
   };
 
   return (
-    <>
+    <><ClientHeader  title="CheckLists" />
       {clientsForShow ? (
         <>
           <div
@@ -204,13 +223,13 @@ function CheckLists(props) {
             </div>
           </div>
           <Table
-            bordered
-            hover
-            // borderless
+            
+            striped
             responsive
+           
             style={{ width: "120%", marginTop: "15px" }}
           >
-            <thead>
+            <thead style={{ position: "sticky", top: 0 }} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody sticky-column">Client</th>
                 <th className="tableBody">WhatsApp Group</th>

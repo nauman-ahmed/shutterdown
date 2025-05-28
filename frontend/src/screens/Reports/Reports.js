@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Table } from "reactstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import "../../assets/css/tableRoundHeader.css";
@@ -9,24 +9,43 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import ClientHeader from "../../components/ClientHeader";
 import { useLoggedInUser } from "../../config/zStore";
+import { getEditorsData, getEditorsList } from "../../API/Deliverables";
+import Select from "react-select";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+import { MdPhotoCameraFront } from "react-icons/md";
 
-function Reports(props) {
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+function EditorsReports(props) {
   const navigate = useNavigate();
-  const [allTasks, setAllTasks] = useState(null);
-  const [tasksToShow, setTasksToShow] = useState(null);
-  const {userData : currentUser} = useLoggedInUser()
-  const [filterBy, setFilterBy] = useState(null);
-
-  const [page, setPage] = useState(2);
+  const target = useRef(null);
+  const [data, setData] = useState(null);
+  const [allData, setAllData] = useState(null);
+  const { userData: currentUser } = useLoggedInUser()
+  const [allEditors, setAllEditors] = useState([])
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [filterCondition, setFilterCondition] = useState(null);
+  const [filterEditorId, setFilterEditorId] = useState(null);
+  const [selectedEditorData, setSelectedEditorData] = useState(null)
+  const [editorDataModal, setEditorDataModal] = useState(false)
 
-  const getTaskData = async () => {
+  const getData = async () => {
     try {
-      const tasks = await getAllTasks(1);
-      setAllTasks(tasks);
-      setTasksToShow(tasks)
+
+      const res = await getEditorsData(page, filterEditorId);
+      setAllData(res)
+      if (!filterEditorId) {
+        setData(data ? [...data, ...res.data] : res.data);
+      } else {
+        setData(res.data)
+      }
+      setLoading(false)
+      if (res.pagination.currentPage < res.pagination.totalPages) {
+        setHasMore(true)
+      }
+      // setTasksToShow(tasks)
     } catch (error) {
       console.log(error);
     }
@@ -37,333 +56,350 @@ function Reports(props) {
       currentUser?.rollSelect === "Editor" ||
       currentUser?.rollSelect === "Shooter"
     ) {
-      navigate("/MyProfile/Tasks/DailyTasks");
+      navigate("/MyProfile");
     }
-    getTaskData();
+    getData();
+    if (allEditors?.length === 0) {
+      getEditorsForFilters()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [page, filterEditorId]);
 
-  const fetchTasks = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        
-        const  data = await getAllTasks(page);
-         
-        
-        if (data.length > 0) {
-          let dataToAdd;
-         
-            setAllTasks([...allTasks, ...data])
-            if(filterCondition){
-              dataToAdd = data.filter(task => eval(filterCondition))
-            } else {
-              dataToAdd = data
-            }
-            setTasksToShow([...tasksToShow, ...dataToAdd]);
-          
 
-          setPage(page + 1);
-        } else {
-          setHasMore(false);
-        }
-      } catch (error) {
-        console.log(error);
+
+
+
+  const getEditorsForFilters = async () => {
+    const editorsList = await getEditorsList();
+
+    setAllEditors(editorsList.data)
+  };
+
+
+
+
+
+  useEffect(() => {
+    // Select the .table-responsive element
+    const tableResponsiveElement = document.querySelector(".table-responsive");
+    // Apply the max-height style
+    if (tableResponsiveElement) {
+      tableResponsiveElement.style.maxHeight = "75vh";
+      tableResponsiveElement.style.overflowY = "auto";
+    }
+
+    // Clean up style when the component unmounts
+    return () => {
+      if (tableResponsiveElement) {
+        tableResponsiveElement.style.maxHeight = "";
+        tableResponsiveElement.style.overflowY = "";
       }
-      setLoading(false);
-    }
+    };
+  }, [document.querySelector(".table-responsive")]);
+
+
+  const customStyles = {
+    option: (defaultStyles, state) => ({
+      ...defaultStyles,
+      color: state.isSelected ? "white" : "black",
+      backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
+    }),
+    control: (defaultStyles) => ({
+      ...defaultStyles,
+      backgroundColor: "#EFF0F5",
+      padding: "2px",
+      border: "none",
+      boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.15)",
+    }),
+    singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
   };
 
-  useEffect(()=>{
-    if(tasksToShow?.length < 10 && hasMore && !loading){
-      fetchTasks()
+  const checkForSameDayEdit = (deliverable) => {
+    // Check if deliverable and necessary properties exist
+    if (!deliverable?.client?.events || !deliverable?.forEvents) {
+      return false;
     }
-  }, [tasksToShow])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
 
-    if (bottomOfWindow) {
-      console.log("at bottom");
-      fetchTasks();
-    }
+    // Get the event IDs from forEvents array
+    const eventIds = deliverable.forEvents.map(eventId =>
+      typeof eventId === 'object' ? eventId._id : eventId
+    );
+
+    // Check if any event in client.events that matches forEvents has sameDayVideoEditors > 0
+    return deliverable.client.events.some(event => {
+      const eventId = typeof event._id === 'string' ? event._id : event._id.toString();
+      return eventIds.includes(eventId) && parseInt(event.sameDayVideoEditors, 10) > 0;
+    });
   };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
-
-  const getUsersForFilters = (propertyName) => {
-    const seenUsers = new Set();
-    return allTasks
-      ?.map((taskObj, i) => ({
-        title: `${taskObj?.[propertyName]?.firstName}`,
-        id: i,
-        userId: taskObj?.[propertyName]?._id,
-      }))
-      .filter((taskObj) => {
-        if (taskObj.userId && !seenUsers.has(taskObj.userId)) {
-          seenUsers.add(taskObj.userId);
-          return true;
-        }
-        return false;
-      });
-  };
-  const filterOptions = [
-    {
-      title: "Assign By",
-      id: 1,
-      filters: getUsersForFilters("assignBy"),
-    },
-    {
-      title: "Assign To",
-      id: 2,
-      filters: getUsersForFilters("assignTo"),
-    },
-  ];
-
-  // Define priority for parentTitle
-  const priority = {
-    "Assign By": 1,
-    "Assign To": 2,
-  };
-
-  const changeFilter = (filterType) => {
-    if (filterType !== filterBy) {
-      setTasksToShow(allTasks);
-    }
-    setFilterBy(filterType);
-  };
-
-  const applyFilterNew = (filterValue) => {
-    if(filterValue.length){
-      let conditionBy = null
-      let conditionTo= null
-      filterValue.map((obj) => {
-        if(obj.parentTitle == "Assign By"){
-          conditionBy = conditionBy ? conditionBy + " || task.assignBy.firstName === '" + obj.title + "'" : "task.assignBy.firstName === '" + obj.title + "'"
-        }else if(obj.parentTitle == "Assign To"){
-          conditionTo = conditionTo ? conditionTo + " || task.assignTo.firstName === '" + obj.title + "'" : "task.assignTo.firstName === '" + obj.title + "'"
-        }
-      })
-      let finalCond = null
-      if(conditionBy){
-        if(conditionTo){
-          finalCond = "(" + conditionBy +")" + " && " + "(" + conditionTo + ")"
-        }else{
-          finalCond = "(" + conditionBy +")" 
-        }
-      }else{
-        finalCond = "(" + conditionTo +")" 
-      }
-      setFilterCondition(finalCond)
-      const newData = allTasks.filter(task => eval(finalCond))
-      setTasksToShow(newData)
-    }else{
-      setTasksToShow(allTasks)
-    }
-  }
-
 
 
   return (
     <>
       <ClientHeader
-        selectFilter={changeFilter}
-        currentFilter={filterBy}
-        priority={priority} applyFilter={applyFilterNew}
-        options={filterOptions}
-        title="Reports"
-        filter
+
+        title="Editors Reports"
+      // filter
       />
-      {tasksToShow ? (
-         <>
-        <Table
-          bordered
-          hover
-          borderless
-          responsive
-          // striped
-          className="tableViewClient"
-          style={{ width: "130%", marginTop: "15px" }}
-        >
-          <thead>
-            <tr className="logsHeader Text16N1">
-              <th className="tableBody">Client</th>
-              <th className="tableBody">Task</th>
-              <th className="tableBody">Task Assigned Date</th>
-              <th className="tableBody">Assigned By</th>
-              <th className="tableBody">Assigned To</th>
-              <th className="tableBody">Status</th>
+      {data ? (
+        <>
+          <div
+            className="widthForFilters d-flex flex-row  mx-auto align-items-center"
+            style={{}}
+            ref={target}
+          >
+            <div className="w-100 d-flex flex-row align-items-center">
+              <div className="w-75 ">
+                <Select
+                  isSearchable={true}
+                  onChange={(e) => {
+
+                    setLoading(true)
+                    if (e.value !== 'Reset') {
+                      setFilterEditorId(e.value)
+                    } else {
+                      setFilterEditorId(null)
+                    }
+                  }}
+                  styles={{ ...customStyles, zIndex: -1000, width: "300px" }}
+                  options={[
+                    {
+                      value: "Reset",
+                      label: (
+                        <div className="d-flex justify-content-around">
+                          <strong>Reset</strong>
+                        </div>
+                      )
+                    },
+                    ...Array.from(allEditors)?.map((editor) => {
+                      return {
+                        value: editor._id,
+                        label: (
+                          <div className="d-flex justify-content-around">
+                            <span>{editor.firstName + " " + editor.lastName}</span>
+                          </div>
+                        )
+                      };
+                    }),
+                  ]}
+                  // filterOption={(option, searchInput) => {
+                  //   const { value } = option.data;
+                  //   const searchText = searchInput?.toLowerCase();
+                  //   if (value === 'Reset') {
+
+                  //     return true
+                  //   }
+                  //   // // Perform search on both brideName and groomName
+                  //   // return (
+                  //   //   brideName?.toLowerCase().startsWith(searchText) ||
+                  //   //   groomName?.toLowerCase().startsWith(searchText)
+                  //   // );
+                  // }}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <Table
+            bordered
+            hover
+            borderless
+            responsive
+            // striped
+            className="tableViewClient"
+            style={{ width: "100%", marginTop: "15px" }}
+          >
+            <thead style={{ position: "sticky", top: 0 }} >
+              <tr className="logsHeader Text16N1">
+                <th className="tableBody">Editor</th>
+                <th className="tableBody">Email</th>
+                <th className="tableBody">Yes to Start</th>
+                <th className="tableBody">In Progress</th>
+                <th className="tableBody">Completed</th>
+                <th className="tableBody">Overdue</th>
+                {/* <th className="tableBody">Status</th>
               <th className="tableBody">Deadline</th>
               <th className="tableBody">Completion Date</th>
               <th className="tableBody">Task Ended</th>
-              <th className="tableBody">Delays</th>
-            </tr>
-          </thead>
-          <tbody
-            className="Text12"
-            style={{
-              textAlign: "center",
-              borderWidth: '1px 1px 1px 1px',
-              // background: "#EFF0F5",
-            }}
-          >
-            {tasksToShow?.map((task, index) => (
-              <>
-                <div style={{ marginTop: "15px" }} />
-                <tr
-                  style={{
-                    background: "#EFF0F5",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
+              <th className="tableBody">Delays</th> */}
+              </tr>
+            </thead>
+            <tbody
+              className="Text12"
+              style={{
+                textAlign: "center",
+                borderWidth: '1px 1px 1px 1px',
+                // background: "#EFF0F5",
+              }}
+            >
+              {data?.map((data, index) => (
+                <>
+                  <div style={{ marginTop: "15px" }} />
+                  <tr
                     style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
+                      background: "#EFF0F5",
+                      borderRadius: "8px",
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      setSelectedEditorData(data)
+                      setEditorDataModal(true)
                     }}
                   >
-                    {task?.client.brideName}
-                    <br />
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data?.editor.firstName + " " + data?.editor?.lastName}
+                      {/* <br />
                     <img src={Heart} alt="" />
-                    <br />
-                    {task?.client?.groomName}
-                  </td>
+                    <br /> */}
 
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.taskName}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {dayjs(task.assignDate).format("DD-MMM-YYYY")}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.assignBy.firstName} {task.assignBy.lastName}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.assignTo.firstName} {task.assignTo.lastName}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.completionDate
-                      ? dayjs(task.completionDate)
+                    </td>
+
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data.editor.email}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data.deliverables.yetToStartDelivs.length}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data.deliverables.inProgressDelivs.length}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data.deliverables.completedDelivs.length}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {data.deliverables.overdueDelivs.length}
+                    </td>
+                    {/* <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {task.completionDate
+                        ? dayjs(task.completionDate)
                           .startOf("day")
                           .isBefore(dayjs(task.deadlineDate).startOf("day"))
-                        ? "Completed"
-                        : "Overdue"
-                      : dayjs()
+                          ? "Completed"
+                          : "Overdue"
+                        : dayjs()
                           .startOf("day")
                           .isBefore(dayjs(task.deadlineDate).startOf("day"))
-                      ? "In Progress"
-                      : "Closed"}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {dayjs(task.deadlineDate).format("DD-MMM-YYYY")}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.completionDate
-                      ? dayjs(task.completionDate).format("DD-MMM-YYYY")
-                      : "Not Yet Completed"}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.ended ? "Yes" : "No"}
-                  </td>
-                  <td
-                    className="tableBody Text14Semi primary2 tablePlaceContent"
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "15px",
-                    }}
-                  >
-                    {task.completionDate
-                      ? dayjs(task.completionDate).isBefore(task.deadlineDate)
-                        ? 0
-                        : Math.abs(
+                          ? "In Progress"
+                          : "Closed"}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {dayjs(task.deadlineDate).format("DD-MMM-YYYY")}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {task.completionDate
+                        ? dayjs(task.completionDate).format("DD-MMM-YYYY")
+                        : "Not Yet Completed"}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {task.ended ? "Yes" : "No"}
+                    </td>
+                    <td
+                      className="tableBody Text14Semi primary2 tablePlaceContent"
+                      style={{
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {task.completionDate
+                        ? dayjs(task.completionDate).isBefore(task.deadlineDate)
+                          ? 0
+                          : Math.abs(
                             dayjs(task.deadlineDate).diff(
                               task.completionDate,
                               "day"
                             )
                           )
-                      : 0}
-                  </td>
-                </tr>
-              </>
-            ))}
-          </tbody>
-        </Table>
-       
-         {loading && (
-           <div className="d-flex my-3 justify-content-center align-items-center">
-            <div class="spinner"></div>
-          </div>
-        )}
-        {!hasMore && (
-          <div className="d-flex my-3 justify-content-center align-items-center">
-            <div>No more data to load.</div>
-          </div>
-        )}
-        {(!loading && hasMore) && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchTasks()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )}
+                        : 0}
+                    </td> */}
+                  </tr>
+                </>
+              ))}
+            </tbody>
+          </Table>
+
+          {loading && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <div class="spinner"></div>
+            </div>
+          )}
+          {allData?.pagination.currentPage == allData?.pagination.totalPages && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <div>No more data to load.</div>
+            </div>
+          )}
+          {(!filterEditorId && !loading && allData.pagination.currentPage < allData.pagination.totalPages) && (
+            <div className="d-flex my-3 justify-content-center align-items-center">
+              <button
+                onClick={() => {
+                  setPage(page + 1);
+                  setLoading(true)
+                }}
+                className="btn btn-primary"
+                style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+              >
+                Load More
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <div
@@ -373,8 +409,278 @@ function Reports(props) {
           <div class="spinner"></div>
         </div>
       )}
+      <Modal isOpen={editorDataModal} centered={true} size="lg" >
+        <ModalHeader>Editor Report</ModalHeader>
+        {selectedEditorData &&
+          <ModalBody>
+            <Row>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label">Editor Name</div>
+                <div className={`textPrimary`}>
+                  {selectedEditorData?.editor.firstName + " " + selectedEditorData?.editor.lastName}
+                </div>
+              </Col>
+              <Col xl="6" sm="6" className="p-2">
+                <div className="label">Editor Email</div>
+                <div className={`textPrimary`}>
+                  {selectedEditorData.editor.email}
+                </div>
+              </Col>
+            </Row>
+
+            <Row className="mt-4">
+              <Col>
+                <div className="label mb-3">Deliverables Overview</div>
+                <div style={{ height: "300px" }}>
+                  <Pie
+                    data={{
+                      labels: ['Yet to Start', 'In Progress', 'Completed', 'Overdue'],
+                      datasets: [{
+                        data: [
+                          selectedEditorData.deliverables.yetToStartDelivs.length || 0,
+                          selectedEditorData.deliverables.inProgressDelivs.length || 0,
+                          selectedEditorData.deliverables.completedDelivs.length || 0,
+                          selectedEditorData.deliverables.overdueDelivs.length || 0
+                        ],
+                        backgroundColor: ['#FFD700', '#4169E1', '#32CD32', '#FF0000'],
+                        borderColor: ['#FFD700', '#4169E1', '#32CD32', '#FF0000'],
+                        borderWidth: 1,
+                      }]
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Col>
+            </Row>
+
+            {/* Yet to Start Deliverables Table */}
+            {selectedEditorData.deliverables.yetToStartDelivs.length > 0 &&
+              <Row className="mt-4">
+                <Col>
+                  <div className="label mb-3 fs-5 text-center primary2">Yet to Start Deliverables</div>
+                  <Table bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Deliverable Name</th>
+                        <th>Deliverable Date</th>
+                        <th>Deadline Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedEditorData.deliverables.yetToStartDelivs.map((deliv, index) => (
+                        <tr className="Text14Semi" key={index}>
+                          <td
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                            className="tableBody Text14Semi primary2 "
+                          >
+                            {deliv?.client?.brideName + " "}
+
+                            <img alt="" src={Heart} />
+
+                            {" " + deliv?.client?.groomName}
+                            <br />
+                            {checkForSameDayEdit(deliv) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
+                          </td>
+                          <td className="tableBody Text14Semi">{deliv.isAlbum ? `Album (${deliv.deliverableName})` : deliv.deliverableName}</td>
+
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.date).format('DD-MMM-YYYY')}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.deadlineDate).format('DD-MMM-YYYY')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Col>
+              </Row>
+            }
+
+
+            {/* In Progress Deliverables Table */}
+            {selectedEditorData.deliverables.inProgressDelivs.length > 0 &&
+              <Row className="mt-4">
+                <Col>
+                  <div className="label mb-3 fs-5 text-center primary2">In Progress Deliverables</div>
+                  <Table bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Deliverable Name</th>
+                        <th>Deliverable Date</th>
+                        <th>Deadline Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedEditorData.deliverables.inProgressDelivs.map((deliv, index) => (
+                        <tr className="Text14Semi" key={index}>
+                          <td
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                            className="tableBody Text14Semi primary2 "
+                          >
+                            {deliv?.client?.brideName + " "}
+
+                            <img alt="" src={Heart} />
+
+                            {" " + deliv?.client?.groomName}
+                            <br />
+                            {checkForSameDayEdit(deliv) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
+                          </td>
+                          <td className="tableBody Text14Semi">{deliv.isAlbum ? `Album (${deliv.deliverableName})` : deliv.deliverableName}</td>
+
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.date).format('DD-MMM-YYYY')}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.deadlineDate).format('DD-MMM-YYYY')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Col>
+              </Row>
+            }
+
+
+            {/* Completed Deliverables Table */}
+            {selectedEditorData.deliverables.completedDelivs.length > 0 &&
+              <Row className="mt-4">
+                <Col>
+                  <div className="label mb-3 fs-5 text-center primary2">Completed Deliverables</div>
+                  <Table bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Deliverable Name</th>
+                        <th>Deliverable Date</th>
+                        <th>Deadline Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedEditorData.deliverables.completedDelivs.map((deliv, index) => (
+                        <tr className="Text14Semi" key={index}>
+                          <td
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                            className="tableBody Text14Semi primary2 "
+                          >
+                            {deliv?.client?.brideName + " "}
+
+                            <img alt="" src={Heart} />
+
+                            {" " + deliv?.client?.groomName}
+                            <br />
+                            {checkForSameDayEdit(deliv) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
+                          </td>
+                          <td className="tableBody Text14Semi">{deliv.isAlbum ? `Album (${deliv.deliverableName})` : deliv.deliverableName}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.date).format('DD-MMM-YYYY')}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.deadlineDate).format('DD-MMM-YYYY')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Col>
+              </Row>
+            }
+
+
+            {/* Overdue Deliverables Table */}
+            {selectedEditorData.deliverables.overdueDelivs.length > 0 &&
+              <Row className="mt-4">
+                <Col>
+                  <div className="label mb-3 fs-5 text-center primary2">Overdue Deliverables</div>
+                  <Table bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Deliverable Name</th>
+                        <th>Deliverable Date</th>
+                        <th>Deadline Date</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedEditorData.deliverables.overdueDelivs.map((deliv, index) => (
+                        <tr className="Text14Semi" key={index}>
+                          <td
+                            style={{
+                              paddingTop: "15px",
+                              paddingBottom: "15px",
+                            }}
+                            className="tableBody Text14Semi primary2 "
+                          >
+                            {deliv?.client?.brideName + " "}
+
+                            <img alt="" src={Heart} />
+
+                            {" " + deliv?.client?.groomName}
+                            <br />
+                            {checkForSameDayEdit(deliv) && (
+                              <>
+                                <br />
+                                <MdPhotoCameraFront className="fs-4" />
+                                {/* <span className="text-primary fw-bold">Same Day Edit</span> */}
+                              </>
+                            )}
+                          </td>
+                          <td className="tableBody Text14Semi">{deliv.isAlbum ? `Album (${deliv.deliverableName})` : deliv.deliverableName}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.date).format('DD-MMM-YYYY')}</td>
+                          <td className="tableBody Text14Semi" >{dayjs(deliv.deadlineDate).format('DD-MMM-YYYY')}</td>
+                          <td className="tableBody Text14Semi">{deliv.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Col>
+              </Row>
+            }
+
+          </ModalBody>
+        }
+        <ModalFooter>
+          <Button
+            color="danger"
+            onClick={() => {
+              setSelectedEditorData(null);
+              setEditorDataModal(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+
+      </Modal>
     </>
   );
 }
 
-export default Reports;
+export default EditorsReports;

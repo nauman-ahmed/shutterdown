@@ -261,6 +261,8 @@ const AddPreWedDetails = async (req, res) => {
 
 const updateClient = async (req, res) => {
   try {
+    console.log(req.body);
+    
     await ClientModel.findByIdAndUpdate(req.body.client._id, req.body.client);
     res.status(200).json("client Updated SucccessFully");
   } catch (error) {

@@ -10,7 +10,7 @@ const ClientModel = require("../models/ClientModel");
 const deliverableModel = require("../models/DeliverableModel");
 dotenv.config({ path: "./config.env" });
 const DB = 'mongodb+srv://developersafdar:shutterDown@cluster0.zein9x3.mongodb.net/shutterDown';
-// const DB = "mongodb://127.0.0.1:27017/shutterDown";
+// const DB = "mongodb://127.0.0.1:27017/shutter-down";
 
 
 
