@@ -306,9 +306,7 @@ function FormII() {
               );
               if (isWeddingAvailable.length > 0) {
                 setWeddingAssigned(true);
-              } else if (isWeddingAvailable.length === 0 && !weddingAssigned) {
-                toast.warning("Wedding Event not Added yet!");
-              }
+              } 
               dispatch(
                 updateClintData({ ...clientData, events: clientEvents })
               );
