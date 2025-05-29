@@ -43,7 +43,6 @@ function FormII() {
     useState(null);
   const [minDate, setMinDate] = useState(new Date(Date.now()));
 
-
   const eventOptionObjectKeys = [
     "travelBy",
     "shootDirector",
@@ -65,12 +64,8 @@ function FormII() {
     "longFilms",
     "reels",
     "performanceFilms",
-
   ];
-  const simpleFields = [
-    "hardDrives"
-  ]
-
+  const simpleFields = ["hardDrives"];
 
   const target = useRef(null);
   const [show, setShow] = useState(false);
@@ -80,7 +75,11 @@ function FormII() {
   const updateEventValues = (e) => {
     setEventValues({ ...eventValues, [e.target.name]: e.target.value });
   };
-  const [deliverables, setDeliverables] = useState(clientData?.deliverables || [{ albums: [""], forEvents: [], photos: true, number: 1 }])
+  const [deliverables, setDeliverables] = useState(
+    clientData?.deliverables || [
+      { albums: [""], forEvents: [], photos: true, number: 1 },
+    ]
+  );
   const navigate = useNavigate();
   // Add this useEffect to apply global settings for location and travel
   useEffect(() => {
@@ -88,30 +87,34 @@ function FormII() {
       // If using same location for all and not custom, set location from first event
       if (sameLocationForAll && !useCustomLocation) {
         const firstEvent = clientData.events[0];
-        setEventValues(prev => ({
+        setEventValues((prev) => ({
           ...prev,
-          location: firstEvent.location
+          location: firstEvent.location,
         }));
       }
 
       // If using same travel for all and not custom, set travel from first event
       if (sameTravelForAll && !useCustomTravel) {
         const firstEvent = clientData.events[0];
-        setEventValues(prev => ({
+        setEventValues((prev) => ({
           ...prev,
-          travelBy: firstEvent.travelBy
+          travelBy: firstEvent.travelBy,
         }));
       }
     }
-  }, [clientData?.events, sameLocationForAll, sameTravelForAll, useCustomLocation, useCustomTravel]);
+  }, [
+    clientData?.events,
+    sameLocationForAll,
+    sameTravelForAll,
+    useCustomLocation,
+    useCustomTravel,
+  ]);
 
   const handleAddEvent = (e) => {
     if (!eventValues?.eventDate) {
       return window.notify("Please Select the Date", "error");
     }
-    if (!weddingAssigned) {
-      toast.warning('Wedding Event is not aAdded yet!')
-    }
+
     const updatedEvents = clientData?.events ? [...clientData?.events] : [];
     updatedEvents.push(eventValues);
     const isWeddingAvailable = updatedEvents.filter(
@@ -122,22 +125,26 @@ function FormII() {
     }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
     updateGlobalSettings(updatedEvents);
-    saveDraftClientData({ ...clientData, events: updatedEvents })
+    saveDraftClientData({ ...clientData, events: updatedEvents });
     const updatedStoredEvents = [...allEvents];
     updatedStoredEvents.push(eventValues);
     setAllEvents(updatedStoredEvents);
   };
   const addNewDeliverables = () => {
     const updatedDeliverables = [...deliverables];
-    updatedDeliverables.push({ photos: true, albums: [""], forEvents: [], number: deliverables?.length + 1 })
-    setDeliverables(updatedDeliverables)
-  }
+    updatedDeliverables.push({
+      photos: true,
+      albums: [""],
+      forEvents: [],
+      number: deliverables?.length + 1,
+    });
+    setDeliverables(updatedDeliverables);
+  };
   const clearLatsDeliverables = () => {
     const updatedDeliverables = [...deliverables];
-    updatedDeliverables.pop()
-    setDeliverables(updatedDeliverables)
-  }
-
+    updatedDeliverables.pop();
+    setDeliverables(updatedDeliverables);
+  };
 
   useEffect(() => {
     if (clientData.events && clientData.events.length) {
@@ -162,15 +169,13 @@ function FormII() {
       setWeddingAssigned(false);
     }
     dispatch(updateClintData({ ...clientData, events: updatedEvents }));
-    saveDraftClientData({ ...clientData, events: updatedEvents })
+    saveDraftClientData({ ...clientData, events: updatedEvents });
   };
 
   useEffect(() => {
     dispatch(updateClintData({ ...clientData, deliverables: deliverables }));
-    saveDraftClientData({ ...clientData, deliverables: deliverables })
-  }, [deliverables])
-
-
+    saveDraftClientData({ ...clientData, deliverables: deliverables });
+  }, [deliverables]);
 
   const getAllFormOptionsHandler = async () => {
     const eventOptions = await getAllEventOptions();
@@ -185,7 +190,7 @@ function FormII() {
     }
     getAllFormOptionsHandler();
 
-    const data = getDraftClientData()
+    const data = getDraftClientData();
     if (data) {
       dispatch(updateClintData(data));
     }
@@ -249,7 +254,6 @@ function FormII() {
     }
   };
 
-
   return (
     <>
       <div className="mt18">
@@ -267,7 +271,9 @@ function FormII() {
               }}
               style={{ width: "16px", height: "16px", marginRight: "8px" }}
             />
-            <label htmlFor="sameLocationForAll" className="cursor-pointer">Same Location for All Events</label>
+            <label htmlFor="sameLocationForAll" className="cursor-pointer">
+              Same Location for All Events
+            </label>
           </div>
           <div>
             <input
@@ -282,7 +288,9 @@ function FormII() {
               }}
               style={{ width: "16px", height: "16px", marginRight: "8px" }}
             />
-            <label htmlFor="sameTravelForAll" className="cursor-pointer">Same Travel Mode for All Events</label>
+            <label htmlFor="sameTravelForAll" className="cursor-pointer">
+              Same Travel Mode for All Events
+            </label>
           </div>
         </div>
         <Form
@@ -299,13 +307,13 @@ function FormII() {
               if (isWeddingAvailable.length > 0) {
                 setWeddingAssigned(true);
               } else if (isWeddingAvailable.length === 0 && !weddingAssigned) {
-                toast.warning('Wedding Event not Added yet!')
+                toast.warning("Wedding Event not Added yet!");
               }
               dispatch(
                 updateClintData({ ...clientData, events: clientEvents })
               );
               updateGlobalSettings(clientEvents);
-              saveDraftClientData({ ...clientData, events: clientEvents })
+              saveDraftClientData({ ...clientData, events: clientEvents });
               setAllEvents([...storedEvents, ...clientEvents]);
               setEditingEvent(null);
             }
@@ -370,7 +378,14 @@ function FormII() {
             </Col>
             <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
               <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+                <div
+                  className="Text16N"
+                  style={{
+                    marginBottom: "6px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <span>Location</span>
                   {sameLocationForAll && clientData?.events?.length > 0 && (
                     <div>
@@ -379,16 +394,29 @@ function FormII() {
                         id="customLocation"
                         checked={useCustomLocation}
                         onChange={(e) => setUseCustomLocation(e.target.checked)}
-                        style={{ width: "16px", height: "16px", marginRight: "5px" }}
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          marginRight: "5px",
+                        }}
                       />
-                      <label htmlFor="customLocation" style={{ fontSize: "12px" }}>Custom for this event</label>
+                      <label
+                        htmlFor="customLocation"
+                        style={{ fontSize: "12px" }}
+                      >
+                        Custom for this event
+                      </label>
                     </div>
                   )}
                 </div>
                 <Input
                   type="text"
                   name="location"
-                  disabled={sameLocationForAll && !useCustomLocation && clientData?.events?.length > 0}
+                  disabled={
+                    sameLocationForAll &&
+                    !useCustomLocation &&
+                    clientData?.events?.length > 0
+                  }
                   className="forminput"
                   value={eventValues?.location || ""}
                   required={true}
@@ -398,30 +426,61 @@ function FormII() {
               </div>
             </Col>
             {eventOptionObjectKeys.map((Objkey) => (
-              <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5" key={Objkey}>
+              <Col
+                xs="12"
+                sm="6"
+                md="6"
+                lg="6"
+                xl="4"
+                className="pr5"
+                key={Objkey}
+              >
                 <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
-                    <span>{eventOptionsKeyValues && eventOptionsKeyValues[Objkey].label}</span>
-                    {Objkey === "travelBy" && sameTravelForAll && clientData?.events?.length > 0 && (
-                      <div>
-                        <input
-                          type="checkbox"
-                          id="customTravel"
-                          checked={useCustomTravel}
-                          onChange={(e) => setUseCustomTravel(e.target.checked)}
-                          style={{ width: "16px", height: "16px", marginRight: "5px" }}
-                        />
-                        <label htmlFor="customTravel" style={{ fontSize: "12px" }}>Custom for this event</label>
-                      </div>
-                    )}
+                  <div
+                    className="Text16N"
+                    style={{
+                      marginBottom: "6px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>
+                      {eventOptionsKeyValues &&
+                        eventOptionsKeyValues[Objkey].label}
+                    </span>
+                    {Objkey === "travelBy" &&
+                      sameTravelForAll &&
+                      clientData?.events?.length > 0 && (
+                        <div>
+                          <input
+                            type="checkbox"
+                            id="customTravel"
+                            checked={useCustomTravel}
+                            onChange={(e) =>
+                              setUseCustomTravel(e.target.checked)
+                            }
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              marginRight: "5px",
+                            }}
+                          />
+                          <label
+                            htmlFor="customTravel"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Custom for this event
+                          </label>
+                        </div>
+                      )}
                   </div>
                   <Select
                     value={
                       eventValues?.[Objkey]
                         ? {
-                          label: eventValues?.[Objkey],
-                          value: eventValues?.[Objkey],
-                        }
+                            label: eventValues?.[Objkey],
+                            value: eventValues?.[Objkey],
+                          }
                         : null
                     }
                     name={Objkey}
@@ -438,7 +497,12 @@ function FormII() {
                       eventOptionsKeyValues[Objkey].values
                     }
                     required={true}
-                    isDisabled={Objkey === "travelBy" && sameTravelForAll && !useCustomTravel && clientData?.events?.length > 0}
+                    isDisabled={
+                      Objkey === "travelBy" &&
+                      sameTravelForAll &&
+                      !useCustomTravel &&
+                      clientData?.events?.length > 0
+                    }
                   />
                 </div>
               </Col>
@@ -510,12 +574,22 @@ function FormII() {
             e.preventDefault();
             console.log(clientData);
 
-            if (clientData.deliverables.some(deliv => deliv.forEvents?.length == 0)) {
-              toast.error("Deliverable cannot be added without selecting events")
-              return
+            if (
+              clientData.deliverables.some(
+                (deliv) => deliv.forEvents?.length == 0
+              )
+            ) {
+              toast.error(
+                "Deliverable cannot be added without selecting events"
+              );
+              return;
             }
+            if (!weddingAssigned) {
+              toast.warning("Wedding Event is not Added yet!");
+            }
+            
             dispatch(updateClintData({ ...clientData, form2Submitted: true }));
-            saveDraftClientData({ ...clientData, form2Submitted: true })
+            saveDraftClientData({ ...clientData, form2Submitted: true });
             navigate("/clients/add-client/preview");
           }}
         >
@@ -524,7 +598,6 @@ function FormII() {
               <input
                 type="checkbox"
                 onChange={(e) => {
-
                   dispatch(
                     updateClintData({
                       ...clientData,
@@ -534,7 +607,7 @@ function FormII() {
                   saveDraftClientData({
                     ...clientData,
                     preWeddingPhotos: e.target.checked,
-                  })
+                  });
                 }}
                 name="preWeddingPhotos"
                 checked={clientData?.preWeddingPhotos}
@@ -555,7 +628,7 @@ function FormII() {
                   saveDraftClientData({
                     ...clientData,
                     preWeddingVideos: e.target.checked,
-                  })
+                  });
                 }}
                 type="checkbox"
                 name="preWeddingVideos"
@@ -567,50 +640,49 @@ function FormII() {
             </div>
           </div>
 
-          {(clientData?.preWeddingVideos ||
-            clientData?.preWeddingPhotos) && (
-              <Row>
-                {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
-                  <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
-                    <div className="mt25">
-                      <div className="Text16N" style={{ marginBottom: "6px" }}>
-                        {deliverableOptionsKeyValues &&
-                          deliverableOptionsKeyValues[Objkey].label}
-                      </div>
-                      <Select
-                        value={
-                          clientData?.["preWed" + Objkey]
-                            ? {
+          {(clientData?.preWeddingVideos || clientData?.preWeddingPhotos) && (
+            <Row>
+              {deliverablePreWeddingOptionObjectKeys.map((Objkey) => (
+                <Col xs="12" sm="6" md="6" lg="6" xl="4" className="pr5">
+                  <div className="mt25">
+                    <div className="Text16N" style={{ marginBottom: "6px" }}>
+                      {deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].label}
+                    </div>
+                    <Select
+                      value={
+                        clientData?.["preWed" + Objkey]
+                          ? {
                               value: clientData?.["preWed" + Objkey],
                               label: clientData?.["preWed" + Objkey],
                             }
-                            : null
-                        }
-                        name={"preWed" + Objkey}
-                        onChange={(selected) => {
-                          dispatch(
-                            updateClintData({
-                              ...clientData,
-                              ["preWed" + Objkey]: selected?.value,
-                            })
-                          );
-                          saveDraftClientData({
+                          : null
+                      }
+                      name={"preWed" + Objkey}
+                      onChange={(selected) => {
+                        dispatch(
+                          updateClintData({
                             ...clientData,
                             ["preWed" + Objkey]: selected?.value,
                           })
-                        }}
-                        styles={customStyles}
-                        options={
-                          deliverableOptionsKeyValues &&
-                          deliverableOptionsKeyValues[Objkey].values
-                        }
-                        required
-                      />
-                    </div>
-                  </Col>
-                ))}
-              </Row>
-            )}
+                        );
+                        saveDraftClientData({
+                          ...clientData,
+                          ["preWed" + Objkey]: selected?.value,
+                        });
+                      }}
+                      styles={customStyles}
+                      options={
+                        deliverableOptionsKeyValues &&
+                        deliverableOptionsKeyValues[Objkey].values
+                      }
+                      required
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
           {clientData?.events?.length > 0 && (
             <>
               <div
@@ -621,40 +693,51 @@ function FormII() {
               </div>
               {deliverables?.map((deliverable, index) => (
                 <div className="bg-slight deliverableBox my-2">
-
                   <Row>
                     <Col xl="10" sm="8">
                       <div className=" d-flex flex-row align-items-center gap-4">
-                        <h4 className="LabelDrop"> {deliverable.number + ")"} For Events :</h4>
+                        <h4 className="LabelDrop">
+                          {" "}
+                          {deliverable.number + ")"} For Events :
+                        </h4>
                         {clientData?.events?.map((event, eventIndex) => (
                           <div className="d-flex flex-row align-items-center gap-2">
                             <input
                               onChange={(e) => {
-                                const updatedDeliverables = [...deliverables]
-                                const updatedForEvents = [...deliverable?.forEvents];
+                                const updatedDeliverables = [...deliverables];
+                                const updatedForEvents = [
+                                  ...deliverable?.forEvents,
+                                ];
                                 if (e.target.checked) {
-                                  updatedForEvents.push(eventIndex)
-                                  updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: updatedForEvents }
+                                  updatedForEvents.push(eventIndex);
+                                  updatedDeliverables[index] = {
+                                    ...updatedDeliverables[index],
+                                    forEvents: updatedForEvents,
+                                  };
                                 } else {
-                                  const filteredForEvents = updatedForEvents.filter(num => num != eventIndex)
-                                  updatedDeliverables[index] = { ...updatedDeliverables[index], forEvents: filteredForEvents }
+                                  const filteredForEvents =
+                                    updatedForEvents.filter(
+                                      (num) => num != eventIndex
+                                    );
+                                  updatedDeliverables[index] = {
+                                    ...updatedDeliverables[index],
+                                    forEvents: filteredForEvents,
+                                  };
                                 }
 
-
-                                setDeliverables(updatedDeliverables)
-
+                                setDeliverables(updatedDeliverables);
                               }}
                               type="checkbox"
                               style={{ width: "16px", height: "16px" }}
                               className="cursor-pointer"
                               name={`event${index}-${eventIndex}`}
-                              checked={deliverable?.forEvents?.includes(eventIndex)}
-
+                              checked={deliverable?.forEvents?.includes(
+                                eventIndex
+                              )}
                             />
                             <span>{event.eventType}</span>
                           </div>
                         ))}
-
                       </div>
                       <Row>
                         {deliverable?.albums?.map((albumValue, i) =>
@@ -671,33 +754,43 @@ function FormII() {
                                   name={`album${i + 1}`}
                                   className="w-75"
                                   onChange={(selected) => {
-                                    if (selected.value !== 'Not included') {
-                                      const updatedDeliverables = [...deliverables]
-                                      const updatedAlbums = [...deliverable?.[Objkey]];
+                                    if (selected.value !== "Not included") {
+                                      const updatedDeliverables = [
+                                        ...deliverables,
+                                      ];
+                                      const updatedAlbums = [
+                                        ...deliverable?.[Objkey],
+                                      ];
                                       updatedAlbums[i] = selected?.value;
-                                      updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
-                                      setDeliverables(updatedDeliverables)
+                                      updatedDeliverables[index] = {
+                                        ...updatedDeliverables[index],
+                                        [Objkey]: updatedAlbums,
+                                      };
+                                      setDeliverables(updatedDeliverables);
                                     } else {
-                                      const updatedDeliverables = [...deliverables]
-                                      const updatedAlbums = [...deliverable?.[Objkey]];
+                                      const updatedDeliverables = [
+                                        ...deliverables,
+                                      ];
+                                      const updatedAlbums = [
+                                        ...deliverable?.[Objkey],
+                                      ];
                                       if (i === 0) {
-                                        updatedAlbums[i] = "Not included"
+                                        updatedAlbums[i] = "Not included";
                                       } else {
-
                                         updatedAlbums.splice(i, 1);
                                       }
-                                      updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: updatedAlbums }
-                                      setDeliverables(updatedDeliverables)
+                                      updatedDeliverables[index] = {
+                                        ...updatedDeliverables[index],
+                                        [Objkey]: updatedAlbums,
+                                      };
+                                      setDeliverables(updatedDeliverables);
                                     }
-
-
                                   }}
                                   styles={customStyles}
                                   options={
                                     deliverableOptionsKeyValues &&
                                     deliverableOptionsKeyValues[Objkey].values
                                   }
-
                                 />
                               </div>
                             </Col>
@@ -718,39 +811,45 @@ function FormII() {
                             }}
                             className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
                             onClick={() => {
-                              const updatedDeliverables = [...deliverables]
+                              const updatedDeliverables = [...deliverables];
                               const updatedAlbums = [...deliverable?.albums];
                               updatedAlbums.pop();
-                              updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
-                              setDeliverables(updatedDeliverables)
-
+                              updatedDeliverables[index] = {
+                                ...updatedDeliverables[index],
+                                albums: updatedAlbums,
+                              };
+                              setDeliverables(updatedDeliverables);
                             }}
                           >
                             <CgMathMinus />
                           </div>
                         )}
-                        {(deliverable?.albums?.length >= 1 && deliverable?.albums[0] !== "" && deliverable?.albums[0] !== "Not included") && (
-                          <div
-                            className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
-                            onClick={() => {
-                              const updatedDeliverables = [...deliverables]
-                              const updatedAlbums = [...deliverable?.albums];
-                              updatedAlbums.push("");
-                              updatedDeliverables[index] = { ...updatedDeliverables[index], albums: updatedAlbums };
-                              setDeliverables(updatedDeliverables)
-                            }}
-                            style={{
-                              backgroundColor: "rgb(102, 109, 255)",
-                              color: "white",
-                              width: "30PX",
-                              height: "30px",
-                              borderRadius: "100%",
-                            }}
-                          >
-                            <LuPlus />
-                          </div>
-                        )}
-
+                        {deliverable?.albums?.length >= 1 &&
+                          deliverable?.albums[0] !== "" &&
+                          deliverable?.albums[0] !== "Not included" && (
+                            <div
+                              className="fs-3 mt-4 mx-1 d-flex justify-content-center align-items-center"
+                              onClick={() => {
+                                const updatedDeliverables = [...deliverables];
+                                const updatedAlbums = [...deliverable?.albums];
+                                updatedAlbums.push("");
+                                updatedDeliverables[index] = {
+                                  ...updatedDeliverables[index],
+                                  albums: updatedAlbums,
+                                };
+                                setDeliverables(updatedDeliverables);
+                              }}
+                              style={{
+                                backgroundColor: "rgb(102, 109, 255)",
+                                color: "white",
+                                width: "30PX",
+                                height: "30px",
+                                borderRadius: "100%",
+                              }}
+                            >
+                              <LuPlus />
+                            </div>
+                          )}
                       </div>
                     </Col>
                   </Row>
@@ -758,7 +857,10 @@ function FormII() {
                     {deliverableOptionObjectKeys.map((Objkey) => (
                       <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
                         <div className="mt25">
-                          <div className="Text16N" style={{ marginBottom: "6px" }}>
+                          <div
+                            className="Text16N"
+                            style={{ marginBottom: "6px" }}
+                          >
                             {deliverableOptionsKeyValues &&
                               deliverableOptionsKeyValues[Objkey].label}
                           </div>
@@ -766,16 +868,19 @@ function FormII() {
                             value={
                               deliverable?.[Objkey]
                                 ? {
-                                  value: deliverable?.[Objkey],
-                                  label: deliverable?.[Objkey],
-                                }
+                                    value: deliverable?.[Objkey],
+                                    label: deliverable?.[Objkey],
+                                  }
                                 : null
                             }
                             name={Objkey}
                             onChange={(selected) => {
-                              const updatedDeliverables = [...deliverables]
-                              updatedDeliverables[index] = { ...updatedDeliverables[index], [Objkey]: selected?.value, }
-                              setDeliverables(updatedDeliverables)
+                              const updatedDeliverables = [...deliverables];
+                              updatedDeliverables[index] = {
+                                ...updatedDeliverables[index],
+                                [Objkey]: selected?.value,
+                              };
+                              setDeliverables(updatedDeliverables);
                             }}
                             styles={customStyles}
                             options={
@@ -827,47 +932,45 @@ function FormII() {
             </Col>
           )}
 
-
-
-            {simpleFields.map((Objkey) => (
-              <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
-                <div className="mt25">
-                  <div className="Text16N" style={{ marginBottom: "6px" }}>
-                    {deliverableOptionsKeyValues &&
-                      deliverableOptionsKeyValues[Objkey].label}
-                  </div>
-                  <Select
-                    value={
-                      clientData?.[Objkey]
-                        ? {
+          {simpleFields.map((Objkey) => (
+            <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+              <div className="mt25">
+                <div className="Text16N" style={{ marginBottom: "6px" }}>
+                  {deliverableOptionsKeyValues &&
+                    deliverableOptionsKeyValues[Objkey].label}
+                </div>
+                <Select
+                  value={
+                    clientData?.[Objkey]
+                      ? {
                           value: clientData?.[Objkey],
                           label: clientData?.[Objkey],
                         }
-                        : null
-                    }
-                    name={Objkey}
-                    onChange={(selected) => {
-                      dispatch(
-                        updateClintData({
-                          ...clientData,
-                          [Objkey]: selected.value,
-                        })
-                      )
-                      saveDraftClientData({
+                      : null
+                  }
+                  name={Objkey}
+                  onChange={(selected) => {
+                    dispatch(
+                      updateClintData({
                         ...clientData,
                         [Objkey]: selected.value,
                       })
-                    }}
-                    styles={customStyles}
-                    options={
-                      deliverableOptionsKeyValues &&
-                      deliverableOptionsKeyValues[Objkey].values
-                    }
-                    required
-                  />
-                </div>
-              </Col>
-            ))}
+                    );
+                    saveDraftClientData({
+                      ...clientData,
+                      [Objkey]: selected.value,
+                    });
+                  }}
+                  styles={customStyles}
+                  options={
+                    deliverableOptionsKeyValues &&
+                    deliverableOptionsKeyValues[Objkey].values
+                  }
+                  required
+                />
+              </div>
+            </Col>
+          ))}
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
               Client Suggestions If Any
@@ -880,19 +983,17 @@ function FormII() {
               value={clientData?.suggestion || ""}
               required={false}
               onChange={(e) => {
-
                 dispatch(
                   updateClintData({
                     ...clientData,
                     [e.target.name]: e.target.value,
                   })
-                )
+                );
                 saveDraftClientData({
                   ...clientData,
                   [e.target.name]: e.target.value,
-                })
-              }
-              }
+                });
+              }}
               placeholder={"Write notes here..."}
             />
           </div>
