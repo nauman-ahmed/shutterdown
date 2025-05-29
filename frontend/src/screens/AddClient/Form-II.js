@@ -306,7 +306,7 @@ function FormII() {
               );
               if (isWeddingAvailable.length > 0) {
                 setWeddingAssigned(true);
-              } 
+              }
               dispatch(
                 updateClintData({ ...clientData, events: clientEvents })
               );
@@ -476,9 +476,9 @@ function FormII() {
                     value={
                       eventValues?.[Objkey]
                         ? {
-                            label: eventValues?.[Objkey],
-                            value: eventValues?.[Objkey],
-                          }
+                          label: eventValues?.[Objkey],
+                          value: eventValues?.[Objkey],
+                        }
                         : null
                     }
                     name={Objkey}
@@ -585,7 +585,7 @@ function FormII() {
             if (!weddingAssigned) {
               toast.warning("Wedding Event is not Added yet!");
             }
-            
+
             dispatch(updateClintData({ ...clientData, form2Submitted: true }));
             saveDraftClientData({ ...clientData, form2Submitted: true });
             navigate("/clients/add-client/preview");
@@ -651,9 +651,9 @@ function FormII() {
                       value={
                         clientData?.["preWed" + Objkey]
                           ? {
-                              value: clientData?.["preWed" + Objkey],
-                              label: clientData?.["preWed" + Objkey],
-                            }
+                            value: clientData?.["preWed" + Objkey],
+                            label: clientData?.["preWed" + Objkey],
+                          }
                           : null
                       }
                       name={"preWed" + Objkey}
@@ -866,9 +866,9 @@ function FormII() {
                             value={
                               deliverable?.[Objkey]
                                 ? {
-                                    value: deliverable?.[Objkey],
-                                    label: deliverable?.[Objkey],
-                                  }
+                                  value: deliverable?.[Objkey],
+                                  label: deliverable?.[Objkey],
+                                }
                                 : null
                             }
                             name={Objkey}
@@ -930,45 +930,37 @@ function FormII() {
             </Col>
           )}
 
-          {simpleFields.map((Objkey) => (
-            <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
-              <div className="mt25">
-                <div className="Text16N" style={{ marginBottom: "6px" }}>
-                  {deliverableOptionsKeyValues &&
-                    deliverableOptionsKeyValues[Objkey].label}
-                </div>
-                <Select
-                  value={
-                    clientData?.[Objkey]
-                      ? {
-                          value: clientData?.[Objkey],
-                          label: clientData?.[Objkey],
-                        }
-                      : null
-                  }
-                  name={Objkey}
-                  onChange={(selected) => {
-                    dispatch(
-                      updateClintData({
-                        ...clientData,
-                        [Objkey]: selected.value,
-                      })
-                    );
-                    saveDraftClientData({
-                      ...clientData,
-                      [Objkey]: selected.value,
-                    });
-                  }}
-                  styles={customStyles}
-                  options={
-                    deliverableOptionsKeyValues &&
-                    deliverableOptionsKeyValues[Objkey].values
-                  }
-                  required
-                />
+
+          <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+            <div className="mt25">
+              <div className="Text16N" style={{ marginBottom: "6px" }}>
+                Hard Drives
               </div>
-            </Col>
-          ))}
+              <Input
+                type="text"
+                name='hardDrives'
+
+                className="forminput"
+                value={clientData?.hardDrives || ""}
+                required={true}
+                onChange={(e) => {
+                  dispatch(
+                    updateClintData({
+                      ...clientData,
+                      [e.target.name]: e.target.value,
+                    })
+                  );
+                  saveDraftClientData({
+                    ...clientData,
+                    [e.target.name]: e.target.value,
+                  });
+                }}
+                placeholder={"Hard Drives"}
+              />
+
+            </div>
+          </Col>
+
           <div className="mt25">
             <div className="Text16N" style={{ marginBottom: "6px" }}>
               Client Suggestions If Any

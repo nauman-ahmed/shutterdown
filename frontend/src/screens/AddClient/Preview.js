@@ -373,7 +373,7 @@ function Preview() {
                     <Row>
                       {deliverable?.albums?.map((albumValue, i) =>
                         deliverableAlbumOptionObjectKeys.map((Objkey) => (
-                          <Col xs="12" sm="6" lg="6" xl="5"  key={i}>
+                          <Col xs="12" sm="6" lg="6" xl="5" key={i}>
                             <div className="Drop">
                               <h4 className="LabelDrop">Album {i + 1}</h4>
                               <Input
@@ -614,6 +614,25 @@ function Preview() {
             </div>
           </Col>
         </Row> */}
+        <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
+          <div className="mt25">
+            <div className="Text16N" style={{ marginBottom: "6px" }}>
+              Hard Drives
+            </div>
+            <Input
+              type="text"
+              name='hardDrives'
+
+              className="forminput"
+              value={clientData?.hardDrives || ""}
+              required={true}
+             
+              placeholder={"Hard Drives"}
+            />
+
+          </div>
+        </Col>
+
         <div className="mt25">
           <div className="Text16N" style={{ marginBottom: "6px" }}>
             Client Suggestions If Any

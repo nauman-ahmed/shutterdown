@@ -24,7 +24,7 @@ const ClientSchema = mongoose.Schema({
   ],
   albums: [{ type: String }],
   hardDrives: {
-    type: Number,
+    type: String,
   },
   email: {
     type: String,

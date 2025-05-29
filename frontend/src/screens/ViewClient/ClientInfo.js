@@ -4,6 +4,7 @@ import {
   Button,
   Col,
   Form,
+  Input,
   Modal,
   ModalBody,
   ModalFooter,
@@ -335,7 +336,7 @@ function ClientInfo() {
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Long Film')?.length}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Reel')?.length}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.deliverables?.filter(deliv => deliv.deliverableName === 'Promo')?.length}</td>
-            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.hardDrives || 0}</td>
+            <td className="textPrimary fs-6 tablePlaceContent">{clientData?.hardDrives || "_"}</td>
             <td className="textPrimary fs-6 tablePlaceContent">{clientData?.paymentStatus}</td>
             {clientData?.paymentStatus === 'Pending' && (
               <td className="textPrimary fs-6 tablePlaceContent">{clientData?.pendingAmount}</td>
@@ -1298,30 +1299,19 @@ function ClientInfo() {
                 <Col xs="12" sm="6" lg="6" xl="4" className="pr5">
                   <div className="mt25">
                     <div className="Text16N" style={{ marginBottom: "6px" }}>
-                      {deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].label}
+                      Hard Drives
                     </div>
-                    <Select
-                      value={
-                        editedClient?.[Objkey]
-                          ? {
-                            value: editedClient?.[Objkey],
-                            label: editedClient?.[Objkey],
-                          }
-                          : null
-                      }
-                      name={Objkey}
-                      onChange={(selected) => {
-                        setEditedClient({ ...editedClient, [Objkey]: selected.value });
-                        
-                      }}
-                      styles={customStyles}
-                      options={
-                        deliverableOptionsKeyValues &&
-                        deliverableOptionsKeyValues[Objkey].values
-                      }
-                      required
+                    <Input
+                      type="text"
+                      name='hardDrives'
+
+                      className="forminput"
+                      value={editedClient?.hardDrives}
+                      required={true}
+                      onChange={(e) => updateEditedClient(e)}
+                      placeholder={"Hard_Drives"}
                     />
+
                   </div>
                 </Col>
               ))}
