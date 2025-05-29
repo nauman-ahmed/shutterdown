@@ -60,11 +60,10 @@ function CheckLists(props) {
       const clients = await getClients(
         startDate,
         endDate,
-        null
       );
       setClientsForShow(clients.data);
-      setHasMore(true);
-      setPage(2);
+      // setHasMore(clients.hasMore);
+      // setPage(2);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -94,57 +93,49 @@ function CheckLists(props) {
     };
   }, [document.querySelector(".table-responsive")]);
 
-  const fetchClientsAgain = async () => {
-    if (hasMore) {
-      setLoading(true);
-      try {
-        const data = await getClients(
-          startDate,
-          endDate,
-          null
-        );
-        if (data.data.length > 0) {
-          if (dateForFilter) {
-            const clientsToAdd = data.data.filter((clientData) => {
-              return clientData.events.some(
-                (eventData) =>
-                  new Date(eventData.eventDate).getTime() >=
-                  new Date(dateForFilter).getTime() &&
-                  new Date(eventData.eventDate).getTime() <=
-                  new Date(dateForFilter).getTime()
-              );
-            });
-            setClientsForShow([...clientsForShow, ...clientsToAdd]);
-          } else {
-            setClientsForShow([...clientsForShow, ...data.data]);
-          }
-        }
-        if (data.hasMore) {
-          setPage(page + 1);
-        }
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
+  // const fetchClientsAgain = async () => {
+  //   if (hasMore) {
+  //     setLoading(true);
+  //     try {
+  //       const data = await getClients(
+  //         startDate,
+  //         endDate,
+  //         null
+  //       );
+  //       if (data.data.length > 0) {
+  //         if (dateForFilter) {
+  //           const clientsToAdd = data.data.filter((clientData) => {
+  //             return clientData.events.some(
+  //               (eventData) =>
+  //                 new Date(eventData.eventDate).getTime() >=
+  //                 new Date(dateForFilter).getTime() &&
+  //                 new Date(eventData.eventDate).getTime() <=
+  //                 new Date(dateForFilter).getTime()
+  //             );
+  //           });
+  //           setClientsForShow([...clientsForShow, ...clientsToAdd]);
+  //         } else {
+  //           setClientsForShow([...clientsForShow, ...data.data]);
+  //         }
+  //       }
+  //       if (data.hasMore) {
+  //         setPage(page + 1);
+  //       }
+  //       setHasMore(data.hasMore);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (clientsForShow?.length < 10 && hasMore && !loading) {
-      fetchClientsAgain();
-    }
-  }, [clientsForShow, hasMore, loading]);
+  // useEffect(() => {
+  //   if (clientsForShow?.length < 10 && hasMore && !loading) {
+  //     fetchClientsAgain();
+  //   }
+  // }, [clientsForShow, hasMore, loading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = () => {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >=
-      document.documentElement.scrollHeight - 10;
-
-    if (bottomOfWindow) {
-      fetchClientsAgain();
-    }
-  };
+  
 
   // useEffect(() => {
   //   window.addEventListener("scroll", handleScroll);
@@ -410,7 +401,7 @@ function CheckLists(props) {
             </tbody>
           </Table>
           {loading && <Spinner />}
-          {!hasMore && (
+          {/* {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
             </div>
@@ -425,7 +416,7 @@ function CheckLists(props) {
                 Load More
               </button>
             </div>
-          )}
+          )} */}
           <Overlay
             rootClose={true}
             onHide={() => { setShow(false); setUpdateData(!updateData) }}

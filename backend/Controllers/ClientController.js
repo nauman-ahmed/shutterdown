@@ -1350,7 +1350,7 @@ const getClients = async (req, res) => {
         .populate("userID");
 
       // Determine if there are more objects to fetch
-      const hasMore = clients.length === 10;
+      const hasMore = false;
       res.status(200).json({ hasMore, data: clients });
     }
   } catch (error) {

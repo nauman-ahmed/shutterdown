@@ -341,7 +341,7 @@ function ChecklistDeliverables(props) {
             </tbody>
           </Table>
           {loading && <Spinner />}
-          {!hasMore && (
+          {/* {!hasMore && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div>No more data to load.</div>
             </div>
@@ -356,7 +356,7 @@ function ChecklistDeliverables(props) {
                 Load More
               </button>
             </div>
-          )}
+          )} */}
           <Overlay
             rootClose={true}
             onHide={() => { setShow(false); setUpdateData(!updateData) }}

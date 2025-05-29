@@ -78,9 +78,11 @@ function ClientHeader(props) {
   const route = window.location.href.split("/MyProfile");
 
   useEffect(() => {
+    console.log(route);
+    
     if (
-      route[1] &&
-      route[1]?.startsWith("/Tasks/DailyTasks") &&
+      route[0] &&
+      route[0]?.includes("/tasks/daily-tasks") &&
       currentUser?.rollSelect === "Manager"
     ) {
       fetchClientsData();
@@ -171,7 +173,7 @@ function ClientHeader(props) {
             </div>
           )}
           {currentUser?.rollSelect === "Manager" &&
-          route[1]?.startsWith("/Tasks/DailyTasks") ? (
+          route[0]?.includes("/tasks/daily-tasks") ? (
             <>
               <div
                 style={{ backgroundColor: "#666DFF" }}
