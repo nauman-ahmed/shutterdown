@@ -23,6 +23,7 @@ function Calender() {
   const { userData: currentUser } = useLoggedInUser();
   const navigate = useNavigate();
   const EventsList = useSelector((state) => state.allEvents);
+  
   const getEventsData = async () => {
     try {
       // const res = await getAllEvents();
@@ -107,7 +108,7 @@ function Calender() {
 
   useEffect(() => {
     getEventsData();
-  }, []);
+  }, [EventsList]);
 
   return (
     <>
