@@ -346,6 +346,26 @@ function FormI() {
               />
             </div>
           </Col>
+          {formValues?.paymentStatus === 'Others' && (
+
+            <Col xs="12" sm="6">
+              <div className='mt25'>
+                <div className="Text16N" style={{ marginBottom: '6px' }}>
+                  Payment Info
+                </div>
+                <Input
+                  type="text"
+                  name="paymentInfo"
+                  disabled={false}
+                  className='forminput'
+                  value={formValues?.paymentInfo}
+                  required={true}
+                  onChange={(e) => updateValues(e)}
+                  placeholder={'Payment Description'}
+                />
+              </div>
+            </Col>
+          )}
         </Row>
         <div className="centerAlign mt40">
           <Button type="submit" className="submit_btn submit">

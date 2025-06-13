@@ -960,6 +960,20 @@ function ClientInfo() {
                   />
                 </div>
               </Col>
+              {editedClient?.paymentStatus === 'Others' && (
+                <Col xl="6" sm="6" className="p-2">
+                  <div className="label mt25">Payment Info</div>
+                  <input
+                    value={editedClient?.paymentInfo}
+                    onChange={(e) => updateEditedClient(e)}
+                    type="name"
+                    name="paymentInfo"
+                    placeholder="Payment_Info"
+                    className="ContactModel textPrimary"
+                    required
+                  />
+                </Col>
+              )}
               <Col xl="6" sm="6" className="p-2">
                 <div className="mt25">
                   <div className="Text16N" style={{ marginBottom: "6px" }}>

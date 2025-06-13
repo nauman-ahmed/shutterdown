@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { getAllUserAccountRequestCount, getLastBackupInfo, makeBackup } from "../../API/userApi"
 import { useNavigate } from 'react-router-dom';
 import dayjs from "dayjs"
+import { LuExternalLink } from "react-icons/lu";
 
 function AccountCreated() {
 
@@ -94,7 +95,7 @@ function AccountCreated() {
             
             {backingUp ? "In progress.." : "Backup" }
           </button>
-          <span>Last : {dayjs(recentBackup?.date).format('YYYY-MM-DD')}</span>
+          <span>Last : {dayjs(recentBackup?.date).format('YYYY-MM-DD')} <a target="_blank" href={`https://drive.google.com/file/d/${recentBackup?.fileId}/view?usp=sharing`}><LuExternalLink className="fs-4" /></a></span>
         </div>
       </div>
     </>

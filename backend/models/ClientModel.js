@@ -8,10 +8,14 @@ const ClientSchema = mongoose.Schema({
   groomName: {
     type: String,
   },
+  paymentInfo: {
+    type: String,
+  },
   phoneNumbers: [{
     number: String,
     belongsTo: String
   }
+ 
   ],
   deliverablesArr: {
     type: Array
