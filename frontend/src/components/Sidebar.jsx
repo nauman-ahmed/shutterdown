@@ -570,6 +570,13 @@ const SideBar = () => {
                   ))}
                 </>
               )}
+              {currentUser?.rollSelect === "Production Manager" && (
+                  <>
+                    {productionManagerMenuOptions.map((option) => (
+                      <MenuOption option={option} />
+                    ))}
+                  </>
+                )}
               {currentUser?.rollSelect === "Shooter" && (
                 <>
                   {shooterMenuOptions.map((option) => (

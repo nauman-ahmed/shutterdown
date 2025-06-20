@@ -503,9 +503,9 @@ function Photos() {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
                     <th className="tableBody">Deliverables</th>
-                    <th className="tableBody">Editor</th>
+                    <th className="tableBody" style={{ minWidth: "150px" }}>Editor</th>
                     <th className="tableBody">Editor Deadline</th>
-                    <th className="tableBody">Status</th>
+                    <th className="tableBody" style={{ minWidth: "150px" }}>Status</th>
                     <th className="tableBody">Delivery URL</th>
                     <th className="tableBody">Save</th>
                   </tr>
@@ -513,7 +513,7 @@ function Photos() {
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody sticky-column">Client</th>
                     <th className="tableBody">Deliverables</th>
-                    <th className="tableBody">Editor</th>
+                    <th className="tableBody" style={{ minWidth: "150px" }}>Editor</th>
                     <th
                       className="tableBody"
                       style={{ cursor: "pointer" }}
@@ -536,7 +536,7 @@ function Photos() {
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">First Delivery Date</th>
                     <th className="tableBody">Final Delivery Date</th>
-                    <th className="tableBody">Status</th>
+                    <th className="tableBody" style={{ minWidth: "150px" }}>Status</th>
                     <th className="tableBody">Delivered Url</th>
                     <th className="tableBody">Client Revisions</th>
                     <th className="tableBody">Client Ratings</th>
