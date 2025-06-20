@@ -162,8 +162,10 @@ const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
 
     // Install mongodump before performing the backup
     const installCommand = `curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.0.tgz | tar -xz && mkdir -p /tmp/mongodb-tools && mv mongodb-database-tools-*/bin/mongodump /tmp/mongodb-tools/ && chmod +x /tmp/mongodb-tools/mongodump`;
+    const mongoUri = 'mongodb+srv://developersafdar:shutterDown@cluster0.zein9x3.mongodb.net/shutterDown';
+    const command = `/tmp/mongodb-tools/mongodump --uri="${mongoUri}" --archive=${backupFile} --gzip`;
 
-    const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
+    //const command = `/tmp/mongodb-tools/mongodump --db=${dbName} --archive=${backupFile} --gzip`;
 
     return new Promise((resolve, reject) => {
         console.log(`Starting mongodump installation...`);
