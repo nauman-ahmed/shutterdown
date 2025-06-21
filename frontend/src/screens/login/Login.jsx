@@ -72,7 +72,7 @@ const Login = () => {
         });
         const accountExist = await checkExistEmail(res.data.email);
         if (res.status === 200) {
-          if (accountExist?.email && accountExist.googleConnected) {
+          if (accountExist?.email) {
             updateUserData(accountExist)
             Cookies.set("currentUser", JSON.stringify(accountExist))
             toast.success("Logged in successfully!");

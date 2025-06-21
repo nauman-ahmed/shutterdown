@@ -9,7 +9,6 @@ const { syncEventWithGoogleCalendar } = require("../utils/googleCalendarFns");
 
 const calendarRequestMaker = async (user, event) => { 
   try {
-    console.log(user.googleConnected);
     
     if (user.googleConnected) {
       const userData = await userModel.findById(user._id);
