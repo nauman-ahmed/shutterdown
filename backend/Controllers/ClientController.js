@@ -1318,14 +1318,14 @@ const getClients = async (req, res) => {
       res.status(200).json({ hasMore: false, data: [client] });
     } else {
       const clients = await ClientModel.find(
-      //   {
-      //   dates: {
-      //     $elemMatch: {
-      //       $gte: startDate,
-      //       $lte: endDate,
-      //     },
-      //   },
-      // }
+        {
+        dates: {
+          $elemMatch: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      }
     )
         .populate({
           path: "events",

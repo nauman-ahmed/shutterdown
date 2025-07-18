@@ -165,6 +165,7 @@ function ClientInfo() {
         const dateB = new Date(b?.eventDate);
         return dateA - dateB
       })
+      console.log("res",res);
       setClientData(res);
     } catch (error) {
       console.log(error);

@@ -174,7 +174,6 @@ function ListView(props) {
       setVideoEditor(
         usersData.users.filter((user) => user.subRole.includes("Video Editor"))
       );
-      console.log('getting events');
 
       let res = await getEvents(
         clientId,
