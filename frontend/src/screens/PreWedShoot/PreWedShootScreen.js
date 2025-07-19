@@ -395,7 +395,7 @@ function PreWedShootScreen() {
               responsive
               style={{ width: "150%", marginTop: "15px" }}
             >
-              <thead style={{ position: "sticky", top: 0 }} >
+              <thead style={{ position: "sticky", top: 0, zIndex: 101 }} >
 
                 <tr className="logsHeader Text16N1">
                   <th className="tableBody sticky-column-prewed">Couple</th>
@@ -1078,7 +1078,7 @@ function PreWedShootScreen() {
               show={show}
               placement="bottom"
             >
-              <div style={{ width: "300px" }}>
+              <div style={{ width: "300px", zIndex: 102 }}>
                 <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
                 
               </div>

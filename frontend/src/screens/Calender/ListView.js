@@ -667,7 +667,7 @@ function ListView(props) {
                 </div>
               </div>
             </div>
-          </div>
+          </div> 
           <div style={{ overflowX: "hidden", width: "100%" }}>
             <Table
               striped

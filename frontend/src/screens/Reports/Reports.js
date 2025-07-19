@@ -45,6 +45,7 @@ function EditorsReports(props) {
       if (res.pagination.currentPage < res.pagination.totalPages) {
         setHasMore(true)
       }
+      
       // setTasksToShow(tasks)
     } catch (error) {
       console.log(error);
@@ -76,14 +77,11 @@ function EditorsReports(props) {
   };
 
 
-
-
-
   useEffect(() => {
     // Select the .table-responsive element
     const tableResponsiveElement = document.querySelector(".table-responsive");
     // Apply the max-height style
-    if (tableResponsiveElement) {
+    if (target.current) {
       tableResponsiveElement.style.maxHeight = "75vh";
       tableResponsiveElement.style.overflowY = "auto";
     }
@@ -95,7 +93,8 @@ function EditorsReports(props) {
         tableResponsiveElement.style.overflowY = "";
       }
     };
-  }, [document.querySelector(".table-responsive")]);
+
+  }, [document.querySelector(".table-responsive"), target.current]);
 
 
   const customStyles = {
@@ -145,7 +144,6 @@ function EditorsReports(props) {
           <div
             className="widthForFilters d-flex flex-row  mx-auto align-items-center"
             style={{}}
-            ref={target}
           >
             <div className="w-100 d-flex flex-row align-items-center">
               <div className="w-75 ">
@@ -160,7 +158,7 @@ function EditorsReports(props) {
                       setFilterEditorId(null)
                     }
                   }}
-                  styles={{ ...customStyles, zIndex: -1000, width: "300px" }}
+                  styles={{ ...customStyles, zIndex: 1000, width: "300px" }}
                   options={[
                     {
                       value: "Reset",
@@ -200,15 +198,14 @@ function EditorsReports(props) {
             </div>
           </div>
           <Table
-            bordered
+            ref={target}
             hover
-            borderless
+            bordered
             responsive
-            // striped
-            className="tableViewClient"
+            className="tableViewClient table-responsive"
             style={{ width: "100%", marginTop: "15px" }}
           >
-            <thead style={{ position: "sticky", top: 0 }} >
+            <thead style={{ position: "sticky", top: 0}} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Editor</th>
                 <th className="tableBody">Email</th>
@@ -375,7 +372,6 @@ function EditorsReports(props) {
               ))}
             </tbody>
           </Table>
-
           {loading && (
             <div className="d-flex my-3 justify-content-center align-items-center">
               <div class="spinner"></div>

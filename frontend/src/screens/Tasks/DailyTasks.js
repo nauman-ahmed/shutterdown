@@ -242,7 +242,7 @@ function DailyTasks(props) {
       />
       {tasksToShow ? (
         <>
-          <Table
+          <Table 
             hover
             bordered
             responsive

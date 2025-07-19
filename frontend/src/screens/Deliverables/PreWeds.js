@@ -398,6 +398,24 @@ function PreWedDeliverables(props) {
     }
   };
 
+  useEffect(() => {
+        // Select the .table-responsive element
+        const tableResponsiveElement = document.querySelector(".table-responsive");
+        // Apply the max-height style
+        if (tableResponsiveElement) {
+          tableResponsiveElement.style.maxHeight = "75vh";
+          tableResponsiveElement.style.overflowY = "auto";
+        }
+    
+        // Clean up style when the component unmounts
+        return () => {
+          if (tableResponsiveElement) {
+            tableResponsiveElement.style.maxHeight = "";
+            tableResponsiveElement.style.overflowY = "";
+          }
+        };
+      }, [document.querySelector(".table-responsive")]);
+
   const getrelevantDeadline = (title) => {
     if (title == "Pre-Wedding Photos") {
       return deadlineDays.preWedPhoto;
@@ -508,7 +526,7 @@ function PreWedDeliverables(props) {
                   : { width: "100%", marginTop: "15px" }
               }
             >
-              <thead>
+              <thead  style={{ position: "sticky", top: 0, zIndex: 101 }} >
                 {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") ? (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
@@ -546,7 +564,7 @@ function PreWedDeliverables(props) {
                     <th className="tableBody">Editor Deadline</th>
                     <th className="tableBody">First Delivery Date</th>
                     <th className="tableBody">Final Delivery Date</th>
-                    <th className="tableBody" style={{ minWidth: "150px" }}>Status</th>
+                    <th className="tableBody" style={{ minWidth: "150px" }}>Status</th> 
                     <th className="tableBody">Delivered Url</th>
                     <th className="tableBody">Client Revisions</th>
                     <th className="tableBody">Client Ratings</th>
@@ -1082,7 +1100,7 @@ function PreWedDeliverables(props) {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102 }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
             </div>
           </Overlay>

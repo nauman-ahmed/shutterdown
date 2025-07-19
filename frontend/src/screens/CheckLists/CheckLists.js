@@ -215,12 +215,12 @@ function CheckLists(props) {
           </div>
           <Table
             
-            striped
+            striped 
             responsive
            
             style={{ width: "120%", marginTop: "15px" }}
           >
-            <thead style={{ position: "sticky", top: 0 }} >
+            <thead style={{ position: "sticky", top: 0, zIndex: 101 }} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody sticky-column">Client</th>
                 <th className="tableBody">WhatsApp Group</th>
@@ -424,7 +424,7 @@ function CheckLists(props) {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102 }}>
             <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
               {/* <CalenderMultiListView
                 monthForData={monthForData}

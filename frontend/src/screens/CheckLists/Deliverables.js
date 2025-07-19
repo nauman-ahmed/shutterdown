@@ -193,9 +193,9 @@ function ChecklistDeliverables(props) {
             hover
             // borderless
             responsive
-            style={{ width: "100%", marginTop: "15px" }}
+            style={{ width: "100%", marginTop: "15px" }} 
           >
-            <thead  style={{ position: "sticky", top: 0 }} >
+            <thead  style={{ position: "sticky", top: 0, zIndex: 101 }} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody sticky-column">Client</th>
                 <th className="tableBody">Raw Photos</th>
@@ -364,7 +364,7 @@ function ChecklistDeliverables(props) {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102 }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
               {/* <CalenderMultiListView
                 monthForData={monthForData}

@@ -226,7 +226,7 @@ function ViewClient() {
             </div>
           </div>
           <Table bordered hover responsive style={{ marginTop: "15px" }}>
-            <thead style={{ position: "sticky", top: 0 }} >
+            <thead style={{ position: "sticky", top: 0, zIndex: 0 }} >
               <tr className="logsHeader Text16N1">
                 <th className="tableBody">Client</th>
                 <th className="tableBody" style={{ width: "33%" }} onClick={() => applySorting()}>
@@ -359,7 +359,7 @@ function ViewClient() {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102}}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
 
             </div>

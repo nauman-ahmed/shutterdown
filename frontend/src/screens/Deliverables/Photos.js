@@ -372,7 +372,24 @@ function Photos() {
     }
   };
 
-
+  useEffect(() => {
+        // Select the .table-responsive element
+        const tableResponsiveElement = document.querySelector(".table-responsive");
+        // Apply the max-height style
+        if (tableResponsiveElement) {
+          tableResponsiveElement.style.maxHeight = "75vh";
+          tableResponsiveElement.style.overflowY = "auto";
+        }
+    
+        // Clean up style when the component unmounts
+        return () => {
+          if (tableResponsiveElement) {
+            tableResponsiveElement.style.maxHeight = "";
+            tableResponsiveElement.style.overflowY = "";
+          }
+        };
+      }, [document.querySelector(".table-responsive")]);
+      
   // Add this function somewhere in your component
   const checkForSameDayEdit = (deliverable) => {
     // Check if deliverable and necessary properties exist
@@ -498,7 +515,7 @@ function Photos() {
                   : { width: "100%", marginTop: "15px" }
               }
             >
-              <thead>
+              <thead  style={{ position: "sticky", top: 0, zIndex: 101 }} >
                 {(currentUser?.rollSelect === "Editor" || currentUser?.rollSelect === "Shooter") ? (
                   <tr className="logsHeader Text16N1">
                     <th className="tableBody">Client</th>
@@ -529,7 +546,7 @@ function Photos() {
                         <IoIosArrowRoundUp
                           style={{ color: "#666DFF" }}
                           className="fs-4 cursor-pointer"
-                        />
+                        /> 
                       )}
                     </th>
                     <th className="tableBody">Client Deadline</th>
@@ -1067,7 +1084,7 @@ function Photos() {
             show={show}
             placement="bottom"
           >
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "300px", zIndex: 102 }}>
               <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
 
             </div>
