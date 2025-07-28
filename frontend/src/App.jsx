@@ -59,13 +59,13 @@ function App() {
           <SideBar />
           <div style={{ paddingTop: "10px" }} />
           <Routes>
+            {CalendarRoutes({ userData })}
             {ProfileRoutes()}
             {AdminRoutes({ userData })}
             {ClientRoutes({ userData })}
-            {CalendarRoutes({ userData })}
             {DeliverableRoutes({ userData })}
             {GeneralRoutes({ userData })}
-            <Route exact path="*" element={<Navigate to="/profile" replace />} />
+            <Route exact path="*" element={<Navigate to="/calendar" replace />} />
           </Routes>
         </>
         :
