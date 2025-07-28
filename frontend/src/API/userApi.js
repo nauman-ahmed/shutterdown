@@ -293,6 +293,19 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getUsersExcludingShooters = async () => {
+  try {
+    const res = await axios.get(BASE_URL + "/getUsersExcludingShooters", {
+      Headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    alert(error.toString());
+  }
+};
+
 export const getEditors = async () => {
   try {
     const res = await axios.get(BASE_URL + "/getEditors", {

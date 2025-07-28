@@ -26,7 +26,7 @@ import Cookies from "js-cookie";
 import { getAllClients, getClients } from "../API/Client";
 import Heart from "../assets/Profile/Heart.svg";
 import Select from "react-select";
-import { getEditors } from "../API/userApi";
+import { getEditors, getUsersExcludingShooters } from "../API/userApi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { DropdownSubmenu, NavDropdownMenu } from "react-bootstrap-submenu";
 import { useLoggedInUser } from "../config/zStore";
@@ -54,7 +54,7 @@ function ClientHeader(props) {
 
   const fetchClientsData = async () => {
     const clients = await getAllClients();
-    const res = await getEditors();
+    const res = await getUsersExcludingShooters();
     setEditors(res.editors);
     setAllClients(clients);
   };

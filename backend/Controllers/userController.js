@@ -488,6 +488,23 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getUsersExcludingShooters = async (req, res) => {
+  try {
+    const editors = await userSchema.find({
+      rollSelect: { $ne: 'Shooter' },
+      banAccount: false,
+    });
+    const usersToSend = editors.map(user => {
+      const userObject = user.toObject(); // Convert to plain object
+      const { password, googleToken, ...userToSend } = userObject; // Remove sensitive data
+      return userToSend;
+    });
+    res.json({ editors: usersToSend });
+  } catch (error) {
+    console.log("error");
+  }
+};
+
 const getEditors = async (req, res) => {
   try {
     const editors = await userSchema.find({
@@ -547,5 +564,6 @@ module.exports = {
   downloadFile,
   previewFile,
   updateUserData,
-  updateUserDataGoogle
+  updateUserDataGoogle,
+  getUsersExcludingShooters
 };
