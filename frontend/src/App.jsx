@@ -65,7 +65,7 @@ function App() {
             {ClientRoutes({ userData })}
             {DeliverableRoutes({ userData })}
             {GeneralRoutes({ userData })}
-            <Route exact path="*" element={<Navigate to="/calendar-view" replace />} />
+            <Route exact path="*" element={<Navigate to="/calendar/calendar-view" replace />} />
           </Routes>
         </>
         :
