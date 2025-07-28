@@ -12,7 +12,7 @@ router.post('/Signup', userController.RegisterPostRequest);
 router.post('/signInWithGoogle', userController.RegisterPostRequest);
 router.get('/getAllUsers',userController.getAllUsers)
 router.get('/getEditors',userController.getEditors);
-router.get('/getUsersExcludingShooters',userController.getEditors);
+router.get('/getUsersExcludingShooters',userController.getUsersExcludingShooters);
 router.get('/getShooters',userController.getShooters);
 router.get('/user/me', verifyToken ,userController.getMe);
 router.post('/sign-in', userController.SignInPostRequest);
