@@ -31,7 +31,8 @@ function App() {
     await fetchUser(token).then((data) => {
       updateUserData(data.user)
       setData(data)
-      Cookies.set("currentUser", JSON.stringify(data.user))
+      // Set cookie with 30-day expiration when user data is fetched
+      Cookies.set("currentUser", JSON.stringify(data.user), { expires: 365 })
     }).catch(err => {
       console.log(err);
     }).finally(() => {

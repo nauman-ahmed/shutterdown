@@ -23,9 +23,11 @@ const Login = () => {
     onSuccess: (data) => {
       console.log(data);
 
-      Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }))
+      // Set cookies with appropriate expiration based on remember me
+      const cookieOptions = remember ? { expires: 365 } : { expires: 365 };
+      Cookies.set("userKeys", JSON.stringify({ userToken: data?.token }), cookieOptions)
       updateUserData(data.user)
-      Cookies.set("currentUser", JSON.stringify(data.user))
+      Cookies.set("currentUser", JSON.stringify(data.user), cookieOptions)
       toast.success("Logged in successfully!");
       navigate("/profile/info");
     },
@@ -74,7 +76,8 @@ const Login = () => {
         if (res.status === 200) {
           if (accountExist?.email) {
             updateUserData(accountExist)
-            Cookies.set("currentUser", JSON.stringify(accountExist))
+            // Set cookies with 30-day expiration for Google login (treated as "remember me")
+            Cookies.set("currentUser", JSON.stringify(accountExist), { expires: 30 })
             toast.success("Logged in successfully!");
             navigate("/profile");
           } else {

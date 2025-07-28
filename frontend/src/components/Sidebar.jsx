@@ -166,6 +166,7 @@ const SideBar = () => {
                   onClick={() => {
                     dispatch(updateAllEvents([]));
                     Cookies.remove("userKeys");
+                    Cookies.remove("currentUser");
                     window.location.reload();
                     // navigate("/");
                   }}
@@ -600,6 +601,7 @@ const SideBar = () => {
                 onClick={() => {
                   dispatch(updateAllEvents([]));
                   Cookies.remove("userKeys");
+                  Cookies.remove("currentUser");
                   window.location.reload();
                   // navigate("/");
                 }}

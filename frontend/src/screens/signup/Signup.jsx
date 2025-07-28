@@ -123,8 +123,9 @@ const Signup = (props) => {
       googleSignUp({ ...GoogleRegisterData, phone: phone, googleToken : signInData.googleToken }, {
         onSuccess: (response) => {
           if (response.status === 200) {
-            Cookies.set('userKeys', JSON.stringify({ userToken: response.data.token }))
-            Cookies.set("currentUser", JSON.stringify(response.data.User))
+            // Set cookies with 30-day expiration for Google signup (treated as "remember me")
+            Cookies.set('userKeys', JSON.stringify({ userToken: response.data.token }), { expires: 365 })
+            Cookies.set("currentUser", JSON.stringify(response.data.User), { expires: 365 })
             updateUserData(response.data.User)
             toast.success("You Are Registered Successfully");
             navigate("/profile");

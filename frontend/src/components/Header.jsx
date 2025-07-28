@@ -339,6 +339,7 @@ const Header = (args) => {
                   onClick={() => {
                     dispatch(updateAllEvents([]))
                     Cookies.remove("userKeys");
+                    Cookies.remove("currentUser");
                     Cookies.remove('currentTab')
                     window.location.reload();
                   }}
