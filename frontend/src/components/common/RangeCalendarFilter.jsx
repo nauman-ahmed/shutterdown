@@ -15,6 +15,9 @@ function RangeCalendarFilter({ startDate, endDate, updateStartDate, updateEndDat
   }
 
   const onDateClickHandler = (date) => {
+    localStorage.setItem("startDate", new Date(date[0]))
+    localStorage.setItem("endDate", new Date(date[1]))  
+    localStorage.setItem("monthForData", months[new Date(date[0]).getMonth()] + " " + new Date(date[0]).getFullYear())
     setMonthForData(months[new Date(date[0]).getMonth()]+ " " + new Date(date[0]).getFullYear())
     updateStartDate(new Date(date[0]))
     updateEndDate(new Date(date[1]))

@@ -47,23 +47,27 @@ function ViewClient() {
     setShow(!show);
   };
   const currentDate = new Date();
-  const [startDate, setStartDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+  const [startDate, setStartDate] = useState(new Date(localStorage.getItem("startDate")) || new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(localStorage.getItem("endDate")) ||new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+  const [monthForData, setMonthForData] = useState(localStorage.getItem("monthForData") || months[new Date().getMonth()] + " " + new Date().getFullYear());
+
   const target = useRef(null);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [monthForData, setMonthForData] = useState(months[new Date().getMonth()] + " " + new Date().getFullYear());
   const [yearForData, setYearForData] = useAtom(clientFilterYear);
   const [filterClient, setFilterClient] = useState(null);
   const [updateData, setUpdateData] = useState(false);
 
   const fetchData = async () => {
     try {
+      console.log("Fetching data with startDate:", startDate, "endDate:", endDate, "filterClient:", filterClient);
+      setLoading(true);
       const data = await getClients(
         startDate,
         endDate,
         filterClient
       );
+      setLoading(false);
       applySorting(data.data);
       const completeclients = await getAllClients();
       setAllClients(completeclients);
@@ -171,6 +175,9 @@ function ViewClient() {
                         setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
                         setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
                         setUpdateData(!updateData);
+                        localStorage.removeItem("startDate");
+                        localStorage.removeItem("endDate"); 
+                        localStorage.removeItem("monthForData");
                       }}
                     />
                   </div>
@@ -360,8 +367,7 @@ function ViewClient() {
             placement="bottom"
           >
             <div style={{ width: "300px", zIndex: 102}}>
-              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-
+              <RangeCalendarFilter startDate={startDate} updateStartDate={setStartDate} setMonthForData={setMonthForData} endDate={endDate} updateEndDate={setEndDate}/>
             </div>
           </Overlay>
         </>
