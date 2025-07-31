@@ -47,9 +47,13 @@ function ViewClient() {
     setShow(!show);
   };
   const currentDate = new Date();
-  const [startDate, setStartDate] = useState(new Date(localStorage.getItem("startDate")) || new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  const [endDate, setEndDate] = useState(new Date(localStorage.getItem("endDate")) ||new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
-  const [monthForData, setMonthForData] = useState(localStorage.getItem("monthForData") || months[new Date().getMonth()] + " " + new Date().getFullYear());
+  const [startDate, setStartDate] = useState( localStorage.getItem("startDate") ? new Date(localStorage.getItem("startDate")) : new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [endDate, setEndDate] = useState(localStorage.getItem("endDate") ? new Date(localStorage.getItem("endDate")) : new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+  const [monthForData, setMonthForData] = useState(
+    localStorage.getItem("startDate") ?
+    months[new Date(localStorage.getItem("startDate")).getMonth()] + " " + new Date(localStorage.getItem("startDate")).getFullYear()
+    :months[new Date().getMonth()] + " " + new Date().getFullYear()
+  );
 
   const target = useRef(null);
   const [show, setShow] = useState(false);
