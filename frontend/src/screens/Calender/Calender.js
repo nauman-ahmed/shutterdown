@@ -211,8 +211,8 @@ function Calender() {
                           marginLeft: "5px",
                           width: "100%",
                           overflow: "auto",
-                          backgroundColor: eventInfo.event?.extendedProps.client.bookingStatus !== "Yes" ? "#ff4242" : eventInfo.event?.extendedProps.isWedding ? "#4aff4a" : eventInfo.event?.extendedProps.eventType === 'Pre-Wedding' ? "#6663ff" : "#fcfc58",
-                          color: (eventInfo.event?.extendedProps.client.bookingStatus !== "Yes" || eventInfo.event?.extendedProps.eventType === 'Pre-Wedding') ? "white" : "black"
+                          backgroundColor: eventInfo.event?.extendedProps.client?.bookingStatus !== "Yes" ? "#ff4242" : eventInfo.event?.extendedProps.isWedding ? "#4aff4a" : eventInfo.event?.extendedProps.eventType === 'Pre-Wedding' ? "#6663ff" : "#fcfc58",
+                          color: (eventInfo.event?.extendedProps.client?.bookingStatus !== "Yes" || eventInfo.event?.extendedProps.eventType === 'Pre-Wedding') ? "white" : "black"
                         }}
                       >
                         {" "}
