@@ -87,6 +87,14 @@
   /*This needs to be adjusted based on the actual width of the first column*/
 }
 
+.sticky-column2 {
+  position: sticky;
+  left: 70px;
+  z-index: 100 !important;
+  background-color: white;
+}
+
+
 .widthForFiltersViewClient {
   width: 50%;
   margin-top: -60px;

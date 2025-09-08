@@ -48,6 +48,7 @@ import { useLoggedInUser } from "../../config/zStore";
 import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 import { MdOutlinePhotoCameraFront } from "react-icons/md";
 import { MdPhotoCameraFront } from "react-icons/md";
+import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 
 const months = [
   "January",
@@ -63,6 +64,7 @@ const months = [
   "November",
   "Decemeber",
 ];
+
 const transport_icons = {
   Cab: Car,
   "Personal Car": Car,
@@ -91,6 +93,7 @@ function ListView(props) {
     "sameDayVideoEditors",
   ];
   const target = useRef(null);
+  const dropdownRef = useRef(null);
   const currentDate = new Date();
   const [show, setShow] = useState(false);
   const [rowOfWarning, setRowOfWarnig] = useState(null);
@@ -98,6 +101,7 @@ function ListView(props) {
   const [endDate, setEndDate] = useState(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const dispatch = useDispatch();
   const [monthForData, setMonthForData] = useState(
     months[new Date().getMonth()] + " " + new Date().getFullYear()
@@ -113,9 +117,74 @@ function ListView(props) {
   const [clientId, setClientId] = useState(clientIdd);
   const [allClients, setAllClients] = useState([]);
   const [updateData, setUpdateData] = useState(false);
+
   const toggle = () => {
+    console.log('Calendar toggle clicked, current show state:', show);
     setShow(!show);
   };
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        const element = document.documentElement;
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) {
+          await element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+          await element.msRequestFullscreen();
+        }
+        setIsFullscreen(true);
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          await document.msExitFullscreen();
+        }
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      console.error('Error toggling fullscreen:', error);
+      // Fallback to CSS fullscreen if browser API fails
+      setIsFullscreen(!isFullscreen);
+    }
+  };
+
+  // Handle keyboard shortcuts and fullscreen events
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'F11') {
+        event.preventDefault();
+        toggleFullscreen();
+      } else if (event.key === 'Escape' && isFullscreen) {
+        toggleFullscreen();
+      }
+    };
+
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(isCurrentlyFullscreen);
+    };
+
+    // Add event listeners
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [isFullscreen]);
 
   const groupByClientID = (events) => {
     // Step 1: Group events by brideName
@@ -460,8 +529,8 @@ function ListView(props) {
   useEffect(() => {
     // Select the .table-responsive element
     const tableResponsiveElement = document.querySelector(".table-responsive");
-    // Apply the max-height style
-    if (tableResponsiveElement) {
+    // Apply the max-height style only for non-fullscreen mode
+    if (tableResponsiveElement && !isFullscreen) {
       tableResponsiveElement.style.maxHeight = "75vh";
       tableResponsiveElement.style.overflowY = "auto";
     }
@@ -473,7 +542,25 @@ function ListView(props) {
         tableResponsiveElement.style.overflowY = "";
       }
     };
-  }, [document.querySelector(".table-responsive")]);
+  }, [document.querySelector(".table-responsive"), isFullscreen]);
+
+  // Click outside listener to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShow(false);
+        setUpdateData(!updateData);
+      }
+    };
+
+    if (show) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [show]);
 
   const addNewEvent = async () => {
     try {
@@ -565,6 +652,1009 @@ function ListView(props) {
       {eventsForShow !== null ? (
         <>
           <ClientHeader title="List View" options={filterOptions} calender />
+          
+          {/* Fullscreen Overlay - appears when browser is in fullscreen */}
+          {isFullscreen && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "white",
+                zIndex: 9999,
+                padding: "10px",
+                display: "flex",
+                flexDirection: "column"
+              }}
+            >
+              
+              {/* Include all the header controls in fullscreen */}
+              <div
+                className=" d-flex mx-auto align-items-center justify-content-between flex-wrap gap-2"
+                style={{ width: "100%", marginBottom: "10px", flexShrink: 0 }}
+              >
+                <div style={{ width: "120px" }}>
+                  {currentUser?.rollSelect == "Manager" && (
+                    <button
+                      onClick={() => {
+                        setNewEventModel(true);
+                      }}
+                      className="btn btn-primary"
+                      style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
+                    >
+                      Add Event
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ width: "120px" }}>
+                  <button
+                    onClick={toggleFullscreen}
+                    className="btn btn-outline-primary"
+                    style={{ 
+                      backgroundColor: isFullscreen ? "#666DFF" : "transparent",
+                      color: isFullscreen ? "white" : "#666DFF",
+                      border: "1px solid #666DFF",
+                      marginLeft: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px"
+                    }}
+                    title={isFullscreen ? "Exit Fullscreen (F11 or Esc)" : "Enter Fullscreen (F11)"}
+                  >
+                    {isFullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
+                  </button>
+                </div>
+
+                <div style={{ width: "200px", zIndex: 1000 }}>
+                  <Select
+                    isSearchable={true}
+                    onChange={(e) => {
+                      console.log(e);
+                      filterByNameHanler(e.value)
+                    }}
+                    styles={{ ...customStyles, zIndex: 1000, width: "300px" }}
+                    options={[
+                      {
+                        value: "Reset",
+                        label: (
+                          <div className="d-flex justify-content-around">
+                            <strong>Reset</strong>
+                          </div>
+                        ),
+                        brideName: 'reset',
+                        groomName: 'reset'
+                      },
+                      ...Array.from(
+                        (currentUser.rollSelect === "Manager" || currentUser.rollSelect === "Production Manager")
+                          ? allClients
+                          : getClientsForFilterShooter()
+                      )?.map((client) => {
+                        return {
+                          value: client._id,
+                          label: (
+                            <div className="d-flex justify-content-around">
+                              <span>{client.brideName}</span>
+                              <img className="mx-1" alt="" src={Heart} />
+                              <span>{client.groomName}</span>
+                            </div>
+                          ),
+                          brideName: client.brideName,
+                          groomName: client.groomName,
+                        };
+                      }),
+                    ]}
+                    filterOption={(option, searchInput) => {
+                      const { brideName, groomName } = option.data;
+                      const searchText = searchInput?.toLowerCase();
+                      if (brideName === 'reset' && groomName === 'reset') {
+                        return true
+                      }
+                      // Perform search on both brideName and groomName
+                      return (
+                        brideName?.toLowerCase().startsWith(searchText) ||
+                        groomName?.toLowerCase().startsWith(searchText)
+                      );
+                    }}
+                    required
+                  />
+                </div>
+
+                <div
+                  className="addMarginForCalendar"
+                  style={{ width: "200px", position: "relative", zIndex: 1000 }}
+                >
+                  <div
+                    ref={target}
+                    className={`forminput R_A_Justify1`}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div onClick={toggle}>
+                      <>
+                        {monthForData}
+                      </>
+                    </div>
+                    <div
+                      className="d-flex align-items-center"
+                      style={{ position: "relative" }}
+                    >
+                      <img alt="" src={CalenderImg} onClick={toggle} />
+                      <GrPowerReset
+                        className="mx-1"
+                        onClick={() => {
+                          setStartDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+                          setEndDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0))
+                          setMonthForData(months[currentDate.getMonth()] + " " + currentDate.getFullYear());
+                          setUpdateData(!updateData);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div 
+                    ref={dropdownRef}
+                    style={{ 
+                      width: "300px", 
+                      zIndex: 10000,
+                      display: show ? "block" : "none",
+                      position: "absolute",
+                      top: isFullscreen ? "100%" : "100%",
+                      left: isFullscreen ? "-70%" : "-70%",
+                      backgroundColor: "white",
+                      border: "1px solid #ccc",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                      padding: "10px",
+                      zIndex: 100001,
+                    }}
+                    >
+                      <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+                  </div>
+                </div>
+                
+              </div>
+              
+              {/* Table in fullscreen */}
+              <div 
+                style={{ 
+                  overflowX: "auto", 
+                  overflowY: "auto",
+                  width: "100%",
+                  height: "calc(100vh - 120px)", // Adjust based on header height
+                  flex: 1
+                }}
+              >
+                <Table
+                  striped
+                  style={{
+                    width: "100%",
+                    fontSize: "14px",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                    marginTop: "0"
+                  }}
+                >
+                  <thead style={{ 
+                position: "sticky", 
+                top: isFullscreen ? 0 : 0, 
+                zIndex: 101,
+                backgroundColor: "white",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+              }}>
+                    <tr className="logsHeader Text16N1">
+                      <th className="tableBody sticky-column ">Couple Location</th>
+                      <th className="tableBody sticky-column2 ">
+                        Date{" "}
+                        {!ascending ? (
+                          <IoIosArrowRoundDown
+                            style={{ color: "#666DFF" }}
+                            onClick={() => {
+                              setAscending(true);
+                              applySorting(true);
+                            }}
+                            className="fs-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoIosArrowRoundUp
+                            style={{ color: "#666DFF" }}
+                            className="fs-4 cursor-pointer"
+                            onClick={() => {
+                              setAscending(false);
+                              applySorting(false);
+                            }}
+                          />
+                        )}
+                      </th>
+                      <th className="tableBody">Shoot Directors</th>
+                      <th className="tableBody mx-1">
+                        Photographers
+                        <img alt="" src={Camera} />
+                      </th>
+                      <th className="tableBody mx-1">
+                        Cinematographers
+                        <img alt="" src={Video} />
+                      </th>
+                      <th className="tableBody mx-1">
+                        Drone Flyers
+                        <img alt="" src={Drone} />
+                      </th>
+                      <th className="tableBody mx-1">
+                        Manager
+                        <img alt="" src={Manager} />
+                      </th>
+                      <th className="tableBody mx-1">
+                        Assistants
+                        <img alt="" src={Assistant} />
+                      </th>
+                      <th className="tableBody">Same Day Photos</th>
+                      <th className="tableBody">Same Day Videos</th>
+                      {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
+                        <th className="tableBody">Team Assign</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody
+                    className="Text12"
+                    style={{
+                      textAlign: "center",
+                      borderWidth: "0px 1px 0px 1px",
+                    }}
+                  >
+                    {eventsForShow?.map((event, index) => {
+                      let errorText = "";
+                      if (currentUser?.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") {
+                        if (
+                          Number(event?.sameDayVideoEditors) > 0 &&
+                          (!event?.sameDayVideoMakers ||
+                            event?.sameDayVideoMakers.length !=
+                            Number(event.sameDayVideoEditors))
+                        ) {
+                          errorText += "Same Day Video Maker(s) are incomplete, \n";
+                        }
+
+                        if (
+                          Number(event?.sameDayPhotoEditors) > 0 &&
+                          (!event?.sameDayPhotoMakers ||
+                            event?.sameDayPhotoMakers.length !==
+                            Number(event.sameDayPhotoEditors))
+                        ) {
+                          errorText += "Same Day Photo Maker(s) are incomplete, \n";
+                        }
+
+                        if (
+                          Number(event?.cinematographers) > 0 &&
+                          (!event?.choosenCinematographers ||
+                            event?.choosenCinematographers?.length !==
+                            Number(event?.cinematographers))
+                        ) {
+                          errorText += "Cinematographer(s) are incomplete, \n";
+                        }
+
+                        if (
+                          Number(event?.drones) > 0 &&
+                          (!event?.droneFlyers ||
+                            event?.droneFlyers.length !== Number(event.drones))
+                        ) {
+                          errorText += "Drone Flyer(s) are not complete, \n";
+                        }
+
+                        if (!event?.manager || event?.manager.length !== 1) {
+                          errorText += "Manager(s) are incomplete, \n";
+                        }
+
+                        if (
+                          Number(event?.photographers) > 0 &&
+                          (!event?.choosenPhotographers ||
+                            event?.choosenPhotographers.length !==
+                            Number(event?.photographers))
+                        ) {
+                          errorText += "Photographer(s) are incomplete, \n";
+                        }
+
+                        if (
+                          Number(event?.shootDirector) > 0 &&
+                          (!event?.shootDirectors ||
+                            event?.shootDirectors.length !==
+                            Number(event?.shootDirector))
+                        ) {
+                          errorText += "Shoot Director(s) are incomplete. \n";
+                        }
+                      }
+
+                      return (
+                        <>
+                          {returnOneRow(
+                            event,
+                            index >= 0 ? eventsForShow[index - 1] : null
+                          )}
+                          {event && event !== null && (
+                            <>
+                              {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
+                                <tr className="relative" key={index}>
+                                  <td
+                                    style={{
+                                      width: "180px",
+                                    }}
+                                    className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
+                                      (rowOfWarning === index - 1 &&
+                                        errorText?.length > 150)
+                                      ? " "
+                                      : " sticky-column "
+                                      } tablePlaceContent`}
+                                  >
+                                    <div
+                                      className={"d-flex flex-row justify-content-center"}>
+                                      <div
+                                        className={`${errorText.length === 0 && "ms-1"
+                                          }`}
+                                          style={{ fontSize: '80%' }}
+                                      >
+                                        {event?.client?.brideName}
+                                        <img alt="" src={Heart} style={{ margin: '0px 5px' }}/>
+                                        {event?.client?.groomName}
+                                        <div
+                                          style={{ color: "green", marginTop: '10%', fontSize: '75%' }}
+                                        >
+                                          {event?.location}
+                                        </div>
+                                        <div className="d-flex justify-content-center align-items-center">
+                                          {errorText.length > 0 && (
+                                            <ButtonWithHoverBox
+                                              buttonText="error"
+                                              hoverText={errorText}
+                                              setRowOfWarnig={setRowOfWarnig}
+                                              i={index}
+                                              isFullscreen={isFullscreen}
+                                            />
+                                          )}
+                                          <img height="20"
+                                            alt=""
+                                            src={transport_icons[event.travelBy]}
+                                          />
+                                          {Number(event?.sameDayPhotoEditors) > 0 && (
+                                            <MdOutlinePhotoCameraFront className="fs-6" />
+                                          )}
+                                          {Number(event?.sameDayVideoEditors) > 0 && (
+                                            <MdPhotoCameraFront className="fs-6" />
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td
+                                    style={{
+                                      width: "90px",
+                                      marginLeft: 10,
+                                    }}
+                                    className={`tableBody Text14Semi primary2 ${rowOfWarning === index ||
+                                      (rowOfWarning === index - 1 &&
+                                        errorText?.length > 150)
+                                      ? " "
+                                      : " sticky-column2 "
+                                      }  tablePlaceContent`}
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: '80%',
+                                      }}
+                                    >
+                                      {dayjs(event?.eventDate).format(
+                                        "DD-MMM-YYYY"
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                      <ShootDropDown
+                                        role={"shootDirectors"}
+                                        message={"Shoot Directors"}
+                                        teble={true}
+                                        allowedPersons={event?.shootDirector}
+                                        usersToShow={directors}
+                                        currentEvent={event}
+                                        allEvents={allEvents}
+                                        eventsForShow={eventsForShow}
+                                        existedUsers={event?.shootDirectors}
+                                        userChecked={(userObj) => {
+                                          const updatedEvents = [...eventsForShow];
+                                          updatedEvents[index].shootDirectors =
+                                            Array.isArray(event?.shootDirectors)
+                                              ? [...event?.shootDirectors, userObj]
+                                              : [userObj];
+                                          setEventsForShow(updatedEvents);
+                                        }}
+                                        userUnChecked={(userObj) => {
+                                          const updatedEvents = [...eventsForShow];
+                                          updatedEvents[index].shootDirectors =
+                                            event?.shootDirectors?.filter(
+                                              (director) =>
+                                                director._id !== userObj._id
+                                            );
+                                          setEventsForShow(updatedEvents);
+                                        }}
+                                      />
+                                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        {Array.isArray(event?.shootDirectors) &&
+                                          event?.shootDirectors?.map((director) => (
+                                            <p
+                                              key={director._id}
+                                              style={{
+                                                marginBottom: 0,
+                                                fontFamily: "Roboto Regular",
+                                                whiteSpace: "nowrap",
+                                                fontSize: '80%'
+                                              }}
+                                            >
+                                              {director.firstName} {director.lastName}
+                                            </p>
+                                          ))}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"choosenPhotographers"}
+                                      message={"Photographers"}
+                                      teble={true}
+                                      allowedPersons={event?.photographers}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      eventsForShow={eventsForShow}
+                                      usersToShow={photographer}
+                                      existedUsers={event?.choosenPhotographers}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].choosenPhotographers =
+                                          Array.isArray(event?.choosenPhotographers)
+                                            ? [
+                                              ...event?.choosenPhotographers,
+                                              userObj,
+                                            ]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].choosenPhotographers =
+                                          event?.choosenPhotographers?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    {Array.isArray(event?.choosenPhotographers) &&
+                                      event?.choosenPhotographers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"choosenCinematographers"}
+                                      message={"Cinematographers"}
+                                      teble={true}
+                                      currentEvent={event}
+                                      eventsForShow={eventsForShow}
+                                      allEvents={allEvents}
+                                      allowedPersons={event?.cinematographers}
+                                      usersToShow={cinematographer}
+                                      existedUsers={event?.choosenCinematographers}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[
+                                          index
+                                        ].choosenCinematographers = Array.isArray(
+                                          event?.choosenCinematographers
+                                        )
+                                            ? [
+                                              ...event?.choosenCinematographers,
+                                              userObj,
+                                            ]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[
+                                          index
+                                        ].choosenCinematographers =
+                                          event?.choosenCinematographers?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                    {Array.isArray(
+                                      event?.choosenCinematographers
+                                    ) &&
+                                      event?.choosenCinematographers &&
+                                      event?.choosenCinematographers?.map(
+                                        (user) => (
+                                          <p
+                                            style={{
+                                              marginBottom: 0,
+                                              fontFamily: "Roboto Regular",
+                                              whiteSpace: "nowrap",
+                                              fontSize: '80%'
+                                            }}
+                                          >
+                                            {user.firstName} {user.lastName}
+                                          </p>
+                                        )
+                                      )}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"droneFlyers"}
+                                      message={"Drone Flyers"}
+                                      teble={true}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      eventsForShow={eventsForShow}
+                                      allowedPersons={event?.drones}
+                                      usersToShow={flyer}
+                                      existedUsers={event?.droneFlyers}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].droneFlyers =
+                                          Array.isArray(event?.droneFlyers)
+                                            ? [...event?.droneFlyers, userObj]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].droneFlyers =
+                                          event?.droneFlyers?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    {Array.isArray(event?.droneFlyers) &&
+                                      event?.droneFlyers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"manager"}
+                                      message={"Manager"}
+                                      teble={true}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      allowedPersons={1}
+                                      usersToShow={manager}
+                                      eventsForShow={eventsForShow}
+                                      existedUsers={event?.manager}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].manager =
+                                          Array.isArray(event?.manager)
+                                            ? [...event?.manager, userObj]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].manager =
+                                          event?.manager?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                    {Array.isArray(event?.manager) &&
+                                      event?.manager?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"assistants"}
+                                      message={"Assistants"}
+                                      teble={true}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      allowedPersons={4}
+                                      usersToShow={assistant}
+                                      eventsForShow={eventsForShow}
+                                      existedUsers={event?.assistants}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].assistants =
+                                          Array.isArray(event?.assistants)
+                                            ? [...event?.assistants, userObj]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].assistants =
+                                          event?.assistants?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                    {Array.isArray(event?.assistants) &&
+                                      event?.assistants?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"sameDayPhotoMakers"}
+                                      message={"Same Day Photo Makers"}
+                                      teble={true}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      eventsForShow={eventsForShow}
+                                      allowedPersons={event?.sameDayPhotoEditors}
+                                      usersToShow={photoEditor}
+                                      existedUsers={event?.sameDayPhotoMakers}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].sameDayPhotoMakers =
+                                          Array.isArray(event?.sameDayPhotoMakers)
+                                            ? [
+                                              ...event?.sameDayPhotoMakers,
+                                              userObj,
+                                            ]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].sameDayPhotoMakers =
+                                          event?.sameDayPhotoMakers?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                    {Array.isArray(event?.sameDayPhotoMakers) &&
+                                      event?.sameDayPhotoMakers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                    <ShootDropDown
+                                      role={"sameDayVideoEditors"}
+                                      message={"Same Day Video Makers"}
+                                      teble={true}
+                                      allowedPersons={event?.sameDayVideoEditors}
+                                      currentEvent={event}
+                                      allEvents={allEvents}
+                                      eventsForShow={eventsForShow}
+                                      usersToShow={videoEditor}
+                                      existedUsers={event?.sameDayVideoMakers}
+                                      userChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].sameDayVideoMakers =
+                                          Array.isArray(event?.sameDayVideoMakers)
+                                            ? [
+                                              ...event?.sameDayVideoMakers,
+                                              userObj,
+                                            ]
+                                            : [userObj];
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                      userUnChecked={(userObj) => {
+                                        const updatedEvents = [...eventsForShow];
+                                        updatedEvents[index].sameDayVideoMakers =
+                                          event?.sameDayVideoMakers?.filter(
+                                            (existingUser) =>
+                                              existingUser._id !== userObj._id
+                                          );
+                                        setEventsForShow(updatedEvents);
+                                      }}
+                                    />
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                    {Array.isArray(event?.sameDayVideoMakers) &&
+                                      event?.sameDayVideoMakers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                            fontSize: '80%'
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      ))}
+                                      </div>
+                                      </div>
+                                  </td>
+                                  <td className="tablePlaceContent">
+                                    <button
+                                      style={{
+                                        backgroundColor: "#FFDADA",
+                                        borderRadius: "5px",
+                                        border: "none",
+                                        height: "30px",
+                                      }}
+                                      onClick={() => onSubmitHandler(event, index)}
+                                    >
+                                      {updatingIndex === index ? (
+                                        <div className="w-100">
+                                          <div className="smallSpinner mx-auto"></div>
+                                        </div>
+                                      ) : (
+                                        "Save"
+                                      )}
+                                    </button>
+                                  </td>
+                                </tr>
+                              )}
+                              {(currentUser.rollSelect === "Shooter" || currentUser.rollSelect === "Editor") && (
+                                <tr className="relative" key={index}>
+                                  <td
+                                    className={`tableBody Text14Semi primary2  tablePlaceContent`}
+                                  >
+                                    <div
+                                      className="d-flex flex-row justify-content-center"
+                                    >
+                                      <div
+                                      >
+                                        {event?.client?.brideName}
+                                        <br />
+                                        <img alt="" src={Heart} />
+                                        <br />
+                                        {event?.client?.groomName}
+                                        <br />
+                                        <div
+                                          className="mt-2"
+                                          style={{ color: "green" }}
+                                        >
+                                          {event?.location}
+                                        </div>
+                                        <img
+                                          alt=""
+                                          src={transport_icons[event.travelBy]}
+                                        />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td
+                                    style={{
+                                      width: "90px",
+                                    }}
+                                    className={`tableBody Text14Semi primary2  tablePlaceContent`}
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      {dayjs(event?.eventDate).format(
+                                        "DD-MMM-YYYY"
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.shootDirectors) && event?.shootDirectors?.length > 0) ?
+                                      event?.shootDirectors?.map((director) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {director.firstName} {director.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.choosenPhotographers) && event?.choosenPhotographers?.length > 0) ?
+                                      event?.choosenPhotographers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.choosenCinematographers) && event?.choosenCinematographers?.length > 0) ?
+                                      event?.choosenCinematographers?.map(
+                                        (user) => (
+                                          <p
+                                            style={{
+                                              marginBottom: 0,
+                                              fontFamily: "Roboto Regular",
+                                              whiteSpace: "nowrap",
+                                            }}
+                                          >
+                                            {user.firstName} {user.lastName}
+                                          </p>
+                                        )
+                                      ) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.droneFlyers) && event?.droneFlyers?.length > 0) ?
+                                      event?.droneFlyers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.manager) && event?.manager?.length > 0) ?
+                                      event?.manager?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.assistants) && event?.assistants?.length > 0) ?
+                                      event?.assistants?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.sameDayPhotoMakers) && event?.sameDayPhotoMakers?.length > 0) ?
+                                      event?.sameDayPhotoMakers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                  <td className="tableBody Text14Semi primary2 tablePlaceContent">
+                                    {(Array.isArray(event?.sameDayVideoMakers) && event?.sameDayVideoMakers?.length > 0) ?
+                                      event?.sameDayVideoMakers?.map((user) => (
+                                        <p
+                                          style={{
+                                            marginBottom: 0,
+                                            fontFamily: "Roboto Regular",
+                                            whiteSpace: "nowrap",
+                                          }}
+                                        >
+                                          {user.firstName} {user.lastName}
+                                        </p>
+                                      )) : "None"}
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          )}
+                        </>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+               
+              </div>
+              
+              
+
+            </div>
+          )}
+          
+          {/* fullscreen ends here*/}
+          {/* fullscreen ends here*/}
+          {/* fullscreen ends here*/}
+          {/* fullscreen ends here*/}
+
           <div
             className=" d-flex mx-auto align-items-center justify-content-between flex-wrap gap-3"
             style={{ width: "100%" }}
@@ -572,7 +1662,9 @@ function ListView(props) {
             <div style={{ width: "120px" }}>
               {currentUser?.rollSelect == "Manager" && (
                 <button
-                  onClick={() => setNewEventModel(true)}
+                  onClick={() => {
+                    setNewEventModel(true);
+                  }}
                   className="btn btn-primary"
                   style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
                 >
@@ -581,12 +1673,30 @@ function ListView(props) {
               )}
             </div>
 
-            <div style={{ width: "200px", zIndex: 102 }}>
+            <div style={{ width: "120px" }}>
+              <button
+                onClick={toggleFullscreen}
+                className="btn btn-outline-primary"
+                style={{ 
+                  backgroundColor: isFullscreen ? "#666DFF" : "transparent",
+                  color: isFullscreen ? "white" : "#666DFF",
+                  border: "1px solid #666DFF",
+                  marginLeft: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px"
+                }}
+                title={isFullscreen ? "Exit Fullscreen (F11 or Esc)" : "Enter Fullscreen (F11)"}
+              >
+                {isFullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
+              </button>
+            </div>
+
+            <div style={{ width: "200px", zIndex: 102, position: "relative" }}>
               <Select
                 isSearchable={true}
                 onChange={(e) => {
                   console.log(e);
-
                   filterByNameHanler(e.value)
                 }}
                 styles={{ ...customStyles, zIndex: -1000, width: "300px" }}
@@ -635,9 +1745,10 @@ function ListView(props) {
                 required
               />
             </div>
+
             <div
               className="addMarginForCalendar"
-              style={{ width: "200px", position: "relative" }}
+              style={{ width: "200px", position: "relative", zIndex: 1000 }}
             >
               <div
                 ref={target}
@@ -666,18 +1777,55 @@ function ListView(props) {
                   />
                 </div>
               </div>
+
+              <div 
+                ref={dropdownRef}
+                style={{ 
+                  width: "300px", 
+                  zIndex: 10000,
+                  display: show ? "block" : "none",
+                  position: "absolute",
+                  top: isFullscreen ? "100%" : "100%",
+                  left: isFullscreen ? "-70%" : "-70%",
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  padding: "10px",
+                  zIndex: 100001,
+                }}
+                >
+                  <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
+              </div>
+              
             </div>
+
           </div> 
-          <div style={{ overflowX: "hidden", width: "100%" }}>
+
+          <div
+            style={{ 
+              overflowX: "auto", 
+              overflowY: "auto",
+              width: "100%",
+              height: "calc(100vh - 200px)", // Adjust based on header height
+              maxHeight: "75vh"
+            }}
+          >
+
             <Table
               striped
-              responsive
               style={{
                 marginTop: "15px",
                 width: "180%",
-              }}
-            >
-              <thead style={{ position: "sticky", top: 0, zIndex: 101 }}>
+                }}
+              >
+              <thead style={{ 
+                position: "sticky", 
+                top: isFullscreen ? 0 : 0, 
+                zIndex: 101,
+                backgroundColor: "white",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+              }}>
 
                 <tr className="logsHeader Text16N1">
                   <th className="tableBody sticky-column ">Couple Location</th>
@@ -687,8 +1835,9 @@ function ListView(props) {
                       <IoIosArrowRoundDown
                         style={{ color: "#666DFF" }}
                         onClick={() => {
-                          setAscending(false);
-                          applySorting(false);
+                          console.log("ascending", ascending, !ascending);
+                          setAscending(true);
+                          applySorting(true);
                         }}
                         className="fs-4 cursor-pointer"
                       />
@@ -697,8 +1846,8 @@ function ListView(props) {
                         style={{ color: "#666DFF" }}
                         className="fs-4 cursor-pointer"
                         onClick={() => {
-                          setAscending(true);
-                          applySorting(true);
+                          setAscending(false);
+                          applySorting(false);
                         }}
                       />
                     )}
@@ -1454,47 +2603,20 @@ function ListView(props) {
                 })}
               </tbody>
             </Table>
+            
             {loading && <Spinner />}
             {!hasMore && (
               <div className="d-flex my-3 justify-content-center align-items-center">
                 <div>No more data to load.</div>
               </div>
             )}
-            {/* {!loading && hasMore && (
-              <div className="d-flex my-3 justify-content-center align-items-center">
-                <button
-                  onClick={() => fetchEvents()}
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "#666DFF", marginLeft: "5px" }}
-                >
-                  Load More
-                </button>
-              </div>
-            )} */}
+            
           </div>
-          <Overlay
-            rootClose={true}
-            onHide={() => {
-              setShow(false);
-              setUpdateData(!updateData);
-            }}
-            target={target.current}
-            show={show}
-            placement="bottom"
-          >
-            <div style={{ width: "300px", zIndex: 102 }}>
-              <RangeCalendarFilter startDate={startDate} setMonthForData={setMonthForData} updateStartDate={setStartDate} updateEndDate={setEndDate} endDate={endDate} />
-              {/* <CalenderMultiListView
-                monthForData={monthForData}
-                dateForFilter={dateForFilter}
-                yearForData={yearForData}
-                setShow={setShow}
-                setMonthForData={setMonthForData}
-                setYearForData={setYearForData}
-                setDateForFilter={setDateForFilter}
-              /> */}
-            </div>
-          </Overlay>
+
+          {/* Normal mode calendar overlay */}
+
+          
+
         </>
       ) : (
         <div
@@ -1506,12 +2628,12 @@ function ListView(props) {
       )}
 
       <Modal
-        className="bg-white"
-        style={{ borderRadius: "10px" }}
-        isOpen={newEventModel}
-        centered={true}
-        size="lg"
-      >
+          className="bg-white"
+          isOpen={newEventModel}
+          centered={true}
+          size="lg"
+          zIndex={999999999}
+        >
         <ModalHeader>Event Details</ModalHeader>
         <Form
           onSubmit={(e) => {
@@ -1592,14 +2714,14 @@ function ListView(props) {
                   <img alt="" src={CalenderImg} />
                 </div>
                 {showCalender && (
-                  <div
-                    style={{
-                      zIndex: "5",
-                      width: "300px",
-                      right: "5px",
-                    }}
-                    className="position-absolute top-5 right-5"
-                  >
+                    <div
+                      style={{
+                        zIndex: isFullscreen ? "10002" : "10001",
+                        width: "300px",
+                        right: "5px",
+                      }}
+                      className="position-absolute top-5 right-5"
+                    >
                     <Calendar
                       CalenderPress={() => setShowCalender(false)}
                       onClickDay={(date) => {
@@ -1724,10 +2846,11 @@ function ListView(props) {
           </ModalFooter>
         </Form>
       </Modal>
+
     </>
   );
 }
-const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
+const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i, isFullscreen }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = (e) => {
     setTimeout(() => {
@@ -1745,7 +2868,7 @@ const ButtonWithHoverBox = ({ hoverText, setRowOfWarnig, i }) => {
   return (
     <div style={{ position: 'relative' }}>
       <IoIosWarning
-        className="fs-5 text-danger"
+        className={isFullscreen ? "fs-8 text-danger" : "fs-5 text-danger"}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />

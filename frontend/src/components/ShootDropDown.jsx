@@ -22,7 +22,8 @@ const ShootDropDown = memo((props) => {
     message,
     fromPreWed,
     preWedDetails,
-    eventsForShow
+    eventsForShow,
+    direction = "down" 
   } = props;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -89,7 +90,7 @@ const ShootDropDown = memo((props) => {
   return (
     <div className="d-flex" ref={dropdownRef}> {/* Apply ref to dropdown wrapper */}
       <ButtonDropdown>
-        <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+        <Dropdown isOpen={dropdownOpen} toggle={toggle} direction={direction}>
           <DropdownToggle
             className="DropDownBox tableDropdwn"
             style={{
