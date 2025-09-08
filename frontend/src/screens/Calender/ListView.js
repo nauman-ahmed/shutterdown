@@ -49,6 +49,7 @@ import RangeCalendarFilter from "../../components/common/RangeCalendarFilter";
 import { MdOutlinePhotoCameraFront } from "react-icons/md";
 import { MdPhotoCameraFront } from "react-icons/md";
 import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
+import { MdContentCopy, MdContentPaste } from "react-icons/md";
 
 const months = [
   "January",
@@ -117,6 +118,9 @@ function ListView(props) {
   const [clientId, setClientId] = useState(clientIdd);
   const [allClients, setAllClients] = useState([]);
   const [updateData, setUpdateData] = useState(false);
+  
+  // Copy/Paste functionality state
+  const [copiedRowData, setCopiedRowData] = useState(null);
 
   const toggle = () => {
     console.log('Calendar toggle clicked, current show state:', show);
@@ -579,6 +583,149 @@ function ListView(props) {
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
 
+  // Copy/Paste functionality
+  const copyRowData = (event) => {
+    // Extract data from the event object, excluding first 2 columns (Couple Location, Date) and last column (Team Assign)
+    // Only copy the team assignments (people), not the numeric counts
+    const dataToCopy = {
+      shootDirectors: event.shootDirectors || [],
+      choosenPhotographers: event.choosenPhotographers || [],
+      choosenCinematographers: event.choosenCinematographers || [],
+      droneFlyers: event.droneFlyers || [],
+      manager: event.manager || [],
+      assistants: event.assistants || [],
+      sameDayPhotoMakers: event.sameDayPhotoMakers || [],
+      sameDayVideoMakers: event.sameDayVideoMakers || [],
+    };
+    
+    setCopiedRowData(dataToCopy);
+    toast.success('Row data copied successfully!');
+  };
+
+  const pasteRowData = (targetIndex) => {
+    if (!copiedRowData) {
+      toast.error('No data to paste! Copy a row first.');
+      return;
+    }
+
+    const targetEvent = eventsForShow[targetIndex];
+    const mismatchedRoles = [];
+    
+    // First, validate that copied data has enough people for target requirements
+    Object.keys(copiedRowData).forEach(key => {
+      const copiedArray = copiedRowData[key];
+      const targetAllowedCount = getMaxAllowedCount(key, targetEvent);
+      
+      // Only check roles that have data to paste
+      // Allow pasting if copied data >= target requirement
+      // Block pasting if copied data < target requirement
+      if (copiedArray.length > 0 && copiedArray.length > targetAllowedCount) {
+        mismatchedRoles.push({
+          role: getRoleDisplayName(key),
+          copied: copiedArray.length,
+          target: targetAllowedCount
+        });
+      }
+    });
+    
+    // If copied data has fewer people than target needs, show error and don't paste
+    if (mismatchedRoles.length > 0) {
+      const mismatchDetails = mismatchedRoles.map(role => 
+        `${role.role}: copied ${role.copied}, target needs ${role.target}`
+      ).join(', ');
+      
+      toast.error(`Cannot paste: Not enough people! ${mismatchDetails}`);
+      return;
+    }
+    
+    // If validation passes, proceed with pasting
+    const updatedEvents = [...eventsForShow];
+    const finalTargetEvent = updatedEvents[targetIndex];
+    const truncatedRoles = [];
+    
+    // Apply copied data to target event, truncating if necessary
+    Object.keys(copiedRowData).forEach(key => {
+      const copiedArray = copiedRowData[key];
+      const targetAllowedCount = getMaxAllowedCount(key, finalTargetEvent);
+      
+      if (copiedArray.length > 0) {
+        if (copiedArray.length > targetAllowedCount) {
+          // Truncate if we have more people than needed
+          finalTargetEvent[key] = copiedArray.slice(0, targetAllowedCount);
+          truncatedRoles.push({
+            role: getRoleDisplayName(key),
+            copied: copiedArray.length,
+            allowed: targetAllowedCount,
+            truncated: copiedArray.length - targetAllowedCount
+          });
+        } else {
+          // Use all copied data if it fits within the limit
+          finalTargetEvent[key] = copiedArray;
+        }
+      }
+    });
+    
+    setEventsForShow(updatedEvents);
+    
+    // Show appropriate success message
+    if (truncatedRoles.length > 0) {
+      const truncationDetails = truncatedRoles.map(role => 
+        `${role.role}: ${role.truncated} removed (${role.copied} → ${role.allowed})`
+      ).join(', ');
+      toast.success(`Data pasted successfully! ${truncationDetails}`);
+    } else {
+      toast.success('Row data pasted successfully!');
+    }
+  };
+
+  // Helper function to get the maximum allowed count for each role
+  const getMaxAllowedCount = (roleKey, event) => {
+    switch (roleKey) {
+      case 'shootDirectors':
+        return Number(event.shootDirector) || 0;
+      case 'choosenPhotographers':
+        return Number(event.photographers) || 0;
+      case 'choosenCinematographers':
+        return Number(event.cinematographers) || 0;
+      case 'droneFlyers':
+        return Number(event.drones) || 0;
+      case 'manager':
+        return 1; // Manager is always limited to 1
+      case 'assistants':
+        return 4; // Assistants are limited to 4
+      case 'sameDayPhotoMakers':
+        return Number(event.sameDayPhotoEditors) || 0;
+      case 'sameDayVideoMakers':
+        return Number(event.sameDayVideoEditors) || 0;
+      default:
+        return 0;
+    }
+  };
+
+  // Helper function to get display names for roles
+  const getRoleDisplayName = (roleKey) => {
+    switch (roleKey) {
+      case 'shootDirectors':
+        return 'Shoot Directors';
+      case 'choosenPhotographers':
+        return 'Photographers';
+      case 'choosenCinematographers':
+        return 'Cinematographers';
+      case 'droneFlyers':
+        return 'Drone Flyers';
+      case 'manager':
+        return 'Manager';
+      case 'assistants':
+        return 'Assistants';
+      case 'sameDayPhotoMakers':
+        return 'Same Day Photo Makers';
+      case 'sameDayVideoMakers':
+        return 'Same Day Video Makers';
+      default:
+        return roleKey;
+    }
+  };
+
   const filterByNameHanler = (idOfClient) => {
     console.log(idOfClient);
 
@@ -889,6 +1036,9 @@ function ListView(props) {
                       </th>
                       <th className="tableBody">Same Day Photos</th>
                       <th className="tableBody">Same Day Videos</th>
+                      {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
+                        <th className="tableBody">Copy/Paste</th>
+                      )}
                       {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                         <th className="tableBody">Team Assign</th>
                       )}
@@ -1452,6 +1602,46 @@ function ListView(props) {
                                       </div>
                                   </td>
                                   <td className="tablePlaceContent">
+                                    <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center', justifyContent: 'center' }}>
+                                      <button
+                                        style={{
+                                          backgroundColor: "#2196F3",
+                                          color: "white",
+                                          borderRadius: "3px",
+                                          border: "none",
+                                          height: "25px",
+                                          width: "25px",
+                                          cursor: "pointer",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center"
+                                        }}
+                                        onClick={() => copyRowData(event)}
+                                        title="Copy row data"
+                                      >
+                                        <MdContentCopy size={16} />
+                                      </button>
+                                      <button
+                                        style={{
+                                          backgroundColor: "#4CAF50",
+                                          color: "white",
+                                          borderRadius: "3px",
+                                          border: "none",
+                                          height: "25px",
+                                          width: "25px",
+                                          cursor: "pointer",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center"
+                                        }}
+                                        onClick={() => pasteRowData(index)}
+                                        title="Paste row data"
+                                      >
+                                        <MdContentPaste size={16} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td className="tablePlaceContent">
                                     <button
                                       style={{
                                         backgroundColor: "#FFDADA",
@@ -1875,6 +2065,9 @@ function ListView(props) {
                   </th>
                   <th className="tableBody">Same Day Photos</th>
                   <th className="tableBody">Same Day Videos</th>
+                  {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
+                    <th className="tableBody">Copy/Paste</th>
+                  )}
                   {(currentUser.rollSelect === "Manager" || currentUser?.rollSelect === "Production Manager") && (
                     <th className="tableBody">Team Assign</th>
                   )}
@@ -2398,6 +2591,46 @@ function ListView(props) {
                                       {user.firstName} {user.lastName}
                                     </p>
                                   ))}
+                              </td>
+                              <td className="tablePlaceContent">
+                                <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center', justifyContent: 'center' }}>
+                                  <button
+                                    style={{
+                                      backgroundColor: "#2196F3",
+                                      color: "white",
+                                      borderRadius: "3px",
+                                      border: "none",
+                                      height: "25px",
+                                      width: "25px",
+                                      cursor: "pointer",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center"
+                                    }}
+                                    onClick={() => copyRowData(event)}
+                                    title="Copy row data"
+                                  >
+                                    <MdContentCopy size={16} />
+                                  </button>
+                                  <button
+                                    style={{
+                                      backgroundColor: "#4CAF50",
+                                      color: "white",
+                                      borderRadius: "3px",
+                                      border: "none",
+                                      height: "25px",
+                                      width: "25px",
+                                      cursor: "pointer",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center"
+                                    }}
+                                    onClick={() => pasteRowData(index)}
+                                    title="Paste row data"
+                                  >
+                                    <MdContentPaste size={16} />
+                                  </button>
+                                </div>
                               </td>
                               <td className="tablePlaceContent">
                                 <button
