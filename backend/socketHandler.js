@@ -30,6 +30,10 @@ module.exports = (server) => {
         }
       }
     });
+    socket.on("updated-events", async (data) => {
+      console.log("get events data", data);
+      io.emit("received-updated-events", data);
+    });
     socket.on("read-notification", async (data) => {
       console.log("read-request");
       await Notification.findByIdAndUpdate(data._id, data);

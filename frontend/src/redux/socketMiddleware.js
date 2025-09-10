@@ -1,6 +1,7 @@
 import BASE_URL from "../API";
 import { io } from "socket.io-client";
 import { addNewNotification, updateReadNotification } from "./notificationsSlice";
+import { triggerEventsRefresh } from "./eventsSlice";
 
 let socketInstance = null; // Socket instance initialized as null
 
@@ -18,13 +19,18 @@ const socketMiddleware = (store) => (next) => (action) => {
       socketInstance.on("receive-notification", (notification) => {
         store.dispatch(addNewNotification(notification));
       });
+      socketInstance.on("received-updated-events", (data) => {
+        console.log("received-updated-events and dispatching", data);
+        // Dispatch action to trigger events refresh
+        store.dispatch(triggerEventsRefresh());
+      });
     } else {
       console.log("Socket already connected");
     }
   }
 
   // Handle socket disconnection
-  if (action.type === "SOCKET_DISCONNECT") {
+  if (action.type === "SOCKET_DISCONNECT") { 
     if (socketInstance) {
       socketInstance.disconnect();
       socketInstance = null; // Reset the socket instance

@@ -76,6 +76,7 @@ const transport_icons = {
 function ListView(props) {
   const { clientIdd } = useParams();
   const allEvents = useSelector((state) => state.allEvents);
+  const refreshCounter = useSelector(state => state.eventsRefresh?.refreshCounter);
   const [eventsForShow, setEventsForShow] = useState(null);
   const { userData: currentUser } = useLoggedInUser();
   const [updatingIndex, setUpdatingIndex] = useState(null);
@@ -215,8 +216,10 @@ function ListView(props) {
     return sortedEvents;
   };
 
-  const getEventsData = async () => {
-    setLoading(true);
+  const getEventsData = async (loading = true) => {
+    if(loading) {
+      setLoading(true);
+    }
     try {
       const usersData = await getAllUsers();
       setDirectors(
@@ -325,12 +328,21 @@ function ListView(props) {
     } catch (error) {
       console.log(error);
     }
-    setLoading(false);
+    if(loading) {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     getEventsData();
   }, [updateData]);
+
+  // Listen for socket-triggered refresh
+  useEffect(() => {
+    if (refreshCounter > 0) {
+      getEventsData(false);
+    }
+  }, [refreshCounter]);
 
 
 
@@ -482,6 +494,17 @@ function ListView(props) {
             },
           },
         });
+      });
+      console.log("updated-events 10");
+      // Emit updated-events notification after all individual notifications are sent
+      dispatch({
+        type: "SOCKET_EMIT_EVENT",
+        payload: {
+          event: "updated-events",
+          data: {
+            message: "Event updated successfully!",
+          },
+        },
       });
     } catch (error) {
       toast.error("It seems like nothing to update");
