@@ -51,7 +51,7 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app)
 
-require("./socketHandler")(server)
+const { io, getConnectionCount } = require("./socketHandler")(server)
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -71,6 +71,16 @@ app.use('/', DailyTaskRouter);
 app.use('/eventOptions', EventOptionsRouter);
 app.use('/deliverableOptions', DeliverableOptionsRouter);
 app.use('/Whatsapp', WhatsappRouter);
+
+// API endpoint to get current socket connection count
+app.get('/api/connection-count', (req, res) => {
+  const count = getConnectionCount();
+  res.json({ 
+    connectedUsers: count,
+    timestamp: new Date().toISOString()
+  });
+});
+
 applyBackupSchedule()
 
 

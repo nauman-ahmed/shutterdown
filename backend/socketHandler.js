@@ -5,12 +5,22 @@ module.exports = (server) => {
     cors: "*",
   });
 
+  // Track connected users
+  let connectedUsers = 0;
+
   io.on("connection", (socket) => {
-    console.log('user connected');
+    connectedUsers++;
+    console.log(`User connected. Total connected users: ${connectedUsers}`);
     
+    // Broadcast updated connection count to all clients
+    io.emit("connection-count-update", { count: connectedUsers });
 
     socket.on("disconnect", () => {
-      console.log("user disconnected!");
+      connectedUsers--;
+      console.log(`User disconnected. Total connected users: ${connectedUsers}`);
+      
+      // Broadcast updated connection count to all clients
+      io.emit("connection-count-update", { count: connectedUsers });
     });
     socket.on("add-notification", async (data) => {
 
@@ -39,5 +49,13 @@ module.exports = (server) => {
       await Notification.findByIdAndUpdate(data._id, data);
       socket.emit("update-read-notification", data);
     });
+
+    // Handle request for current connection count
+    socket.on("get-connection-count", () => {
+      socket.emit("connection-count", { count: connectedUsers });
+    });
   });
+
+  // Return the io instance and connection count for external access
+  return { io, getConnectionCount: () => connectedUsers };
 };
