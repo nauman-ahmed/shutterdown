@@ -3,7 +3,6 @@ import { Table } from "reactstrap";
 import "../../assets/css/Profile.css";
 import Heart from "../../assets/Profile/Heart.svg";
 import { getClients, updateClient } from "../../API/Client";
-import Select from "react-select";
 import CalenderImg from "../../assets/Profile/Calender.svg";
 import { Overlay } from "react-bootstrap";
 import dayjs from "dayjs";
@@ -141,40 +140,17 @@ function CheckLists(props) {
   //   window.addEventListener("scroll", handleScroll);
   //   return () => window.removeEventListener("scroll", handleScroll);
   // }, [handleScroll]);
-  const yesNoOptions = [
-    {
-      label: "Yes",
-      value: "Yes",
-    },
-    {
-      label: "No",
-      value: "No",
-    },
-  ];
-
-  const customStyles = {
-    option: (defaultStyles, state) => ({
-      ...defaultStyles,
-      color: state.isSelected ? "white" : "black",
-      backgroundColor: state.isSelected ? "rgb(102, 109, 255)" : "#EFF0F5",
-    }),
-    control: (defaultStyles) => ({
-      ...defaultStyles,
-      backgroundColor: "#EFF0F5",
-      padding: "2px",
-      border: "none",
-    }),
-    singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#666DFF" }),
-  };
 
   const handleSaveData = async (index) => {
     try {
-      const client = allClients[index];
+      const client = clientsForShow[index];
+      console.log(clientsForShow[index], client);
       setUpdatingIndex(index);
       await updateClient(client);
       setUpdatingIndex(null);
     } catch (error) {
       console.log(error);
+      setUpdatingIndex(null);
     }
   };
 
@@ -224,9 +200,9 @@ function CheckLists(props) {
               <tr className="logsHeader Text16N1">
                 <th className="tableBody sticky-column">Client</th>
                 <th className="tableBody">WhatsApp Group</th>
-                <th className="tableBody">SOP Date</th>
-                <th className="tableBody">Questionnaire Date</th>
-                <th className="tableBody">Itinerary Status</th>
+                <th className="tableBody">SOP Sent</th>
+                <th className="tableBody">Questionnaire Sent</th>
+                <th className="tableBody">Itinerary Collected</th>
                 <th className="tableBody">Save</th>
               </tr>
             </thead>
@@ -267,30 +243,24 @@ function CheckLists(props) {
                           width: "170px",
                         }}
                       >
-                        <Select
-                          value={
-                            client.checklistDetails?.whatsAppGroup
-                              ? {
-                                value:
-                                  client?.checklistDetails?.whatsAppGroup,
-                                label:
-                                  client?.checklistDetails?.whatsAppGroup,
-                              }
-                              : null
-                          }
-                          onChange={(selected) => {
-                            const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails =
-                              client.checklistDetails || {};
-                            updatedClients[
-                              index
-                            ].checklistDetails.whatsAppGroup = selected.value;
-                            setAllClients(updatedClients);
-                          }}
-                          styles={customStyles}
-                          options={yesNoOptions}
-                          required
-                        />
+                        <div className="d-flex justify-content-center">
+                          <input
+                            type="checkbox"
+                            checked={client.checklistDetails?.whatsAppGroup === "Yes"}
+                            onChange={(e) => {
+                              const updatedClients = [...clientsForShow];
+                              updatedClients[index].checklistDetails =
+                                client.checklistDetails || {};
+                              updatedClients[index].checklistDetails.whatsAppGroup = 
+                                e.target.checked ? "Yes" : "No";
+                              setClientsForShow(updatedClients);
+                            }}
+                            style={{
+                              transform: "scale(1.5)",
+                              cursor: "pointer"
+                            }}
+                          />
+                        </div>
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
@@ -299,22 +269,23 @@ function CheckLists(props) {
                           paddingBottom: "15px",
                         }}
                       >
-                        <input
-                          type="Date"
-                          onChange={(e) => {
-                            const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails =
-                              client.checklistDetails || {};
-                            updatedClients[index].checklistDetails.sopSentDate =
-                              e.target.value;
-                            setAllClients(updatedClients);
-                          }}
-                          style={{
-                            border: "none",
-                            BackgroundColor: "transparent",
-                          }}
-                          value={client?.checklistDetails?.sopSentDate}
-                        />
+                        <div className="d-flex justify-content-center">
+                          <input
+                            type="checkbox"
+                            checked={client.checklistDetails?.sopSent === true}
+                            onChange={(e) => {
+                              const updatedClients = [...clientsForShow];
+                              updatedClients[index].checklistDetails =
+                                client.checklistDetails || {};
+                              updatedClients[index].checklistDetails.sopSent = e.target.checked;
+                              setClientsForShow(updatedClients);
+                            }}
+                            style={{
+                              transform: "scale(1.5)",
+                              cursor: "pointer"
+                            }}
+                          />
+                        </div>
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
@@ -323,21 +294,23 @@ function CheckLists(props) {
                           paddingBottom: "15px",
                         }}
                       >
-                        <input
-                          type="Date"
-                          onChange={(e) => {
-                            const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails =
-                              client.checklistDetails || {};
-                            updatedClients[
-                              index
-                            ].checklistDetails.questionsSentDate =
-                              e.target.value;
-                            setAllClients(updatedClients);
-                          }}
-                          style={{ border: "none" }}
-                          value={client?.checklistDetails?.questionsSentDate}
-                        />
+                        <div className="d-flex justify-content-center">
+                          <input
+                            type="checkbox"
+                            checked={client.checklistDetails?.questionnaireSent === true}
+                            onChange={(e) => {
+                              const updatedClients = [...clientsForShow];
+                              updatedClients[index].checklistDetails =
+                                client.checklistDetails || {};
+                              updatedClients[index].checklistDetails.questionnaireSent = e.target.checked;
+                              setClientsForShow(updatedClients);
+                            }}
+                            style={{
+                              transform: "scale(1.5)",
+                              cursor: "pointer"
+                            }}
+                          />
+                        </div>
                       </td>
                       <td
                         className="tableBody Text14Semi primary2"
@@ -347,33 +320,24 @@ function CheckLists(props) {
                           width: "170px",
                         }}
                       >
-                        <Select
-                          value={
-                            client.checklistDetails?.iternaryCollection
-                              ? {
-                                value:
-                                  client?.checklistDetails
-                                    ?.iternaryCollection,
-                                label:
-                                  client?.checklistDetails
-                                    ?.iternaryCollection,
-                              }
-                              : null
-                          }
-                          onChange={(selected) => {
-                            const updatedClients = [...allClients];
-                            updatedClients[index].checklistDetails =
-                              client.checklistDetails || {};
-                            updatedClients[
-                              index
-                            ].checklistDetails.iternaryCollection =
-                              selected.value;
-                            setAllClients(updatedClients);
-                          }}
-                          styles={customStyles}
-                          options={yesNoOptions}
-                          required
-                        />
+                        <div className="d-flex justify-content-center">
+                          <input
+                            type="checkbox"
+                            checked={client.checklistDetails?.iternaryCollection === "Yes"}
+                            onChange={(e) => {
+                              const updatedClients = [...clientsForShow];
+                              updatedClients[index].checklistDetails =
+                                client.checklistDetails || {};
+                              updatedClients[index].checklistDetails.iternaryCollection = 
+                                e.target.checked ? "Yes" : "No";
+                              setClientsForShow(updatedClients);
+                            }}
+                            style={{
+                              transform: "scale(1.5)",
+                              cursor: "pointer"
+                            }}
+                          />
+                        </div>
                       </td>
                       <td className="tableBody Text14Semi Primary2">
                         <button
