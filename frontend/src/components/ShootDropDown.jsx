@@ -60,7 +60,7 @@ const ShootDropDown = memo((props) => {
 
   const sameDateEvents = useMemo(() => {
     if (!allEvents || !currentEvent) return [];
-    return [...allEvents, ...eventsForShow].filter(
+    return [...eventsForShow].filter(
       event => event.eventDate === currentEvent.eventDate && event._id !== currentEvent._id
     );
   }, [allEvents, eventsForShow, currentEvent]);
