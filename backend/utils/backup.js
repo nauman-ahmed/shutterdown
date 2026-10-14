@@ -28,7 +28,7 @@ const authorizeGoogleDrive = async () => {
     try {
         const auth = new google.auth.GoogleAuth({
             credentials,
-            scopes: ["https://www.googleapis.com/auth/drive.file"],
+            scopes: ["https://www.googleapis.com/auth/drive"],
         });
         console.log('auth completed');
         return auth.getClient();
@@ -38,52 +38,55 @@ const authorizeGoogleDrive = async () => {
     }
 };
 
+// createBackupFolder was removed deliberately. When the configured folder was
+// unreachable it silently created a different one in the service account's own
+// Drive, so a misconfigured destination looked like a working backup. The
+// destination is now asserted up front and a bad one fails loudly.
+
 /**
- * Create a backup folder in Google Drive if it doesn't exist
+ * Verify the configured backup destination is a shared drive the service
+ * account can actually write to. Throws with a actionable message otherwise.
+ *
+ * A service account owns any file it creates and has no storage quota of its
+ * own, so uploading into a regular My Drive folder - even one shared with it -
+ * always fails with storageQuotaExceeded. Only a shared drive works, because
+ * there the drive owns the files rather than the creator.
+ *
  * @param {object} drive - Google Drive API instance
- * @returns {Promise<string>} - Folder ID
+ * @param {string} folderId - Destination folder ID
  */
-const createBackupFolder = async (drive) => {
-    try {
-        const folderMetadata = {
-            name: 'MongoDB Backups',
-            mimeType: 'application/vnd.google-apps.folder'
-        };
-
-        const folder = await drive.files.create({
-            resource: folderMetadata,
-            fields: 'id'
-        });
-
-        console.log(`Created backup folder with ID: ${folder.data.id}`);
-        return folder.data.id;
-    } catch (error) {
-        console.error('Error creating backup folder:', error);
-        throw error;
+const assertBackupFolder = async (drive, folderId) => {
+    if (!folderId) {
+        throw new Error("GOOGLE_BACKUP_FOLDER_ID is not set - nowhere to upload the backup to.");
     }
-};
 
-/**
- * Check if a folder exists and is accessible
- * @param {object} drive - Google Drive API instance
- * @param {string} folderId - Folder ID to check
- * @returns {Promise<boolean>} - Whether folder exists and is accessible
- */
-const checkFolderExists = async (drive, folderId) => {
+    let data;
     try {
-        await drive.files.get({
+        ({ data } = await drive.files.get({
             fileId: folderId,
-            fields: 'id,name'
-        });
-        return true;
+            fields: "id,name,driveId",
+            supportsAllDrives: true
+        }));
     } catch (error) {
         if (error.code === 404) {
-            console.log(`Folder ${folderId} not found`);
-            return false;
+            throw new Error(
+                `Backup folder ${folderId} not found. Share the shared drive with ` +
+                `${credentials.client_email} as Content manager, or correct GOOGLE_BACKUP_FOLDER_ID.`
+            );
         }
-        console.error('Error checking folder:', error);
-        return false;
+        throw error;
     }
+
+    if (!data.driveId) {
+        throw new Error(
+            `Backup folder "${data.name}" (${folderId}) is a regular My Drive folder, not a shared drive. ` +
+            `A service account cannot own files, so uploads there fail with storageQuotaExceeded. ` +
+            `Create a shared drive, add ${credentials.client_email} as Content manager, and set ` +
+            `GOOGLE_BACKUP_FOLDER_ID to its id (shared drive ids start with "0A").`
+        );
+    }
+
+    console.log(`Backup destination verified: shared drive folder "${data.name}"`);
 };
 
 /**
@@ -98,20 +101,8 @@ const uploadToGoogleDrive = async (filePath) => {
 
         const drive = google.drive({ version: "v3", auth });
         
-        // The problematic folder ID from your code
-        const originalFolderId = '14GqlsC6wgufsizP-qvw4O_dIBlQaWocQ';
-        let parentFolderId = null;
-
-        // Check if the original folder exists
-        const folderExists = await checkFolderExists(drive, originalFolderId);
-        
-        if (folderExists) {
-            parentFolderId = originalFolderId;
-            console.log('Using existing folder');
-        } else {
-            console.log('Original folder not accessible, creating new backup folder');
-            parentFolderId = await createBackupFolder(drive);
-        }
+        const parentFolderId = process.env.GOOGLE_BACKUP_FOLDER_ID;
+        await assertBackupFolder(drive, parentFolderId);
 
         const fileMetadata = {
             name: path.basename(filePath),
@@ -129,21 +120,20 @@ const uploadToGoogleDrive = async (filePath) => {
             resource: fileMetadata,
             media,
             fields: "id",
+            supportsAllDrives: true,
         });
 
         console.log(`Backup uploaded to Google Drive with file ID: ${res.data.id}`);
         
         // Save backup info to database
-        const newbackup = new BackupModel({ 
-            fileId: res.data.id, 
-            date: dayjs(new Date()).format('YYYY-MM-DD'), 
+        const newbackup = new BackupModel({
+            fileId: res.data.id,
+            date: dayjs(new Date()).format('YYYY-MM-DD'),
             fileName: path.basename(filePath),
-            parentFolderId: parentFolderId
         });
         await newbackup.save();
-        
-        await setFilePermissions(res.data.id);
-        
+
+        return res.data.id;
     } catch (error) {
         console.error('Error uploading to Google Drive:', error);
         throw error;
@@ -206,29 +196,9 @@ const backupDatabaseToGoogleDrive = async (dbName, backupPath) => {
     });
 };
 
-/**
- * Set file permissions on Google Drive
- * @param {string} fileId - The ID of the file
- * @returns {Promise<void>}
- */
-const setFilePermissions = async (fileId) => {
-    try {
-        const auth = await authorizeGoogleDrive();
-        const drive = google.drive({ version: "v3", auth });
-
-        await drive.permissions.create({
-            fileId: fileId,
-            requestBody: {
-                role: "reader",
-                type: "anyone",
-            },
-        });
-
-        console.log(`Permissions updated for file ID: ${fileId}`);
-    } catch (error) {
-        console.error(`Error setting permissions for file ${fileId}:`, error);
-        // Don't throw error here as the file upload was successful
-    }
-};
+// setFilePermissions was removed deliberately. It granted every uploaded backup
+// `role: reader, type: anyone`, making a full database export of client and
+// staff records readable by anyone holding the link. Access is now governed by
+// shared drive membership instead.
 
 module.exports = { backupDatabaseToGoogleDrive };

@@ -9,14 +9,20 @@ const { backupDatabaseToGoogleDrive } = require("../utils/backup");
 
 const makeNewBackup = async (req, res) => {
     try {
-        await backupDatabaseToGoogleDrive("shutterDown", "/tmp") 
-            .then(() => console.log("Backup and upload to Google Drive completed!"))
-            .catch((err) => console.error("Error during backup and upload:", err));
+        // No .catch() here on purpose. It used to swallow the failure, so this
+        // endpoint returned 200 with the PREVIOUS backup record and the UI
+        // reported success every time while nothing was being saved.
+        await backupDatabaseToGoogleDrive("shutterDown", "/tmp");
+        console.log("Backup and upload to Google Drive completed!");
+
         const recentBackup = await BackupModel.findOne().sort({ date: -1 });
         res.status(200).json(recentBackup);
     } catch (error) {
-        console.log(error);
-        res.status(500).json(error);
+        console.error("Backup failed:", error);
+        res.status(500).json({
+            message: "Backup failed",
+            reason: error?.errors?.[0]?.message || error?.message || "Unknown error",
+        });
     }
 };
 
