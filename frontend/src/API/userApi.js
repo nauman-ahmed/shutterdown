@@ -86,16 +86,15 @@ export const getLastBackupInfo = async () => {
 };
 
 export const makeBackup = async () => {
-  try {
-    const res = await axios.post(BASE_URL + "/newBackup", {
-      Headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (error) {
-    alert(error.toString());
-  }
+  // Deliberately not swallowing the error. Returning undefined on failure made
+  // the caller overwrite the last-backup state with nothing, and dayjs(undefined)
+  // renders as today - so a failed backup looked like a fresh one.
+  const res = await axios.post(BASE_URL + "/newBackup", {
+    Headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return res.data;
 };
 
 export const SignUpAPI = async (data) => {

@@ -23,11 +23,21 @@ function AccountCreated() {
     const backup = await getLastBackupInfo()
     setRecentBackup(backup)
   }
+  const [backupError, setBackupError] = useState(null)
   const handleNewBackup = async () => {
     setBackingUp(true)
-    const latestBackup = await makeBackup();
-    setRecentBackup(latestBackup)
-    setBackingUp(false)
+    setBackupError(null)
+    try {
+      const latestBackup = await makeBackup();
+      // Only replace what is shown if the backup actually produced a record.
+      if (latestBackup?.date) setRecentBackup(latestBackup)
+    } catch (error) {
+      setBackupError(
+        error?.response?.data?.reason || error?.message || "Backup failed"
+      )
+    } finally {
+      setBackingUp(false)
+    }
   }
   useEffect(() => {
     getUsertAccountRequestCountHandler()
@@ -95,8 +105,18 @@ function AccountCreated() {
             
             {backingUp ? "In progress.." : "Backup" }
           </button>
-          <span>Last : {dayjs(recentBackup?.date).format('YYYY-MM-DD')} <a target="_blank" href={`https://drive.google.com/file/d/${recentBackup?.fileId}/view?usp=sharing`}><LuExternalLink className="fs-4" /></a></span>
+          <span>
+            Last : {recentBackup?.date ? dayjs(recentBackup.date).format('YYYY-MM-DD') : "never"}
+            {recentBackup?.fileId && (
+              <a target="_blank" rel="noreferrer" href={`https://drive.google.com/file/d/${recentBackup.fileId}/view?usp=sharing`}><LuExternalLink className="fs-4" /></a>
+            )}
+          </span>
         </div>
+        {backupError && (
+          <div style={{ color: "#b3261e", fontSize: "0.85rem", marginTop: "8px", maxWidth: "420px" }}>
+            Backup failed: {backupError}
+          </div>
+        )}
       </div>
     </>
   );
